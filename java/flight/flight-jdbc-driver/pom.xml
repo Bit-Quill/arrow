@@ -93,7 +93,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>${dep.protobuf.version}</version>
+            <version>${dep.protobuf-bom.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
