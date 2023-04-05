@@ -24,9 +24,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.arrow.driver.jdbc.utils.FlightStreamQueue;
@@ -50,10 +47,11 @@ public final class ArrowFlightJdbcFlightStreamResultSet
     extends ArrowFlightJdbcVectorSchemaRootResultSet {
 
   private final ArrowFlightConnection connection;
+  private FlightStream currentFlightStream;
   private FlightStreamQueue flightStreamQueue;
 
   private VectorSchemaRootTransformer transformer;
-  private BlockingQueue<VectorSchemaRoot> vectorSchemaRoots = null;
+  private VectorSchemaRoot currentVectorSchemaRoot;
 
   private Schema schema;
 
@@ -88,7 +86,7 @@ public final class ArrowFlightJdbcFlightStreamResultSet
   static ArrowFlightJdbcFlightStreamResultSet fromFlightInfo(
       final ArrowFlightConnection connection,
       final FlightInfo flightInfo,
-      final VectorSchemaRootTransformer transformer) throws SQLException, InterruptedException {
+      final VectorSchemaRootTransformer transformer) throws SQLException {
     // Similar to how org.apache.calcite.avatica.util.ArrayFactoryImpl does
 
     final TimeZone timeZone = TimeZone.getDefault();
@@ -113,24 +111,11 @@ public final class ArrowFlightJdbcFlightStreamResultSet
     flightStreamQueue = createNewQueue(connection.getExecutorService());
   }
 
-  private FlightStream getNextFlightStream(final boolean isExecution) throws SQLException {
-    if (isExecution) {
-      final int statementTimeout = statement != null ? statement.getQueryTimeout() : 0;
-      return statementTimeout != 0 ?
-              flightStreamQueue.next(statementTimeout, TimeUnit.SECONDS) : flightStreamQueue.next();
-    } else {
-      return flightStreamQueue.next();
+  private void loadNewFlightStream() throws SQLException {
+    if (currentFlightStream != null) {
+      AutoCloseables.closeNoChecked(currentFlightStream);
     }
-  }
-
-  private CompletableFuture<FlightStream> getFutureNextFlightStream(final boolean isExecution) {
-    return CompletableFuture.supplyAsync(() -> {
-      try {
-        return getNextFlightStream(isExecution);
-      } catch (SQLException e) {
-        throw new RuntimeException(e);
-      }
-    });
+    this.currentFlightStream = getNextFlightStream(true);
   }
 
   @Override
@@ -139,76 +124,49 @@ public final class ArrowFlightJdbcFlightStreamResultSet
 
     if (flightInfo != null) {
       schema = flightInfo.getSchema();
-      try {
-        execute(flightInfo);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
+      execute(flightInfo);
     }
     return this;
   }
 
-  private void executeFlightStream(FlightStream currentFlightStream) throws SQLException, InterruptedException {
-    final VectorSchemaRoot originalRoot = currentFlightStream.getRoot();
-    executeVectorSchemaRoot(originalRoot);
-  }
-
-  private void execute(final FlightInfo flightInfo) throws SQLException, InterruptedException {
+  private void execute(final FlightInfo flightInfo) throws SQLException {
     loadNewQueue();
     flightStreamQueue.enqueue(connection.getClientHandler().getStreams(flightInfo));
-    FlightStream currentFlightStream = getNextFlightStream(true);
+    loadNewFlightStream();
 
     // Ownership of the root will be passed onto the cursor.
     if (currentFlightStream != null) {
-      executeFlightStream(currentFlightStream);
+      executeForCurrentFlightStream();
     }
   }
 
-  private void executeVectorSchemaRoot(VectorSchemaRoot originalRoot) throws SQLException, InterruptedException {
+  private void executeForCurrentFlightStream() throws SQLException {
+    final VectorSchemaRoot originalRoot = currentFlightStream.getRoot();
+
     if (transformer != null) {
       try {
-        vectorSchemaRoots.put(transformer.transform(originalRoot, vectorSchemaRoots.take()));
+        currentVectorSchemaRoot = (transformer.transform(originalRoot, currentVectorSchemaRoot));
       } catch (final Exception e) {
         throw new SQLException("Failed to transform VectorSchemaRoot.", e);
       }
     } else {
-      vectorSchemaRoots.put(originalRoot);
+      currentVectorSchemaRoot= originalRoot;
     }
 
     if (schema != null) {
-      execute(vectorSchemaRoots.take(), schema);
+      execute(currentVectorSchemaRoot, schema);
     } else {
-      execute(vectorSchemaRoots.take());
+      execute(currentVectorSchemaRoot);
     }
   }
 
-
   @Override
   public boolean next() throws SQLException {
-    // If vectorSchemaRoots has been initalised
-    if (vectorSchemaRoots != null)
-    {
-      // If there are no more vectorSchemaRoots in the queue
-      if (vectorSchemaRoots.isEmpty())
-      {
-        return false;
-      }
-      // If there are vectorSchemaRoots in the queue
-      else
-      {
-        // Try taking vectorSchemaRoot from queue
-        try {
-          // Try executing currentVectorSchemaRoot
-          try (VectorSchemaRoot currentVectorSchemaRoot = vectorSchemaRoots.take()) {
-            executeVectorSchemaRoot(currentVectorSchemaRoot);
-            return true;
-          }
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
-        }
-      }
-
-      // If past max rows
+    if (currentVectorSchemaRoot == null) {
+      return false;
+    }
+    while (true) {
+      final boolean hasNext = super.next();
       final int maxRows = statement != null ? statement.getMaxRows() : 0;
       if (maxRows != 0 && this.getRow() > maxRows) {
         if (statement.isCloseOnCompletion()) {
@@ -217,21 +175,43 @@ public final class ArrowFlightJdbcFlightStreamResultSet
         return false;
       }
 
-    }
-    //vectorSchemaRoots not filled up yet (initialisation)
-    else{
-      vectorSchemaRoots = new ArrayBlockingQueue<VectorSchemaRoot>(5);
-      while(){
-
+      if (hasNext) {
+        return true;
       }
+
+      if (currentFlightStream != null) {
+        currentFlightStream.getRoot().clear();
+        if (currentFlightStream.next()) {
+          executeForCurrentFlightStream();
+          continue;
+        }
+
+        flightStreamQueue.enqueue(currentFlightStream);
+      }
+
+      currentFlightStream = getNextFlightStream(false);
+
+      if (currentFlightStream != null) {
+        executeForCurrentFlightStream();
+        continue;
+      }
+
+      if (statement != null && statement.isCloseOnCompletion()) {
+        statement.close();
+      }
+
+      return false;
     }
-
-
   }
 
   @Override
   protected void cancel() {
     super.cancel();
+    final FlightStream currentFlightStream = this.currentFlightStream;
+    if (currentFlightStream != null) {
+      currentFlightStream.cancel("Cancel", null);
+    }
+
     if (flightStreamQueue != null) {
       try {
         flightStreamQueue.close();
@@ -245,8 +225,11 @@ public final class ArrowFlightJdbcFlightStreamResultSet
   public synchronized void close() {
     try {
       if (flightStreamQueue != null) {
-        // flightStreamQueue should close contained Flight Streams internally
+        // flightStreamQueue should close currentFlightStream internally
         flightStreamQueue.close();
+      } else if (currentFlightStream != null) {
+        // close is only called for currentFlightStream if there's no queue
+        currentFlightStream.close();
       }
     } catch (final Exception e) {
       throw new RuntimeException(e);
@@ -255,6 +238,13 @@ public final class ArrowFlightJdbcFlightStreamResultSet
     }
   }
 
+  private FlightStream getNextFlightStream(final boolean isExecution) throws SQLException {
+    if (isExecution) {
+      final int statementTimeout = statement != null ? statement.getQueryTimeout() : 0;
+      return statementTimeout != 0 ?
+          flightStreamQueue.next(statementTimeout, TimeUnit.SECONDS) : flightStreamQueue.next();
+    } else {
+      return flightStreamQueue.next();
+    }
+  }
 }
-
-
