@@ -424,6 +424,76 @@ TEST_F(TestParquetFileSystemDataset, WriteWithEmptyPartitioningSchema) {
   TestWriteWithEmptyPartitioningSchema();
 }
 
+class TestParquetFileSystemDatasetAllTypes : public WriteFileSystemDatasetMixin,
+                                             public testing::Test {
+ public:
+  void SetUp() override {
+    MakeSourceDataset();
+    check_metadata_ = false;
+    auto parquet_format = std::make_shared<ParquetFileFormat>();
+    format_ = parquet_format;
+    SetWriteOptions(parquet_format->DefaultWriteOptions());
+  }
+
+  std::shared_ptr<Schema> GetSourceSchema() const override {
+    return std::shared_ptr<Schema>(schema({
+        field("null", null()),
+        field("int8", int8()),
+        field("int16", int16()),
+        field("int32", int32()),
+        field("int64", int64()),
+        field("uint8", uint8()),
+        field("uint16", uint16()),
+        field("uint32", uint32()),
+        field("uint64", uint64()),
+        field("float16", float16()),
+        field("float32", float32()),
+        field("float64", float64()),
+        field("utf8", utf8()),
+        field("large_utf8", large_utf8()),
+        field("binary", binary()),
+        field("large_binary", large_binary()),
+        field("date32", date32()),
+        field("date64", date64()),
+        field("fixed_size_binary", fixed_size_binary(10)),
+        field("decimal128", decimal128(5, 1)),
+        field("decimal256", decimal256(40, 10)),
+        field("list", list(int32())),
+        field("large_list", large_list(int32())),
+        field("map", map(int32(), int64())),
+        field("fixed_size_list", fixed_size_list(int32(), 10)),
+        field("duration", duration(TimeUnit::MILLI)),
+        field("day_time_interval", day_time_interval()),
+        field("month_interval", month_interval()),
+        field("month_day_nano_interval", month_day_nano_interval()),
+        field("timestamp", timestamp(TimeUnit::MILLI)),
+        field("timestamp", timestamp(TimeUnit::MILLI, "UTC")),
+
+    }));
+  }
+
+  PathAndContent GetSourceFiles() const override {
+
+  };
+
+};
+
+TEST_F(TestParquetFileSystemDataset, WriteWithIdenticalPartitioningSchema) {
+  TestWriteWithIdenticalPartitioningSchema();
+}
+
+TEST_F(TestParquetFileSystemDataset, WriteWithUnrelatedPartitioningSchema) {
+  TestWriteWithUnrelatedPartitioningSchema();
+}
+
+TEST_F(TestParquetFileSystemDataset, WriteWithSupersetPartitioningSchema) {
+  TestWriteWithSupersetPartitioningSchema();
+}
+
+TEST_F(TestParquetFileSystemDataset, WriteWithEmptyPartitioningSchema) {
+  TestWriteWithEmptyPartitioningSchema();
+}
+
 class TestParquetFileFormatScan : public FileFormatScanMixin<ParquetFormatHelper> {
  public:
   std::shared_ptr<RecordBatch> SingleBatch(std::shared_ptr<Fragment> fragment) {

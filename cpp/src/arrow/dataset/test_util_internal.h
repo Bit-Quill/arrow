@@ -1868,7 +1868,7 @@ class WriteFileSystemDatasetMixin : public MakeFileSystemDatasetMixin {
  public:
   using PathAndContent = std::unordered_map<std::string, std::string>;
 
-  void MakeSourceDataset() {
+  virtual PathAndContent GetSourceFiles() const {
     PathAndContent source_files;
 
     source_files["/dataset/year=2018/month=01/dat0.json"] = R"([
@@ -1896,22 +1896,29 @@ class WriteFileSystemDatasetMixin : public MakeFileSystemDatasetMixin {
         {"region": "QC", "model": "Y", "sales": 37, "country": "CA"}
       ])";
     source_files["/dataset/.pesky"] = "garbage content";
+    return source_files;
+  }
 
-    auto mock_fs = std::make_shared<fs::internal::MockFileSystem>(fs::kNoTime);
-    for (const auto& f : source_files) {
-      ARROW_EXPECT_OK(mock_fs->CreateFile(f.first, f.second, /* recursive */ true));
-    }
-    fs_ = mock_fs;
-
-    /// schema for the whole dataset (both source and destination)
-    source_schema_ = schema({
+  virtual std::shared_ptr<Schema> GetSourceSchema() const {
+    return std::shared_ptr<Schema>(schema({
         field("region", utf8()),
         field("model", utf8()),
         field("sales", float64()),
         field("year", int32()),
         field("month", int32()),
         field("country", utf8()),
-    });
+    }));
+  }
+
+  void MakeSourceDataset() {
+    auto mock_fs = std::make_shared<fs::internal::MockFileSystem>(fs::kNoTime);
+    for (const auto& f : GetSourceFiles()) {
+      ARROW_EXPECT_OK(mock_fs->CreateFile(f.first, f.second, /* recursive */ true));
+    }
+    fs_ = mock_fs;
+
+    /// schema for the whole dataset (both source and destination)
+    source_schema_ = GetSourceSchema();
 
     /// Dummy file format for source dataset. Note that it isn't partitioned on country
     auto source_format = std::make_shared<JSONRecordBatchFileFormat>(
@@ -1966,7 +1973,7 @@ class WriteFileSystemDatasetMixin : public MakeFileSystemDatasetMixin {
     ASSERT_OK_AND_ASSIGN(written_, factory->Finish());
   }
 
-  void TestWriteWithIdenticalPartitioningSchema() {
+  virtual void TestWriteWithIdenticalPartitioningSchema() {
     DoWrite(std::make_shared<DirectoryPartitioning>(
         SchemaFromColumnNames(source_schema_, {"year", "month"})));
 
@@ -1996,7 +2003,7 @@ class WriteFileSystemDatasetMixin : public MakeFileSystemDatasetMixin {
     AssertWrittenAsExpected();
   }
 
-  void TestWriteWithUnrelatedPartitioningSchema() {
+  virtual void TestWriteWithUnrelatedPartitioningSchema() {
     DoWrite(std::make_shared<DirectoryPartitioning>(
         SchemaFromColumnNames(source_schema_, {"country", "region"})));
 
@@ -2030,7 +2037,7 @@ class WriteFileSystemDatasetMixin : public MakeFileSystemDatasetMixin {
     AssertWrittenAsExpected();
   }
 
-  void TestWriteWithSupersetPartitioningSchema() {
+  virtual void TestWriteWithSupersetPartitioningSchema() {
     DoWrite(std::make_shared<DirectoryPartitioning>(
         SchemaFromColumnNames(source_schema_, {"year", "month", "country", "region"})));
 
@@ -2065,7 +2072,7 @@ class WriteFileSystemDatasetMixin : public MakeFileSystemDatasetMixin {
     AssertWrittenAsExpected();
   }
 
-  void TestWriteWithEmptyPartitioningSchema() {
+  virtual void TestWriteWithEmptyPartitioningSchema() {
     DoWrite(std::make_shared<DirectoryPartitioning>(
         SchemaFromColumnNames(source_schema_, {})));
 
