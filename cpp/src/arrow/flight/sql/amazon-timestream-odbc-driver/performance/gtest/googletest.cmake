@@ -20,34 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Modifications Copyright Amazon.com, Inc. or its affiliates. 
+# Modifications Copyright Amazon.com, Inc. or its affiliates.
 # SPDX-License-Identifier: MIT.
 
 macro(fetch_googletest _download_module_path _download_root)
-    set(GOOGLETEST_DOWNLOAD_ROOT ${_download_root})
-    configure_file(
-        ${_download_module_path}/googletest-download.cmake
-        ${_download_root}/CMakeLists.txt
-        @ONLY
-        )
-    unset(GOOGLETEST_DOWNLOAD_ROOT)
+  set(GOOGLETEST_DOWNLOAD_ROOT ${_download_root})
+  configure_file(${_download_module_path}/googletest-download.cmake
+                 ${_download_root}/CMakeLists.txt @ONLY)
+  unset(GOOGLETEST_DOWNLOAD_ROOT)
 
-    execute_process(
-        COMMAND
-            "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-        WORKING_DIRECTORY
-            ${_download_root}
-        )
-    execute_process(
-        COMMAND
-            "${CMAKE_COMMAND}" --build .
-        WORKING_DIRECTORY
-            ${_download_root}
-        )
+  execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+                  WORKING_DIRECTORY ${_download_root})
+  execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+                  WORKING_DIRECTORY ${_download_root})
 
-    # adds the targers: gtest, gtest_main, gmock, gmock_main
-    add_subdirectory(
-        ${_download_root}/googletest-src EXCLUDE_FROM_ALL
-        ${_download_root}/googletest-build EXCLUDE_FROM_ALL
-        )
+  # adds the targers: gtest, gtest_main, gmock, gmock_main
+  add_subdirectory(${_download_root}/googletest-src EXCLUDE_FROM_ALL
+                   ${_download_root}/googletest-build EXCLUDE_FROM_ALL)
 endmacro()
