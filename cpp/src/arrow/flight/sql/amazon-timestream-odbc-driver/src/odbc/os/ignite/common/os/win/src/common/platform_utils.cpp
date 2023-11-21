@@ -17,8 +17,8 @@
 
 #include <Windows.h>
 #include <ignite/common/include/common/platform_utils.h>
-#include <timestream/odbc/utility.h>
 #include <time.h>
+#include <timestream/odbc/utility.h>
 
 #include <vector>
 
@@ -37,13 +37,9 @@ time_t IgniteTimeLocal(const tm& time) {
   return mktime(&tmc);
 }
 
-bool IgniteGmTime(time_t in, tm& out) {
-  return gmtime_s(&out, &in) == 0;
-}
+bool IgniteGmTime(time_t in, tm& out) { return gmtime_s(&out, &in) == 0; }
 
-bool IgniteLocalTime(time_t in, tm& out) {
-  return localtime_s(&out, &in) == 0;
-}
+bool IgniteLocalTime(time_t in, tm& out) { return localtime_s(&out, &in) == 0; }
 
 std::string GetEnv(const std::string& name) {
   static const std::string empty;
@@ -58,11 +54,10 @@ std::string GetEnv(const std::string& name, const std::string& dflt) {
   DWORD envRes =
       GetEnvironmentVariableW(wname.c_str(), res, sizeof(res) / sizeof(res[0]));
 
-  if (envRes == 0 || envRes > sizeof(res))
-    return dflt;
+  if (envRes == 0 || envRes > sizeof(res)) return dflt;
 
   return timestream::odbc::utility::ToUtf8(
-      std::wstring(res, static_cast< size_t >(envRes)));
+      std::wstring(res, static_cast<size_t>(envRes)));
 }
 
 bool FileExists(const std::string& path) {
@@ -70,8 +65,7 @@ bool FileExists(const std::string& path) {
 
   HANDLE hnd = FindFirstFileA(path.c_str(), &findres);
 
-  if (hnd == INVALID_HANDLE_VALUE)
-    return false;
+  if (hnd == INVALID_HANDLE_VALUE) return false;
 
   FindClose(hnd);
 
@@ -79,14 +73,12 @@ bool FileExists(const std::string& path) {
 }
 
 bool IsValidDirectory(const std::string& path) {
-  if (path.empty())
-    return false;
+  if (path.empty()) return false;
 
   std::wstring path0 = timestream::odbc::utility::FromUtf8(path);
   DWORD attrs = GetFileAttributesW(path0.c_str());
 
-  return attrs != INVALID_FILE_ATTRIBUTES
-         && (attrs & FILE_ATTRIBUTE_DIRECTORY) != 0;
+  return attrs != INVALID_FILE_ATTRIBUTES && (attrs & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 bool DeletePath(const std::string& path) {
@@ -124,7 +116,7 @@ StdCharOutStream& Dle(StdCharOutStream& ostr) {
 }
 
 IGNITE_IMPORT_EXPORT unsigned GetRandSeed() {
-  return static_cast< unsigned >(GetTickCount64() ^ GetCurrentProcessId());
+  return static_cast<unsigned>(GetTickCount64() ^ GetCurrentProcessId());
 }
 }  // namespace common
 }  // namespace odbc

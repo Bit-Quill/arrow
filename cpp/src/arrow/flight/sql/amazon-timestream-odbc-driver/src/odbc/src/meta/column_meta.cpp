@@ -20,11 +20,11 @@
 
 #include "timestream/odbc/meta/column_meta.h"
 
-#include "timestream/odbc/utils.h"
 #include "timestream/odbc/common_types.h"
 #include "timestream/odbc/log.h"
 #include "timestream/odbc/system/odbc_constants.h"
 #include "timestream/odbc/type_traits.h"
+#include "timestream/odbc/utils.h"
 
 #include <aws/timestream-query/model/Type.h>
 
@@ -76,7 +76,7 @@ const char* ColumnMeta::AttrIdToString(uint16_t id) {
 
 #undef DBG_STR_CASE
 
-SqlLen Nullability::ToSql(boost::optional< int32_t > nullability) {
+SqlLen Nullability::ToSql(boost::optional<int32_t> nullability) {
   if (!nullability) {
     LOG_WARNING_MSG(
         "nullability is not defined. Returning SQL_NULLABLE_UNKNOWN by "
@@ -156,8 +156,8 @@ void ColumnMeta::Read(app::ColumnBindingMap& columnBindings, int32_t position) {
     return;
   }
 
-  dataType = static_cast< int16_t >(
-      GetScalarDataType(itr->second.GetString(STRING_BUFFER_SIZE)));
+  dataType =
+      static_cast<int16_t>(GetScalarDataType(itr->second.GetString(STRING_BUFFER_SIZE)));
 
   itr = columnBindings.find(3);
   if (itr == columnBindings.end()) {
@@ -186,10 +186,9 @@ void ColumnMeta::ReadMetadata(const ColumnInfo& tsMetadata) {
   columnName = tsMetadata.GetName();
   LOG_DEBUG_MSG("columnName is " << columnName);
   if (columnType.ScalarTypeHasBeenSet()) {
-    dataType = static_cast< int16_t >(columnType.GetScalarType());
+    dataType = static_cast<int16_t>(columnType.GetScalarType());
   } else {
-    dataType = static_cast< int16_t >(
-        Aws::TimestreamQuery::Model::ScalarType::VARCHAR);
+    dataType = static_cast<int16_t>(Aws::TimestreamQuery::Model::ScalarType::VARCHAR);
   }
 }
 
@@ -203,30 +202,26 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
     case SQL_DESC_LABEL:
     case SQL_DESC_BASE_COLUMN_NAME:
     case SQL_DESC_NAME: {
-      if (columnName)
-        value = *columnName;
+      if (columnName) value = *columnName;
 
       break;
     }
 
     case SQL_DESC_TABLE_NAME:
     case SQL_DESC_BASE_TABLE_NAME: {
-      if (tableName)
-        value = *tableName;
+      if (tableName) value = *tableName;
 
       break;
     }
 
     case SQL_DESC_SCHEMA_NAME: {
-      if (schemaName)
-        value = *schemaName;
+      if (schemaName) value = *schemaName;
 
       break;
     }
 
     case SQL_DESC_CATALOG_NAME: {
-      if (catalogName)
-        value = *catalogName;
+      if (catalogName) value = *catalogName;
 
       break;
     }
@@ -247,7 +242,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
 
     case SQL_DESC_TYPE_NAME:
     case SQL_DESC_LOCAL_TYPE_NAME: {
-      if (boost::optional< std::string > val =
+      if (boost::optional<std::string> val =
               type_traits::BinaryTypeToSqlTypeName(dataType))
         value = *val;
       else
@@ -262,8 +257,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
       if (!precision || *precision == -1)
         retval = false;
       else
-        value =
-            timestream::odbc::common::LexicalCast< std::string >(*precision);
+        value = timestream::odbc::common::LexicalCast<std::string>(*precision);
 
       break;
     }
@@ -273,7 +267,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, std::string& value) const {
       if (!scale || *scale == -1)
         retval = false;
       else
-        value = timestream::odbc::common::LexicalCast< std::string >(*scale);
+        value = timestream::odbc::common::LexicalCast<std::string>(*scale);
 
       break;
     }
@@ -293,8 +287,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
   value = -1;
   switch (fieldId) {
     case SQL_DESC_FIXED_PREC_SCALE: {
-      if ((!precision || *precision == -1)
-          || (!scale || *scale == -1 || *scale == 0))
+      if ((!precision || *precision == -1) || (!scale || *scale == -1 || *scale == 0))
         value = SQL_FALSE;
       else
         value = SQL_TRUE;
@@ -322,8 +315,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
 
     case SQL_DESC_CONCISE_TYPE:
     case SQL_DESC_TYPE: {
-      if (boost::optional< int16_t > val =
-              type_traits::BinaryToSqlType(dataType))
+      if (boost::optional<int16_t> val = type_traits::BinaryToSqlType(dataType))
         value = *val;
 
       break;
@@ -334,16 +326,14 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
       // character string or binary data type
     case SQL_COLUMN_LENGTH:
     case SQL_DESC_DISPLAY_SIZE: {
-      if (boost::optional< int > val =
-              type_traits::BinaryTypeDisplaySize(dataType))
+      if (boost::optional<int> val = type_traits::BinaryTypeDisplaySize(dataType))
         value = *val;
 
       break;
     }
 
     case SQL_DESC_OCTET_LENGTH: {
-      if (boost::optional< int > val =
-              type_traits::BinaryTypeTransferLength(dataType)) {
+      if (boost::optional<int> val = type_traits::BinaryTypeTransferLength(dataType)) {
         value = *val;
       }
 
@@ -357,8 +347,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     }
 
     case SQL_DESC_NUM_PREC_RADIX: {
-      if (boost::optional< int > val =
-              type_traits::BinaryTypeNumPrecRadix(dataType))
+      if (boost::optional<int> val = type_traits::BinaryTypeNumPrecRadix(dataType))
         value = *val;
 
       break;
@@ -367,8 +356,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     case SQL_DESC_PRECISION:
     case SQL_COLUMN_PRECISION: {
       if (dataType && (!precision || *precision == -1)) {
-        if (boost::optional< int > val =
-                type_traits::BinaryTypeColumnSize(dataType))
+        if (boost::optional<int> val = type_traits::BinaryTypeColumnSize(dataType))
           value = *val;
       } else if (precision)
         value = *precision;
@@ -378,8 +366,7 @@ bool ColumnMeta::GetAttribute(uint16_t fieldId, SqlLen& value) const {
     case SQL_DESC_SCALE:
     case SQL_COLUMN_SCALE: {
       if (dataType && (!scale || *scale == -1)) {
-        if (boost::optional< int16_t > val =
-                type_traits::BinaryTypeDecimalDigits(dataType))
+        if (boost::optional<int16_t> val = type_traits::BinaryTypeDecimalDigits(dataType))
           value = *val;
       } else if (scale)
         value = *scale;

@@ -23,9 +23,7 @@
 namespace timestream {
 namespace odbc {
 namespace meta {
-void TableMeta::Read(std::string& tbType) {
-  tableType = tbType;
-}
+void TableMeta::Read(std::string& tbType) { tableType = tbType; }
 }  // namespace meta
 }  // namespace odbc
 }  // namespace timestream

@@ -29,14 +29,12 @@ using namespace boost::unit_test;
  * Test setup fixture.
  */
 struct ConnectionStringParserUnitTestSuiteFixture : OdbcUnitTestSuite {
-  ConnectionStringParserUnitTestSuiteFixture() : OdbcUnitTestSuite() {
-  }
+  ConnectionStringParserUnitTestSuiteFixture() : OdbcUnitTestSuite() {}
 
   /**
    * Destructor.
    */
-  ~ConnectionStringParserUnitTestSuiteFixture() {
-  }
+  ~ConnectionStringParserUnitTestSuiteFixture() {}
 };
 
 const AuthType::Type testAuthType = AuthType::FromString("Aws_Profile");
@@ -53,9 +51,12 @@ BOOST_AUTO_TEST_CASE(TestParsingCredentials) {
   diagnostic::DiagnosticRecordStorage diag;
 
   std::string connectionString =
-            "driver={Amazon Timestream ODBC Driver};"
-            "auth=" + AuthType::ToString(testAuthType) + ";"
-            "profileName=" + profileName + ";";
+      "driver={Amazon Timestream ODBC Driver};"
+      "auth=" +
+      AuthType::ToString(testAuthType) +
+      ";"
+      "profileName=" +
+      profileName + ";";
 
   BOOST_CHECK_NO_THROW(parser.ParseConnectionString(connectionString, &diag));
 
@@ -72,8 +73,8 @@ BOOST_AUTO_TEST_CASE(TestParsingNoProvider) {
 
   std::string connectionString =
       "driver={Amazon Timestream ODBC Driver};"
-      "profileName="
-      + profileName + ";";
+      "profileName=" +
+      profileName + ";";
 
   BOOST_CHECK_NO_THROW(parser.ParseConnectionString(connectionString, &diag));
 
@@ -89,9 +90,12 @@ BOOST_AUTO_TEST_CASE(TestParsingEmptyCredentials) {
   diagnostic::DiagnosticRecordStorage diag;
 
   std::string connectionString =
-            "driver={Amazon Timestream ODBC Driver};"
-            "auth=" + AuthType::ToString(testAuthType) + ";"
-            "profileName=" + profileName + ";";
+      "driver={Amazon Timestream ODBC Driver};"
+      "auth=" +
+      AuthType::ToString(testAuthType) +
+      ";"
+      "profileName=" +
+      profileName + ";";
 
   BOOST_CHECK_NO_THROW(parser.ParseConnectionString(connectionString, &diag));
 
@@ -155,10 +159,9 @@ BOOST_AUTO_TEST_CASE(TestParsingConnectionTimeout) {
   BOOST_CHECK_NO_THROW(parser.ParseConnectionString(connectionString, &diag));
 
   BOOST_CHECK(diag.GetStatusRecordsNumber() == 2);
-  BOOST_CHECK_EQUAL(
-      diag.GetStatusRecord(2).GetMessageText(),
-      "Connection Timeout attribute value contains unexpected characters. "
-      "Using default value. [key='ConnectionTimeout', value='-1000']");
+  BOOST_CHECK_EQUAL(diag.GetStatusRecord(2).GetMessageText(),
+                    "Connection Timeout attribute value contains unexpected characters. "
+                    "Using default value. [key='ConnectionTimeout', value='-1000']");
 }
 
 BOOST_AUTO_TEST_CASE(TestParsingMaxRetryCountClient) {

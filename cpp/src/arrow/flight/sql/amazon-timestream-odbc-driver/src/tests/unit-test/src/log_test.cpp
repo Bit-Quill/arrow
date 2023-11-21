@@ -37,18 +37,16 @@ using timestream::odbc::OdbcUnitTestSuite;
  * Test setup fixture.
  */
 struct LogUnitTestSuiteFixture : OdbcUnitTestSuite {
-  LogUnitTestSuiteFixture() : OdbcUnitTestSuite() {
-  }
+  LogUnitTestSuiteFixture() : OdbcUnitTestSuite() {}
 
   /**
    * Destructor.
    */
-  ~LogUnitTestSuiteFixture() {
-  }
+  ~LogUnitTestSuiteFixture() {}
 
-  bool SaveLoggerVars(std::shared_ptr< Logger > logger,
-                      boost::optional< std::string >& origLogPath,
-                      boost::optional< LogLevel::Type >& origLogLevel) {
+  bool SaveLoggerVars(std::shared_ptr<Logger> logger,
+                      boost::optional<std::string>& origLogPath,
+                      boost::optional<LogLevel::Type>& origLogLevel) {
     if (logger->IsEnabled()) {
       origLogPath = logger->GetLogPath();
       origLogLevel = logger->GetLogLevel();
@@ -61,9 +59,9 @@ struct LogUnitTestSuiteFixture : OdbcUnitTestSuite {
     return false;
   }
 
-  void setLoggerVars(std::shared_ptr< Logger > logger,
-                     boost::optional< std::string >& origLogPath,
-                     boost::optional< LogLevel::Type >& origLogLevel) {
+  void setLoggerVars(std::shared_ptr<Logger> logger,
+                     boost::optional<std::string>& origLogPath,
+                     boost::optional<LogLevel::Type>& origLogLevel) {
     // pre-requiste: origLogPath and origLogLevel hold valid values
 
     logger->SetLogLevel(origLogLevel.get());
@@ -80,10 +78,10 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
   std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::DEBUG_LEVEL;
 
-  std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
+  std::shared_ptr<Logger> logger = Logger::GetLoggerInstance();
 
-  boost::optional< std::string > origLogPath;
-  boost::optional< LogLevel::Type > origLogLevel;
+  boost::optional<std::string> origLogPath;
+  boost::optional<LogLevel::Type> origLogLevel;
   bool logVarSaved = SaveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
@@ -153,8 +151,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamCreatedOnDefaultInstance) {
       "expected.");
 
   // set the original log level / log path back
-  if (logVarSaved)
-    setLoggerVars(logger, origLogPath, origLogLevel);
+  if (logVarSaved) setLoggerVars(logger, origLogPath, origLogLevel);
 }
 
 BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
@@ -164,11 +161,11 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::INFO_LEVEL;
 
-  std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
+  std::shared_ptr<Logger> logger = Logger::GetLoggerInstance();
 
   // save the original log path / log level
-  boost::optional< std::string > origLogPath;
-  boost::optional< LogLevel::Type > origLogLevel;
+  boost::optional<std::string> origLogPath;
+  boost::optional<LogLevel::Type> origLogLevel;
   bool logVarSaved = SaveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
@@ -235,12 +232,10 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithInfoLevel) {
   // Check that the debug log is not logged
   BOOST_CHECK_EQUAL(std::string::npos, stringStream.str().find(testData));
 
-  LOG_INFO_MSG(
-      "TestLogStreamWithInfoLevel ends. Log path/level changes are expected.");
+  LOG_INFO_MSG("TestLogStreamWithInfoLevel ends. Log path/level changes are expected.");
 
   // set the original log level / log path back
-  if (logVarSaved)
-    setLoggerVars(logger, origLogPath, origLogLevel);
+  if (logVarSaved) setLoggerVars(logger, origLogPath, origLogLevel);
 }
 
 BOOST_AUTO_TEST_CASE(TestLogStreamWithWarningLevel) {
@@ -250,11 +245,11 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithWarningLevel) {
   std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::WARNING_LEVEL;
 
-  std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
+  std::shared_ptr<Logger> logger = Logger::GetLoggerInstance();
 
   // save the original log path / log level
-  boost::optional< std::string > origLogPath;
-  boost::optional< LogLevel::Type > origLogLevel;
+  boost::optional<std::string> origLogPath;
+  boost::optional<LogLevel::Type> origLogLevel;
   bool logVarSaved = SaveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
@@ -333,8 +328,7 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithWarningLevel) {
       "expected.");
 
   // set the original log level / log path back
-  if (logVarSaved)
-    setLoggerVars(logger, origLogPath, origLogLevel);
+  if (logVarSaved) setLoggerVars(logger, origLogPath, origLogLevel);
 }
 
 BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
@@ -344,11 +338,11 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
   std::string logPath = DEFAULT_LOG_PATH;
   LogLevel::Type logLevel = LogLevel::Type::ERROR_LEVEL;
 
-  std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
+  std::shared_ptr<Logger> logger = Logger::GetLoggerInstance();
 
   // save the original log path / log level
-  boost::optional< std::string > origLogPath;
-  boost::optional< LogLevel::Type > origLogLevel;
+  boost::optional<std::string> origLogPath;
+  boost::optional<LogLevel::Type> origLogLevel;
   bool logVarSaved = SaveLoggerVars(logger, origLogPath, origLogLevel);
 
   // set log level and stream
@@ -427,18 +421,17 @@ BOOST_AUTO_TEST_CASE(TestLogStreamWithErrorLevel) {
       "ends. Log path/level changes are expected.");
 
   // set the original log level / log path back
-  if (logVarSaved)
-    setLoggerVars(logger, origLogPath, origLogLevel);
+  if (logVarSaved) setLoggerVars(logger, origLogPath, origLogLevel);
 }
 
 BOOST_AUTO_TEST_CASE(TestLogSetInvalidLogPath) {
   std::string logPath = "invalid\\log\\path";
 
-  std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
+  std::shared_ptr<Logger> logger = Logger::GetLoggerInstance();
 
   // save the original log path / log level
-  boost::optional< std::string > origLogPath;
-  boost::optional< LogLevel::Type > origLogLevel;
+  boost::optional<std::string> origLogPath;
+  boost::optional<LogLevel::Type> origLogLevel;
   bool logVarSaved = SaveLoggerVars(logger, origLogPath, origLogLevel);
 
   // attempt to set wrong log path
@@ -447,44 +440,42 @@ BOOST_AUTO_TEST_CASE(TestLogSetInvalidLogPath) {
   // check that invalid log path is not set and the original log path remains
   // (if not null)
   BOOST_CHECK_NE(logPath, logger->GetLogPath());
-  if (origLogPath)
-    BOOST_CHECK_EQUAL(origLogPath.get(), logger->GetLogPath());
+  if (origLogPath) BOOST_CHECK_EQUAL(origLogPath.get(), logger->GetLogPath());
 
   // set the original log level / log path back
   // in case the invalid log path is set, still ensure to change it back at end
   // of the test
-  if (logVarSaved)
-    setLoggerVars(logger, origLogPath, origLogLevel);
+  if (logVarSaved) setLoggerVars(logger, origLogPath, origLogLevel);
 }
 
 BOOST_AUTO_TEST_CASE(TestAWSLogLevelParseMixedCases) {
   using timestream::odbc::Connection;
 
   // Check default value is Warn
-  BOOST_CHECK(Connection::GetAWSLogLevelFromString("")
-              == Aws::Utils::Logging::LogLevel::Warn);
+  BOOST_CHECK(Connection::GetAWSLogLevelFromString("") ==
+              Aws::Utils::Logging::LogLevel::Warn);
 
   // Check parse strings
-  BOOST_CHECK(Connection::GetAWSLogLevelFromString("OfF")
-              == Aws::Utils::Logging::LogLevel::Off);
+  BOOST_CHECK(Connection::GetAWSLogLevelFromString("OfF") ==
+              Aws::Utils::Logging::LogLevel::Off);
 
-  BOOST_CHECK(Connection::GetAWSLogLevelFromString("FatAl")
-              == Aws::Utils::Logging::LogLevel::Fatal);
+  BOOST_CHECK(Connection::GetAWSLogLevelFromString("FatAl") ==
+              Aws::Utils::Logging::LogLevel::Fatal);
 
-  BOOST_CHECK(Connection::GetAWSLogLevelFromString("ErroR")
-              == Aws::Utils::Logging::LogLevel::Error);
+  BOOST_CHECK(Connection::GetAWSLogLevelFromString("ErroR") ==
+              Aws::Utils::Logging::LogLevel::Error);
 
-  BOOST_CHECK(Connection::GetAWSLogLevelFromString("WARn")
-              == Aws::Utils::Logging::LogLevel::Warn);
+  BOOST_CHECK(Connection::GetAWSLogLevelFromString("WARn") ==
+              Aws::Utils::Logging::LogLevel::Warn);
 
-  BOOST_CHECK(Connection::GetAWSLogLevelFromString("infO")
-              == Aws::Utils::Logging::LogLevel::Info);
+  BOOST_CHECK(Connection::GetAWSLogLevelFromString("infO") ==
+              Aws::Utils::Logging::LogLevel::Info);
 
-  BOOST_CHECK(Connection::GetAWSLogLevelFromString("dEbUg")
-              == Aws::Utils::Logging::LogLevel::Debug);
+  BOOST_CHECK(Connection::GetAWSLogLevelFromString("dEbUg") ==
+              Aws::Utils::Logging::LogLevel::Debug);
 
-  BOOST_CHECK(Connection::GetAWSLogLevelFromString("trace")
-              == Aws::Utils::Logging::LogLevel::Trace);
+  BOOST_CHECK(Connection::GetAWSLogLevelFromString("trace") ==
+              Aws::Utils::Logging::LogLevel::Trace);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

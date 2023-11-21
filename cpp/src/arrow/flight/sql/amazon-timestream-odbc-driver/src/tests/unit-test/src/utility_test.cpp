@@ -18,12 +18,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <timestream/odbc/utils.h>
 #include <timestream/odbc/utility.h>
+#include <timestream/odbc/utils.h>
 
+#include <stdio.h>
 #include <boost/test/unit_test.hpp>
 #include <chrono>
-#include <stdio.h>
 
 using namespace timestream::odbc;
 using namespace timestream::odbc::utility;
@@ -49,8 +49,8 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
 
   // With length in character mode
   buffer[0] = 0;
-  bytesWrittenOrRequired = CopyStringToBuffer(
-      str, buffer, sizeof(buffer) / sizeof(SQLWCHAR), isTruncated);
+  bytesWrittenOrRequired =
+      CopyStringToBuffer(str, buffer, sizeof(buffer) / sizeof(SQLWCHAR), isTruncated);
   BOOST_REQUIRE_EQUAL(SqlWcharToString(buffer), str);
   BOOST_CHECK_EQUAL(wstr.size(), bytesWrittenOrRequired);
 
@@ -63,15 +63,14 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
 
   // 10 characters plus 1 for null char.
   buffer[0] = 0;
-  bytesWrittenOrRequired =
-      CopyStringToBuffer(str, buffer, 11, isTruncated, false);
+  bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 11, isTruncated, false);
   BOOST_REQUIRE_EQUAL(SqlWcharToString(buffer), ToUtf8(wstr.substr(0, 10)));
   BOOST_CHECK_EQUAL(10, bytesWrittenOrRequired);
 
   // 10 characters plus 1 for null char, in bytes
   buffer[0] = 0;
-  bytesWrittenOrRequired = CopyStringToBuffer(
-      str, buffer, ((10 + 1) * sizeof(SQLWCHAR)), isTruncated, true);
+  bytesWrittenOrRequired =
+      CopyStringToBuffer(str, buffer, ((10 + 1) * sizeof(SQLWCHAR)), isTruncated, true);
   BOOST_REQUIRE_EQUAL(SqlWcharToString(buffer), ToUtf8(wstr.substr(0, 10)));
   BOOST_CHECK_EQUAL(10 * sizeof(SQLWCHAR), bytesWrittenOrRequired);
 
@@ -83,8 +82,7 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
 
   // Zero length buffer in byte mode.
   buffer[0] = 0;
-  bytesWrittenOrRequired =
-      CopyStringToBuffer(str, buffer, 0, isTruncated, true);
+  bytesWrittenOrRequired = CopyStringToBuffer(str, buffer, 0, isTruncated, true);
   BOOST_REQUIRE_EQUAL(SqlWcharToString(buffer), std::string());
   BOOST_CHECK_EQUAL(0, bytesWrittenOrRequired);
 
@@ -95,14 +93,13 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBuffer) {
 
   // nullptr buffer, zero length, in byte mode.
   buffer[0] = 0;
-  bytesWrittenOrRequired =
-      CopyStringToBuffer(str, nullptr, 0, isTruncated, true);
+  bytesWrittenOrRequired = CopyStringToBuffer(str, nullptr, 0, isTruncated, true);
   BOOST_CHECK_EQUAL(wstr.size() * sizeof(SQLWCHAR), bytesWrittenOrRequired);
 
   // nullptr buffer, non-zero length, in character mode.
   buffer[0] = 0;
-  bytesWrittenOrRequired = CopyStringToBuffer(
-      str, nullptr, sizeof(buffer) / sizeof(SQLWCHAR), isTruncated);
+  bytesWrittenOrRequired =
+      CopyStringToBuffer(str, nullptr, sizeof(buffer) / sizeof(SQLWCHAR), isTruncated);
   BOOST_CHECK_EQUAL(wstr.size(), bytesWrittenOrRequired);
 
   // nullptr buffer, non-zero length, in byte mode.
@@ -117,7 +114,7 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBufferRepetative, *disabled()) {
   char cch;
   int strLen = 1024 * 1024;
   std::string str;
-  std::vector< SQLWCHAR > buffer(strLen + 1);
+  std::vector<SQLWCHAR> buffer(strLen + 1);
 
   for (int i = 0; i < strLen; i++) {
     cch = 'a' + rand() % 26;
@@ -139,7 +136,7 @@ BOOST_AUTO_TEST_CASE(TestUtilityCopyStringToBufferRepetative, *disabled()) {
 
 BOOST_AUTO_TEST_CASE(TestUtilitySqlStringToString) {
   std::string utf8String = u8"你好 - Some data. And some more data here.";
-  std::vector< SQLWCHAR > buffer = ToWCHARVector(utf8String);
+  std::vector<SQLWCHAR> buffer = ToWCHARVector(utf8String);
   std::string utf8StringShortened = u8"你好 - Some da";
 
   std::string result = SqlWcharToString(buffer.data());
@@ -151,8 +148,7 @@ BOOST_AUTO_TEST_CASE(TestUtilitySqlStringToString) {
   result = SqlWcharToString(buffer.data(), buffer.size(), false);
   BOOST_CHECK_EQUAL(utf8String, result);
 
-  result =
-      SqlWcharToString(buffer.data(), buffer.size() * sizeof(SQLWCHAR), true);
+  result = SqlWcharToString(buffer.data(), buffer.size() * sizeof(SQLWCHAR), true);
   BOOST_CHECK_EQUAL(utf8String, result);
 
   result = SqlWcharToString(nullptr, buffer.size());

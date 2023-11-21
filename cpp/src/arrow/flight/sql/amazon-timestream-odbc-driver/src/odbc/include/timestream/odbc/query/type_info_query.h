@@ -131,10 +131,10 @@ class TypeInfoQuery : public timestream::odbc::query::Query {
   bool fetched;
 
   /** Requested types. */
-  std::vector< int8_t > types;
+  std::vector<int8_t> types;
 
   /** Query cursor. */
-  std::vector< int8_t >::const_iterator cursor;
+  std::vector<int8_t>::const_iterator cursor;
 };
 }  // namespace query
 }  // namespace odbc

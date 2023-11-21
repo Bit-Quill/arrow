@@ -16,24 +16,22 @@
 
 #include <iostream>
 
-#include <aws/timestream-write/model/Record.h>
 #include <aws/timestream-write/model/MeasureValueType.h>
+#include <aws/timestream-write/model/Record.h>
 
 #include "timestream_writer.h"
 
 bool verifyParameters(std::string& accessKeyId, std::string& secretKey,
-                      std::string& database, std::string& table,
-                      std::string& tableType, int recordNum,
-                      std::string usage) {
-  if (accessKeyId.empty() || secretKey.empty() || database.empty()
-      || table.empty() || tableType.empty() || recordNum == 0) {
+                      std::string& database, std::string& table, std::string& tableType,
+                      int recordNum, std::string usage) {
+  if (accessKeyId.empty() || secretKey.empty() || database.empty() || table.empty() ||
+      tableType.empty() || recordNum == 0) {
     std::cerr << "Invalid parameters, please check";
     std::cerr << usage << std::endl;
     return false;
   }
 
-  std::transform(tableType.begin(), tableType.end(), tableType.begin(),
-                 toupper);
+  std::transform(tableType.begin(), tableType.end(), tableType.begin(), toupper);
 
   if (tableType != "COMPUTER") {
     std::cerr << "Invalid table type " << tableType << std::endl;
@@ -88,14 +86,12 @@ int main(int argc, char* argv[]) {
   }
 
   // use environment variables if accessKeyId and secretKey are not set
-  if (accessKeyId.empty())
-    accessKeyId = getenv("AWS_ACCESS_KEY_ID");
-  if (secretKey.empty())
-    secretKey = getenv("AWS_SECRET_ACCESS_KEY");
+  if (accessKeyId.empty()) accessKeyId = getenv("AWS_ACCESS_KEY_ID");
+  if (secretKey.empty()) secretKey = getenv("AWS_SECRET_ACCESS_KEY");
 
   // verify parameter values
-  if (!verifyParameters(accessKeyId, secretKey, database, table, tableType,
-                        recordNum, usage)) {
+  if (!verifyParameters(accessKeyId, secretKey, database, table, tableType, recordNum,
+                        usage)) {
     return -1;
   }
 
@@ -120,11 +116,9 @@ int main(int argc, char* argv[]) {
   bool result = false;
 
   if (singleValue) {
-    result =
-        writer.WriteSingleValueRecords(tableType, database, table, recordNum);
+    result = writer.WriteSingleValueRecords(tableType, database, table, recordNum);
   } else {
-    result =
-        writer.WriteMultiValueRecords(tableType, database, table, recordNum);
+    result = writer.WriteMultiValueRecords(tableType, database, table, recordNum);
   }
 
   if (result) {

@@ -33,7 +33,7 @@ namespace common {
  * The size can be set during runtime though once array is created
  * its size can not be changed without resetting arrays content.
  */
-template < typename T >
+template <typename T>
 class IGNITE_IMPORT_EXPORT FixedSizeArray {
  public:
   typedef int32_t SizeType;
@@ -67,8 +67,7 @@ class IGNITE_IMPORT_EXPORT FixedSizeArray {
    *
    * @param other Other instance.
    */
-  FixedSizeArray(const FixedSizeArray< T >& other)
-      : size(other.size), data(new T[size]) {
+  FixedSizeArray(const FixedSizeArray<T>& other) : size(other.size), data(new T[size]) {
     Assign(other);
   }
 
@@ -88,7 +87,7 @@ class IGNITE_IMPORT_EXPORT FixedSizeArray {
    * @param other Other instance.
    * @return Reference to this instance.
    */
-  FixedSizeArray< T >& operator=(const FixedSizeArray< T >& other) {
+  FixedSizeArray<T>& operator=(const FixedSizeArray<T>& other) {
     Assign(other);
 
     return *this;
@@ -99,9 +98,8 @@ class IGNITE_IMPORT_EXPORT FixedSizeArray {
    *
    * @param other Another array instance.
    */
-  void Assign(const FixedSizeArray< T >& other) {
-    if (this != &other)
-      Assign(other.GetData(), other.GetSize());
+  void Assign(const FixedSizeArray<T>& other) {
+    if (this != &other) Assign(other.GetData(), other.GetSize());
   }
 
   /**
@@ -124,8 +122,7 @@ class IGNITE_IMPORT_EXPORT FixedSizeArray {
       data = new T[size];
     }
 
-    for (SizeType i = 0; i < len; ++i)
-      data[i] = src[i];
+    for (SizeType i = 0; i < len; ++i) data[i] = src[i];
 
     delete[] toClean;
   }
@@ -135,7 +132,7 @@ class IGNITE_IMPORT_EXPORT FixedSizeArray {
    *
    * @param other Instance to swap with.
    */
-  void Swap(FixedSizeArray< T >& other) {
+  void Swap(FixedSizeArray<T>& other) {
     if (this != &other) {
       std::swap(size, other.size);
       std::swap(data, other.data);
@@ -155,27 +152,21 @@ class IGNITE_IMPORT_EXPORT FixedSizeArray {
    *
    * @return Data pointer.
    */
-  T* GetData() {
-    return data;
-  }
+  T* GetData() { return data; }
 
   /**
    * Get data pointer.
    *
    * @return Data pointer.
    */
-  const T* GetData() const {
-    return data;
-  }
+  const T* GetData() const { return data; }
 
   /**
    * Get array size.
    *
    * @return Array size.
    */
-  SizeType GetSize() const {
-    return size;
-  }
+  SizeType GetSize() const { return size; }
 
   /**
    * Copy part of the array and place in another array.
@@ -186,7 +177,7 @@ class IGNITE_IMPORT_EXPORT FixedSizeArray {
    * @param n Number of elements to copy.
    * @param result Instance of an array where result should be placed.
    */
-  void CopyPart(SizeType pos, SizeType n, FixedSizeArray< T >& result) const {
+  void CopyPart(SizeType pos, SizeType n, FixedSizeArray<T>& result) const {
     assert(pos < size);
     assert(pos + n <= size);
 
@@ -222,9 +213,7 @@ class IGNITE_IMPORT_EXPORT FixedSizeArray {
    *
    * @return True if the array is empty.
    */
-  bool IsEmpty() const {
-    return size == 0;
-  }
+  bool IsEmpty() const { return size == 0; }
 
   /**
    * Resets the state of the array setting it to the specified size

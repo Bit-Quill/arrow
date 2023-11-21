@@ -96,9 +96,7 @@ class IGNITE_IMPORT_EXPORT Decimal {
    *
    * @param val String to assign.
    */
-  explicit Decimal(const std::string& val) : scale(0), magnitude(0) {
-    AssignString(val);
-  }
+  explicit Decimal(const std::string& val) : scale(0), magnitude(0) { AssignString(val); }
 
   /**
    * Destructor.
@@ -187,7 +185,7 @@ class IGNITE_IMPORT_EXPORT Decimal {
    * @param val String to assign.
    */
   void AssignString(const std::string& val) {
-    AssignString(val.data(), static_cast< int32_t >(val.size()));
+    AssignString(val.data(), static_cast<int32_t>(val.size()));
   }
 
   /**
@@ -260,16 +258,14 @@ class IGNITE_IMPORT_EXPORT Decimal {
     const common::BigInteger& unscaled = val.GetUnscaledValue();
 
     // Zero magnitude case. Scale does not matter.
-    if (unscaled.GetMagnitude().IsEmpty())
-      return os << '0';
+    if (unscaled.GetMagnitude().IsEmpty()) return os << '0';
 
     // Scale is zero or negative. No decimal point here.
     if (val.scale <= 0) {
       os << unscaled;
 
       // Adding zeroes if needed.
-      for (int32_t i = 0; i < -val.scale; ++i)
-        os << '0';
+      for (int32_t i = 0; i < -val.scale; ++i) os << '0';
 
       return os;
     }
@@ -281,7 +277,7 @@ class IGNITE_IMPORT_EXPORT Decimal {
 
     std::string magStr = converter.str();
 
-    int32_t magLen = static_cast< int32_t >(magStr.size());
+    int32_t magLen = static_cast<int32_t>(magStr.size());
 
     int32_t magBegin = 0;
 
@@ -295,10 +291,9 @@ class IGNITE_IMPORT_EXPORT Decimal {
 
     // Finding last non-zero char. There is no sense in trailing zeroes
     // beyond the decimal point.
-    int32_t lastNonZero = static_cast< int32_t >(magStr.size()) - 1;
+    int32_t lastNonZero = static_cast<int32_t>(magStr.size()) - 1;
 
-    while (lastNonZero >= magBegin && magStr[lastNonZero] == '0')
-      --lastNonZero;
+    while (lastNonZero >= magBegin && magStr[lastNonZero] == '0') --lastNonZero;
 
     // This is expected as we already covered zero number case.
     assert(lastNonZero >= magBegin);
@@ -316,7 +311,7 @@ class IGNITE_IMPORT_EXPORT Decimal {
       }
 
       os.write(&magStr[magBegin],
-               static_cast< std::streamsize >(lastNonZero) - magBegin + 1);
+               static_cast<std::streamsize>(lastNonZero) - magBegin + 1);
     } else {
       // Decimal point is in the middle of the number.
       // Just output everything before the decimal point.
@@ -347,8 +342,7 @@ class IGNITE_IMPORT_EXPORT Decimal {
     // Return zero if input failed.
     val.AssignInt64(0);
 
-    if (!is)
-      return is;
+    if (!is) return is;
 
     // Current char.
     int c = is.peek();
@@ -363,13 +357,11 @@ class IGNITE_IMPORT_EXPORT Decimal {
     common::BigInteger pow;
     common::BigInteger bigPart;
 
-    if (!is)
-      return is;
+    if (!is) return is;
 
     // Checking sign.
     if (c == '-' || c == '+') {
-      if (c == '-')
-        sign = -1;
+      if (c == '-') sign = -1;
 
       is.ignore();
       c = is.peek();
@@ -400,8 +392,7 @@ class IGNITE_IMPORT_EXPORT Decimal {
       }
 
       // Counting scale if the decimal point have been encountered.
-      if (scale >= 0)
-        ++scale;
+      if (scale >= 0) ++scale;
     }
 
     // Adding last part of the number.
@@ -431,8 +422,7 @@ class IGNITE_IMPORT_EXPORT Decimal {
 
     val.scale = scale;
 
-    if (sign < 0)
-      mag.Negate();
+    if (sign < 0) mag.Negate();
 
     return is;
   }

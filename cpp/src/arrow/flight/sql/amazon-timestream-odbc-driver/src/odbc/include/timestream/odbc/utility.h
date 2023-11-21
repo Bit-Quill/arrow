@@ -29,15 +29,15 @@
 #include <boost/optional/optional_io.hpp>
 
 #include <ignite/common/include/common/decimal.h>
-#include <timestream/odbc/utils.h>
 #include <stdint.h>
+#include <timestream/odbc/utils.h>
 
 #include <boost/optional.hpp>
 #include <boost/optional/optional_io.hpp>
 #include <string>
 
-#include <sqltypes.h>
 #include <sql.h>
+#include <sqltypes.h>
 
 namespace timestream {
 namespace odbc {
@@ -46,7 +46,7 @@ namespace utility {
 using timestream::odbc::common::IntoLower;
 using namespace ignite::odbc::common;
 
-template < typename T >
+template <typename T>
 T* GetPointerWithOffset(T* ptr, size_t offset) {
   uint8_t* ptrBytes = (uint8_t*)ptr;
 
@@ -68,9 +68,10 @@ T* GetPointerWithOffset(T* ptr, size_t offset) {
  *   - copied bytes number, if outBuffer is not nullptr and outBufferLenBytes
  *   is not 0
  */
-IGNITE_IMPORT_EXPORT size_t
-CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
-                              size_t outBufferLenBytes, bool& isTruncated);
+IGNITE_IMPORT_EXPORT size_t CopyUtf8StringToSqlCharString(const char* inBuffer,
+                                                          SQLCHAR* outBuffer,
+                                                          size_t outBufferLenBytes,
+                                                          bool& isTruncated);
 
 /**
  * Copy utf-8 string to SQLWCHAR buffer of the specific length. It will ensure
@@ -87,9 +88,10 @@ CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
  *   - copied bytes number, if outBuffer is not nullptr and outBufferLenBytes
  *   is not 0
  */
-IGNITE_IMPORT_EXPORT size_t
-CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
-                               size_t outBufferLenBytes, bool& isTruncated);
+IGNITE_IMPORT_EXPORT size_t CopyUtf8StringToSqlWcharString(const char* inBuffer,
+                                                           SQLWCHAR* outBuffer,
+                                                           size_t outBufferLenBytes,
+                                                           bool& isTruncated);
 
 /**
  * Copy string to buffer of the specific length.
@@ -104,9 +106,8 @@ CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
  *   - copied bytes number, if outBuffer is not nullptr and outBufferLenBytes
  *   is not 0
  */
-IGNITE_IMPORT_EXPORT size_t CopyStringToBuffer(const std::string& str,
-                                               SQLWCHAR* buf, size_t buflen,
-                                               bool& isTruncated,
+IGNITE_IMPORT_EXPORT size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf,
+                                               size_t buflen, bool& isTruncated,
                                                bool isLenInBytes = false);
 
 /**
@@ -132,9 +133,8 @@ IGNITE_IMPORT_EXPORT std::string SqlWcharToString(const SQLWCHAR* sqlStr,
  * @return Standard optional string containing the same data.
  * If sqlStrLen indicates null string, boost::none is returned.
  */
-IGNITE_IMPORT_EXPORT boost::optional< std::string > SqlWcharToOptString(
-    const SQLWCHAR* sqlStr, int32_t sqlStrLen = SQL_NTS,
-    bool isLenInBytes = false);
+IGNITE_IMPORT_EXPORT boost::optional<std::string> SqlWcharToOptString(
+    const SQLWCHAR* sqlStr, int32_t sqlStrLen = SQL_NTS, bool isLenInBytes = false);
 
 /**
  * Convert SQL string buffer to std::string.
@@ -184,8 +184,7 @@ IGNITE_IMPORT_EXPORT std::wstring FromUtf8(const char* value);
  * @param value wide string value to convert.
  * @return String value converted to vector of unsigned short encoding.
  */
-IGNITE_IMPORT_EXPORT std::vector< SQLWCHAR > ToWCHARVector(
-    const std::string& value);
+IGNITE_IMPORT_EXPORT std::vector<SQLWCHAR> ToWCHARVector(const std::string& value);
 
 /**
  * Convert a UTF-8 string to vector of unsigned short.
@@ -193,7 +192,7 @@ IGNITE_IMPORT_EXPORT std::vector< SQLWCHAR > ToWCHARVector(
  * @param value pointer to null-terminated wide string value to convert.
  * @return String value converted to vector of unsigned short encoding.
  */
-IGNITE_IMPORT_EXPORT std::vector< SQLWCHAR > ToWCHARVector(const char* value);
+IGNITE_IMPORT_EXPORT std::vector<SQLWCHAR> ToWCHARVector(const char* value);
 
 /**
  * Convert binary data to hex dump form
@@ -233,8 +232,7 @@ IGNITE_IMPORT_EXPORT std::string Trim(const std::string& s);
  *
  * @return the converted regular expression string.
  */
-IGNITE_IMPORT_EXPORT std::string ConvertPatternToRegex(
-    const std::string& pattern);
+IGNITE_IMPORT_EXPORT std::string ConvertPatternToRegex(const std::string& pattern);
 
 /**
  * Converts a numeric string to int.

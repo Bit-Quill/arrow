@@ -27,8 +27,7 @@ namespace bits {
 int32_t NumberOfTrailingZerosI32(int32_t i) {
   int32_t y;
 
-  if (i == 0)
-    return 32;
+  if (i == 0) return 32;
 
   int32_t n = 31;
 
@@ -60,16 +59,15 @@ int32_t NumberOfTrailingZerosI32(int32_t i) {
     i = y;
   }
 
-  return n - static_cast< int32_t >(static_cast< uint32_t >(i << 1) >> 31);
+  return n - static_cast<int32_t>(static_cast<uint32_t>(i << 1) >> 31);
 }
 
 int32_t NumberOfLeadingZerosI32(int32_t i) {
-  return NumberOfLeadingZerosU32(static_cast< uint32_t >(i));
+  return NumberOfLeadingZerosU32(static_cast<uint32_t>(i));
 }
 
 int32_t NumberOfLeadingZerosU32(uint32_t i) {
-  if (i == 0)
-    return 32;
+  if (i == 0) return 32;
 
   int32_t n = 1;
 
@@ -93,24 +91,23 @@ int32_t NumberOfLeadingZerosU32(uint32_t i) {
     i <<= 2;
   }
 
-  return n - static_cast< int32_t >(i >> 31);
+  return n - static_cast<int32_t>(i >> 31);
 }
 
 int32_t NumberOfLeadingZerosI64(int64_t i) {
-  return NumberOfLeadingZerosU64(static_cast< uint64_t >(i));
+  return NumberOfLeadingZerosU64(static_cast<uint64_t>(i));
 }
 
 int32_t NumberOfLeadingZerosU64(uint64_t i) {
-  if (i == 0)
-    return 64;
+  if (i == 0) return 64;
 
   int32_t n = 1;
 
-  uint32_t x = static_cast< uint32_t >(i >> 32);
+  uint32_t x = static_cast<uint32_t>(i >> 32);
 
   if (x == 0) {
     n += 32;
-    x = static_cast< uint32_t >(i);
+    x = static_cast<uint32_t>(i);
   }
 
   if (x >> 16 == 0) {
@@ -139,7 +136,7 @@ int32_t NumberOfLeadingZerosU64(uint64_t i) {
 }
 
 int32_t BitCountI32(int32_t i) {
-  uint32_t ui = static_cast< uint32_t >(i);
+  uint32_t ui = static_cast<uint32_t>(i);
 
   ui -= (ui >> 1) & 0x55555555;
   ui = (ui & 0x33333333) + ((ui >> 2) & 0x33333333);
@@ -147,27 +144,21 @@ int32_t BitCountI32(int32_t i) {
   ui += ui >> 8;
   ui += ui >> 16;
 
-  return static_cast< int32_t >(ui & 0x3f);
+  return static_cast<int32_t>(ui & 0x3f);
 }
 
-int32_t BitLengthI32(int32_t i) {
-  return 32 - NumberOfLeadingZerosI32(i);
-}
+int32_t BitLengthI32(int32_t i) { return 32 - NumberOfLeadingZerosI32(i); }
 
-int32_t BitLengthU32(uint32_t i) {
-  return 32 - NumberOfLeadingZerosU32(i);
-}
+int32_t BitLengthU32(uint32_t i) { return 32 - NumberOfLeadingZerosU32(i); }
 
 int32_t GetCapasityForSize(int32_t size) {
   assert(size > 0);
 
-  if (size <= 8)
-    return 8;
+  if (size <= 8) return 8;
 
   int32_t bl = BitLengthI32(size);
 
-  if (bl > 30)
-    return INT32_MAX;
+  if (bl > 30) return INT32_MAX;
 
   int32_t res = 1 << bl;
 
@@ -178,8 +169,7 @@ int32_t DigitLength(uint64_t x) {
   // See http://graphics.stanford.edu/~seander/bithacks.html
   // for the details on the algorithm.
 
-  if (x < 10)
-    return 1;
+  if (x < 10) return 1;
 
   int32_t r = ((64 - NumberOfLeadingZerosU64(x) + 1) * 1233) >> 12;
 

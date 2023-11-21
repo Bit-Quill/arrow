@@ -46,17 +46,11 @@ Time& Time::operator=(const Time& another) {
   return *this;
 }
 
-int64_t Time::GetMilliseconds() const {
-  return seconds * 1000 + fractionNs / 1000;
-}
+int64_t Time::GetMilliseconds() const { return seconds * 1000 + fractionNs / 1000; }
 
-int32_t Time::GetSeconds() const {
-  return seconds;
-}
+int32_t Time::GetSeconds() const { return seconds; }
 
-int32_t Time::GetSecondFraction() const {
-  return fractionNs;
-}
+int32_t Time::GetSecondFraction() const { return fractionNs; }
 
 bool operator==(const Time& val1, const Time& val2) {
   return val1.seconds == val2.seconds && val1.fractionNs == val2.fractionNs;
@@ -67,25 +61,23 @@ bool operator!=(const Time& val1, const Time& val2) {
 }
 
 bool operator<(const Time& val1, const Time& val2) {
-  return val1.seconds < val2.seconds
-         || (val1.seconds == val2.seconds && val1.fractionNs < val2.fractionNs);
+  return val1.seconds < val2.seconds ||
+         (val1.seconds == val2.seconds && val1.fractionNs < val2.fractionNs);
 }
 
 bool operator<=(const Time& val1, const Time& val2) {
-  return val1.seconds < val2.seconds
-         || (val1.seconds == val2.seconds
-             && val1.fractionNs <= val2.fractionNs);
+  return val1.seconds < val2.seconds ||
+         (val1.seconds == val2.seconds && val1.fractionNs <= val2.fractionNs);
 }
 
 bool operator>(const Time& val1, const Time& val2) {
-  return val1.seconds > val2.seconds
-         || (val1.seconds == val2.seconds && val1.fractionNs > val2.fractionNs);
+  return val1.seconds > val2.seconds ||
+         (val1.seconds == val2.seconds && val1.fractionNs > val2.fractionNs);
 }
 
 bool operator>=(const Time& val1, const Time& val2) {
-  return val1.seconds > val2.seconds
-         || (val1.seconds == val2.seconds
-             && val1.fractionNs >= val2.fractionNs);
+  return val1.seconds > val2.seconds ||
+         (val1.seconds == val2.seconds && val1.fractionNs >= val2.fractionNs);
 }
 }  // namespace odbc
 }  // namespace timestream

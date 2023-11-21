@@ -26,11 +26,11 @@
 #include <string>
 #include <vector>
 
+#include "odbc_test_suite.h"
+#include "test_utils.h"
 #include "timestream/odbc/config/connection_info.h"
 #include "timestream/odbc/system/odbc_constants.h"
 #include "timestream/odbc/utility.h"
-#include "odbc_test_suite.h"
-#include "test_utils.h"
 
 using namespace timestream;
 using namespace timestream_test;
@@ -50,16 +50,15 @@ struct SqlGetInfoTestSuiteFixture : odbc::OdbcTestSuite {
     ODBC_FAIL_ON_ERROR1(ret, SQL_HANDLE_DBC, dbc, typeStr);
 
     // Note: length is in bytes, not characters.
-    std::vector< SQLWCHAR > val((valLen / sizeof(SQLWCHAR)) + 1);
-    ret = SQLGetInfo(dbc, type, val.data(), val.size() * sizeof(SQLWCHAR),
-                     &valLen);
+    std::vector<SQLWCHAR> val((valLen / sizeof(SQLWCHAR)) + 1);
+    ret = SQLGetInfo(dbc, type, val.data(), val.size() * sizeof(SQLWCHAR), &valLen);
 
     ODBC_FAIL_ON_ERROR1(ret, SQL_HANDLE_DBC, dbc, typeStr);
 
     std::string actualValue = utility::SqlWcharToString(val.data());
     BOOST_REQUIRE_MESSAGE(actualValue == expectedValue,
-                          "\"" + actualValue + "\" != \"" + expectedValue
-                              + "\". SQLGetInfo Type: " + typeStr);
+                          "\"" + actualValue + "\" != \"" + expectedValue +
+                              "\". SQLGetInfo Type: " + typeStr);
   }
 
   void CheckIntInfo(SQLSMALLINT type, SQLUINTEGER expectedValue) {
@@ -69,9 +68,8 @@ struct SqlGetInfoTestSuiteFixture : odbc::OdbcTestSuite {
     std::string typeStr = odbc::config::ConnectionInfo::InfoTypeToString(type);
     ODBC_FAIL_ON_ERROR1(ret, SQL_HANDLE_DBC, dbc, typeStr);
     BOOST_REQUIRE_MESSAGE(val == expectedValue,
-                          std::to_string(val)
-                              + " != " + std::to_string(expectedValue)
-                              + ". SQLGetInfo Type: " + typeStr);
+                          std::to_string(val) + " != " + std::to_string(expectedValue) +
+                              ". SQLGetInfo Type: " + typeStr);
   }
 
   void CheckShortInfo(SQLSMALLINT type, SQLUSMALLINT expectedValue) {
@@ -81,22 +79,19 @@ struct SqlGetInfoTestSuiteFixture : odbc::OdbcTestSuite {
     std::string typeStr = odbc::config::ConnectionInfo::InfoTypeToString(type);
     ODBC_FAIL_ON_ERROR1(ret, SQL_HANDLE_DBC, dbc, typeStr);
     BOOST_REQUIRE_MESSAGE(val == expectedValue,
-                          std::to_string(val)
-                              + " != " + std::to_string(expectedValue)
-                              + ". SQLGetInfo Type: " + typeStr);
+                          std::to_string(val) + " != " + std::to_string(expectedValue) +
+                              ". SQLGetInfo Type: " + typeStr);
   }
 
   /**
    * Constructor.
    */
-  SqlGetInfoTestSuiteFixture() {
-  }
+  SqlGetInfoTestSuiteFixture() {}
 
   /**
    * Destructor.
    */
-  ~SqlGetInfoTestSuiteFixture() {
-  }
+  ~SqlGetInfoTestSuiteFixture() {}
 
   /**
    * Connect to the Timestream server with the database name
@@ -170,8 +165,7 @@ BOOST_AUTO_TEST_CASE(TestValues) {
   CheckStrInfo(SQL_ROW_UPDATES, "N");
   CheckStrInfo(SQL_SEARCH_PATTERN_ESCAPE, "");
   CheckStrInfo(SQL_SERVER_NAME, "AWS Timestream");
-  std::string expectedUserName =
-      ignite::odbc::common::GetEnv("AWS_ACCESS_KEY_ID");
+  std::string expectedUserName = ignite::odbc::common::GetEnv("AWS_ACCESS_KEY_ID");
   CheckStrInfo(SQL_USER_NAME, expectedUserName);
 
   CheckIntInfo(SQL_ASYNC_MODE, SQL_AM_NONE);
@@ -185,33 +179,30 @@ BOOST_AUTO_TEST_CASE(TestValues) {
     CheckIntInfo(SQL_CATALOG_LOCATION, SQL_CL_START);
     CheckIntInfo(SQL_CATALOG_USAGE, SQL_CU_DML_STATEMENTS);
   }
-  CheckIntInfo(SQL_GETDATA_EXTENSIONS, SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER
-                                           | SQL_GD_BOUND | SQL_GD_BLOCK);
+  CheckIntInfo(SQL_GETDATA_EXTENSIONS,
+               SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER | SQL_GD_BOUND | SQL_GD_BLOCK);
   CheckIntInfo(SQL_ODBC_INTERFACE_CONFORMANCE, SQL_OIC_CORE);
   CheckIntInfo(SQL_SQL_CONFORMANCE, SQL_SC_SQL92_ENTRY);
   CheckIntInfo(SQL_TIMEDATE_ADD_INTERVALS,
-               SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE
-                   | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK
-                   | SQL_FN_TSI_MONTH | SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR);
+               SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE |
+                   SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH |
+                   SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR);
   CheckIntInfo(SQL_TIMEDATE_DIFF_INTERVALS,
-               SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE
-                   | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK
-                   | SQL_FN_TSI_MONTH | SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR);
+               SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE |
+                   SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH |
+                   SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR);
   CheckIntInfo(SQL_DATETIME_LITERALS, 0);
   CheckIntInfo(SQL_SYSTEM_FUNCTIONS, SQL_FN_SYS_IFNULL);
   CheckIntInfo(SQL_CONVERT_FUNCTIONS, SQL_FN_CVT_CAST);
-  CheckIntInfo(SQL_OJ_CAPABILITIES, SQL_OJ_LEFT | SQL_OJ_NOT_ORDERED
-                                        | SQL_OJ_RIGHT
-                                        | SQL_OJ_ALL_COMPARISON_OPS);
+  CheckIntInfo(SQL_OJ_CAPABILITIES, SQL_OJ_LEFT | SQL_OJ_NOT_ORDERED | SQL_OJ_RIGHT |
+                                        SQL_OJ_ALL_COMPARISON_OPS);
   CheckIntInfo(SQL_POS_OPERATIONS, 0);
-  CheckIntInfo(SQL_SQL92_DATETIME_FUNCTIONS, SQL_SDF_CURRENT_DATE
-                                                 | SQL_SDF_CURRENT_TIME
-                                                 | SQL_SDF_CURRENT_TIMESTAMP);
+  CheckIntInfo(SQL_SQL92_DATETIME_FUNCTIONS,
+               SQL_SDF_CURRENT_DATE | SQL_SDF_CURRENT_TIME | SQL_SDF_CURRENT_TIMESTAMP);
   CheckIntInfo(SQL_SQL92_VALUE_EXPRESSIONS, SQL_SVE_CASE | SQL_SVE_CAST);
   CheckIntInfo(SQL_STATIC_CURSOR_ATTRIBUTES1,
-               SQL_CA1_NEXT | SQL_CA1_ABSOLUTE | SQL_CA1_RELATIVE
-                   | SQL_CA1_BOOKMARK | SQL_CA1_LOCK_NO_CHANGE
-                   | SQL_CA1_POS_POSITION | SQL_CA1_POS_REFRESH);
+               SQL_CA1_NEXT | SQL_CA1_ABSOLUTE | SQL_CA1_RELATIVE | SQL_CA1_BOOKMARK |
+                   SQL_CA1_LOCK_NO_CHANGE | SQL_CA1_POS_POSITION | SQL_CA1_POS_REFRESH);
   CheckIntInfo(SQL_STATIC_CURSOR_ATTRIBUTES2,
                SQL_CA2_READ_ONLY_CONCURRENCY | SQL_CA2_CRC_EXACT);
   CheckIntInfo(SQL_PARAM_ARRAY_ROW_COUNTS, SQL_PARC_BATCH);
@@ -268,9 +259,9 @@ BOOST_AUTO_TEST_CASE(TestValues) {
   CheckIntInfo(SQL_UNION, SQL_U_UNION | SQL_U_UNION_ALL);
 
   if (DATABASE_AS_SCHEMA) {
-    CheckIntInfo(SQL_SCHEMA_USAGE,
-                 SQL_SU_DML_STATEMENTS | SQL_SU_TABLE_DEFINITION
-                     | SQL_SU_PRIVILEGE_DEFINITION | SQL_SU_INDEX_DEFINITION);
+    CheckIntInfo(SQL_SCHEMA_USAGE, SQL_SU_DML_STATEMENTS | SQL_SU_TABLE_DEFINITION |
+                                       SQL_SU_PRIVILEGE_DEFINITION |
+                                       SQL_SU_INDEX_DEFINITION);
   } else {
     CheckIntInfo(SQL_SCHEMA_USAGE, 0);
   }
@@ -278,36 +269,33 @@ BOOST_AUTO_TEST_CASE(TestValues) {
   CheckIntInfo(SQL_AGGREGATE_FUNCTIONS, SQL_AF_ALL);
 
   CheckIntInfo(SQL_NUMERIC_FUNCTIONS,
-               SQL_FN_NUM_ABS | SQL_FN_NUM_ATAN | SQL_FN_NUM_ATAN2
-                   | SQL_FN_NUM_COS | SQL_FN_NUM_COT | SQL_FN_NUM_DEGREES
-                   | SQL_FN_NUM_FLOOR | SQL_FN_NUM_LOG | SQL_FN_NUM_LOG10
-                   | SQL_FN_NUM_PI | SQL_FN_NUM_POWER | SQL_FN_NUM_RADIANS
-                   | SQL_FN_NUM_ROUND | SQL_FN_NUM_SIGN | SQL_FN_NUM_SIN
-                   | SQL_FN_NUM_SQRT | SQL_FN_NUM_TAN);
+               SQL_FN_NUM_ABS | SQL_FN_NUM_ATAN | SQL_FN_NUM_ATAN2 | SQL_FN_NUM_COS |
+                   SQL_FN_NUM_COT | SQL_FN_NUM_DEGREES | SQL_FN_NUM_FLOOR |
+                   SQL_FN_NUM_LOG | SQL_FN_NUM_LOG10 | SQL_FN_NUM_PI | SQL_FN_NUM_POWER |
+                   SQL_FN_NUM_RADIANS | SQL_FN_NUM_ROUND | SQL_FN_NUM_SIGN |
+                   SQL_FN_NUM_SIN | SQL_FN_NUM_SQRT | SQL_FN_NUM_TAN);
 
-  CheckIntInfo(SQL_STRING_FUNCTIONS, SQL_FN_STR_ASCII | SQL_FN_STR_LENGTH
-                                         | SQL_FN_STR_LTRIM | SQL_FN_STR_REPLACE
-                                         | SQL_FN_STR_RTRIM
-                                         | SQL_FN_STR_SUBSTRING);
+  CheckIntInfo(SQL_STRING_FUNCTIONS, SQL_FN_STR_ASCII | SQL_FN_STR_LENGTH |
+                                         SQL_FN_STR_LTRIM | SQL_FN_STR_REPLACE |
+                                         SQL_FN_STR_RTRIM | SQL_FN_STR_SUBSTRING);
 
-  CheckIntInfo(SQL_TIMEDATE_FUNCTIONS,
-               SQL_FN_TD_CURDATE | SQL_FN_TD_DAYOFMONTH | SQL_FN_TD_MONTH
-                   | SQL_FN_TD_MONTHNAME | SQL_FN_TD_NOW | SQL_FN_TD_YEAR);
+  CheckIntInfo(SQL_TIMEDATE_FUNCTIONS, SQL_FN_TD_CURDATE | SQL_FN_TD_DAYOFMONTH |
+                                           SQL_FN_TD_MONTH | SQL_FN_TD_MONTHNAME |
+                                           SQL_FN_TD_NOW | SQL_FN_TD_YEAR);
 
   CheckIntInfo(SQL_SQL92_NUMERIC_VALUE_FUNCTIONS, 0);
 
   CheckIntInfo(SQL_SQL92_STRING_FUNCTIONS,
-               SQL_SSF_CONVERT | SQL_SSF_LOWER | SQL_SSF_UPPER
-                   | SQL_SSF_SUBSTRING | SQL_SSF_TRANSLATE | SQL_SSF_TRIM_BOTH
-                   | SQL_SSF_TRIM_LEADING | SQL_SSF_TRIM_TRAILING);
+               SQL_SSF_CONVERT | SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_SUBSTRING |
+                   SQL_SSF_TRANSLATE | SQL_SSF_TRIM_BOTH | SQL_SSF_TRIM_LEADING |
+                   SQL_SSF_TRIM_TRAILING);
 
-  CheckIntInfo(SQL_SQL92_PREDICATES, SQL_SP_BETWEEN | SQL_SP_COMPARISON
-                                         | SQL_SP_IN | SQL_SP_ISNULL
-                                         | SQL_SP_LIKE);
+  CheckIntInfo(SQL_SQL92_PREDICATES, SQL_SP_BETWEEN | SQL_SP_COMPARISON | SQL_SP_IN |
+                                         SQL_SP_ISNULL | SQL_SP_LIKE);
 
   CheckIntInfo(SQL_SQL92_RELATIONAL_JOIN_OPERATORS,
-               SQL_SRJO_CROSS_JOIN | SQL_SRJO_INNER_JOIN
-                   | SQL_SRJO_LEFT_OUTER_JOIN | SQL_SRJO_RIGHT_OUTER_JOIN);
+               SQL_SRJO_CROSS_JOIN | SQL_SRJO_INNER_JOIN | SQL_SRJO_LEFT_OUTER_JOIN |
+                   SQL_SRJO_RIGHT_OUTER_JOIN);
 
   CheckIntInfo(SQL_CONVERT_BIGINT, SQL_CVT_BIGINT | SQL_CVT_DOUBLE);
   CheckIntInfo(SQL_CONVERT_BINARY, 0);
@@ -321,12 +309,10 @@ BOOST_AUTO_TEST_CASE(TestValues) {
   CheckIntInfo(SQL_CONVERT_GUID, 0);
   CheckIntInfo(SQL_CONVERT_DATE, SQL_CVT_DATE);
   CheckIntInfo(SQL_CONVERT_DECIMAL, 0);
-  CheckIntInfo(SQL_CONVERT_DOUBLE,
-               SQL_CVT_INTEGER | SQL_CVT_BIGINT | SQL_CVT_DOUBLE);
+  CheckIntInfo(SQL_CONVERT_DOUBLE, SQL_CVT_INTEGER | SQL_CVT_BIGINT | SQL_CVT_DOUBLE);
   CheckIntInfo(SQL_CONVERT_FLOAT, 0);
   CheckIntInfo(SQL_CONVERT_REAL, 0);
-  CheckIntInfo(SQL_CONVERT_INTEGER,
-               SQL_CVT_INTEGER | SQL_CVT_BIGINT | SQL_CVT_DOUBLE);
+  CheckIntInfo(SQL_CONVERT_INTEGER, SQL_CVT_INTEGER | SQL_CVT_BIGINT | SQL_CVT_DOUBLE);
   CheckIntInfo(SQL_CONVERT_NUMERIC, 0);
   CheckIntInfo(SQL_CONVERT_SMALLINT, 0);
   CheckIntInfo(SQL_CONVERT_TINYINT, 0);
@@ -340,13 +326,13 @@ BOOST_AUTO_TEST_CASE(TestValues) {
   CheckIntInfo(SQL_SQL92_ROW_VALUE_CONSTRUCTOR,
                SQL_SRVC_VALUE_EXPRESSION | SQL_SRVC_NULL);
 
-  CheckIntInfo(SQL_SUBQUERIES, SQL_SQ_QUANTIFIED | SQL_SQ_IN | SQL_SQ_EXISTS
-                                   | SQL_SQ_COMPARISON);
+  CheckIntInfo(SQL_SUBQUERIES,
+               SQL_SQ_QUANTIFIED | SQL_SQ_IN | SQL_SQ_EXISTS | SQL_SQ_COMPARISON);
 
-  CheckIntInfo(SQL_FETCH_DIRECTION,
-               SQL_FD_FETCH_NEXT | SQL_FD_FETCH_FIRST | SQL_FD_FETCH_LAST
-                   | SQL_FD_FETCH_PRIOR | SQL_FD_FETCH_ABSOLUTE
-                   | SQL_FD_FETCH_RELATIVE | SQL_FD_FETCH_BOOKMARK);
+  CheckIntInfo(SQL_FETCH_DIRECTION, SQL_FD_FETCH_NEXT | SQL_FD_FETCH_FIRST |
+                                        SQL_FD_FETCH_LAST | SQL_FD_FETCH_PRIOR |
+                                        SQL_FD_FETCH_ABSOLUTE | SQL_FD_FETCH_RELATIVE |
+                                        SQL_FD_FETCH_BOOKMARK);
 
   CheckShortInfo(SQL_MAX_CONCURRENT_ACTIVITIES, 0);
   CheckShortInfo(SQL_QUOTED_IDENTIFIER_CASE, SQL_IC_SENSITIVE);

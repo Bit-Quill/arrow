@@ -28,8 +28,7 @@
 namespace timestream {
 namespace odbc {
 Environment::Environment()
-    : connections(), odbcVersion(SQL_OV_ODBC3), odbcNts(SQL_TRUE) {
-}
+    : connections(), odbcVersion(SQL_OV_ODBC3), odbcNts(SQL_TRUE) {}
 
 Environment::~Environment() {
   // No-op.
@@ -43,9 +42,7 @@ Connection* Environment::CreateConnection() {
   return connection;
 }
 
-void Environment::DeregisterConnection(Connection* conn) {
-  connections.erase(conn);
-}
+void Environment::DeregisterConnection(Connection* conn) { connections.erase(conn); }
 
 SqlResult::Type Environment::InternalCreateConnection(Connection*& connection) {
   LOG_DEBUG_MSG("InternalCreateConnection is called");
@@ -75,8 +72,7 @@ SqlResult::Type Environment::InternalSetAttribute(int32_t attr, void* value,
 
   switch (attribute) {
     case EnvironmentAttribute::ODBC_VERSION: {
-      int32_t version =
-          static_cast< int32_t >(reinterpret_cast< intptr_t >(value));
+      int32_t version = static_cast<int32_t>(reinterpret_cast<intptr_t>(value));
 
       if (version == SQL_OV_ODBC2 || version == SQL_OV_ODBC3) {
         odbcVersion = version;
@@ -97,7 +93,7 @@ SqlResult::Type Environment::InternalSetAttribute(int32_t attr, void* value,
     }
 
     case EnvironmentAttribute::OUTPUT_NTS: {
-      int32_t nts = static_cast< int32_t >(reinterpret_cast< intptr_t >(value));
+      int32_t nts = static_cast<int32_t>(reinterpret_cast<intptr_t>(value));
 
       if (nts != odbcNts) {
         AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
@@ -121,13 +117,12 @@ SqlResult::Type Environment::InternalSetAttribute(int32_t attr, void* value,
   return SqlResult::AI_ERROR;
 }
 
-void Environment::GetAttribute(int32_t attr,
-                               app::ApplicationDataBuffer& buffer) {
+void Environment::GetAttribute(int32_t attr, app::ApplicationDataBuffer& buffer) {
   IGNITE_ODBC_API_CALL(InternalGetAttribute(attr, buffer));
 }
 
-SqlResult::Type Environment::InternalGetAttribute(
-    int32_t attr, app::ApplicationDataBuffer& buffer) {
+SqlResult::Type Environment::InternalGetAttribute(int32_t attr,
+                                                  app::ApplicationDataBuffer& buffer) {
   LOG_DEBUG_MSG("InternalGetAttribute is called with attr is " << attr);
   EnvironmentAttribute::Type attribute = EnvironmentAttributeToInternal(attr);
 

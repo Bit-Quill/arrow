@@ -31,8 +31,7 @@ MockConnection::~MockConnection() {
   // No-op
 }
 
-SqlResult::Type MockConnection::InternalCreateStatement(
-    MockStatement*& statement) {
+SqlResult::Type MockConnection::InternalCreateStatement(MockStatement*& statement) {
   statement = new MockStatement(*this);
 
   if (!statement) {
@@ -44,24 +43,21 @@ SqlResult::Type MockConnection::InternalCreateStatement(
   return SqlResult::AI_SUCCESS;
 }
 
-std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
-MockConnection::CreateTSQueryClient(
-    const Aws::Auth::AWSCredentials& credentials,
-    const Aws::Client::ClientConfiguration& clientCfg) {
-  return std::static_pointer_cast<
-      Aws::TimestreamQuery::TimestreamQueryClient >(
-      std::make_shared< timestream::odbc::MockTimestreamQueryClient >(
-          credentials, clientCfg));
+std::shared_ptr<Aws::TimestreamQuery::TimestreamQueryClient>
+MockConnection::CreateTSQueryClient(const Aws::Auth::AWSCredentials& credentials,
+                                    const Aws::Client::ClientConfiguration& clientCfg) {
+  return std::static_pointer_cast<Aws::TimestreamQuery::TimestreamQueryClient>(
+      std::make_shared<timestream::odbc::MockTimestreamQueryClient>(credentials,
+                                                                    clientCfg));
 }
 
-std::shared_ptr< Aws::Http::HttpClient > MockConnection::GetHttpClient() {
-  return std::static_pointer_cast< Aws::Http::HttpClient >(
-      std::make_shared< timestream::odbc::MockHttpClient >());
+std::shared_ptr<Aws::Http::HttpClient> MockConnection::GetHttpClient() {
+  return std::static_pointer_cast<Aws::Http::HttpClient>(
+      std::make_shared<timestream::odbc::MockHttpClient>());
 }
 
-std::shared_ptr< Aws::STS::STSClient > MockConnection::GetStsClient() {
-  return std::static_pointer_cast< Aws::STS::STSClient >(
-      std::make_shared< MockSTSClient >());
+std::shared_ptr<Aws::STS::STSClient> MockConnection::GetStsClient() {
+  return std::static_pointer_cast<Aws::STS::STSClient>(std::make_shared<MockSTSClient>());
 }
 
 MockStatement* MockConnection::CreateStatement() {

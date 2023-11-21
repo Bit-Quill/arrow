@@ -32,10 +32,9 @@ class IGNITE_IMPORT_EXPORT TimestreamAADCredentialsProvider
    * @param httpClient Shared pointer to httpClient
    * @param stsClient Shared pointer to STSClient
    */
-  TimestreamAADCredentialsProvider(
-      const config::Configuration& config,
-      std::shared_ptr< Aws::Http::HttpClient > httpClient,
-      std::shared_ptr< Aws::STS::STSClient > stsClient)
+  TimestreamAADCredentialsProvider(const config::Configuration& config,
+                                   std::shared_ptr<Aws::Http::HttpClient> httpClient,
+                                   std::shared_ptr<Aws::STS::STSClient> stsClient)
       : TimestreamSAMLCredentialsProvider(config, httpClient, stsClient) {
     // No-op.
   }

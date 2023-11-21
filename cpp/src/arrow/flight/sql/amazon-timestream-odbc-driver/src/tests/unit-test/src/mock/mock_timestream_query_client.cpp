@@ -16,10 +16,10 @@
 
 #include <aws/core/Aws.h>
 #include <aws/core/utils/Outcome.h>
+#include <aws/timestream-query/TimestreamQueryErrors.h>
+#include <aws/timestream-query/model/Datum.h>
 #include <aws/timestream-query/model/QueryResult.h>
 #include <aws/timestream-query/model/Row.h>
-#include <aws/timestream-query/model/Datum.h>
-#include <aws/timestream-query/TimestreamQueryErrors.h>
 
 #include <mock/mock_timestream_query_client.h>
 #include <mock/mock_timestream_service.h>
@@ -28,12 +28,12 @@ namespace timestream {
 namespace odbc {
 // All the working logic is done by the singleton MockTimestreamService object.
 Aws::TimestreamQuery::Model::QueryOutcome MockTimestreamQueryClient::Query(
-    const Aws::TimestreamQuery::Model::QueryRequest &request) const {
+    const Aws::TimestreamQuery::Model::QueryRequest& request) const {
   // authenticate first
   if (!MockTimestreamService::GetInstance()->Authenticate(
           credentials_.GetAWSAccessKeyId(), credentials_.GetAWSSecretKey())) {
     Aws::TimestreamQuery::TimestreamQueryError error(
-        Aws::Client::AWSError< Aws::Client::CoreErrors >(
+        Aws::Client::AWSError<Aws::Client::CoreErrors>(
             Aws::Client::CoreErrors::INVALID_ACCESS_KEY_ID, false));
 
     return Aws::TimestreamQuery::Model::QueryOutcome(error);

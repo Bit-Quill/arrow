@@ -14,8 +14,8 @@
  *
  */
 
-#include "timestream/odbc/log.h"
 #include "timestream/odbc/authentication/saml.h"
+#include "timestream/odbc/log.h"
 
 #include <aws/sts/model/Credentials.h>
 
@@ -42,8 +42,8 @@ bool TimestreamSAMLCredentialsProvider::FetchCredentialsWithSAMLAssertion(
     retval = true;
   } else {
     auto error = outcome.GetError();
-    errInfo = "Failed to fetch credentials, ERROR: " + error.GetExceptionName()
-              + ": " + error.GetMessage();
+    errInfo = "Failed to fetch credentials, ERROR: " + error.GetExceptionName() + ": " +
+              error.GetMessage();
     LOG_ERROR_MSG(errInfo);
   }
 
@@ -64,8 +64,7 @@ bool TimestreamSAMLCredentialsProvider::GetAWSCredentials(
         .WithSAMLAssertion(samlAsseration)
         .WithPrincipalArn(config_.GetIdPArn().c_str());
 
-    retval =
-        FetchCredentialsWithSAMLAssertion(samlRequest, credentials, errInfo);
+    retval = FetchCredentialsWithSAMLAssertion(samlRequest, credentials, errInfo);
   }
 
   return retval;

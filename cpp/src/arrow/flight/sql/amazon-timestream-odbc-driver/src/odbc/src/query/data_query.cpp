@@ -20,18 +20,18 @@
 
 #include "timestream/odbc/query/data_query.h"
 
+#include "ignite/odbc/odbc_error.h"
 #include "timestream/odbc/connection.h"
 #include "timestream/odbc/log.h"
-#include "ignite/odbc/odbc_error.h"
 
-#include <aws/timestream-query/model/Type.h>
 #include <aws/timestream-query/model/CancelQueryRequest.h>
+#include <aws/timestream-query/model/Type.h>
 
 namespace timestream {
 namespace odbc {
 namespace query {
-DataQuery::DataQuery(diagnostic::DiagnosableAdapter& diag,
-                     Connection& connection, const std::string& sql)
+DataQuery::DataQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection,
+                     const std::string& sql)
     : Query(diag, timestream::odbc::query::QueryType::DATA),
       connection_(connection),
       sql_(sql),
@@ -49,15 +49,13 @@ DataQuery::DataQuery(diagnostic::DiagnosableAdapter& diag,
 DataQuery::~DataQuery() {
   LOG_DEBUG_MSG("~DataQuery is called");
 
-  if (result_.get())
-    InternalClose();
+  if (result_.get()) InternalClose();
 }
 
 SqlResult::Type DataQuery::Execute() {
   LOG_DEBUG_MSG("Execute is called");
 
-  if (result_.get())
-    InternalClose();
+  if (result_.get()) InternalClose();
 
   SqlResult::Type retval = MakeRequestExecute();
 
@@ -71,8 +69,7 @@ SqlResult::Type DataQuery::Cancel() {
   if (hasAsyncFetch) {
     if (!result_) {
       LOG_ERROR_MSG("no result found");
-      diag.AddStatusRecord(SqlState::SHY000_GENERAL_ERROR,
-                           "query is not executed");
+      diag.AddStatusRecord(SqlState::SHY000_GENERAL_ERROR, "query is not executed");
       return SqlResult::AI_ERROR;
     }
 
@@ -83,11 +80,11 @@ SqlResult::Type DataQuery::Cancel() {
     auto outcome = connection_.GetQueryClient()->CancelQuery(cancel_request);
     std::string message("");
     if (outcome.IsSuccess()) {
-      message = "Query ID: " + cancel_request.GetQueryId() + " is cancelled."
-                + outcome.GetResult().GetCancellationMessage();
+      message = "Query ID: " + cancel_request.GetQueryId() + " is cancelled." +
+                outcome.GetResult().GetCancellationMessage();
     } else {
-      message = "Query ID: " + cancel_request.GetQueryId() + " can't cancel."
-                + outcome.GetError().GetMessage();
+      message = "Query ID: " + cancel_request.GetQueryId() + " can't cancel." +
+                outcome.GetError().GetMessage();
       // ValidationException is an exception that the query is finished and
       // cancel does not work, it should not be counted as error
       if (outcome.GetError().GetExceptionName() != "ValidationException") {
@@ -127,13 +124,13 @@ const meta::ColumnMetaVector* DataQuery::GetMeta() {
  * @return void.
  */
 void AsyncFetchOnePage(
-    const std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient > client,
+    const std::shared_ptr<Aws::TimestreamQuery::TimestreamQueryClient> client,
     const QueryRequest& request, DataQueryContext& context_) {
   LOG_DEBUG_MSG("AsyncFetchOnePage is called");
   Aws::TimestreamQuery::Model::QueryOutcome result;
   result = client->Query(request);
 
-  std::unique_lock< std::mutex > locker(context_.mutex_);
+  std::unique_lock<std::mutex> locker(context_.mutex_);
   context_.cv_.wait(locker, [&]() {
     // This thread could only continue when context_.queue_ is empty
     // or the main thread is exiting.
@@ -150,7 +147,7 @@ void AsyncFetchOnePage(
 
 SqlResult::Type DataQuery::SwitchCursor() {
   LOG_DEBUG_MSG("SwitchCursor is called");
-  std::unique_lock< std::mutex > locker(context_.mutex_);
+  std::unique_lock<std::mutex> locker(context_.mutex_);
   context_.cv_.wait(locker, [&]() { return !context_.queue_.empty(); });
   Aws::TimestreamQuery::Model::QueryOutcome outcome = context_.queue_.front();
   context_.queue_.pop();
@@ -158,20 +155,19 @@ SqlResult::Type DataQuery::SwitchCursor() {
 
   if (!outcome.IsSuccess()) {
     auto& error = outcome.GetError();
-    LOG_ERROR_MSG("ERROR: " << error.GetExceptionName() << ": "
-                            << error.GetMessage() << ", for query " << sql_
+    LOG_ERROR_MSG("ERROR: " << error.GetExceptionName() << ": " << error.GetMessage()
+                            << ", for query " << sql_
                             << ", number of rows fetched: " << rowCounter);
     cursor_.reset();
     hasAsyncFetch = false;  // no async fetch any more
     return SqlResult::Type::AI_ERROR;
   }
 
-  result_ = std::make_shared< QueryResult >(outcome.GetResult());
-  const Aws::Vector< Row >& rows = outcome.GetResult().GetRows();
+  result_ = std::make_shared<QueryResult>(outcome.GetResult());
+  const Aws::Vector<Row>& rows = outcome.GetResult().GetRows();
   const Aws::String& token = outcome.GetResult().GetNextToken();
   if (rows.empty()) {
-    LOG_INFO_MSG(
-        "Data fetching is finished, number of rows fetched: " << rowCounter);
+    LOG_INFO_MSG("Data fetching is finished, number of rows fetched: " << rowCounter);
     return SqlResult::AI_NO_DATA;
   }
 
@@ -182,8 +178,7 @@ SqlResult::Type DataQuery::SwitchCursor() {
 
   if (token.empty()) {
     hasAsyncFetch = false;  // no async fetch any more
-    LOG_INFO_MSG(
-        "Data fetching is finished, number of rows fetched: " << rowCounter);
+    LOG_INFO_MSG("Data fetching is finished, number of rows fetched: " << rowCounter);
   } else {
     if (!threads_.empty()) {
       std::thread& itr = threads_.front();
@@ -238,11 +233,9 @@ SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
   for (uint32_t i = 1; i < cursor_->GetColumnSize() + 1; ++i) {
     app::ColumnBindingMap::iterator it = columnBindings.find(i);
 
-    if (it == columnBindings.end())
-      continue;
-  
-    app::ConversionResult::Type convRes =
-        cursor_->ReadColumnToBuffer(i, it->second);
+    if (it == columnBindings.end()) continue;
+
+    app::ConversionResult::Type convRes = cursor_->ReadColumnToBuffer(i, it->second);
 
     SqlResult::Type result = ProcessConversionResult(convRes, 0, i);
 
@@ -275,8 +268,7 @@ SqlResult::Type DataQuery::GetColumn(uint16_t columnIdx,
     return SqlResult::AI_ERROR;
   }
 
-  app::ConversionResult::Type convRes =
-      cursor_->ReadColumnToBuffer(columnIdx, buffer);
+  app::ConversionResult::Type convRes = cursor_->ReadColumnToBuffer(columnIdx, buffer);
 
   SqlResult::Type result = ProcessConversionResult(convRes, 0, columnIdx);
 
@@ -315,9 +307,7 @@ SqlResult::Type DataQuery::InternalClose() {
   return SqlResult::AI_SUCCESS;
 }
 
-bool DataQuery::DataAvailable() const {
-  return cursor_ != nullptr;
-}
+bool DataQuery::DataAvailable() const { return cursor_ != nullptr; }
 
 int64_t DataQuery::AffectedRows() const {
   // Return zero by default, since number of affected rows is non-zero only
@@ -339,9 +329,7 @@ int64_t DataQuery::RowNumber() const {
   return int64_t(rowCounter);
 }
 
-SqlResult::Type DataQuery::NextResultSet() {
-  return SqlResult::AI_NO_DATA;
-}
+SqlResult::Type DataQuery::NextResultSet() { return SqlResult::AI_NO_DATA; }
 
 SqlResult::Type DataQuery::MakeRequestExecute() {
   // This function is called by Execute() and does the actual querying
@@ -361,18 +349,17 @@ SqlResult::Type DataQuery::MakeRequestExecute() {
 
     if (!outcome.IsSuccess()) {
       auto error = outcome.GetError();
-      LOG_ERROR_MSG("ERROR: " << error.GetExceptionName() << ": "
-                              << error.GetMessage() << " for query " << sql_);
+      LOG_ERROR_MSG("ERROR: " << error.GetExceptionName() << ": " << error.GetMessage()
+                              << " for query " << sql_);
 
-      diag.AddStatusRecord(
-          SqlState::SHY000_GENERAL_ERROR,
-          "AWS API Failure: Failed to execute query \"" + sql_ + "\"");
+      diag.AddStatusRecord(SqlState::SHY000_GENERAL_ERROR,
+                           "AWS API Failure: Failed to execute query \"" + sql_ + "\"");
       InternalClose();
       return SqlResult::AI_ERROR;
     }
 
     // outcome is successful, update result_
-    result_ = std::make_shared< QueryResult >(outcome.GetResult());
+    result_ = std::make_shared<QueryResult>(outcome.GetResult());
     if (result_->GetRows().empty()) {
       if (result_->GetNextToken().empty()) {
         // result is empty
@@ -389,8 +376,7 @@ SqlResult::Type DataQuery::MakeRequestExecute() {
   cursor_.reset(new TimestreamCursor(result_->GetRows(), resultMeta_));
 
   if (!result_->GetNextToken().empty()) {
-    LOG_DEBUG_MSG(
-        "Next token is not empty, starting async thread to fetch next page");
+    LOG_DEBUG_MSG("Next token is not empty, starting async thread to fetch next page");
     request_.SetNextToken(result_->GetNextToken());
     std::thread next(AsyncFetchOnePage, queryClient_, std::ref(request_),
                      std::ref(context_));
@@ -406,12 +392,11 @@ SqlResult::Type DataQuery::MakeRequestFetch() {
   LOG_DEBUG_MSG("MakeRequestFetch is called");
 
   if (!result_.get()) {
-    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                         "result_ is a null pointer");
+    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR, "result_ is a null pointer");
     return SqlResult::AI_ERROR;
   }
 
-  const Aws::Vector< ColumnInfo >& columnInfo = result_->GetColumnInfo();
+  const Aws::Vector<ColumnInfo>& columnInfo = result_->GetColumnInfo();
 
   if (!resultMetaAvailable_) {
     ReadColumnMetadataVector(columnInfo);
@@ -444,23 +429,22 @@ SqlResult::Type DataQuery::MakeRequestResultsetMeta() {
     auto const error = outcome.GetError();
 
     diag.AddStatusRecord(SqlState::SHY000_GENERAL_ERROR,
-                         "AWS API ERROR: " + error.GetExceptionName() + ": "
-                             + error.GetMessage() + " for query " + sql_);
+                         "AWS API ERROR: " + error.GetExceptionName() + ": " +
+                             error.GetMessage() + " for query " + sql_);
 
     InternalClose();
     return SqlResult::AI_ERROR;
   }
   // outcome is successful
   QueryResult result = outcome.GetResult();
-  const Aws::Vector< ColumnInfo >& columnInfo = result.GetColumnInfo();
+  const Aws::Vector<ColumnInfo>& columnInfo = result.GetColumnInfo();
 
   ReadColumnMetadataVector(columnInfo);
 
   return SqlResult::AI_SUCCESS;
 }
 
-void DataQuery::ReadColumnMetadataVector(
-    const Aws::Vector< ColumnInfo >& tsVector) {
+void DataQuery::ReadColumnMetadataVector(const Aws::Vector<ColumnInfo>& tsVector) {
   LOG_DEBUG_MSG("ReadColumnMetadataVector is called");
 
   using timestream::odbc::meta::ColumnMeta;
@@ -479,10 +463,10 @@ void DataQuery::ReadColumnMetadataVector(
   resultMetaAvailable_ = true;
 }
 
-SqlResult::Type DataQuery::ProcessConversionResult(
-    app::ConversionResult::Type convRes, int32_t rowIdx, int32_t columnIdx) {
+SqlResult::Type DataQuery::ProcessConversionResult(app::ConversionResult::Type convRes,
+                                                   int32_t rowIdx, int32_t columnIdx) {
   LOG_DEBUG_MSG("ProcessConversionResult is called with convRes is "
-                << static_cast< int >(convRes));
+                << static_cast<int>(convRes));
 
   switch (convRes) {
     case app::ConversionResult::Type::AI_SUCCESS: {
@@ -503,19 +487,19 @@ SqlResult::Type DataQuery::ProcessConversionResult(
     }
 
     case app::ConversionResult::Type::AI_FRACTIONAL_TRUNCATED: {
-      diag.AddStatusRecord(
-          SqlState::S01S07_FRACTIONAL_TRUNCATION,
-          "Buffer is too small for the column data. Fraction truncated.",
-          timestream::odbc::LogLevel::Type::WARNING_LEVEL, rowIdx, columnIdx);
+      diag.AddStatusRecord(SqlState::S01S07_FRACTIONAL_TRUNCATION,
+                           "Buffer is too small for the column data. Fraction truncated.",
+                           timestream::odbc::LogLevel::Type::WARNING_LEVEL, rowIdx,
+                           columnIdx);
 
       return SqlResult::AI_SUCCESS_WITH_INFO;
     }
 
     case app::ConversionResult::Type::AI_INDICATOR_NEEDED: {
-      diag.AddStatusRecord(
-          SqlState::S22002_INDICATOR_NEEDED,
-          "Indicator is needed but not suplied for the column buffer.",
-          timestream::odbc::LogLevel::Type::WARNING_LEVEL, rowIdx, columnIdx);
+      diag.AddStatusRecord(SqlState::S22002_INDICATOR_NEEDED,
+                           "Indicator is needed but not suplied for the column buffer.",
+                           timestream::odbc::LogLevel::Type::WARNING_LEVEL, rowIdx,
+                           columnIdx);
 
       return SqlResult::AI_SUCCESS_WITH_INFO;
     }
@@ -523,8 +507,8 @@ SqlResult::Type DataQuery::ProcessConversionResult(
     case app::ConversionResult::Type::AI_UNSUPPORTED_CONVERSION: {
       diag.AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
                            "Data conversion is not supported.",
-                           timestream::odbc::LogLevel::Type::WARNING_LEVEL,
-                           rowIdx, columnIdx);
+                           timestream::odbc::LogLevel::Type::WARNING_LEVEL, rowIdx,
+                           columnIdx);
 
       return SqlResult::AI_SUCCESS_WITH_INFO;
     }
@@ -532,9 +516,9 @@ SqlResult::Type DataQuery::ProcessConversionResult(
     case app::ConversionResult::Type::AI_FAILURE:
       LOG_DEBUG_MSG("parameter: convRes: AI_FAILURE");
     default: {
-      diag.AddStatusRecord(
-          SqlState::S01S01_ERROR_IN_ROW, "Can not retrieve row column.",
-          timestream::odbc::LogLevel::Type::WARNING_LEVEL, rowIdx, columnIdx);
+      diag.AddStatusRecord(SqlState::S01S01_ERROR_IN_ROW, "Can not retrieve row column.",
+                           timestream::odbc::LogLevel::Type::WARNING_LEVEL, rowIdx,
+                           columnIdx);
       break;
     }
   }
@@ -554,21 +538,19 @@ void DataQuery::SetResultsetMeta(const meta::ColumnMetaVector& value) {
     meta::ColumnMeta& meta = resultMeta_.at(i);
     if (meta.GetDataType()) {
       LOG_DEBUG_MSG(
-          "\n[" << i << "] SchemaName:     "
-                << meta.GetSchemaName().get_value_or("") << "\n[" << i
-                << "] TypeName:       " << meta.GetTableName().get_value_or("")
+          "\n[" << i << "] SchemaName:     " << meta.GetSchemaName().get_value_or("")
                 << "\n[" << i
-                << "] ColumnName:     " << meta.GetColumnName().get_value_or("")
-                << "\n[" << i << "] ColumnType:     "
-                << static_cast< int32_t >(*meta.GetDataType()));
+                << "] TypeName:       " << meta.GetTableName().get_value_or("") << "\n["
+                << i << "] ColumnName:     " << meta.GetColumnName().get_value_or("")
+                << "\n[" << i
+                << "] ColumnType:     " << static_cast<int32_t>(*meta.GetDataType()));
     } else {
-      LOG_DEBUG_MSG(
-          "\n[" << i << "] SchemaName:     "
-                << meta.GetSchemaName().get_value_or("") << "\n[" << i
-                << "] TypeName:       " << meta.GetTableName().get_value_or("")
-                << "\n[" << i
-                << "] ColumnName:     " << meta.GetColumnName().get_value_or("")
-                << "\n[" << i << "] ColumnType: not available");
+      LOG_DEBUG_MSG("\n[" << i << "] SchemaName:     "
+                          << meta.GetSchemaName().get_value_or("") << "\n[" << i
+                          << "] TypeName:       " << meta.GetTableName().get_value_or("")
+                          << "\n[" << i
+                          << "] ColumnName:     " << meta.GetColumnName().get_value_or("")
+                          << "\n[" << i << "] ColumnType: not available");
     }
   }
 }

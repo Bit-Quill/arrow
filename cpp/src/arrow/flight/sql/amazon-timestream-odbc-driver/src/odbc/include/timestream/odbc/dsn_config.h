@@ -21,9 +21,9 @@
 #ifndef _TIMESTREAM_ODBC_DSN_CONFIG
 #define _TIMESTREAM_ODBC_DSN_CONFIG
 
+#include "sqltypes.h"
 #include "timestream/odbc/config/configuration.h"
 #include "timestream/odbc/ignite_error.h"
-#include "sqltypes.h"
 
 using namespace timestream::odbc::config;
 using namespace timestream::odbc;
@@ -89,8 +89,7 @@ bool DeleteDsnConfiguration(const std::string dsn, IgniteError& error);
  * @param driver Driver.
  * @return True on success and false on fail.
  */
-bool RegisterDsn(const Configuration& config, const LPCSTR driver,
-                 IgniteError& error);
+bool RegisterDsn(const Configuration& config, const LPCSTR driver, IgniteError& error);
 
 /**
  * Unregister specified DSN.

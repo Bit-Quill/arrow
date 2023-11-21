@@ -36,15 +36,14 @@ const wchar_t* const query = L"SELECT * FROM ODBCTest.IoT limit 10000";
 int Setup(SQLHENV* env, SQLHDBC* conn, SQLHSTMT* hstmt) {
   SQLTCHAR out_conn_string[1024];
   SQLSMALLINT out_conn_string_length;
-  if (SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, env))
-      && SQL_SUCCEEDED(
-          SQLSetEnvAttr(*env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0))
-      && SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_DBC, *env, conn))
-      && SQL_SUCCEEDED(SQLDriverConnect(
-          *conn, NULL, (SQLTCHAR*)dsn_conn_string.c_str(), SQL_NTS,
-          out_conn_string, HELPER_SIZEOF(out_conn_string),
-          &out_conn_string_length, SQL_DRIVER_COMPLETE))
-      && SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, *conn, hstmt))) {
+  if (SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, env)) &&
+      SQL_SUCCEEDED(SQLSetEnvAttr(*env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0)) &&
+      SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_DBC, *env, conn)) &&
+      SQL_SUCCEEDED(SQLDriverConnect(*conn, NULL, (SQLTCHAR*)dsn_conn_string.c_str(),
+                                     SQL_NTS, out_conn_string,
+                                     HELPER_SIZEOF(out_conn_string),
+                                     &out_conn_string_length, SQL_DRIVER_COMPLETE)) &&
+      SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, *conn, hstmt))) {
     return SQL_SUCCESS;
   }
   return SQL_ERROR;
@@ -68,10 +67,9 @@ int QueryExecutionTime() {
         auto start = std::chrono::steady_clock::now();
         ret = SQLExecDirect(hstmt, (SQLTCHAR*)query, SQL_NTS);
         auto end = std::chrono::steady_clock::now();
-        std::cout << std::chrono::duration_cast< std::chrono::milliseconds >(
-                         end - start)
-                         .count()
-                  << std::endl;
+        std::cout
+            << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
+            << std::endl;
         SQLCloseCursor(hstmt);
       }
       Teardown(&conn, &env);
@@ -82,6 +80,4 @@ int QueryExecutionTime() {
   return ret;
 }
 
-int main() {
-  return QueryExecutionTime();
-}
+int main() { return QueryExecutionTime(); }

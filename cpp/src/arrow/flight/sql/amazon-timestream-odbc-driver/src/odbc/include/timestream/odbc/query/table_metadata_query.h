@@ -22,8 +22,8 @@
 #define _TIMESTREAM_ODBC_QUERY_TABLE_METADATA_QUERY
 
 #include "timestream/odbc/meta/table_meta.h"
-#include "timestream/odbc/query/query.h"
 #include "timestream/odbc/query/data_query.h"
+#include "timestream/odbc/query/query.h"
 #include "timestream/odbc/statement.h"
 
 namespace timestream {
@@ -66,12 +66,11 @@ class TableMetadataQuery : public timestream::odbc::query::Query {
    * @param table Table search pattern.
    * @param tableType Table type search pattern.
    */
-  TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
-                     Connection& connection,
-                     const boost::optional< std::string >& catalog,
-                     const boost::optional< std::string >& schema,
-                     const boost::optional< std::string >& table,
-                     const boost::optional< std::string >& tableType);
+  TableMetadataQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection,
+                     const boost::optional<std::string>& catalog,
+                     const boost::optional<std::string>& schema,
+                     const boost::optional<std::string>& table,
+                     const boost::optional<std::string>& tableType);
 
   /**
    * Destructor.
@@ -184,8 +183,7 @@ class TableMetadataQuery : public timestream::odbc::query::Query {
    * @param databasePattern Database pattern
    * @return Operation result
    */
-  SqlResult::Type getTablesWithIdentifier(
-      const std::string& databaseIdentifier);
+  SqlResult::Type getTablesWithIdentifier(const std::string& databaseIdentifier);
 
   /**
    * Get tables that match the database and table case-insensitivie search
@@ -195,7 +193,7 @@ class TableMetadataQuery : public timestream::odbc::query::Query {
    * @return Operation result
    */
   SqlResult::Type getTablesWithSearchPattern(
-      const boost::optional< std::string >& databasePattern);
+      const boost::optional<std::string>& databasePattern);
 
   /**
    *  Get the database names that match database pattern
@@ -204,9 +202,8 @@ class TableMetadataQuery : public timestream::odbc::query::Query {
    * @param databaseNames Vector to store database names
    * @return Operation result
    */
-  SqlResult::Type getMatchedDatabases(
-      const std::string& databasePattern,
-      std::vector< std::string >& databaseNames);
+  SqlResult::Type getMatchedDatabases(const std::string& databasePattern,
+                                      std::vector<std::string>& databaseNames);
 
   /**
    *  Get the table names that match table pattern from specified database
@@ -218,7 +215,7 @@ class TableMetadataQuery : public timestream::odbc::query::Query {
    */
   SqlResult::Type getMatchedTables(const std::string& databaseName,
                                    const std::string& tablePattern,
-                                   std::vector< std::string >& c);
+                                   std::vector<std::string>& c);
 
   /**
    * Remove outer matching quotes from a string. They can be either single (')
@@ -233,16 +230,16 @@ class TableMetadataQuery : public timestream::odbc::query::Query {
   Connection& connection;
 
   /** Catalog search pattern. */
-  boost::optional< std::string > catalog;
+  boost::optional<std::string> catalog;
 
   /** Schema search pattern. */
-  boost::optional< std::string > schema;
+  boost::optional<std::string> schema;
 
   /** Table search pattern. */
-  boost::optional< std::string > table;
+  boost::optional<std::string> table;
 
   /** Table type search pattern. */
-  boost::optional< std::string > tableType;
+  boost::optional<std::string> tableType;
 
   /** Query executed. */
   bool executed;
@@ -269,7 +266,7 @@ class TableMetadataQuery : public timestream::odbc::query::Query {
   meta::ColumnMetaVector columnsMeta;
 
   /** DataQuery pointer for "show" command to run **/
-  std::shared_ptr< DataQuery > dataQuery_;
+  std::shared_ptr<DataQuery> dataQuery_;
 };
 }  // namespace query
 }  // namespace odbc

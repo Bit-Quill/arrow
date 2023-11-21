@@ -28,8 +28,7 @@ IntervalYearMonth::IntervalYearMonth(int32_t year, int32_t month)
   // No-op.
 }
 
-IntervalYearMonth& IntervalYearMonth::operator=(
-    const IntervalYearMonth& another) {
+IntervalYearMonth& IntervalYearMonth::operator=(const IntervalYearMonth& another) {
   year_ = another.year_;
   month_ = another.month_;
 
@@ -45,8 +44,8 @@ bool operator!=(const IntervalYearMonth& val1, const IntervalYearMonth& val2) {
 }
 
 bool operator<(const IntervalYearMonth& val1, const IntervalYearMonth& val2) {
-  return (val1.year_ < val2.year_)
-         || ((val1.year_ == val2.year_) && (val1.month_ < val2.month_));
+  return (val1.year_ < val2.year_) ||
+         ((val1.year_ == val2.year_) && (val1.month_ < val2.month_));
 }
 
 bool operator<=(const IntervalYearMonth& val1, const IntervalYearMonth& val2) {

@@ -30,25 +30,22 @@ class TimestreamWriter {
  public:
   TimestreamWriter(Aws::Auth::AWSCredentials& credentials,
                    Aws::Client::ClientConfiguration& clientCfg) {
-    client_ = std::make_shared< Aws::TimestreamWrite::TimestreamWriteClient >(
-        credentials, clientCfg);
+    client_ = std::make_shared<Aws::TimestreamWrite::TimestreamWriteClient>(credentials,
+                                                                            clientCfg);
   }
 
   ~TimestreamWriter() = default;
 
-  bool WriteSingleValueRecords(const Aws::String& tableMeta,
-                               const Aws::String& database,
+  bool WriteSingleValueRecords(const Aws::String& tableMeta, const Aws::String& database,
                                const Aws::String& table, int loop);
 
-  bool WriteMultiValueRecords(const Aws::String& tableMeta,
-                              const Aws::String& database,
+  bool WriteMultiValueRecords(const Aws::String& tableMeta, const Aws::String& database,
                               const Aws::String& table, int loop);
 
  private:
-  std::shared_ptr< MeasureMetadataCreater > CreateMetadataCreater(
-      Aws::String tableType);
+  std::shared_ptr<MeasureMetadataCreater> CreateMetadataCreater(Aws::String tableType);
 
-  std::shared_ptr< Aws::TimestreamWrite::TimestreamWriteClient > client_;
+  std::shared_ptr<Aws::TimestreamWrite::TimestreamWriteClient> client_;
 };
 }  // namespace odbc
 }  // namespace timestream

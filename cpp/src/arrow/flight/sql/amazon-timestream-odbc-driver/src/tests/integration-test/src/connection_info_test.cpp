@@ -70,20 +70,17 @@ BOOST_AUTO_TEST_CASE(TestConnectionInfoSupportedInfo) {
 #endif  // SQL_COLUMN_ALIAS
 
 #ifdef SQL_IDENTIFIER_QUOTE_CHAR
-  result =
-      info.GetInfo(SQL_IDENTIFIER_QUOTE_CHAR, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_IDENTIFIER_QUOTE_CHAR, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_IDENTIFIER_QUOTE_CHAR
 
 #ifdef SQL_CATALOG_NAME_SEPARATOR
-  result =
-      info.GetInfo(SQL_CATALOG_NAME_SEPARATOR, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_CATALOG_NAME_SEPARATOR, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_CATALOG_NAME_SEPARATOR
 
 #ifdef SQL_SPECIAL_CHARACTERS
-  result =
-      info.GetInfo(SQL_SPECIAL_CHARACTERS, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_SPECIAL_CHARACTERS, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_SPECIAL_CHARACTERS
 
@@ -103,20 +100,17 @@ BOOST_AUTO_TEST_CASE(TestConnectionInfoSupportedInfo) {
 #endif  // SQL_SCHEMA_TERM
 
 #ifdef SQL_ASYNC_DBC_FUNCTIONS
-  result =
-      info.GetInfo(SQL_ASYNC_DBC_FUNCTIONS, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_ASYNC_DBC_FUNCTIONS, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_ASYNC_DBC_FUNCTIONS
 
 #ifdef SQL_GETDATA_EXTENSIONS
-  result =
-      info.GetInfo(SQL_GETDATA_EXTENSIONS, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_GETDATA_EXTENSIONS, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_GETDATA_EXTENSIONS
 
 #ifdef SQL_ODBC_INTERFACE_CONFORMANCE
-  result = info.GetInfo(SQL_ODBC_INTERFACE_CONFORMANCE, buffer, sizeof(buffer),
-                        &reslen);
+  result = info.GetInfo(SQL_ODBC_INTERFACE_CONFORMANCE, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_ODBC_INTERFACE_CONFORMANCE
 
@@ -136,14 +130,12 @@ BOOST_AUTO_TEST_CASE(TestConnectionInfoSupportedInfo) {
 #endif  // SQL_SCHEMA_USAGE
 
 #ifdef SQL_MAX_IDENTIFIER_LEN
-  result =
-      info.GetInfo(SQL_MAX_IDENTIFIER_LEN, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_MAX_IDENTIFIER_LEN, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_MAX_IDENTIFIER_LEN
 
 #ifdef SQL_AGGREGATE_FUNCTIONS
-  result =
-      info.GetInfo(SQL_AGGREGATE_FUNCTIONS, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_AGGREGATE_FUNCTIONS, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_AGGREGATE_FUNCTIONS
 
@@ -158,20 +150,17 @@ BOOST_AUTO_TEST_CASE(TestConnectionInfoSupportedInfo) {
 #endif  // SQL_STRING_FUNCTIONS
 
 #ifdef SQL_TIMEDATE_FUNCTIONS
-  result =
-      info.GetInfo(SQL_TIMEDATE_FUNCTIONS, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_TIMEDATE_FUNCTIONS, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_TIMEDATE_FUNCTIONS
 
 #ifdef SQL_TIMEDATE_ADD_INTERVALS
-  result =
-      info.GetInfo(SQL_TIMEDATE_ADD_INTERVALS, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_TIMEDATE_ADD_INTERVALS, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_TIMEDATE_ADD_INTERVALS
 
 #ifdef SQL_TIMEDATE_DIFF_INTERVALS
-  result = info.GetInfo(SQL_TIMEDATE_DIFF_INTERVALS, buffer, sizeof(buffer),
-                        &reslen);
+  result = info.GetInfo(SQL_TIMEDATE_DIFF_INTERVALS, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_TIMEDATE_DIFF_INTERVALS
 
@@ -201,21 +190,18 @@ BOOST_AUTO_TEST_CASE(TestConnectionInfoSupportedInfo) {
 #endif  // SQL_POS_OPERATIONS
 
 #ifdef SQL_MAX_CONCURRENT_ACTIVITIES
-  result = info.GetInfo(SQL_MAX_CONCURRENT_ACTIVITIES, buffer, sizeof(buffer),
-                        &reslen);
+  result = info.GetInfo(SQL_MAX_CONCURRENT_ACTIVITIES, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_MAX_CONCURRENT_ACTIVITIES
 
 #ifndef _WIN32
 #ifdef SQL_CURSOR_COMMIT_BEHAVIOR
-  result =
-      info.GetInfo(SQL_CURSOR_COMMIT_BEHAVIOR, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_CURSOR_COMMIT_BEHAVIOR, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_CURSOR_COMMIT_BEHAVIOR
 
 #ifdef SQL_CURSOR_ROLLBACK_BEHAVIOR
-  result = info.GetInfo(SQL_CURSOR_ROLLBACK_BEHAVIOR, buffer, sizeof(buffer),
-                        &reslen);
+  result = info.GetInfo(SQL_CURSOR_ROLLBACK_BEHAVIOR, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_CURSOR_ROLLBACK_BEHAVIOR
 #endif  // ifndef _WIN32
@@ -226,8 +212,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionInfoSupportedInfo) {
 #endif  // SQL_TXN_CAPABLE
 
 #ifdef SQL_QUOTED_IDENTIFIER_CASE
-  result =
-      info.GetInfo(SQL_QUOTED_IDENTIFIER_CASE, buffer, sizeof(buffer), &reslen);
+  result = info.GetInfo(SQL_QUOTED_IDENTIFIER_CASE, buffer, sizeof(buffer), &reslen);
   BOOST_REQUIRE(result == SqlResult::AI_SUCCESS);
 #endif  // SQL_QUOTED_IDENTIFIER_CASE
 }

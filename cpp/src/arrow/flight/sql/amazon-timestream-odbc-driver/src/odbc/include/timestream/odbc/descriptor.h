@@ -114,36 +114,28 @@ class IGNITE_IMPORT_EXPORT Descriptor : public diagnostic::DiagnosableAdapter {
    *
    * @param conn Connection pointer.
    */
-  void SetConnection(Connection* conn) {
-    conn_ = conn;
-  }
+  void SetConnection(Connection* conn) { conn_ = conn; }
 
   /**
    * Record the statement which binds this descriptor.
    *
    * @param stmt Statement pointer.
    */
-  void SetStatement(Statement* stmt) {
-    stmt_ = stmt;
-  }
+  void SetStatement(Statement* stmt) { stmt_ = stmt; }
 
   /**
    * Set descriptor type.
    *
    * @param type Descriptor type.
    */
-  void SetType(DescType type) {
-    type_ = type;
-  }
+  void SetType(DescType type) { type_ = type; }
 
   /**
    * Get descriptor type.
    *
    * @return Descriptor type enum value.
    */
-  DescType GetType() {
-    return type_;
-  }
+  DescType GetType() { return type_; }
 
   /**
    * Deregister from the statement, where the descriptor is bound
@@ -155,36 +147,28 @@ class IGNITE_IMPORT_EXPORT Descriptor : public diagnostic::DiagnosableAdapter {
    *
    * @return Connection*.
    */
-  Connection* GetConnection() {
-    return conn_;
-  }
+  Connection* GetConnection() { return conn_; }
 
   /**
    * Get statement pointer.
    *
    * @return Statement*.
    */
-  Statement* GetStatement() {
-    return stmt_;
-  }
+  Statement* GetStatement() { return stmt_; }
 
   /**
    * Get descriptor header.
    *
    * @return DescriptorHeader&.
    */
-  DescriptorHeader& GetHeader() {
-    return header_;
-  }
+  DescriptorHeader& GetHeader() { return header_; }
 
   /**
    * Get descriptor records map.
    *
    * @return Reference to the map.
    */
-  std::map< int, DescriptorRecord >& GetRecords() {
-    return records_;
-  }
+  std::map<int, DescriptorRecord>& GetRecords() { return records_; }
 
   /**
    * Set a descriptor field.
@@ -194,8 +178,7 @@ class IGNITE_IMPORT_EXPORT Descriptor : public diagnostic::DiagnosableAdapter {
    * @param buffer Buffer that holds the value.
    * @param bufferLen Buffer length.
    */
-  void SetField(int recNum, int fieldId, SQLPOINTER buffer,
-                SQLINTEGER bufferLen);
+  void SetField(int recNum, int fieldId, SQLPOINTER buffer, SQLINTEGER bufferLen);
 
   /**
    * Get a descriptor field value.
@@ -206,8 +189,8 @@ class IGNITE_IMPORT_EXPORT Descriptor : public diagnostic::DiagnosableAdapter {
    * @param bufferLen Buffer length.
    * @param resLen Result length.
    */
-  void GetField(int recNum, int fieldId, SQLPOINTER buffer,
-                SQLINTEGER bufferLen, SQLINTEGER* resLen);
+  void GetField(int recNum, int fieldId, SQLPOINTER buffer, SQLINTEGER bufferLen,
+                SQLINTEGER* resLen);
 
   /**
    * Copy current descriptor content to destination descriptor
@@ -339,7 +322,7 @@ class IGNITE_IMPORT_EXPORT Descriptor : public diagnostic::DiagnosableAdapter {
   DescriptorHeader header_;
 
   /** Descriptor record map, key is column index */
-  std::map< int, DescriptorRecord > records_;
+  std::map<int, DescriptorRecord> records_;
 };
 
 }  // namespace odbc

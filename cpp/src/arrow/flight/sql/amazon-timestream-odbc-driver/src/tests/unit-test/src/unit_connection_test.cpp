@@ -17,14 +17,13 @@
 #define BOOST_TEST_MODULE TimestreamUnitTest
 #include <string>
 
-#include <odbc_unit_test_suite.h>
-#include "timestream/odbc/log.h"
-#include "timestream/odbc/log_level.h"
 #include <ignite/common/include/common/platform_utils.h>
+#include <odbc_unit_test_suite.h>
 #include <timestream/odbc/authentication/auth_type.h>
+#include <regex>
 #include "mock/mock_timestream_service.h"
 #include "timestream/odbc/log.h"
-#include <regex>
+#include "timestream/odbc/log_level.h"
 
 using timestream::odbc::AuthType;
 using timestream::odbc::MockConnection;
@@ -37,14 +36,12 @@ using namespace boost::unit_test;
  * Test setup fixture.
  */
 struct ConnectionUnitTestSuiteFixture : OdbcUnitTestSuite {
-  ConnectionUnitTestSuiteFixture() : OdbcUnitTestSuite() {
-  }
+  ConnectionUnitTestSuiteFixture() : OdbcUnitTestSuite() {}
 
   /**
    * Destructor.
    */
-  ~ConnectionUnitTestSuiteFixture() {
-  }
+  ~ConnectionUnitTestSuiteFixture() {}
 
   void getLogOptions(Configuration& config) const {
     using ignite::odbc::common::GetEnv;
@@ -53,8 +50,7 @@ struct ConnectionUnitTestSuiteFixture : OdbcUnitTestSuite {
     std::string logPath = GetEnv("TIMESTREAM_LOG_PATH", "");
     std::string logLevelStr = GetEnv("TIMESTREAM_LOG_LEVEL", "2");
 
-    LogLevel::Type logLevel =
-        LogLevel::FromString(logLevelStr, LogLevel::Type::UNKNOWN);
+    LogLevel::Type logLevel = LogLevel::FromString(logLevelStr, LogLevel::Type::UNKNOWN);
     config.SetLogLevel(logLevel);
     config.SetLogPath(logPath);
   }
@@ -87,20 +83,19 @@ struct ConnectionUnitTestSuiteFixture : OdbcUnitTestSuite {
     std::ostream* original =
         timestream::odbc::Logger::GetLoggerInstance()->GetLogStream();
     timestream::odbc::Logger::GetLoggerInstance()->SetLogStream(
-        static_cast< std::ostream* >(&ss));
+        static_cast<std::ostream*>(&ss));
 
     dbc->Establish(cfg);
 
     timestream::odbc::Logger::GetLoggerInstance()->SetLogStream(original);
     std::string logMsg = ss.str();
     std::smatch matches;
-    BOOST_REQUIRE_EQUAL(
-        std::regex_search(logMsg, matches, std::regex(expectedMsg)), true);
+    BOOST_REQUIRE_EQUAL(std::regex_search(logMsg, matches, std::regex(expectedMsg)),
+                        true);
   }
 };
 
-BOOST_FIXTURE_TEST_SUITE(ConnectionUnitTestSuite,
-                         ConnectionUnitTestSuiteFixture)
+BOOST_FIXTURE_TEST_SUITE(ConnectionUnitTestSuite, ConnectionUnitTestSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(TestEstablishUsingKey) {
   Configuration cfg;
@@ -226,8 +221,7 @@ BOOST_AUTO_TEST_CASE(TestEstablishUsingAAD) {
   short reslen;
   dbc->GetInfo().GetInfo(SQL_USER_NAME, userName, buflen, &reslen);
 
-  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(userName)
-              == "aad_valid_user");
+  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(userName) == "aad_valid_user");
   BOOST_CHECK(IsSuccessful());
 }
 
@@ -282,9 +276,8 @@ BOOST_AUTO_TEST_CASE(TestAADNoAccessToken) {
 
   getLogOptions(cfg);
 
-  CheckConnectError(
-      cfg,
-      "Unable to extract the access token from the Azure AD response body");
+  CheckConnectError(cfg,
+                    "Unable to extract the access token from the Azure AD response body");
 
   BOOST_CHECK_EQUAL(GetReturnCode(), SQL_ERROR);
   BOOST_CHECK_EQUAL(GetSqlState(), "08001");
@@ -303,8 +296,7 @@ BOOST_AUTO_TEST_CASE(TestAADFailAccessToken) {
 
   getLogOptions(cfg);
 
-  CheckConnectError(
-      cfg, "Request to Azure Active Directory for access token failed");
+  CheckConnectError(cfg, "Request to Azure Active Directory for access token failed");
 
   BOOST_CHECK_EQUAL(GetReturnCode(), SQL_ERROR);
   BOOST_CHECK_EQUAL(GetSqlState(), "08001");
@@ -323,8 +315,7 @@ BOOST_AUTO_TEST_CASE(TestAADInvalidTenant) {
 
   getLogOptions(cfg);
 
-  CheckConnectError(
-      cfg, "Request to Azure Active Directory for access token failed");
+  CheckConnectError(cfg, "Request to Azure Active Directory for access token failed");
 
   BOOST_CHECK_EQUAL(GetReturnCode(), SQL_ERROR);
   BOOST_CHECK_EQUAL(GetSqlState(), "08001");
@@ -384,10 +375,9 @@ BOOST_AUTO_TEST_CASE(TestEstablishUsingOkta) {
 
   // verify SAMLResponse number character references are decoded correctly
   std::string errInfo;
-  BOOST_CHECK_EQUAL(
-      dbc->GetSAMLCredentialsProvider()->GetSAMLAssertion(errInfo),
-      "TUw6Mi4wOmF0dHJuYW1lLWZvcm1hdDpiYXNpYyI+"
-      "aGVtYS1pbnN0YW5jZSIgeHNpOnR5cGU9InhzOnN0cmluZyI+");
+  BOOST_CHECK_EQUAL(dbc->GetSAMLCredentialsProvider()->GetSAMLAssertion(errInfo),
+                    "TUw6Mi4wOmF0dHJuYW1lLWZvcm1hdDpiYXNpYyI+"
+                    "aGVtYS1pbnN0YW5jZSIgeHNpOnR5cGU9InhzOnN0cmluZyI+");
 
   // verify SQL_USER_NAME is set correctly after connect
   SQLWCHAR userName[16];
@@ -395,8 +385,7 @@ BOOST_AUTO_TEST_CASE(TestEstablishUsingOkta) {
   short reslen;
   dbc->GetInfo().GetInfo(SQL_USER_NAME, userName, buflen, &reslen);
 
-  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(userName)
-              == "okta_valid_user");
+  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(userName) == "okta_valid_user");
   BOOST_CHECK(IsSuccessful());
 }
 
@@ -411,8 +400,7 @@ BOOST_AUTO_TEST_CASE(TestOktaFailToGetSessionToken) {
   cfg.SetIdPArn("arn:idp");
 
   CheckConnectError(
-      cfg,
-      "Failed to get Okta session token. Error info: 'Invalid access key id'");
+      cfg, "Failed to get Okta session token. Error info: 'Invalid access key id'");
 
   BOOST_CHECK_EQUAL(GetReturnCode(), SQL_ERROR);
   BOOST_CHECK_EQUAL(GetSqlState(), "08001");
@@ -494,8 +482,7 @@ BOOST_AUTO_TEST_CASE(TestOktaAssertionNoSAMLRsp) {
   cfg.SetRoleArn("arn:role");
   cfg.SetIdPArn("arn:idp");
 
-  CheckConnectError(
-      cfg, "Could not extract SAMLResponse from the Okta response body");
+  CheckConnectError(cfg, "Could not extract SAMLResponse from the Okta response body");
 
   BOOST_CHECK_EQUAL(GetReturnCode(), SQL_ERROR);
   BOOST_CHECK_EQUAL(GetSqlState(), "08001");

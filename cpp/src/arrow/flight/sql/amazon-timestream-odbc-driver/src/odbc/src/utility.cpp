@@ -21,11 +21,11 @@
 #include "timestream/odbc/utility.h"
 
 #include <codecvt>
-#include <regex>
 #include <iomanip>
+#include <regex>
 
-#include "timestream/odbc/system/odbc_constants.h"
 #include "timestream/odbc/log.h"
+#include "timestream/odbc/system/odbc_constants.h"
 
 namespace timestream {
 namespace odbc {
@@ -33,13 +33,10 @@ namespace utility {
 using namespace ignite::odbc::common;
 
 size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
-                                     size_t outBufferLenBytes,
-                                     bool& isTruncated) {
-  LOG_DEBUG_MSG(
-      "CopyUtf8StringToSqlCharString is called with outBufferLenBytes is "
-      << outBufferLenBytes);
-  if (!inBuffer || (outBuffer && outBufferLenBytes == 0))
-    return 0;
+                                     size_t outBufferLenBytes, bool& isTruncated) {
+  LOG_DEBUG_MSG("CopyUtf8StringToSqlCharString is called with outBufferLenBytes is "
+                << outBufferLenBytes);
+  if (!inBuffer || (outBuffer && outBufferLenBytes == 0)) return 0;
 
   if (ANSI_STRING_ONLY) {
     // the inBuffer contains ANSI characters only
@@ -49,12 +46,11 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
     // from unicode to ANSI characters.
     size_t inBufLen = strlen(inBuffer);
     if (inBufLen >= outBufferLenBytes) {
-      strncpy(reinterpret_cast< char* >(outBuffer), inBuffer,
-              outBufferLenBytes - 1);
+      strncpy(reinterpret_cast<char*>(outBuffer), inBuffer, outBufferLenBytes - 1);
       outBuffer[outBufferLenBytes - 1] = 0;
       isTruncated = true;
     } else {
-      strncpy(reinterpret_cast< char* >(outBuffer), inBuffer, inBufLen);
+      strncpy(reinterpret_cast<char*>(outBuffer), inBuffer, inBufLen);
       outBuffer[inBufLen] = 0;
       isTruncated = false;
     }
@@ -65,23 +61,20 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
     // length in characters - as well as get .narrow() to work, as expected
     // Otherwise, it would be impossible to safely determine the
     // output buffer length needed.
-    static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
-        converter;
+    static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
     std::wstring inString = converter.from_bytes(inBuffer);
     size_t inBufferLenChars = inString.size();
     LOG_DEBUG_MSG("inBufferLenChars is " << inBufferLenChars);
 
     // If no output buffer, return REQUIRED length.
-    if (!outBuffer)
-      return inBufferLenChars;
+    if (!outBuffer) return inBufferLenChars;
 
-    size_t outBufferLenActual =
-        std::min(inBufferLenChars, outBufferLenBytes - 1);
+    size_t outBufferLenActual = std::min(inBufferLenChars, outBufferLenBytes - 1);
 
     std::locale currentLocale("");
-    std::use_facet< std::ctype< wchar_t > >(currentLocale)
+    std::use_facet<std::ctype<wchar_t> >(currentLocale)
         .narrow(inString.data(), inString.data() + outBufferLenActual, '?',
-                reinterpret_cast< char* >(outBuffer));
+                reinterpret_cast<char*>(outBuffer));
 
     outBuffer[outBufferLenActual] = 0;
     isTruncated = (outBufferLenActual < inBufferLenChars);
@@ -91,15 +84,12 @@ size_t CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
   }
 }
 
-template < typename OutCharT >
+template <typename OutCharT>
 size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
-                                   size_t outBufferLenBytes,
-                                   bool& isTruncated) {
-  LOG_DEBUG_MSG(
-      "CopyUtf8StringToWcharString is called with outBufferLenBytes is "
-      << outBufferLenBytes);
-  if (!inBuffer || (outBuffer && outBufferLenBytes == 0))
-    return 0;
+                                   size_t outBufferLenBytes, bool& isTruncated) {
+  LOG_DEBUG_MSG("CopyUtf8StringToWcharString is called with outBufferLenBytes is "
+                << outBufferLenBytes);
+  if (!inBuffer || (outBuffer && outBufferLenBytes == 0)) return 0;
 
   size_t wCharSize = sizeof(SQLWCHAR);
   // This is intended to convert to the SQLWCHAR. Ensure we have the same size.
@@ -113,10 +103,10 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
   // This does NOT include the null-terminating character.
   size_t inBufferLen = std::strlen(inBuffer);
   OutCharT* pOutBuffer;
-  std::vector< OutCharT > targetProxy;
+  std::vector<OutCharT> targetProxy;
 
   if (outBuffer) {
-    pOutBuffer = reinterpret_cast< OutCharT* >(outBuffer);
+    pOutBuffer = reinterpret_cast<OutCharT*>(outBuffer);
     outBufferLenChars = (outBufferLenBytes / wCharSize) - 1;
   } else {
     // Creates a proxy buffer so we can determine the required length.
@@ -129,7 +119,7 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
                                   << outBufferLenChars);
 
   // Setup conversion facet.
-  const std::codecvt_utf8< OutCharT > convFacet;
+  const std::codecvt_utf8<OutCharT> convFacet;
   std::mbstate_t convState = std::mbstate_t();
   // Pointer to next for input.
   const char* pInBufferNext;
@@ -152,8 +142,8 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
       // null-terminate target string, if room
       pOutBuffer[lenConverted] = 0;
 
-      isTruncated = (result == std::codecvt_base::partial
-                     || (inBufferEnd != pInBufferNext));
+      isTruncated =
+          (result == std::codecvt_base::partial || (inBufferEnd != pInBufferNext));
       break;
     case std::codecvt_base::error:
       // Error returned if unable to convert character.
@@ -181,26 +171,21 @@ size_t CopyUtf8StringToWcharString(const char* inBuffer, OutCharT* outBuffer,
 }
 
 size_t CopyUtf8StringToSqlWcharString(const char* inBuffer, SQLWCHAR* outBuffer,
-                                      size_t outBufferLenBytes,
-                                      bool& isTruncated) {
-  LOG_DEBUG_MSG(
-      "CopyUtf8StringToWcharString is called with outBufferLenBytes is "
-      << outBufferLenBytes);
-  if (!inBuffer)
-    return 0;
+                                      size_t outBufferLenBytes, bool& isTruncated) {
+  LOG_DEBUG_MSG("CopyUtf8StringToWcharString is called with outBufferLenBytes is "
+                << outBufferLenBytes);
+  if (!inBuffer) return 0;
 
   // Handles SQLWCHAR if either UTF-16 and UTF-32
   size_t wCharSize = sizeof(SQLWCHAR);
   LOG_DEBUG_MSG("wCharSize is " << wCharSize);
   switch (wCharSize) {
     case 2:
-      return CopyUtf8StringToWcharString(
-          inBuffer, reinterpret_cast< char16_t* >(outBuffer), outBufferLenBytes,
-          isTruncated);
+      return CopyUtf8StringToWcharString(inBuffer, reinterpret_cast<char16_t*>(outBuffer),
+                                         outBufferLenBytes, isTruncated);
     case 4:
-      return CopyUtf8StringToWcharString(
-          inBuffer, reinterpret_cast< char32_t* >(outBuffer), outBufferLenBytes,
-          isTruncated);
+      return CopyUtf8StringToWcharString(inBuffer, reinterpret_cast<char32_t*>(outBuffer),
+                                         outBufferLenBytes, isTruncated);
     default:
       LOG_ERROR_MSG("Unexpected error converting string '" << inBuffer << "'");
       assert(false);
@@ -221,12 +206,11 @@ size_t CopyStringToBuffer(const std::string& str, SQLWCHAR* buf, size_t buflen,
   // Convert buffer length to bytes.
   size_t bufLenInBytes = isLenInBytes ? buflen : buflen * wCharSize;
   isTruncated = false;
-  size_t bytesWritten = CopyUtf8StringToSqlWcharString(
-      str.c_str(), buf, bufLenInBytes, isTruncated);
+  size_t bytesWritten =
+      CopyUtf8StringToSqlWcharString(str.c_str(), buf, bufLenInBytes, isTruncated);
 
-  LOG_DEBUG_MSG("wCharSize is " << wCharSize << ", bufLenInBytes is "
-                                << bufLenInBytes << ", bytesWritten is "
-                                << bytesWritten);
+  LOG_DEBUG_MSG("wCharSize is " << wCharSize << ", bufLenInBytes is " << bufLenInBytes
+                                << ", bytesWritten is " << bytesWritten);
   return isLenInBytes ? bytesWritten : bytesWritten / wCharSize;
 }
 
@@ -234,15 +218,13 @@ std::string SqlWcharToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
                              bool isLenInBytes) {
   LOG_DEBUG_MSG("SqlWcharToString is called with sqlStrLen is "
                 << sqlStrLen << ", isLenInBytes is " << isLenInBytes);
-  if (!sqlStr)
-    return std::string();
+  if (!sqlStr) return std::string();
 
   size_t char_size = sizeof(SQLWCHAR);
 
   assert(char_size == sizeof(wchar_t) || char_size == 2);
 
-  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
-      converter;
+  static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
   std::wstring sqlStr0;
   if (sqlStrLen == SQL_NTS) {
     for (int i = 0; sqlStr[i] != 0; i++) {
@@ -258,27 +240,24 @@ std::string SqlWcharToString(const SQLWCHAR* sqlStr, int32_t sqlStrLen,
   return converter.to_bytes(sqlStr0);
 }
 
-boost::optional< std::string > SqlWcharToOptString(const SQLWCHAR* sqlStr,
-                                                   int32_t sqlStrLen,
-                                                   bool isLenInBytes) {
+boost::optional<std::string> SqlWcharToOptString(const SQLWCHAR* sqlStr,
+                                                 int32_t sqlStrLen, bool isLenInBytes) {
   LOG_DEBUG_MSG("SqlWcharToOptString is called with sqlStrLen is "
                 << sqlStrLen << ", isLenInBytes is " << isLenInBytes);
-  if (!sqlStr)
-    return boost::none;
+  if (!sqlStr) return boost::none;
 
   return SqlWcharToString(sqlStr, sqlStrLen, isLenInBytes);
 }
 
 // test sqlStr null case
 std::string SqlCharToString(const SQLCHAR* sqlStr, int32_t sqlStrLen) {
-  LOG_DEBUG_MSG("SqlCharToString is called with sqlStr is "
-                << sqlStr << ", sqlStrLen is " << sqlStrLen);
+  LOG_DEBUG_MSG("SqlCharToString is called with sqlStr is " << sqlStr << ", sqlStrLen is "
+                                                            << sqlStrLen);
   std::string res;
 
-  const char* sqlStrC = reinterpret_cast< const char* >(sqlStr);
+  const char* sqlStrC = reinterpret_cast<const char*>(sqlStr);
 
-  if (!sqlStr || !sqlStrLen)
-    return res;
+  if (!sqlStr || !sqlStrLen) return res;
 
   if (sqlStrLen == SQL_NTS)
     res.assign(sqlStrC);
@@ -288,35 +267,29 @@ std::string SqlCharToString(const SQLCHAR* sqlStr, int32_t sqlStrLen) {
   return res;
 }
 
-std::string ToUtf8(const std::wstring& value) {
-  return ToUtf8(value.c_str());
-}
+std::string ToUtf8(const std::wstring& value) { return ToUtf8(value.c_str()); }
 
 std::string ToUtf8(const wchar_t* value) {
-  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
-      converter;
+  static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
   return converter.to_bytes(value);
 }
 
-std::wstring FromUtf8(const std::string& value) {
-  return FromUtf8(value.c_str());
-}
+std::wstring FromUtf8(const std::string& value) { return FromUtf8(value.c_str()); }
 
 std::wstring FromUtf8(const char* value) {
-  static std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
-      converter;
+  static std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
   return converter.from_bytes(value);
 }
 
-std::vector< SQLWCHAR > ToWCHARVector(const std::string& value) {
+std::vector<SQLWCHAR> ToWCHARVector(const std::string& value) {
   return ToWCHARVector(value.c_str());
 }
 
-std::vector< SQLWCHAR > ToWCHARVector(const char* value) {
+std::vector<SQLWCHAR> ToWCHARVector(const char* value) {
   size_t wCharSize = sizeof(SQLWCHAR);
   size_t inBufferLenBytes = std::strlen(value);
   // Handle worst-case scenario where there is a one-to-one mapping.
-  std::vector< SQLWCHAR > outBuffer(inBufferLenBytes + 1);
+  std::vector<SQLWCHAR> outBuffer(inBufferLenBytes + 1);
   bool isTruncated = false;
   size_t length = CopyUtf8StringToSqlWcharString(
       value, outBuffer.data(), outBuffer.size() * wCharSize, isTruncated);
@@ -327,9 +300,8 @@ std::vector< SQLWCHAR > ToWCHARVector(const char* value) {
 std::string HexDump(const void* data, size_t count) {
   std::stringstream dump;
   size_t cnt = 0;
-  for (const uint8_t *p = (const uint8_t*)data,
-                     *e = (const uint8_t*)data + count;
-       p != e; ++p) {
+  for (const uint8_t *p = (const uint8_t*)data, *e = (const uint8_t*)data + count; p != e;
+       ++p) {
     if (cnt++ % 16 == 0) {
       dump << std::endl;
     }
@@ -346,9 +318,7 @@ std::string Rtrim(const std::string& s) {
   return std::regex_replace(s, std::regex("\\s+$"), std::string(""));
 }
 
-std::string Trim(const std::string& s) {
-  return Ltrim(Rtrim(s));
-}
+std::string Trim(const std::string& s) { return Ltrim(Rtrim(s)); }
 
 int UpdateRegexExpression(int index, int start, const std::string& pattern,
                           const std::string& str, std::string& converted) {
@@ -378,16 +348,13 @@ std::string ConvertPatternToRegex(const std::string& pattern) {
     if (currChar == '\\') {
       if (escapeFound) {
         // I.e., \\ - two backslash
-        start =
-            UpdateRegexExpression(index - 1, start, pattern, "[\\]", converted)
-            + 1;
+        start = UpdateRegexExpression(index - 1, start, pattern, "[\\]", converted) + 1;
       }
       escapeFound = !escapeFound;
     } else if (escapeFound) {
-      start =
-          UpdateRegexExpression(index - 1, start, pattern,
-                                "[" + std::string(1, currChar) + "]", converted)
-          + 1;
+      start = UpdateRegexExpression(index - 1, start, pattern,
+                                    "[" + std::string(1, currChar) + "]", converted) +
+              1;
       escapeFound = false;
     } else if (currChar == '_') {
       start = UpdateRegexExpression(index, start, pattern, ".", converted);
@@ -405,44 +372,39 @@ std::string ConvertPatternToRegex(const std::string& pattern) {
 
 int StringToInt(const std::string& s, size_t* idx, int base) {
   LOG_DEBUG_MSG("StringToInt is called with s is "
-                << s << ", idx is " << (idx ? *idx : -1) << ", base is "
-                << base);
-  if (s.empty())
-    return 0;
+                << s << ", idx is " << (idx ? *idx : -1) << ", base is " << base);
+  if (s.empty()) return 0;
 
   int retval = 0;
 
   try {
     retval = std::stoi(s, idx, base);
   } catch (std::exception& e) {
-    LOG_ERROR_MSG("Failed to convert " << s << " to int, Exception caught: '"
-                                       << e.what() << "'");
+    LOG_ERROR_MSG("Failed to convert " << s << " to int, Exception caught: '" << e.what()
+                                       << "'");
   }
   return retval;
 }
 
 long StringToLong(const std::string& s, size_t* idx, int base) {
   LOG_DEBUG_MSG("StringToLong is called with s is "
-                << s << ", idx is " << (idx ? *idx : -1) << ", base is "
-                << base);
-  if (s.empty())
-    return 0;
+                << s << ", idx is " << (idx ? *idx : -1) << ", base is " << base);
+  if (s.empty()) return 0;
 
   long retval = 0;
 
   try {
     retval = std::stol(s, idx, base);
   } catch (std::exception& e) {
-    LOG_ERROR_MSG("Failed to convert " << s << " to long, Exception caught: '"
-                                       << e.what() << "'");
+    LOG_ERROR_MSG("Failed to convert " << s << " to long, Exception caught: '" << e.what()
+                                       << "'");
   }
   return retval;
 }
 
 bool CheckEnvVarSetToTrue(const std::string& envVar) {
   std::string envVarVal = ignite::odbc::common::GetEnv(envVar);
-  std::transform(envVarVal.begin(), envVarVal.end(), envVarVal.begin(),
-                 ::toupper);
+  std::transform(envVarVal.begin(), envVarVal.end(), envVarVal.begin(), ::toupper);
   LOG_DEBUG_MSG(envVar << " is set to \"" << envVarVal << "\"");
   return envVarVal == "TRUE";
 }

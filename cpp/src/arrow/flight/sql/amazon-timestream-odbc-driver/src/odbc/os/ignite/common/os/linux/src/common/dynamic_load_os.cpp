@@ -47,17 +47,12 @@ Module& Module::operator=(const Module& other) {
   return *this;
 }
 
-void* Module::FindSymbol(const char* name) {
-  return dlsym(handle, name);
-}
+void* Module::FindSymbol(const char* name) { return dlsym(handle, name); }
 
-bool Module::IsLoaded() const {
-  return handle != NULL;
-}
+bool Module::IsLoaded() const { return handle != NULL; }
 
 void Module::Unload() {
-  if (IsLoaded())
-    dlclose(handle);
+  if (IsLoaded()) dlclose(handle);
 }
 
 Module LoadModule(const wchar_t* path) {
@@ -67,13 +62,9 @@ Module LoadModule(const wchar_t* path) {
   return Module(handle);
 }
 
-Module LoadModule(const std::wstring& path) {
-  return LoadModule(path.c_str());
-}
+Module LoadModule(const std::wstring& path) { return LoadModule(path.c_str()); }
 
-Module GetCurrent() {
-  return LoadModule(NULL);
-}
+Module GetCurrent() { return LoadModule(NULL); }
 }  // namespace dynamic
 }  // namespace common
 }  // namespace odbc

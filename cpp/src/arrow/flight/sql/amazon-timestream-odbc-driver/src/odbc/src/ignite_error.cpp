@@ -18,8 +18,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <timestream/odbc/utils.h>
 #include <timestream/odbc/ignite_error.h>
+#include <timestream/odbc/utils.h>
 
 #include <utility>
 
@@ -28,16 +28,14 @@ using namespace timestream::odbc::common;
 namespace timestream {
 namespace odbc {
 void IgniteError::ThrowIfNeeded(const IgniteError& err) {
-  if (err.code != IGNITE_SUCCESS)
-    throw err;
+  if (err.code != IGNITE_SUCCESS) throw err;
 }
 
 IgniteError::IgniteError() : code(IGNITE_SUCCESS), msg(NULL) {
   // No-op.
 }
 
-IgniteError::IgniteError(int32_t code) : code(code), msg(NULL) {
-}
+IgniteError::IgniteError(int32_t code) : code(code), msg(NULL) {}
 
 IgniteError::IgniteError(int32_t code, const char* msg)
     : code(code), msg(CopyChars(msg)) {
@@ -60,13 +58,9 @@ IgniteError& IgniteError::operator=(const IgniteError& other) {
   return *this;
 }
 
-IgniteError::~IgniteError() IGNITE_NO_THROW {
-  ReleaseChars(msg);
-}
+IgniteError::~IgniteError() IGNITE_NO_THROW { ReleaseChars(msg); }
 
-int32_t IgniteError::GetCode() const {
-  return code;
-}
+int32_t IgniteError::GetCode() const { return code; }
 
 const char* IgniteError::GetText() const IGNITE_NO_THROW {
   if (code == IGNITE_SUCCESS)
@@ -77,8 +71,6 @@ const char* IgniteError::GetText() const IGNITE_NO_THROW {
     return "No additional information available.";
 }
 
-const char* IgniteError::what() const IGNITE_NO_THROW {
-  return GetText();
-}
+const char* IgniteError::what() const IGNITE_NO_THROW { return GetText(); }
 }  // namespace odbc
 }  // namespace timestream

@@ -22,9 +22,9 @@
 #define _TIMESTREAM_ODBC_CONFIG_CONNECTION_INFO
 
 #include <ignite/common/common.h>
+#include <stdint.h>
 #include <timestream/odbc/common_types.h>
 #include <timestream/odbc/config/configuration.h>
-#include <stdint.h>
 
 #include <map>
 
@@ -74,8 +74,7 @@ class ConnectionInfo {
    * @param reslen Result value length pointer.
    * @return True on success.
    */
-  SqlResult::Type GetInfo(InfoType type, void* buf, short buflen,
-                          short* reslen) const;
+  SqlResult::Type GetInfo(InfoType type, void* buf, short buflen, short* reslen) const;
   /**
    * Set info of any type.
    * @param type Info type.
@@ -88,13 +87,13 @@ class ConnectionInfo {
   IGNITE_NO_COPY_ASSIGNMENT(ConnectionInfo);
 
   /** Associative array of string parameters. */
-  typedef std::map< InfoType, std::string > StringInfoMap;
+  typedef std::map<InfoType, std::string> StringInfoMap;
 
   /** Associative array of unsigned integer parameters. */
-  typedef std::map< InfoType, unsigned int > UintInfoMap;
+  typedef std::map<InfoType, unsigned int> UintInfoMap;
 
   /** Associative array of unsigned short parameters. */
-  typedef std::map< InfoType, unsigned short > UshortInfoMap;
+  typedef std::map<InfoType, unsigned short> UshortInfoMap;
 
   /** String parameters. */
   StringInfoMap strParams;

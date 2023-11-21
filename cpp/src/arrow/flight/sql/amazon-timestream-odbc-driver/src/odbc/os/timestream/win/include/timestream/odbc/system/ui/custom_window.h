@@ -21,8 +21,8 @@
 #ifndef _IGNITE_ODBC_SYSTEM_UI_CUSTOM_WINDOW
 #define _IGNITE_ODBC_SYSTEM_UI_CUSTOM_WINDOW
 
-#include "timestream/odbc/system/ui/window.h"
 #include <commctrl.h>
+#include "timestream/odbc/system/ui/window.h"
 
 namespace timestream {
 namespace odbc {
@@ -91,9 +91,8 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Unique pointer containing new window.
    */
-  std::unique_ptr< Window > CreateGroupBox(int posX, int posY, int sizeX,
-                                           int sizeY, const std::wstring& title,
-                                           int id);
+  std::unique_ptr<Window> CreateGroupBox(int posX, int posY, int sizeX, int sizeY,
+                                         const std::wstring& title, int id);
 
   /**
    * Create child label window.
@@ -106,9 +105,8 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Unique pointer containing new window.
    */
-  std::unique_ptr< Window > CreateLabel(int posX, int posY, int sizeX,
-                                        int sizeY, const std::wstring& title,
-                                        int id);
+  std::unique_ptr<Window> CreateLabel(int posX, int posY, int sizeX, int sizeY,
+                                      const std::wstring& title, int id);
 
   /**
    * Create child Edit window.
@@ -121,9 +119,8 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Unique pointer containing new window.
    */
-  std::unique_ptr< Window > CreateEdit(int posX, int posY, int sizeX, int sizeY,
-                                       const std::wstring& title, int id,
-                                       int style = 0);
+  std::unique_ptr<Window> CreateEdit(int posX, int posY, int sizeX, int sizeY,
+                                     const std::wstring& title, int id, int style = 0);
 
   /**
    * Create child button window.
@@ -136,9 +133,8 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Unique pointer containing new window.
    */
-  std::unique_ptr< Window > CreateButton(int posX, int posY, int sizeX,
-                                         int sizeY, const std::wstring& title,
-                                         int id);
+  std::unique_ptr<Window> CreateButton(int posX, int posY, int sizeX, int sizeY,
+                                       const std::wstring& title, int id);
 
   /**
    * Create child CheckBox window.
@@ -151,9 +147,8 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Unique pointer containing new window.
    */
-  std::unique_ptr< Window > CreateCheckBox(int posX, int posY, int sizeX,
-                                           int sizeY, const std::wstring& title,
-                                           int id, bool state);
+  std::unique_ptr<Window> CreateCheckBox(int posX, int posY, int sizeX, int sizeY,
+                                         const std::wstring& title, int id, bool state);
 
   /**
    * Create child ComboBox window.
@@ -166,9 +161,8 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Unique pointer containing new window.
    */
-  std::unique_ptr< Window > CreateComboBox(int posX, int posY, int sizeX,
-                                           int sizeY, const std::wstring& title,
-                                           int id);
+  std::unique_ptr<Window> CreateComboBox(int posX, int posY, int sizeX, int sizeY,
+                                         const std::wstring& title, int id);
 
   /**
    * Create child Tab.
@@ -181,9 +175,8 @@ class CustomWindow : public Window {
    * @param id ID to be assigned to the created window.
    * @return Unique pointer containing new window.
    */
-  std::unique_ptr< Window > CreateTab(int posX, int posY, int sizeX, int sizeY,
-                                      const std::wstring& title, int id,
-                                      int style = 0);
+  std::unique_ptr<Window> CreateTab(int posX, int posY, int sizeX, int sizeY,
+                                    const std::wstring& title, int id, int style = 0);
 
   /**
    * Create child Balloon.
@@ -193,9 +186,8 @@ class CustomWindow : public Window {
    * @param icon Icon
    * @return Unique pointer containing EDITBALLOONTIP object.
    */
-  std::unique_ptr< EDITBALLOONTIP > CreateBalloon(const wchar_t* title,
-                                                  const wchar_t* text,
-                                                  int icon);
+  std::unique_ptr<EDITBALLOONTIP> CreateBalloon(const wchar_t* title, const wchar_t* text,
+                                                int icon);
 
  private:
   IGNITE_NO_COPY_ASSIGNMENT(CustomWindow)
@@ -209,8 +201,7 @@ class CustomWindow : public Window {
    * @param lParam Long parameter.
    * @return Operation result.
    */
-  static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam,
-                                  LPARAM lParam);
+  static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 }  // namespace ui
 }  // namespace system

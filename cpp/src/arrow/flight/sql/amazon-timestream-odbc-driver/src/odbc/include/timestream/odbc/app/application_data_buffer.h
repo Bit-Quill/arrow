@@ -21,19 +21,19 @@
 #ifndef _TIMESTREAM_ODBC_APP_APPLICATION_DATA_BUFFER
 #define _TIMESTREAM_ODBC_APP_APPLICATION_DATA_BUFFER
 
-#include <ignite/common/include/date.h>
 #include <ignite/common/include/common/decimal.h>
+#include <ignite/common/include/date.h>
+#include <stdint.h>
 #include <timestream/odbc/time.h>
 #include <timestream/odbc/timestamp.h>
-#include <stdint.h>
 #include <boost/optional.hpp>
 
 #include <map>
 
 #include "timestream/odbc/common_types.h"
-#include "timestream/odbc/type_traits.h"
-#include "timestream/odbc/interval_year_month.h"
 #include "timestream/odbc/interval_day_second.h"
+#include "timestream/odbc/interval_year_month.h"
+#include "timestream/odbc/type_traits.h"
 
 using ignite::odbc::Date;
 using ignite::odbc::common::Decimal;
@@ -116,18 +116,14 @@ class ApplicationDataBuffer {
    *
    * @param offset Offset.
    */
-  void SetByteOffset(int offset) {
-    this->byteOffset = offset;
-  }
+  void SetByteOffset(int offset) { this->byteOffset = offset; }
 
   /**
    * Set offset in elements for all bound pointers.
    *
    * @param
    */
-  void SetElementOffset(SqlUlen idx) {
-    this->elementOffset = idx;
-  }
+  void SetElementOffset(SqlUlen idx) { this->elementOffset = idx; }
 
   /**
    * Put in buffer value of type optional int8_t.
@@ -135,7 +131,7 @@ class ApplicationDataBuffer {
    * @param value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutInt8(boost::optional< int8_t > value);
+  ConversionResult::Type PutInt8(boost::optional<int8_t> value);
 
   /**
    * Put in buffer value of type int8_t.
@@ -151,7 +147,7 @@ class ApplicationDataBuffer {
    * @param value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutInt16(boost::optional< int16_t > value);
+  ConversionResult::Type PutInt16(boost::optional<int16_t> value);
 
   /**
    * Put in buffer value of type int16_t.
@@ -167,7 +163,7 @@ class ApplicationDataBuffer {
    * @param value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutInt32(boost::optional< int32_t > value);
+  ConversionResult::Type PutInt32(boost::optional<int32_t> value);
 
   /**
    * Put in buffer value of type int32_t.
@@ -183,7 +179,7 @@ class ApplicationDataBuffer {
    * @param value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutInt64(boost::optional< int64_t > value);
+  ConversionResult::Type PutInt64(boost::optional<int64_t> value);
 
   /**
    * Put in buffer value of type int64_t.
@@ -199,7 +195,7 @@ class ApplicationDataBuffer {
    * @param value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutFloat(boost::optional< float > value);
+  ConversionResult::Type PutFloat(boost::optional<float> value);
 
   /**
    * Put in buffer value of type float.
@@ -215,7 +211,7 @@ class ApplicationDataBuffer {
    * @param value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutDouble(boost::optional< double > value);
+  ConversionResult::Type PutDouble(boost::optional<double> value);
 
   /**
    * Put in buffer value of type double.
@@ -231,7 +227,7 @@ class ApplicationDataBuffer {
    * @param optional value Value.
    * @return Conversion result.
    */
-  ConversionResult::Type PutString(const boost::optional< std::string >& value);
+  ConversionResult::Type PutString(const boost::optional<std::string>& value);
 
   /**
    * Put in buffer value of type string.
@@ -262,7 +258,7 @@ class ApplicationDataBuffer {
    * @param value Value to put.
    * @return Conversion result.
    */
-  ConversionResult::Type PutDecimal(const boost::optional< Decimal >& value);
+  ConversionResult::Type PutDecimal(const boost::optional<Decimal>& value);
 
   /**
    * Put decimal value to buffer.
@@ -278,7 +274,7 @@ class ApplicationDataBuffer {
    * @param value Value to put.
    * @return Conversion result.
    */
-  ConversionResult::Type PutDate(const boost::optional< Date >& value);
+  ConversionResult::Type PutDate(const boost::optional<Date>& value);
 
   /**
    * Put date to buffer.
@@ -294,8 +290,7 @@ class ApplicationDataBuffer {
    * @param value Value to put.
    * @return Conversion result.
    */
-  ConversionResult::Type PutTimestamp(
-      const boost::optional< Timestamp >& value);
+  ConversionResult::Type PutTimestamp(const boost::optional<Timestamp>& value);
 
   /**
    * Put timestamp to buffer.
@@ -311,7 +306,7 @@ class ApplicationDataBuffer {
    * @param value Value to put.
    * @return Conversion result.
    */
-  ConversionResult::Type PutTime(const boost::optional< Time >& value);
+  ConversionResult::Type PutTime(const boost::optional<Time>& value);
 
   /**
    * Put time to buffer.
@@ -446,9 +441,7 @@ class ApplicationDataBuffer {
    *
    * @return Buffer size.
    */
-  SqlLen GetSize() const {
-    return buflen;
-  }
+  SqlLen GetSize() const { return buflen; }
 
   /**
    * Check if the data is going to be provided at execution.
@@ -487,9 +480,7 @@ class ApplicationDataBuffer {
    *
    * @return Buffer type.
    */
-  type_traits::OdbcNativeType::Type GetType() const {
-    return type;
-  }
+  type_traits::OdbcNativeType::Type GetType() const { return type; }
 
  private:
   /**
@@ -498,7 +489,7 @@ class ApplicationDataBuffer {
    * @param value Numeric value to put.
    * @return Conversion result.
    */
-  template < typename T >
+  template <typename T>
   ConversionResult::Type PutNum(T value);
 
   /**
@@ -507,7 +498,7 @@ class ApplicationDataBuffer {
    * @param value Numeric value.
    * @return Conversion result.
    */
-  template < typename Tbuf, typename Tin >
+  template <typename Tbuf, typename Tin>
   ConversionResult::Type PutNumToNumBuffer(Tin value);
 
   /**
@@ -516,7 +507,7 @@ class ApplicationDataBuffer {
    * @param value Value that can be converted to string.
    * @return Conversion result.
    */
-  template < typename CharT, typename Tin >
+  template <typename CharT, typename Tin>
   ConversionResult::Type PutValToStrBuffer(const Tin& value);
 
   /**
@@ -525,7 +516,7 @@ class ApplicationDataBuffer {
    * @param value Value that can be converted to string.
    * @return Conversion result.
    */
-  template < typename CharT >
+  template <typename CharT>
   ConversionResult::Type PutValToStrBuffer(const int8_t& value);
 
   /**
@@ -535,9 +526,9 @@ class ApplicationDataBuffer {
    * @param written Number of characters written.
    * @return Conversion result.
    */
-  template < typename OutCharT, typename InCharT >
-  ConversionResult::Type PutStrToStrBuffer(
-      const std::basic_string< InCharT >& value, int32_t& written);
+  template <typename OutCharT, typename InCharT>
+  ConversionResult::Type PutStrToStrBuffer(const std::basic_string<InCharT>& value,
+                                           int32_t& written);
 
   /**
    * Put raw data to any buffer.
@@ -555,7 +546,7 @@ class ApplicationDataBuffer {
    *
    * @return Integer value of specified type.
    */
-  template < typename T >
+  template <typename T>
   T GetNum() const;
 
   /**
@@ -565,7 +556,7 @@ class ApplicationDataBuffer {
    * @param elemSize Element size.
    * @return Pointer with applied offset.
    */
-  template < typename T >
+  template <typename T>
   T* ApplyOffset(T* ptr, size_t elemSize) const;
 
   /**
@@ -575,8 +566,7 @@ class ApplicationDataBuffer {
    * @param pattern The result string format pattern
    * @return timestamp in string format "YYYY-MM--DD hh:mm:ss.xxxxxxxxx"
    */
-  std::string GetTimestampString(tm& tmTime, int32_t fraction,
-                                 const char* pattern);
+  std::string GetTimestampString(tm& tmTime, int32_t fraction, const char* pattern);
 
   /**
    * Set the interval buffer type.
@@ -623,7 +613,7 @@ class ApplicationDataBuffer {
 };
 
 /** Column binging map type alias. */
-typedef std::map< uint16_t, ApplicationDataBuffer > ColumnBindingMap;
+typedef std::map<uint16_t, ApplicationDataBuffer> ColumnBindingMap;
 }  // namespace app
 }  // namespace odbc
 }  // namespace timestream

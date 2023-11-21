@@ -14,17 +14,17 @@
  *
  */
 
-#include "timestream/odbc/log.h"
 #include "timestream/odbc/authentication/aad.h"
 #include "timestream/odbc/diagnostic/diagnosable_adapter.h"
+#include "timestream/odbc/log.h"
 
 #include <aws/core/client/ClientConfiguration.h>
-#include <aws/core/utils/base64/Base64.h>
 #include <aws/core/http/HttpClient.h>
-#include <aws/core/utils/json/JsonSerializer.h>
 #include <aws/core/http/standard/StandardHttpRequest.h>
 #include <aws/core/http/standard/StandardHttpResponse.h>
 #include <aws/core/utils/Array.h>
+#include <aws/core/utils/base64/Base64.h>
+#include <aws/core/utils/json/JsonSerializer.h>
 
 namespace timestream {
 namespace odbc {
@@ -40,29 +40,27 @@ const Aws::Utils::Base64::Base64 BASE64_URL =
 // The ASCII format for colon
 const std::string COLON = "%3A";
 
-std::string TimestreamAADCredentialsProvider::GetAccessToken(
-    std::string& errInfo) {
+std::string TimestreamAADCredentialsProvider::GetAccessToken(std::string& errInfo) {
   LOG_DEBUG_MSG("GetAccessToken is called");
 
   using Aws::Http::URI;
   std::string accessToken("");
 
   // create HTTP request with DSN configuration
-  Aws::String accessTokenEndpoint = "https://login.microsoftonline.com/"
-                                    + config_.GetAADTenant() + "/oauth2/token";
+  Aws::String accessTokenEndpoint =
+      "https://login.microsoftonline.com/" + config_.GetAADTenant() + "/oauth2/token";
   LOG_DEBUG_MSG("accessTokenEndpoint is " << accessTokenEndpoint);
 
-  std::shared_ptr< Aws::Http::HttpRequest > req = Aws::Http::CreateHttpRequest(
+  std::shared_ptr<Aws::Http::HttpRequest> req = Aws::Http::CreateHttpRequest(
       accessTokenEndpoint, Aws::Http::HttpMethod::HTTP_POST,
       Aws::Utils::Stream::DefaultResponseStreamFactoryMethod);
   req->SetHeaderValue(Aws::Http::ACCEPT_HEADER, "application/json");
   req->SetHeaderValue(Aws::Http::CONTENT_TYPE_HEADER,
                       "application/x-www-form-urlencoded");
 
-  std::shared_ptr< Aws::StringStream > ss =
-      Aws::MakeShared< Aws::StringStream >("");
-  *ss << "grant_type=password&requested_token_type=urn" << COLON << "ietf"
-      << COLON << "params" << COLON << "oauth" << COLON << "token-type" << COLON
+  std::shared_ptr<Aws::StringStream> ss = Aws::MakeShared<Aws::StringStream>("");
+  *ss << "grant_type=password&requested_token_type=urn" << COLON << "ietf" << COLON
+      << "params" << COLON << "oauth" << COLON << "token-type" << COLON
       << "saml2&username=" << URI::URLEncodePath(config_.GetDSNUserName())
       << "&password=" << URI::URLEncodePath(config_.GetDSNPassword())
       << "&client_secret=" << URI::URLEncodePath(config_.GetAADClientSecret())
@@ -72,8 +70,7 @@ std::string TimestreamAADCredentialsProvider::GetAccessToken(
   req->AddContentBody(ss);
   req->SetContentLength(std::to_string(ss.get()->str().size()));
 
-  std::shared_ptr< Aws::Http::HttpResponse > res =
-      httpClient_->MakeRequest(req);
+  std::shared_ptr<Aws::Http::HttpResponse> res = httpClient_->MakeRequest(req);
 
   if (res->GetResponseCode() != Aws::Http::HttpResponseCode::OK) {
     // HTTP response code is not 200(OK), proceed to log error
@@ -101,16 +98,14 @@ std::string TimestreamAADCredentialsProvider::GetAccessToken(
   if (bodyJsonView.ValueExists("access_token")) {
     accessToken = bodyJsonView.GetString("access_token");
   } else {
-    errInfo =
-        "Unable to extract the access token from the Azure AD response body.";
+    errInfo = "Unable to extract the access token from the Azure AD response body.";
     LOG_ERROR_MSG(errInfo);
   }
 
   return accessToken;
 }
 
-std::string TimestreamAADCredentialsProvider::GetSAMLAssertion(
-    std::string& errInfo) {
+std::string TimestreamAADCredentialsProvider::GetSAMLAssertion(std::string& errInfo) {
   LOG_DEBUG_MSG("GetSAMLAssertion is called");
 
   std::string accessToken = GetAccessToken(errInfo);
@@ -143,20 +138,19 @@ std::string TimestreamAADCredentialsProvider::GetSAMLAssertion(
   const Aws::Utils::ByteBuffer& decodedBuffer = BASE64_URL.Decode(accessToken);
   size_t size = decodedBuffer.GetLength();
 
-  std::string decoded(
-      reinterpret_cast< char const* >(decodedBuffer.GetUnderlyingData()), size);
+  std::string decoded(reinterpret_cast<char const*>(decodedBuffer.GetUnderlyingData()),
+                      size);
 
   // Construct SAML response with SAML assertion
   std::string assertion(
       "<samlp:Response "
       "xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:protocol\"><samlp:Status><"
       "samlp:StatusCode "
-      "Value=\"urn:oasis:names:tc:SAML:2.0:status:Success\"/></samlp:Status>"
-      + decoded + "</samlp:Response>");
+      "Value=\"urn:oasis:names:tc:SAML:2.0:status:Success\"/></samlp:Status>" +
+      decoded + "</samlp:Response>");
 
   Aws::Utils::ByteBuffer encodeBuffer(
-      reinterpret_cast< unsigned char const* >(assertion.c_str()),
-      assertion.size());
+      reinterpret_cast<unsigned char const*>(assertion.c_str()), assertion.size());
 
   return BASE64_URL.Encode(encodeBuffer);
 }

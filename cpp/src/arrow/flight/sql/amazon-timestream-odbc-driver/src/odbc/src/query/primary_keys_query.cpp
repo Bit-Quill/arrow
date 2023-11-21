@@ -38,18 +38,18 @@ PrimaryKeysQuery::PrimaryKeysQuery(diagnostic::DiagnosableAdapter& diag)
   const std::string sch("");
   const std::string tbl("");
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", ScalarType::VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", ScalarType::VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", ScalarType::VARCHAR,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", ScalarType::VARCHAR,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "KEY_SEQ", ScalarType::INTEGER,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PK_NAME", ScalarType::VARCHAR,
-                                   Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "TABLE_CAT", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "TABLE_SCHEM", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "COLUMN_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "KEY_SEQ", ScalarType::INTEGER, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "PK_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
 }
 
 PrimaryKeysQuery::~PrimaryKeysQuery() {
@@ -57,24 +57,18 @@ PrimaryKeysQuery::~PrimaryKeysQuery() {
 }
 
 SqlResult::Type PrimaryKeysQuery::Execute() {
-  diag.AddStatusRecord(
-      SqlState::S01000_GENERAL_WARNING,
-      "SQLPrimaryKeys is not supported. Return empty result set.",
-      LogLevel::Type::WARNING_LEVEL);
+  diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
+                       "SQLPrimaryKeys is not supported. Return empty result set.",
+                       LogLevel::Type::WARNING_LEVEL);
 
   return SqlResult::AI_SUCCESS_WITH_INFO;
 }
 
-SqlResult::Type PrimaryKeysQuery::Cancel() {
-  return SqlResult::AI_SUCCESS;
-}
+SqlResult::Type PrimaryKeysQuery::Cancel() { return SqlResult::AI_SUCCESS; }
 
-const meta::ColumnMetaVector* PrimaryKeysQuery::GetMeta() {
-  return &columnsMeta;
-}
+const meta::ColumnMetaVector* PrimaryKeysQuery::GetMeta() { return &columnsMeta; }
 
-SqlResult::Type PrimaryKeysQuery::FetchNextRow(
-    app::ColumnBindingMap& columnBindings) {
+SqlResult::Type PrimaryKeysQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
   diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
                        "SQLPrimaryKeys is not supported. No data is returned.",
                        LogLevel::Type::WARNING_LEVEL);
@@ -82,8 +76,8 @@ SqlResult::Type PrimaryKeysQuery::FetchNextRow(
   return SqlResult::AI_NO_DATA;
 }
 
-SqlResult::Type PrimaryKeysQuery::GetColumn(
-    uint16_t columnIdx, app::ApplicationDataBuffer& buffer) {
+SqlResult::Type PrimaryKeysQuery::GetColumn(uint16_t columnIdx,
+                                            app::ApplicationDataBuffer& buffer) {
   diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
                        "SQLPrimaryKeys is not supported. No data is returned.",
                        LogLevel::Type::WARNING_LEVEL);
@@ -91,21 +85,13 @@ SqlResult::Type PrimaryKeysQuery::GetColumn(
   return SqlResult::AI_NO_DATA;
 }
 
-SqlResult::Type PrimaryKeysQuery::Close() {
-  return SqlResult::AI_SUCCESS;
-}
+SqlResult::Type PrimaryKeysQuery::Close() { return SqlResult::AI_SUCCESS; }
 
-bool PrimaryKeysQuery::DataAvailable() const {
-  return false;
-}
+bool PrimaryKeysQuery::DataAvailable() const { return false; }
 
-int64_t PrimaryKeysQuery::AffectedRows() const {
-  return 0;
-}
+int64_t PrimaryKeysQuery::AffectedRows() const { return 0; }
 
-SqlResult::Type PrimaryKeysQuery::NextResultSet() {
-  return SqlResult::AI_NO_DATA;
-}
+SqlResult::Type PrimaryKeysQuery::NextResultSet() { return SqlResult::AI_NO_DATA; }
 }  // namespace query
 }  // namespace odbc
 }  // namespace timestream

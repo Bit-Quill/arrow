@@ -53,9 +53,8 @@ class IGNITE_IMPORT_EXPORT DiagnosticRecord {
    * @param columnNum Associated column number.
    */
   DiagnosticRecord(SqlState::Type sqlState, const std::string& message,
-                   const std::string& connectionName,
-                   const std::string& serverName, int32_t rowNum = 0,
-                   int32_t columnNum = 0);
+                   const std::string& connectionName, const std::string& serverName,
+                   int32_t rowNum = 0, int32_t columnNum = 0);
 
   /**
    * Destructor.

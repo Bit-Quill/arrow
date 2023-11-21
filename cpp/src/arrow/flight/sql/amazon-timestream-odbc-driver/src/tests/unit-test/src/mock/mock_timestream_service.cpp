@@ -15,12 +15,12 @@
  */
 
 #include <aws/core/Aws.h>
-#include <aws/timestream-query/model/QueryResult.h>
-#include <aws/timestream-query/TimestreamQueryErrors.h>
 #include <aws/core/utils/Outcome.h>
-#include <aws/timestream-query/model/Row.h>
-#include <aws/timestream-query/model/Datum.h>
+#include <aws/timestream-query/TimestreamQueryErrors.h>
 #include <aws/timestream-query/model/ColumnInfo.h>
+#include <aws/timestream-query/model/Datum.h>
+#include <aws/timestream-query/model/QueryResult.h>
+#include <aws/timestream-query/model/Row.h>
 
 #include <mock/mock_timestream_service.h>
 
@@ -34,7 +34,7 @@ int MockTimestreamService::errorToken = 0;
 
 void MockTimestreamService::CreateMockTimestreamService() {
   if (!instance_) {
-    std::lock_guard< std::mutex > lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     if (!instance_) {
       instance_ = new MockTimestreamService;
     }
@@ -43,7 +43,7 @@ void MockTimestreamService::CreateMockTimestreamService() {
 
 void MockTimestreamService::DestoryMockTimestreamService() {
   if (instance_) {
-    std::lock_guard< std::mutex > lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     if (instance_) {
       delete instance_;
       instance_ = nullptr;
@@ -132,21 +132,20 @@ Aws::TimestreamQuery::Model::QueryOutcome MockTimestreamService::HandleQueryReq(
 
     result.AddRows(row);
     return Aws::TimestreamQuery::Model::QueryOutcome(result);
-  } else if (request.GetQueryString()
-             == "select measure, time from mockDB.mockTable") {
+  } else if (request.GetQueryString() == "select measure, time from mockDB.mockTable") {
     Aws::TimestreamQuery::Model::QueryResult result;
     SetupResultForMockTable(result);
     return Aws::TimestreamQuery::Model::QueryOutcome(result);
-  } else if (request.GetQueryString()
-             == "select measure, time from mockDB.mockTable10000") {
+  } else if (request.GetQueryString() ==
+             "select measure, time from mockDB.mockTable10000") {
     Aws::TimestreamQuery::Model::QueryResult result;
     SetupResultForMockTable(result);
 
     // for pagination test
     result.SetNextToken(std::to_string(++token));
     return Aws::TimestreamQuery::Model::QueryOutcome(result);
-  } else if (request.GetQueryString()
-             == "select measure, time from mockDB.mockTable10Error") {
+  } else if (request.GetQueryString() ==
+             "select measure, time from mockDB.mockTable10Error") {
     Aws::TimestreamQuery::Model::QueryResult result;
     SetupResultForMockTable(result);
 
@@ -156,15 +155,15 @@ Aws::TimestreamQuery::Model::QueryOutcome MockTimestreamService::HandleQueryReq(
       return Aws::TimestreamQuery::Model::QueryOutcome(result);
     } else {
       Aws::TimestreamQuery::TimestreamQueryError error(
-          Aws::Client::AWSError< Aws::Client::CoreErrors >(
-              Aws::Client::CoreErrors::UNKNOWN, false));
+          Aws::Client::AWSError<Aws::Client::CoreErrors>(Aws::Client::CoreErrors::UNKNOWN,
+                                                         false));
 
       return Aws::TimestreamQuery::Model::QueryOutcome(error);
     }
   } else {
     Aws::TimestreamQuery::TimestreamQueryError error(
-        Aws::Client::AWSError< Aws::Client::CoreErrors >(
-            Aws::Client::CoreErrors::UNKNOWN, false));
+        Aws::Client::AWSError<Aws::Client::CoreErrors>(Aws::Client::CoreErrors::UNKNOWN,
+                                                       false));
 
     return Aws::TimestreamQuery::Model::QueryOutcome(error);
   }

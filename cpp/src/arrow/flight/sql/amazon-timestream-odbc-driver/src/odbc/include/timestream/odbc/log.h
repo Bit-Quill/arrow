@@ -38,84 +38,79 @@ using ignite::odbc::common::concurrent::CriticalSection;
 #define WRITE_LOG_MSG(param, logLevel) \
   WRITE_MSG_TO_STREAM(param, logLevel, (std::ostream*)nullptr)
 
-#define WRITE_MSG_TO_STREAM(param, logLevel, logStream)                       \
-  {                                                                           \
-    std::shared_ptr< timestream::odbc::Logger > p =                           \
-        timestream::odbc::Logger::GetLoggerInstance();                        \
-    if (p->GetLogLevel() >= logLevel && (p->IsEnabled() || p->EnableLog())) { \
-      std::ostream* prevStream = p.get()->GetLogStream();                     \
-      if (logStream != nullptr) {                                             \
-        /* Override the stream temporarily */                                 \
-        p.get()->SetLogStream(logStream);                                     \
-      }                                                                       \
-      std::unique_ptr< timestream::odbc::LogStream > lstream(                 \
-          new timestream::odbc::LogStream(p.get()));                          \
-      std::string msg_prefix;                                                 \
-      switch (logLevel) {                                                     \
-        case timestream::odbc::LogLevel::Type::DEBUG_LEVEL:                   \
-          msg_prefix = "DEBUG MSG: ";                                         \
-          break;                                                              \
-        case timestream::odbc::LogLevel::Type::INFO_LEVEL:                    \
-          msg_prefix = "INFO MSG: ";                                          \
-          break;                                                              \
-        case timestream::odbc::LogLevel::Type::WARNING_LEVEL:                 \
-          msg_prefix = "WARNING MSG: ";                                       \
-          break;                                                              \
-        case timestream::odbc::LogLevel::Type::ERROR_LEVEL:                   \
-          msg_prefix = "ERROR MSG: ";                                         \
-          break;                                                              \
-        default:                                                              \
-          msg_prefix = "";                                                    \
-      }                                                                       \
-      char tStr[1000];                                                        \
-      time_t curTime = time(NULL);                                            \
-      struct tm* locTime = localtime(&curTime);                               \
-      strftime(tStr, 1000, "%T %x ", locTime);                                \
-      /* Write the formatted message to the stream */                         \
-      *lstream << "TID: " << std::this_thread::get_id() << " " << tStr        \
-               << msg_prefix << " "                                           \
-               << timestream::odbc::Logger::GetBaseFileName(__FILE__) << ":"  \
-               << __LINE__ << " " << __FUNCTION__ << ": " << param;           \
-      /* This will trigger the write to stream */                             \
-      lstream = nullptr;                                                      \
-      if (logStream != nullptr) {                                             \
-        /* Restore the stream if it was set */                                \
-        p.get()->SetLogStream(prevStream);                                    \
-      }                                                                       \
-    }                                                                         \
+#define WRITE_MSG_TO_STREAM(param, logLevel, logStream)                              \
+  {                                                                                  \
+    std::shared_ptr<timestream::odbc::Logger> p =                                    \
+        timestream::odbc::Logger::GetLoggerInstance();                               \
+    if (p->GetLogLevel() >= logLevel && (p->IsEnabled() || p->EnableLog())) {        \
+      std::ostream* prevStream = p.get()->GetLogStream();                            \
+      if (logStream != nullptr) {                                                    \
+        /* Override the stream temporarily */                                        \
+        p.get()->SetLogStream(logStream);                                            \
+      }                                                                              \
+      std::unique_ptr<timestream::odbc::LogStream> lstream(                          \
+          new timestream::odbc::LogStream(p.get()));                                 \
+      std::string msg_prefix;                                                        \
+      switch (logLevel) {                                                            \
+        case timestream::odbc::LogLevel::Type::DEBUG_LEVEL:                          \
+          msg_prefix = "DEBUG MSG: ";                                                \
+          break;                                                                     \
+        case timestream::odbc::LogLevel::Type::INFO_LEVEL:                           \
+          msg_prefix = "INFO MSG: ";                                                 \
+          break;                                                                     \
+        case timestream::odbc::LogLevel::Type::WARNING_LEVEL:                        \
+          msg_prefix = "WARNING MSG: ";                                              \
+          break;                                                                     \
+        case timestream::odbc::LogLevel::Type::ERROR_LEVEL:                          \
+          msg_prefix = "ERROR MSG: ";                                                \
+          break;                                                                     \
+        default:                                                                     \
+          msg_prefix = "";                                                           \
+      }                                                                              \
+      char tStr[1000];                                                               \
+      time_t curTime = time(NULL);                                                   \
+      struct tm* locTime = localtime(&curTime);                                      \
+      strftime(tStr, 1000, "%T %x ", locTime);                                       \
+      /* Write the formatted message to the stream */                                \
+      *lstream << "TID: " << std::this_thread::get_id() << " " << tStr << msg_prefix \
+               << " " << timestream::odbc::Logger::GetBaseFileName(__FILE__) << ":"  \
+               << __LINE__ << " " << __FUNCTION__ << ": " << param;                  \
+      /* This will trigger the write to stream */                                    \
+      lstream = nullptr;                                                             \
+      if (logStream != nullptr) {                                                    \
+        /* Restore the stream if it was set */                                       \
+        p.get()->SetLogStream(prevStream);                                           \
+      }                                                                              \
+    }                                                                                \
   }
 
 // Debug messages are messages that are useful for debugging
 #define LOG_DEBUG_MSG(param) \
   WRITE_LOG_MSG(param, timestream::odbc::LogLevel::Type::DEBUG_LEVEL)
 
-#define LOG_DEBUG_MSG_TO_STREAM(param, logStream)                           \
-  WRITE_MSG_TO_STREAM(param, timestream::odbc::LogLevel::Type::DEBUG_LEVEL, \
-                      logStream)
+#define LOG_DEBUG_MSG_TO_STREAM(param, logStream) \
+  WRITE_MSG_TO_STREAM(param, timestream::odbc::LogLevel::Type::DEBUG_LEVEL, logStream)
 
 // Info messages are messages that document the application flow
 #define LOG_INFO_MSG(param) \
   WRITE_LOG_MSG(param, timestream::odbc::LogLevel::Type::INFO_LEVEL)
 
-#define LOG_INFO_MSG_TO_STREAM(param, logStream)                           \
-  WRITE_MSG_TO_STREAM(param, timestream::odbc::LogLevel::Type::INFO_LEVEL, \
-                      logStream)
+#define LOG_INFO_MSG_TO_STREAM(param, logStream) \
+  WRITE_MSG_TO_STREAM(param, timestream::odbc::LogLevel::Type::INFO_LEVEL, logStream)
 
 // Warning messages display warnings
 #define LOG_WARNING_MSG(param) \
   WRITE_LOG_MSG(param, timestream::odbc::LogLevel::Type::WARNING_LEVEL)
 
-#define LOG_WARNING_MSG_TO_STREAM(param, logStream)                           \
-  WRITE_MSG_TO_STREAM(param, timestream::odbc::LogLevel::Type::WARNING_LEVEL, \
-                      logStream)
+#define LOG_WARNING_MSG_TO_STREAM(param, logStream) \
+  WRITE_MSG_TO_STREAM(param, timestream::odbc::LogLevel::Type::WARNING_LEVEL, logStream)
 
 // Error messages display errors
 #define LOG_ERROR_MSG(param) \
   WRITE_LOG_MSG(param, timestream::odbc::LogLevel::Type::ERROR_LEVEL)
 
-#define LOG_ERROR_MSG_TO_STREAM(param, logStream)                           \
-  WRITE_MSG_TO_STREAM(param, timestream::odbc::LogLevel::Type::ERROR_LEVEL, \
-                      logStream)
+#define LOG_ERROR_MSG_TO_STREAM(param, logStream) \
+  WRITE_MSG_TO_STREAM(param, timestream::odbc::LogLevel::Type::ERROR_LEVEL, logStream)
 
 namespace timestream {
 namespace odbc {
@@ -126,7 +121,7 @@ class Logger;
  * Helper object providing stream operations for single log line.
  * Writes resulting string to Logger object upon destruction.
  */
-class IGNITE_IMPORT_EXPORT LogStream : public std::basic_ostream< char > {
+class IGNITE_IMPORT_EXPORT LogStream : public std::basic_ostream<char> {
  public:
   /**
    * Constructor.
@@ -149,7 +144,7 @@ class IGNITE_IMPORT_EXPORT LogStream : public std::basic_ostream< char > {
   IGNITE_NO_COPY_ASSIGNMENT(LogStream);
 
   /** String buffer. */
-  std::basic_stringbuf< char > strbuf;
+  std::basic_stringbuf<char> strbuf;
 
   /** Parent logger object */
   Logger* logger;
@@ -186,9 +181,7 @@ class Logger {
    * multi-thread safe. Any modification to it shoud
    * be protected by lock.
    */
-  std::ostream* GetLogStream() {
-    return stream;
-  }
+  std::ostream* GetLogStream() { return stream; }
 
   /**
    * Get default log path.
@@ -201,12 +194,12 @@ class Logger {
    * If there is no instance, create new instance.
    * @return Logger instance.
    */
-  static std::shared_ptr< Logger > GetLoggerInstance() {
+  static std::shared_ptr<Logger> GetLoggerInstance() {
     if (!logger_) {
       // avoid to be created multiple times for multi-thread execution
       ignite::odbc::common::concurrent::CsLockGuard guard(mutexForCreation);
       if (!logger_) {
-        logger_ = std::shared_ptr< Logger >(new Logger());
+        logger_ = std::shared_ptr<Logger>(new Logger());
       }
     }
 
@@ -269,7 +262,7 @@ class Logger {
   void WriteMessage(std::string const& message);
 
  private:
-  static std::shared_ptr< Logger > logger_;  // a singleton instance
+  static std::shared_ptr<Logger> logger_;  // a singleton instance
 
   /**
    * Constructor.

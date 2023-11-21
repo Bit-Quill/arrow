@@ -16,11 +16,11 @@
 
 #include "timestream_writer.h"
 
-#include <aws/timestream-write/model/Record.h>
-#include <aws/timestream-write/model/WriteRecordsRequest.h>
 #include <aws/timestream-write/model/MeasureValueType.h>
-#include <aws/timestream-write/model/RejectedRecordsException.h>
+#include <aws/timestream-write/model/Record.h>
 #include <aws/timestream-write/model/RejectedRecord.h>
+#include <aws/timestream-write/model/RejectedRecordsException.h>
+#include <aws/timestream-write/model/WriteRecordsRequest.h>
 
 #include "metadata-creator/computer_table_creater.h"
 
@@ -53,52 +53,47 @@ namespace odbc {
 int gettimeofday(struct timeval* tp, struct timezone* tzp) {
   namespace sc = std::chrono;
   sc::system_clock::duration d = sc::system_clock::now().time_since_epoch();
-  sc::seconds s = sc::duration_cast< sc::seconds >(d);
+  sc::seconds s = sc::duration_cast<sc::seconds>(d);
   tp->tv_sec = s.count();
-  tp->tv_usec = sc::duration_cast< sc::microseconds >(d - s).count();
+  tp->tv_usec = sc::duration_cast<sc::microseconds>(d - s).count();
 
   return 0;
 }
 #endif  // _WIN32
 
-std::shared_ptr< MeasureMetadataCreater >
-TimestreamWriter::CreateMetadataCreater(Aws::String tableType) {
-  std::transform(tableType.begin(), tableType.end(), tableType.begin(),
-                 toupper);
+std::shared_ptr<MeasureMetadataCreater> TimestreamWriter::CreateMetadataCreater(
+    Aws::String tableType) {
+  std::transform(tableType.begin(), tableType.end(), tableType.begin(), toupper);
   if (tableType == "COMPUTER") {
-    return std::make_shared< ComputerTableCreater >();
+    return std::make_shared<ComputerTableCreater>();
   } else {
-    std::cerr << "No table metadata creator is found for " << tableType
-              << std::endl;
+    std::cerr << "No table metadata creator is found for " << tableType << std::endl;
     return nullptr;
   }
 }
 
 bool TimestreamWriter::WriteSingleValueRecords(const Aws::String& tableType,
                                                const Aws::String& database,
-                                               const Aws::String& table,
-                                               int loopNum) {
-  std::shared_ptr< MeasureMetadataCreater > creater =
-      CreateMetadataCreater(tableType);
+                                               const Aws::String& table, int loopNum) {
+  std::shared_ptr<MeasureMetadataCreater> creater = CreateMetadataCreater(tableType);
   if (!creater) {
     std::cerr << "Table metadata creater could not be found" << std::endl;
     return false;
   }
 
   // create dimensions
-  Aws::Vector< Dimension > dimensions;
+  Aws::Vector<Dimension> dimensions;
   creater->CreateDimensions(dimensions);
 
   // create records
-  Aws::Vector< Record > records;
+  Aws::Vector<Record> records;
   creater->CreateRecords(dimensions, records);
 
   for (int i = 0; i < loopNum; i++) {
     // get current time
     struct timeval tp;
     gettimeofday(&tp, NULL);
-    long long time =
-        (static_cast< long long >(tp.tv_sec) * 1000L) + (tp.tv_usec / 1000);
+    long long time = (static_cast<long long>(tp.tv_sec) * 1000L) + (tp.tv_usec / 1000);
 
     // fill timestamp for each record
     for (auto& itr : records) {
@@ -119,14 +114,13 @@ bool TimestreamWriter::WriteSingleValueRecords(const Aws::String& tableType,
       Aws::TimestreamWrite::Model::WriteRecordsOutcome outcome =
           client_->WriteRecords(writeRecordsRequest);
       if (!outcome.IsSuccess()) {
-        std::cout << "Error msg is " << outcome.GetError().GetMessage()
-                  << std::endl;
+        std::cout << "Error msg is " << outcome.GetError().GetMessage() << std::endl;
         return false;
       }
     } catch (RejectedRecordsException e) {
       for (RejectedRecord rejectedRecord : e.GetRejectedRecords()) {
-        std::cout << "Rejected Index " << rejectedRecord.GetRecordIndex()
-                  << ": " << rejectedRecord.GetReason() << std::endl;
+        std::cout << "Rejected Index " << rejectedRecord.GetRecordIndex() << ": "
+                  << rejectedRecord.GetReason() << std::endl;
       }
       return false;
     }
@@ -136,21 +130,19 @@ bool TimestreamWriter::WriteSingleValueRecords(const Aws::String& tableType,
 
 bool TimestreamWriter::WriteMultiValueRecords(const Aws::String& tableType,
                                               const Aws::String& database,
-                                              const Aws::String& table,
-                                              int loopNum) {
-  std::shared_ptr< MeasureMetadataCreater > creater =
-      CreateMetadataCreater(tableType);
+                                              const Aws::String& table, int loopNum) {
+  std::shared_ptr<MeasureMetadataCreater> creater = CreateMetadataCreater(tableType);
   if (!creater) {
     std::cerr << "Table metadata creater could not be found" << std::endl;
     return false;
   }
 
   // create dimensions
-  Aws::Vector< Dimension > dimensions;
+  Aws::Vector<Dimension> dimensions;
   creater->CreateDimensions(dimensions);
 
   // create measure values
-  Aws::Vector< MeasureValue > values;
+  Aws::Vector<MeasureValue> values;
   creater->CreateMeasureValues(values);
 
   // create common attributes for all records
@@ -166,8 +158,7 @@ bool TimestreamWriter::WriteMultiValueRecords(const Aws::String& tableType,
     // fill timestamp to common attributes
     struct timeval tp;
     gettimeofday(&tp, NULL);
-    long long time =
-        static_cast< long long >(tp.tv_sec) * 1000L + tp.tv_usec / 1000;
+    long long time = static_cast<long long>(tp.tv_sec) * 1000L + tp.tv_usec / 1000;
     commonAttributes.WithTime(std::to_string(time));
 
     // fill record values
@@ -187,14 +178,13 @@ bool TimestreamWriter::WriteMultiValueRecords(const Aws::String& tableType,
       Aws::TimestreamWrite::Model::WriteRecordsOutcome outcome =
           client_->WriteRecords(writeRecordsRequest);
       if (!outcome.IsSuccess()) {
-        std::cout << "Error msg is " << outcome.GetError().GetMessage()
-                  << std::endl;
+        std::cout << "Error msg is " << outcome.GetError().GetMessage() << std::endl;
         return false;
       }
     } catch (RejectedRecordsException e) {
       for (RejectedRecord rejectedRecord : e.GetRejectedRecords()) {
-        std::cout << "Rejected Index " << rejectedRecord.GetRecordIndex()
-                  << ": " << rejectedRecord.GetReason() << std::endl;
+        std::cout << "Rejected Index " << rejectedRecord.GetRecordIndex() << ": "
+                  << rejectedRecord.GetReason() << std::endl;
       }
       return false;
     }

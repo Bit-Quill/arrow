@@ -42,18 +42,16 @@
     BOOST_FAIL(timestream_test::GetOdbcErrorMessage(type, handle)); \
   }
 
-#define ODBC_FAIL_ON_ERROR1(ret, type, handle, msg)               \
-  if (!SQL_SUCCEEDED(ret)) {                                      \
-    BOOST_FAIL(timestream_test::GetOdbcErrorMessage(type, handle) \
-               + ", msg = " + msg);                               \
+#define ODBC_FAIL_ON_ERROR1(ret, type, handle, msg)                                    \
+  if (!SQL_SUCCEEDED(ret)) {                                                           \
+    BOOST_FAIL(timestream_test::GetOdbcErrorMessage(type, handle) + ", msg = " + msg); \
   }
 
-#define MUTE_TEST_FOR_TEAMCITY                                            \
-  if (jetbrains::teamcity::underTeamcity()) {                             \
-    BOOST_TEST_MESSAGE(                                                   \
-        "Muted on TeamCity because of periodical non-critical failures"); \
-    BOOST_CHECK(jetbrains::teamcity::underTeamcity());                    \
-    return;                                                               \
+#define MUTE_TEST_FOR_TEAMCITY                                                           \
+  if (jetbrains::teamcity::underTeamcity()) {                                            \
+    BOOST_TEST_MESSAGE("Muted on TeamCity because of periodical non-critical failures"); \
+    BOOST_CHECK(jetbrains::teamcity::underTeamcity());                                   \
+    return;                                                                              \
   }
 
 /**
@@ -104,9 +102,7 @@ class OdbcClientError : public std::exception {
    *
    * @return Error message string.
    */
-  virtual const char* what() const IGNITE_NO_THROW {
-    return message.c_str();
-  }
+  virtual const char* what() const IGNITE_NO_THROW { return message.c_str(); }
 
   /** SQL state. */
   std::string sqlstate;
@@ -136,8 +132,7 @@ OdbcClientError GetOdbcError(SQLSMALLINT handleType, SQLHANDLE handle);
  * @param idx Error record index.
  * @return Error state.
  */
-std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
-                              int idx = 1);
+std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle, int idx = 1);
 
 /**
  * Extract error message.
@@ -147,8 +142,7 @@ std::string GetOdbcErrorState(SQLSMALLINT handleType, SQLHANDLE handle,
  * @param idx Error record index.
  * @return Error message.
  */
-std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle,
-                                int idx = 1);
+std::string GetOdbcErrorMessage(SQLSMALLINT handleType, SQLHANDLE handle, int idx = 1);
 }  // namespace timestream_test
 
 #endif  // _IGNITE_ODBC_TEST_TEST_UTILS

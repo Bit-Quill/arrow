@@ -31,8 +31,7 @@ Timestamp::Timestamp(const Timestamp& another)
   // No-op.
 }
 
-Timestamp::Timestamp(int64_t ms)
-    : seconds(ms / 1000), fractionNs((ms % 1000) * 1000000) {
+Timestamp::Timestamp(int64_t ms) : seconds(ms / 1000), fractionNs((ms % 1000) * 1000000) {
   // No-op.
 }
 
@@ -52,17 +51,11 @@ int64_t Timestamp::GetMilliseconds() const {
   return seconds * 1000 + fractionNs / 1000000;
 }
 
-int64_t Timestamp::GetSeconds() const {
-  return seconds;
-}
+int64_t Timestamp::GetSeconds() const { return seconds; }
 
-int32_t Timestamp::GetSecondFraction() const {
-  return fractionNs;
-}
+int32_t Timestamp::GetSecondFraction() const { return fractionNs; }
 
-Date Timestamp::GetDate() const {
-  return Date(GetMilliseconds());
-}
+Date Timestamp::GetDate() const { return Date(GetMilliseconds()); }
 
 bool operator==(const Timestamp& val1, const Timestamp& val2) {
   return val1.seconds == val2.seconds && val1.fractionNs == val2.fractionNs;
@@ -73,25 +66,23 @@ bool operator!=(const Timestamp& val1, const Timestamp& val2) {
 }
 
 bool operator<(const Timestamp& val1, const Timestamp& val2) {
-  return val1.seconds < val2.seconds
-         || (val1.seconds == val2.seconds && val1.fractionNs < val2.fractionNs);
+  return val1.seconds < val2.seconds ||
+         (val1.seconds == val2.seconds && val1.fractionNs < val2.fractionNs);
 }
 
 bool operator<=(const Timestamp& val1, const Timestamp& val2) {
-  return val1.seconds < val2.seconds
-         || (val1.seconds == val2.seconds
-             && val1.fractionNs <= val2.fractionNs);
+  return val1.seconds < val2.seconds ||
+         (val1.seconds == val2.seconds && val1.fractionNs <= val2.fractionNs);
 }
 
 bool operator>(const Timestamp& val1, const Timestamp& val2) {
-  return val1.seconds > val2.seconds
-         || (val1.seconds == val2.seconds && val1.fractionNs > val2.fractionNs);
+  return val1.seconds > val2.seconds ||
+         (val1.seconds == val2.seconds && val1.fractionNs > val2.fractionNs);
 }
 
 bool operator>=(const Timestamp& val1, const Timestamp& val2) {
-  return val1.seconds > val2.seconds
-         || (val1.seconds == val2.seconds
-             && val1.fractionNs >= val2.fractionNs);
+  return val1.seconds > val2.seconds ||
+         (val1.seconds == val2.seconds && val1.fractionNs >= val2.fractionNs);
 }
 }  // namespace odbc
 }  // namespace timestream

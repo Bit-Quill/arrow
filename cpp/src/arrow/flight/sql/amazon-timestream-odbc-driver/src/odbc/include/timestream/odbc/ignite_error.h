@@ -64,31 +64,29 @@
     throw IgniteError(code, stream.str().c_str());         \
   }
 
-#define IGNITE_ERROR_FORMATTED_2(code, msg, key1, val1, key2, val2)       \
-  {                                                                       \
-    std::stringstream stream;                                             \
-    stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "=" \
-           << (val2) << "]";                                              \
-    throw IgniteError(code, stream.str().c_str());                        \
+#define IGNITE_ERROR_FORMATTED_2(code, msg, key1, val1, key2, val2)                 \
+  {                                                                                 \
+    std::stringstream stream;                                                       \
+    stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "=" << (val2) \
+           << "]";                                                                  \
+    throw IgniteError(code, stream.str().c_str());                                  \
   }
 
-#define IGNITE_ERROR_FORMATTED_3(code, msg, key1, val1, key2, val2, key3, \
-                                 val3)                                    \
-  {                                                                       \
-    std::stringstream stream;                                             \
-    stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "=" \
-           << (val2) << ", " << key3 << "=" << (val3) << "]";             \
-    throw IgniteError(code, stream.str().c_str());                        \
+#define IGNITE_ERROR_FORMATTED_3(code, msg, key1, val1, key2, val2, key3, val3)     \
+  {                                                                                 \
+    std::stringstream stream;                                                       \
+    stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "=" << (val2) \
+           << ", " << key3 << "=" << (val3) << "]";                                 \
+    throw IgniteError(code, stream.str().c_str());                                  \
   }
 
-#define IGNITE_ERROR_FORMATTED_4(code, msg, key1, val1, key2, val2, key3,    \
-                                 val3, key4, val4)                           \
-  {                                                                          \
-    std::stringstream stream;                                                \
-    stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "="    \
-           << (val2) << ", " << key3 << "=" << (val3) << ", " << key4 << "=" \
-           << (val4) << "]";                                                 \
-    throw IgniteError(code, stream.str().c_str());                           \
+#define IGNITE_ERROR_FORMATTED_4(code, msg, key1, val1, key2, val2, key3, val3, key4, \
+                                 val4)                                                \
+  {                                                                                   \
+    std::stringstream stream;                                                         \
+    stream << msg << " [" << key1 << "=" << (val1) << ", " << key2 << "=" << (val2)   \
+           << ", " << key3 << "=" << (val3) << ", " << key4 << "=" << (val4) << "]";  \
+    throw IgniteError(code, stream.str().c_str());                                    \
   }
 
 #endif  //_IGNITE_ERROR_MACRO

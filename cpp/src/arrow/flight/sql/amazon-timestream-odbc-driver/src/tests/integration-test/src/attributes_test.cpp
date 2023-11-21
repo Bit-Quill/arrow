@@ -29,10 +29,10 @@
 #include <string>
 #include <vector>
 
-#include "timestream/odbc/connection.h"
-#include "timestream/odbc/utility.h"
 #include "odbc_test_suite.h"
 #include "test_utils.h"
+#include "timestream/odbc/connection.h"
+#include "timestream/odbc/utility.h"
 
 using namespace timestream;
 using namespace timestream_test;
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeConnectionTimeoutSet) {
   SQLRETURN ret;
 
   ret = SQLSetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT,
-                          reinterpret_cast< SQLPOINTER >(10), 0);
+                          reinterpret_cast<SQLPOINTER>(10), 0);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
   std::string error = GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc);
@@ -125,9 +125,8 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeAutoCommit) {
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
   BOOST_REQUIRE_EQUAL(autoCommit, SQL_AUTOCOMMIT_ON);
 
-  ret =
-      SQLSetConnectAttr(dbc, SQL_ATTR_AUTOCOMMIT,
-                        reinterpret_cast< SQLPOINTER >(SQL_AUTOCOMMIT_OFF), 0);
+  ret = SQLSetConnectAttr(dbc, SQL_ATTR_AUTOCOMMIT,
+                          reinterpret_cast<SQLPOINTER>(SQL_AUTOCOMMIT_OFF), 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
@@ -148,7 +147,7 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeMetadataId) {
   BOOST_REQUIRE_EQUAL(id, SQL_FALSE);
 
   ret = SQLSetConnectAttr(dbc, SQL_ATTR_METADATA_ID,
-                          reinterpret_cast< SQLPOINTER >(SQL_TRUE), 0);
+                          reinterpret_cast<SQLPOINTER>(SQL_TRUE), 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
@@ -179,9 +178,8 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeAsyncEnable) {
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
   BOOST_REQUIRE_EQUAL(id, SQL_ASYNC_ENABLE_OFF);
 
-  ret =
-      SQLSetConnectAttr(dbc, SQL_ATTR_ASYNC_ENABLE,
-                        reinterpret_cast< SQLPOINTER >(SQL_ASYNC_ENABLE_ON), 0);
+  ret = SQLSetConnectAttr(dbc, SQL_ATTR_ASYNC_ENABLE,
+                          reinterpret_cast<SQLPOINTER>(SQL_ASYNC_ENABLE_ON), 0);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
   std::string error = GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc);
@@ -194,24 +192,22 @@ BOOST_AUTO_TEST_CASE(ConnectionAttributeTSLogDebug) {
   ConnectToTS();
 
   SQLUINTEGER id = -1;
-  SQLRETURN ret = SQLSetConnectAttr(
-      dbc, SQL_ATTR_TSLOG_DEBUG,
-      reinterpret_cast< SQLPOINTER >(LogLevel::Type::DEBUG_LEVEL), 0);
+  SQLRETURN ret =
+      SQLSetConnectAttr(dbc, SQL_ATTR_TSLOG_DEBUG,
+                        reinterpret_cast<SQLPOINTER>(LogLevel::Type::DEBUG_LEVEL), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
   ret = SQLGetConnectAttr(dbc, SQL_ATTR_TSLOG_DEBUG, &id, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(id,
-                      static_cast< SQLUINTEGER >(LogLevel::Type::DEBUG_LEVEL));
+  BOOST_REQUIRE_EQUAL(id, static_cast<SQLUINTEGER>(LogLevel::Type::DEBUG_LEVEL));
 }
 
 BOOST_AUTO_TEST_CASE(StatementAttributeCursorScrollable) {
   ConnectToTS();
 
   SQLULEN scrollable = -1;
-  SQLRETURN ret =
-      SQLGetStmtAttr(stmt, SQL_ATTR_CURSOR_SCROLLABLE, &scrollable, 0, 0);
+  SQLRETURN ret = SQLGetStmtAttr(stmt, SQL_ATTR_CURSOR_SCROLLABLE, &scrollable, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
   BOOST_REQUIRE_EQUAL(scrollable, SQL_NONSCROLLABLE);
@@ -221,8 +217,7 @@ BOOST_AUTO_TEST_CASE(StatementAttributeCursorSensitivity) {
   ConnectToTS();
 
   SQLULEN sensitivity = -1;
-  SQLRETURN ret =
-      SQLGetStmtAttr(stmt, SQL_ATTR_CURSOR_SENSITIVITY, &sensitivity, 0, 0);
+  SQLRETURN ret = SQLGetStmtAttr(stmt, SQL_ATTR_CURSOR_SENSITIVITY, &sensitivity, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
   BOOST_REQUIRE_EQUAL(sensitivity, SQL_INSENSITIVE);
@@ -232,8 +227,7 @@ BOOST_AUTO_TEST_CASE(StatementAttributeAutoIPD) {
   ConnectToTS();
 
   SQLULEN autoIPD = -1;
-  SQLRETURN ret =
-      SQLGetStmtAttr(stmt, SQL_ATTR_ENABLE_AUTO_IPD, &autoIPD, 0, 0);
+  SQLRETURN ret = SQLGetStmtAttr(stmt, SQL_ATTR_ENABLE_AUTO_IPD, &autoIPD, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
   BOOST_REQUIRE_EQUAL(autoIPD, SQL_FALSE);
@@ -243,20 +237,19 @@ BOOST_AUTO_TEST_CASE(StatementAttributeConcurrency) {
   ConnectToTS();
 
   SQLULEN concurrency = -1;
-  SQLRETURN ret =
-      SQLGetStmtAttr(stmt, SQL_ATTR_CONCURRENCY, &concurrency, 0, 0);
+  SQLRETURN ret = SQLGetStmtAttr(stmt, SQL_ATTR_CONCURRENCY, &concurrency, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
   BOOST_REQUIRE_EQUAL(concurrency, SQL_CONCUR_READ_ONLY);
 
   // Attempt to set to supported value
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_CONCURRENCY,
-                       reinterpret_cast< SQLPOINTER >(SQL_CONCUR_READ_ONLY), 0);
+                       reinterpret_cast<SQLPOINTER>(SQL_CONCUR_READ_ONLY), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Attempt to set to unsupported value
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_CONCURRENCY,
-                       reinterpret_cast< SQLPOINTER >(SQL_CONCUR_VALUES), 0);
+                       reinterpret_cast<SQLPOINTER>(SQL_CONCUR_VALUES), 0);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
   CheckSQLStatementDiagnosticError("HYC00");
@@ -275,13 +268,12 @@ BOOST_AUTO_TEST_CASE(StatementAttributeCursorType) {
 
   // Attempt to set to supported value
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_CURSOR_TYPE,
-                       reinterpret_cast< SQLPOINTER >(SQL_CURSOR_FORWARD_ONLY),
-                       0);
+                       reinterpret_cast<SQLPOINTER>(SQL_CURSOR_FORWARD_ONLY), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Attempt to set to unsupported value
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_CURSOR_TYPE,
-                       reinterpret_cast< SQLPOINTER >(SQL_CURSOR_STATIC), 0);
+                       reinterpret_cast<SQLPOINTER>(SQL_CURSOR_STATIC), 0);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
   CheckSQLStatementDiagnosticError("HYC00");
@@ -299,9 +291,8 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowArraySize) {
   // check that statement array size cannot be set to values not equal to 1
   // repeat test for different values
   SQLULEN val = 5;
-  SQLRETURN ret =
-      SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
-                     reinterpret_cast< SQLPOINTER >(val), sizeof(val));
+  SQLRETURN ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                                 reinterpret_cast<SQLPOINTER>(val), sizeof(val));
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -317,20 +308,19 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRetrieveData) {
   ConnectToTS();
 
   SQLULEN retrieveData = -1;
-  SQLRETURN ret =
-      SQLGetStmtAttr(stmt, SQL_ATTR_RETRIEVE_DATA, &retrieveData, 0, 0);
+  SQLRETURN ret = SQLGetStmtAttr(stmt, SQL_ATTR_RETRIEVE_DATA, &retrieveData, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
   BOOST_REQUIRE_EQUAL(retrieveData, SQL_RD_ON);
 
   // Attempt to set to supported value
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_RETRIEVE_DATA,
-                       reinterpret_cast< SQLPOINTER >(SQL_RD_ON), 0);
+                       reinterpret_cast<SQLPOINTER>(SQL_RD_ON), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Attempt to set to unsupported value
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_RETRIEVE_DATA,
-                       reinterpret_cast< SQLPOINTER >(SQL_RD_OFF), 0);
+                       reinterpret_cast<SQLPOINTER>(SQL_RD_OFF), 0);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
   CheckSQLStatementDiagnosticError("HYC00");
@@ -343,20 +333,19 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowBindType) {
   ConnectToTS();
 
   SQLULEN rowBindType = -1;
-  SQLRETURN ret =
-      SQLGetStmtAttr(stmt, SQL_ATTR_ROW_BIND_TYPE, &rowBindType, 0, 0);
+  SQLRETURN ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_BIND_TYPE, &rowBindType, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
   BOOST_REQUIRE_EQUAL(rowBindType, SQL_BIND_BY_COLUMN);
 
   // Attempt to set to supported value
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROW_BIND_TYPE,
-                       reinterpret_cast< SQLPOINTER >(SQL_BIND_BY_COLUMN), 0);
+                       reinterpret_cast<SQLPOINTER>(SQL_BIND_BY_COLUMN), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Attempt to set to unsupported value
-  ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROW_BIND_TYPE,
-                       reinterpret_cast< SQLPOINTER >(1UL), 0);
+  ret =
+      SQLSetStmtAttr(stmt, SQL_ATTR_ROW_BIND_TYPE, reinterpret_cast<SQLPOINTER>(1UL), 0);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
   CheckSQLStatementDiagnosticError("HYC00");
@@ -378,13 +367,12 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowBindOffset) {
   // Attempt to set pointer
   SQLULEN rowBindOffset1[1] = {2};
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROW_BIND_OFFSET_PTR,
-                       reinterpret_cast< SQLPOINTER >(&rowBindOffset1), 0);
+                       reinterpret_cast<SQLPOINTER>(&rowBindOffset1), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Check pointer is set successfully
   SQLULEN* rowBindOffset2;
-  ret =
-      SQLGetStmtAttr(stmt, SQL_ATTR_ROW_BIND_OFFSET_PTR, &rowBindOffset2, 0, 0);
+  ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_BIND_OFFSET_PTR, &rowBindOffset2, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -396,8 +384,7 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowsFetchedPtr) {
 
   // Test default value is returned
   SQLULEN* rowsFetchedPtr;
-  SQLRETURN ret =
-      SQLGetStmtAttr(stmt, SQL_ATTR_ROWS_FETCHED_PTR, &rowsFetchedPtr, 0, 0);
+  SQLRETURN ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROWS_FETCHED_PTR, &rowsFetchedPtr, 0, 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   BOOST_REQUIRE_EQUAL(rowsFetchedPtr, nullptr);
@@ -405,11 +392,11 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowsFetchedPtr) {
   SQLULEN rowsFetchedPtr1[1];
 
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROWS_FETCHED_PTR,
-                       reinterpret_cast< SQLPOINTER >(&rowsFetchedPtr1), 0);
+                       reinterpret_cast<SQLPOINTER>(&rowsFetchedPtr1), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Fetch data once
-  std::vector< SQLWCHAR > request =
+  std::vector<SQLWCHAR> request =
       MakeSqlBuffer("SELECT * FROM data_queries_test_db.TestScalarTypes");
   ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
@@ -434,8 +421,7 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowsStatusesPtr) {
 
   // Test default value is returned
   SQLUSMALLINT* rowsStatusesPtr;
-  SQLRETURN ret =
-      SQLGetStmtAttr(stmt, SQL_ATTR_ROW_STATUS_PTR, &rowsStatusesPtr, 0, 0);
+  SQLRETURN ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_STATUS_PTR, &rowsStatusesPtr, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -444,10 +430,10 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowsStatusesPtr) {
   // Row Array Size is 1, so only one row status can be returned at a time.
   SQLUSMALLINT rowsStatusesPtr1[1];
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROW_STATUS_PTR,
-                       reinterpret_cast< SQLPOINTER >(&rowsStatusesPtr1), 0);
+                       reinterpret_cast<SQLPOINTER>(&rowsStatusesPtr1), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  std::vector< SQLWCHAR > request = MakeSqlBuffer("SELECT 1");
+  std::vector<SQLWCHAR> request = MakeSqlBuffer("SELECT 1");
   ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
@@ -475,21 +461,19 @@ BOOST_AUTO_TEST_CASE(StatementAttributeParamBindType) {
   ConnectToTS();
 
   SQLULEN paramBindType = -1;
-  SQLRETURN ret =
-      SQLGetStmtAttr(stmt, SQL_ATTR_PARAM_BIND_TYPE, &paramBindType, 0, 0);
+  SQLRETURN ret = SQLGetStmtAttr(stmt, SQL_ATTR_PARAM_BIND_TYPE, &paramBindType, 0, 0);
 
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
   BOOST_REQUIRE_EQUAL(paramBindType, SQL_PARAM_BIND_BY_COLUMN);
 
   // Attempt to set to supported value
   ret = SQLSetStmtAttr(stmt, SQL_ATTR_PARAM_BIND_TYPE,
-                       reinterpret_cast< SQLPOINTER >(SQL_PARAM_BIND_BY_COLUMN),
-                       0);
+                       reinterpret_cast<SQLPOINTER>(SQL_PARAM_BIND_BY_COLUMN), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   // Attempt to set to unsupported arbitrary value 1UL
-  ret = SQLSetStmtAttr(stmt, SQL_ATTR_PARAM_BIND_TYPE,
-                       reinterpret_cast< SQLPOINTER >(1UL), 0);
+  ret = SQLSetStmtAttr(stmt, SQL_ATTR_PARAM_BIND_TYPE, reinterpret_cast<SQLPOINTER>(1UL),
+                       0);
 
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
   CheckSQLStatementDiagnosticError("HYC00");
@@ -507,8 +491,8 @@ BOOST_AUTO_TEST_CASE(StatementAttributeMetadataId) {
   BOOST_REQUIRE_EQUAL(id, SQL_FALSE);
 
   // Attempt to set to change value
-  ret = SQLSetStmtAttr(stmt, SQL_ATTR_METADATA_ID,
-                       reinterpret_cast< SQLPOINTER >(SQL_TRUE), 0);
+  ret = SQLSetStmtAttr(stmt, SQL_ATTR_METADATA_ID, reinterpret_cast<SQLPOINTER>(SQL_TRUE),
+                       0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   ret = SQLGetStmtAttr(stmt, SQL_ATTR_METADATA_ID, &id, 0, 0);
@@ -520,7 +504,7 @@ BOOST_AUTO_TEST_CASE(StatementAttributeMetadataId) {
 BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLExecDirect) {
   ConnectToTS();
 
-  std::vector< SQLWCHAR > request =
+  std::vector<SQLWCHAR> request =
       MakeSqlBuffer("SELECT * FROM data_queries_test_db.TestScalarTypes");
   SQLRETURN ret = SQLExecDirect(stmt, request.data(), SQL_NTS);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
@@ -566,18 +550,17 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLExecDirect) {
   BOOST_REQUIRE(SQL_SUCCEEDED(ret));
   BOOST_REQUIRE_EQUAL(rowNum, 0);
 #else
-  BOOST_REQUIRE_EQUAL(
-      "24000: [Microsoft][ODBC Driver Manager] Invalid cursor state",
-      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  BOOST_REQUIRE_EQUAL("24000: [Microsoft][ODBC Driver Manager] Invalid cursor state",
+                      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 #endif
 }
 
 BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLTables) {
   ConnectToTS();
 
-  std::vector< SQLWCHAR > empty = {0};
-  std::vector< SQLWCHAR > testTableName = MakeSqlBuffer("IoTMulti");
-  std::vector< SQLWCHAR > databaseName = MakeSqlBuffer("meta_queries_test_db");
+  std::vector<SQLWCHAR> empty = {0};
+  std::vector<SQLWCHAR> testTableName = MakeSqlBuffer("IoTMulti");
+  std::vector<SQLWCHAR> databaseName = MakeSqlBuffer("meta_queries_test_db");
   SQLRETURN ret;
 
   if (DATABASE_AS_SCHEMA) {
@@ -626,25 +609,24 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLTables) {
   BOOST_REQUIRE(SQL_SUCCEEDED(ret));
   BOOST_REQUIRE_EQUAL(rowNum, 0);
 #else
-  BOOST_REQUIRE_EQUAL(
-      "24000: [Microsoft][ODBC Driver Manager] Invalid cursor state",
-      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  BOOST_REQUIRE_EQUAL("24000: [Microsoft][ODBC Driver Manager] Invalid cursor state",
+                      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 #endif
 }
 
 BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLColumns) {
   ConnectToTS();
 
-  std::vector< SQLWCHAR > table = MakeSqlBuffer("TestScalarTypes");
-  std::vector< SQLWCHAR > databaseName = MakeSqlBuffer("data_queries_test_db");
+  std::vector<SQLWCHAR> table = MakeSqlBuffer("TestScalarTypes");
+  std::vector<SQLWCHAR> databaseName = MakeSqlBuffer("data_queries_test_db");
   SQLRETURN ret;
 
   if (DATABASE_AS_SCHEMA) {
-    ret = SQLColumns(stmt, nullptr, 0, databaseName.data(), SQL_NTS,
-                     table.data(), SQL_NTS, nullptr, 0);
+    ret = SQLColumns(stmt, nullptr, 0, databaseName.data(), SQL_NTS, table.data(),
+                     SQL_NTS, nullptr, 0);
   } else {
-    ret = SQLColumns(stmt, databaseName.data(), SQL_NTS, nullptr, 0,
-                     table.data(), SQL_NTS, nullptr, 0);
+    ret = SQLColumns(stmt, databaseName.data(), SQL_NTS, nullptr, 0, table.data(),
+                     SQL_NTS, nullptr, 0);
   }
 
   ret = SQLFetch(stmt);
@@ -685,9 +667,8 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLColumns) {
   BOOST_REQUIRE(SQL_SUCCEEDED(ret));
   BOOST_REQUIRE_EQUAL(rowNum, 0);
 #else
-  BOOST_REQUIRE_EQUAL(
-      "24000: [Microsoft][ODBC Driver Manager] Invalid cursor state",
-      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  BOOST_REQUIRE_EQUAL("24000: [Microsoft][ODBC Driver Manager] Invalid cursor state",
+                      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 #endif
 }
 
@@ -735,9 +716,8 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLGetTypeInfo) {
   BOOST_REQUIRE(SQL_SUCCEEDED(ret));
   BOOST_REQUIRE_EQUAL(rowNum, 0);
 #else
-  BOOST_REQUIRE_EQUAL(
-      "24000: [Microsoft][ODBC Driver Manager] Invalid cursor state",
-      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  BOOST_REQUIRE_EQUAL("24000: [Microsoft][ODBC Driver Manager] Invalid cursor state",
+                      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 #endif
 }
 
@@ -777,13 +757,13 @@ BOOST_AUTO_TEST_CASE(EnvironmentAttributeCPMatch) {
   BOOST_REQUIRE(env != NULL);
 
   // We want ODBC 3 support
-  SQLRETURN ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION,
-                                reinterpret_cast< void* >(SQL_OV_ODBC3), 0);
+  SQLRETURN ret =
+      SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(SQL_OV_ODBC3), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_ENV, env);
 
   // Attempt to set SQL_ATTR_CP_MATCH to non-default value
   ret = SQLSetEnvAttr(env, SQL_ATTR_CP_MATCH,
-                      reinterpret_cast< void* >(SQL_CP_RELAXED_MATCH), 0);
+                      reinterpret_cast<void*>(SQL_CP_RELAXED_MATCH), 0);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_ENV, env);
 
   SQLINTEGER cpMatch;
@@ -879,8 +859,8 @@ BOOST_AUTO_TEST_CASE(ConnectionSetConnectOptionUnsupportedOption) {
   std::string pattern = "Specified attribute is not supported";
 #endif
 
-  BOOST_CHECK(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc).find(pattern)
-              != std::string::npos);
+  BOOST_CHECK(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc).find(pattern) !=
+              std::string::npos);
 
   ret = SQLSetConnectOption(dbc, SQL_SIMULATE_CURSOR, SQL_TRUE);
   BOOST_CHECK_EQUAL(ret, SQL_ERROR);
@@ -889,8 +869,8 @@ BOOST_AUTO_TEST_CASE(ConnectionSetConnectOptionUnsupportedOption) {
 #else
   CheckSQLConnectionDiagnosticError("HYC00");
 #endif
-  BOOST_CHECK(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc).find(pattern)
-              != std::string::npos);
+  BOOST_CHECK(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc).find(pattern) !=
+              std::string::npos);
 }
 
 // Test ignored connection options
@@ -905,13 +885,11 @@ BOOST_AUTO_TEST_CASE(ConnectionSetConnectOptionIgnored) {
   CHECK_SET_IGNORED_OPTION(SQL_ASYNC_ENABLE, SQL_TRUE);
   CHECK_SET_IGNORED_OPTION(SQL_TXN_ISOLATION, SQL_TXN_READ_COMMITTED);
   CHECK_SET_IGNORED_OPTION(SQL_ACCESS_MODE, SQL_MODE_READ_ONLY);
-  CHECK_SET_IGNORED_OPTION(SQL_CURRENT_QUALIFIER,
-                           reinterpret_cast< SQLULEN >("test"));
+  CHECK_SET_IGNORED_OPTION(SQL_CURRENT_QUALIFIER, reinterpret_cast<SQLULEN>("test"));
   CHECK_SET_IGNORED_OPTION(SQL_PACKET_SIZE, 100);
   CHECK_SET_IGNORED_OPTION(SQL_QUIET_MODE, NULL);
   CHECK_SET_IGNORED_OPTION(SQL_LOGIN_TIMEOUT, 10);
-  CHECK_SET_IGNORED_OPTION(SQL_TRANSLATE_DLL,
-                           reinterpret_cast< SQLULEN >("trace"));
+  CHECK_SET_IGNORED_OPTION(SQL_TRANSLATE_DLL, reinterpret_cast<SQLULEN>("trace"));
   CHECK_SET_IGNORED_OPTION(SQL_TRANSLATE_OPTION, SQL_FALSE);
 }
 
@@ -919,20 +897,18 @@ BOOST_AUTO_TEST_CASE(ConnectionSetConnectOptionIgnored) {
 BOOST_AUTO_TEST_CASE(ConnectionSetConnectOptionDMCase) {
   ConnectToTS(SQL_OV_ODBC2);
 
-  SQLRETURN ret =
-      SQLSetConnectOption(dbc, SQL_ODBC_CURSORS, SQL_CUR_USE_DRIVER);
+  SQLRETURN ret = SQLSetConnectOption(dbc, SQL_ODBC_CURSORS, SQL_CUR_USE_DRIVER);
   BOOST_CHECK_EQUAL(ret, SQL_ERROR);
 
   ret = SQLSetConnectOption(dbc, SQL_OPT_TRACE, SQL_OPT_TRACE_ON);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 
-  ret = SQLSetConnectOption(dbc, SQL_OPT_TRACEFILE,
-                            reinterpret_cast< SQLULEN >("trace"));
+  ret = SQLSetConnectOption(dbc, SQL_OPT_TRACEFILE, reinterpret_cast<SQLULEN>("trace"));
 #if defined(__APPLE__)
   BOOST_CHECK_EQUAL(ret, SQL_ERROR);
   CheckSQLConnectionDiagnosticError("IM013");
-  BOOST_CHECK(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc).find("Trace file error")
-              != std::string::npos);
+  BOOST_CHECK(GetOdbcErrorMessage(SQL_HANDLE_DBC, dbc).find("Trace file error") !=
+              std::string::npos);
 #else
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
 #endif
@@ -1051,11 +1027,11 @@ BOOST_AUTO_TEST_CASE(StatementOptionSupported) {
   BOOST_CHECK_EQUAL(value, SQL_RD_ON);
 }
 
-#define CHECK_GET_OPTION_NOTSUPPORTED(option)                           \
-  {                                                                     \
-    SQLULEN value = 0;                                                  \
-    SQLRETURN ret = SQLGetStmtOption(stmt, option, (SQLPOINTER)&value); \
-    BOOST_CHECK_EQUAL(ret, SQL_ERROR);                                  \
+#define CHECK_GET_OPTION_NOTSUPPORTED(option)                             \
+  {                                                                       \
+    SQLULEN value = 0;                                                    \
+    SQLRETURN ret = SQLGetStmtOption(stmt, option, (SQLPOINTER) & value); \
+    BOOST_CHECK_EQUAL(ret, SQL_ERROR);                                    \
   }
 
 BOOST_AUTO_TEST_CASE(StatementOptionNotSupported) {

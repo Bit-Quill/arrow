@@ -28,8 +28,8 @@
 
 #include "ignite/odbc/config/settable_value.h"
 #include "ignite/odbc/diagnostic/diagnosable.h"
-#include "timestream/odbc/authentication/auth_type.h"
 #include "ignite/odbc/odbc_error.h"
+#include "timestream/odbc/authentication/auth_type.h"
 #include "timestream/odbc/log_level.h"
 
 #define DEFAULT_DSN "Timestream DSN"
@@ -74,7 +74,7 @@ namespace config {
 class IGNITE_IMPORT_EXPORT Configuration {
  public:
   /** Argument map type. */
-  typedef std::map< std::string, std::string > ArgumentMap;
+  typedef std::map<std::string, std::string> ArgumentMap;
 
   /** Default values for configuration. */
   struct DefaultValue {
@@ -771,9 +771,9 @@ class IGNITE_IMPORT_EXPORT Configuration {
    * @param key Key.
    * @param value Value.
    */
-  template < typename T >
+  template <typename T>
   static void AddToMap(ArgumentMap& map, const std::string& key,
-                       const SettableValue< T >& value);
+                       const SettableValue<T>& value);
 
   /**
    * Add key and value to the argument map.
@@ -782,121 +782,115 @@ class IGNITE_IMPORT_EXPORT Configuration {
    * @param key Key.
    * @param value Value.
    */
-  template < typename T >
+  template <typename T>
   static void AddToMap(ArgumentMap& map, const std::string& key,
-                       const SettableValue< T >& value, bool isJdbcFormat);
+                       const SettableValue<T>& value, bool isJdbcFormat);
 
   /** DSN. */
-  SettableValue< std::string > dsn = DefaultValue::dsn;
+  SettableValue<std::string> dsn = DefaultValue::dsn;
 
   /** Driver Name. */
-  SettableValue< std::string > driver = DefaultValue::driver;
+  SettableValue<std::string> driver = DefaultValue::driver;
 
   /** UID. */
-  SettableValue< std::string > uid = DefaultValue::uid;
+  SettableValue<std::string> uid = DefaultValue::uid;
 
   /** PWD. */
-  SettableValue< std::string > pwd = DefaultValue::pwd;
+  SettableValue<std::string> pwd = DefaultValue::pwd;
 
   /** Access Key Id. */
-  SettableValue< std::string > accessKeyId = DefaultValue::accessKeyId;
+  SettableValue<std::string> accessKeyId = DefaultValue::accessKeyId;
 
   /** Secret Key. */
-  SettableValue< std::string > secretKey = DefaultValue::secretKey;
+  SettableValue<std::string> secretKey = DefaultValue::secretKey;
 
   /** Session Token. */
-  SettableValue< std::string > sessionToken = DefaultValue::sessionToken;
+  SettableValue<std::string> sessionToken = DefaultValue::sessionToken;
 
   /** Profile Name. */
-  SettableValue< std::string > profileName = DefaultValue::profileName;
+  SettableValue<std::string> profileName = DefaultValue::profileName;
 
   /** Request timeout in milliseconds.  */
-  SettableValue< int32_t > reqTimeout = DefaultValue::reqTimeout;
+  SettableValue<int32_t> reqTimeout = DefaultValue::reqTimeout;
 
   /** Connection timeout in milliseconds.  */
-  SettableValue< int32_t > connectionTimeout = DefaultValue::connectionTimeout;
+  SettableValue<int32_t> connectionTimeout = DefaultValue::connectionTimeout;
 
   /** Max Retry Count.  */
-  SettableValue< int32_t > maxRetryCountClient =
-      DefaultValue::maxRetryCountClient;
+  SettableValue<int32_t> maxRetryCountClient = DefaultValue::maxRetryCountClient;
 
   /** Max Connections.  */
-  SettableValue< int32_t > maxConnections = DefaultValue::maxConnections;
+  SettableValue<int32_t> maxConnections = DefaultValue::maxConnections;
 
   /** Endpoint. */
-  SettableValue< std::string > endpoint = DefaultValue::endpoint;
+  SettableValue<std::string> endpoint = DefaultValue::endpoint;
 
   /** Region. */
-  SettableValue< std::string > region = DefaultValue::region;
+  SettableValue<std::string> region = DefaultValue::region;
 
   /** Auth Type. */
-  SettableValue< AuthType::Type > authType = DefaultValue::authType;
+  SettableValue<AuthType::Type> authType = DefaultValue::authType;
 
   /** IdP Host. */
-  SettableValue< std::string > idPHost = DefaultValue::idPHost;
+  SettableValue<std::string> idPHost = DefaultValue::idPHost;
 
   /** IdP User Name. */
-  SettableValue< std::string > idPUserName = DefaultValue::idPUserName;
+  SettableValue<std::string> idPUserName = DefaultValue::idPUserName;
 
   /** IdP Password. */
-  SettableValue< std::string > idPPassword = DefaultValue::idPPassword;
+  SettableValue<std::string> idPPassword = DefaultValue::idPPassword;
 
   /** IdP ARN. */
-  SettableValue< std::string > idPArn = DefaultValue::idPArn;
+  SettableValue<std::string> idPArn = DefaultValue::idPArn;
 
   /** Okta Application ID. */
-  SettableValue< std::string > oktaAppId = DefaultValue::oktaAppId;
+  SettableValue<std::string> oktaAppId = DefaultValue::oktaAppId;
 
   /** Role ARN. */
-  SettableValue< std::string > roleArn = DefaultValue::roleArn;
+  SettableValue<std::string> roleArn = DefaultValue::roleArn;
 
   /** Azure AD Application ID. */
-  SettableValue< std::string > aadAppId = DefaultValue::aadAppId;
+  SettableValue<std::string> aadAppId = DefaultValue::aadAppId;
 
   /** Azure AD Client Secret. */
-  SettableValue< std::string > aadClientSecret = DefaultValue::aadClientSecret;
+  SettableValue<std::string> aadClientSecret = DefaultValue::aadClientSecret;
 
   /** Azure AD Tenant. */
-  SettableValue< std::string > aadTenant = DefaultValue::aadTenant;
+  SettableValue<std::string> aadTenant = DefaultValue::aadTenant;
 
   /** The log level for the log file. */
-  SettableValue< LogLevel::Type > logLevel = DefaultValue::logLevel;
+  SettableValue<LogLevel::Type> logLevel = DefaultValue::logLevel;
 
   /** The logging file path. */
-  SettableValue< std::string > logPath = DefaultValue::logPath;
+  SettableValue<std::string> logPath = DefaultValue::logPath;
 
   /** The max row number in one page returned from TS */
-  SettableValue< int32_t > maxRowPerPage = DefaultValue::maxRowPerPage;
+  SettableValue<int32_t> maxRowPerPage = DefaultValue::maxRowPerPage;
 };
 
 template <>
-void Configuration::AddToMap< std::string >(
-    ArgumentMap& map, const std::string& key,
-    const SettableValue< std::string >& value);
+void Configuration::AddToMap<std::string>(ArgumentMap& map, const std::string& key,
+                                          const SettableValue<std::string>& value);
 
 template <>
-void Configuration::AddToMap< uint16_t >(
-    ArgumentMap& map, const std::string& key,
-    const SettableValue< uint16_t >& value);
+void Configuration::AddToMap<uint16_t>(ArgumentMap& map, const std::string& key,
+                                       const SettableValue<uint16_t>& value);
 
 template <>
-void Configuration::AddToMap< int32_t >(ArgumentMap& map,
-                                        const std::string& key,
-                                        const SettableValue< int32_t >& value);
+void Configuration::AddToMap<int32_t>(ArgumentMap& map, const std::string& key,
+                                      const SettableValue<int32_t>& value);
 
 template <>
-void Configuration::AddToMap< bool >(ArgumentMap& map, const std::string& key,
-                                     const SettableValue< bool >& value);
+void Configuration::AddToMap<bool>(ArgumentMap& map, const std::string& key,
+                                   const SettableValue<bool>& value);
 
 template <>
-void Configuration::AddToMap< AuthType::Type >(
-    ArgumentMap& map, const std::string& key,
-    const SettableValue< AuthType::Type >& value);
+void Configuration::AddToMap<AuthType::Type>(ArgumentMap& map, const std::string& key,
+                                             const SettableValue<AuthType::Type>& value);
 
 template <>
-void Configuration::AddToMap< LogLevel::Type >(
-    ArgumentMap& map, const std::string& key,
-    const SettableValue< LogLevel::Type >& value);
+void Configuration::AddToMap<LogLevel::Type>(ArgumentMap& map, const std::string& key,
+                                             const SettableValue<LogLevel::Type>& value);
 }  // namespace config
 }  // namespace odbc
 }  // namespace timestream

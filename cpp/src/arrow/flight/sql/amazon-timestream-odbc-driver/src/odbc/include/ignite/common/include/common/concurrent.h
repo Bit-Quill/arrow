@@ -37,7 +37,7 @@ struct StaticTag {};
  *
  * @param obj Object to be deleted.
  */
-template < typename T >
+template <typename T>
 IGNITE_IMPORT_EXPORT void SharedPointerDefaultDeleter(T* obj) {
   delete obj;
 }
@@ -47,7 +47,7 @@ IGNITE_IMPORT_EXPORT void SharedPointerDefaultDeleter(T* obj) {
  *
  * @param obj Object to be deleted.
  */
-template < typename T >
+template <typename T>
 IGNITE_IMPORT_EXPORT void SharedPointerEmptyDeleter(T*) {
   // No-op.
 }
@@ -112,13 +112,12 @@ class IGNITE_IMPORT_EXPORT SharedPointerImpl {
 };
 
 /* Forward declaration. */
-template < typename T >
+template <typename T>
 class IGNITE_IMPORT_EXPORT EnableSharedFromThis;
 
 /* Forward declaration. */
-template < typename T >
-inline void ImplEnableShared(EnableSharedFromThis< T >* some,
-                             SharedPointerImpl* impl);
+template <typename T>
+inline void ImplEnableShared(EnableSharedFromThis<T>* some, SharedPointerImpl* impl);
 
 // Do nothing if the instance is not derived from EnableSharedFromThis.
 inline void ImplEnableShared(const volatile void*, const volatile void*) {
@@ -128,12 +127,12 @@ inline void ImplEnableShared(const volatile void*, const volatile void*) {
 /**
  * Shared pointer.
  */
-template < typename T >
+template <typename T>
 class IGNITE_IMPORT_EXPORT SharedPointer {
  public:
-  friend class EnableSharedFromThis< T >;
+  friend class EnableSharedFromThis<T>;
 
-  template < typename T2 >
+  template <typename T2>
   friend class SharedPointer;
 
   /**
@@ -149,11 +148,11 @@ class IGNITE_IMPORT_EXPORT SharedPointer {
    * @param ptr Raw pointer.
    * @param deleter Delete function.
    */
-  SharedPointer(T* ptr, void (*deleter)(T*) = &SharedPointerDefaultDeleter< T >)
+  SharedPointer(T* ptr, void (*deleter)(T*) = &SharedPointerDefaultDeleter<T>)
       : ptr(ptr), impl(0) {
     if (ptr) {
       impl = new SharedPointerImpl(
-          ptr, reinterpret_cast< SharedPointerImpl::DeleterType >(deleter));
+          ptr, reinterpret_cast<SharedPointerImpl::DeleterType>(deleter));
       ImplEnableShared(ptr, impl);
     }
   }
@@ -164,13 +163,12 @@ class IGNITE_IMPORT_EXPORT SharedPointer {
    * @param ptr Raw pointer.
    * @param deleter Delete function.
    */
-  template < typename T2 >
-  SharedPointer(T2* ptr,
-                void (*deleter)(T2*) = &SharedPointerDefaultDeleter< T2 >)
+  template <typename T2>
+  SharedPointer(T2* ptr, void (*deleter)(T2*) = &SharedPointerDefaultDeleter<T2>)
       : ptr(ptr), impl(0) {
     if (ptr) {
       impl = new SharedPointerImpl(
-          ptr, reinterpret_cast< SharedPointerImpl::DeleterType >(deleter));
+          ptr, reinterpret_cast<SharedPointerImpl::DeleterType>(deleter));
       ImplEnableShared(ptr, impl);
     }
   }
@@ -181,8 +179,7 @@ class IGNITE_IMPORT_EXPORT SharedPointer {
    * @param other Instance to copy.
    */
   SharedPointer(const SharedPointer& other) : ptr(other.ptr), impl(other.impl) {
-    if (impl)
-      impl->Increment();
+    if (impl) impl->Increment();
   }
 
   /**
@@ -190,11 +187,9 @@ class IGNITE_IMPORT_EXPORT SharedPointer {
    *
    * @param other Instance to copy.
    */
-  template < typename T2 >
-  SharedPointer(const SharedPointer< T2 >& other)
-      : ptr(other.ptr), impl(other.impl) {
-    if (impl)
-      impl->Increment();
+  template <typename T2>
+  SharedPointer(const SharedPointer<T2>& other) : ptr(other.ptr), impl(other.impl) {
+    if (impl) impl->Increment();
   }
 
   /**
@@ -202,11 +197,10 @@ class IGNITE_IMPORT_EXPORT SharedPointer {
    *
    * @param other Instance to copy.
    */
-  template < typename T2 >
-  SharedPointer(const SharedPointer< T2 >& other, StaticTag)
-      : ptr(static_cast< T* >(other.ptr)), impl(other.impl) {
-    if (impl)
-      impl->Increment();
+  template <typename T2>
+  SharedPointer(const SharedPointer<T2>& other, StaticTag)
+      : ptr(static_cast<T*>(other.ptr)), impl(other.impl) {
+    if (impl) impl->Increment();
   }
 
   /**
@@ -229,9 +223,9 @@ class IGNITE_IMPORT_EXPORT SharedPointer {
    *
    * @param other Other instance.
    */
-  template < typename T2 >
-  SharedPointer& operator=(const SharedPointer< T2 >& other) {
-    SharedPointer< T > tmp(other);
+  template <typename T2>
+  SharedPointer& operator=(const SharedPointer<T2>& other) {
+    SharedPointer<T> tmp(other);
 
     Swap(tmp);
 
@@ -260,18 +254,14 @@ class IGNITE_IMPORT_EXPORT SharedPointer {
    *
    * @return Raw pointer.
    */
-  T* Get() {
-    return ptr;
-  }
+  T* Get() { return ptr; }
 
   /**
    * Get raw pointer.
    *
    * @return Raw pointer.
    */
-  const T* Get() const {
-    return ptr;
-  }
+  const T* Get() const { return ptr; }
 
   /**
    * Check whether underlying raw pointer is valid.
@@ -284,9 +274,7 @@ class IGNITE_IMPORT_EXPORT SharedPointer {
    *
    * @return True if valid.
    */
-  bool IsValid() const {
-    return impl != 0;
-  }
+  bool IsValid() const { return impl != 0; }
 
   /**
    * Swap pointer content with another instance.
@@ -319,9 +307,9 @@ class IGNITE_IMPORT_EXPORT SharedPointer {
  *
  * @param val Value to cast.
  */
-template < class T1, class T2 >
-SharedPointer< T1 > StaticPointerCast(const SharedPointer< T2 >& val) {
-  return SharedPointer< T1 >(val, StaticTag());
+template <class T1, class T2>
+SharedPointer<T1> StaticPointerCast(const SharedPointer<T2>& val) {
+  return SharedPointer<T1>(val, StaticTag());
 }
 
 /**
@@ -329,7 +317,7 @@ SharedPointer< T1 > StaticPointerCast(const SharedPointer< T2 >& val) {
  * classes to create instances of shared_ptr pointing to themselves
  * and sharing ownership with existing shared_ptr objects.
  */
-template < typename T >
+template <typename T>
 class IGNITE_IMPORT_EXPORT EnableSharedFromThis {
  public:
   /**
@@ -349,9 +337,7 @@ class IGNITE_IMPORT_EXPORT EnableSharedFromThis {
   /**
    * Assignment operator.
    */
-  EnableSharedFromThis& operator=(const EnableSharedFromThis&) {
-    return *this;
-  }
+  EnableSharedFromThis& operator=(const EnableSharedFromThis&) { return *this; }
 
   /**
    * Destructor.
@@ -366,10 +352,10 @@ class IGNITE_IMPORT_EXPORT EnableSharedFromThis {
    * Can only be called on already shared object.
    * @return New shared pointer instance.
    */
-  SharedPointer< T > SharedFromThis() {
+  SharedPointer<T> SharedFromThis() {
     assert(self != 0);
 
-    SharedPointer< T > ptr;
+    SharedPointer<T> ptr;
 
     ptr.impl = self;
 
@@ -379,25 +365,23 @@ class IGNITE_IMPORT_EXPORT EnableSharedFromThis {
   }
 
  private:
-  template < typename T0 >
-  friend void ImplEnableShared(EnableSharedFromThis< T0 >*, SharedPointerImpl*);
+  template <typename T0>
+  friend void ImplEnableShared(EnableSharedFromThis<T0>*, SharedPointerImpl*);
 
   /** Shared pointer base. */
   SharedPointerImpl* self;
 };
 
 // Implementation for instances derived from EnableSharedFromThis.
-template < typename T >
-inline void ImplEnableShared(EnableSharedFromThis< T >* some,
-                             SharedPointerImpl* impl) {
-  if (some)
-    some->self = impl;
+template <typename T>
+inline void ImplEnableShared(EnableSharedFromThis<T>* some, SharedPointerImpl* impl) {
+  if (some) some->self = impl;
 }
 
 /**
  * Lock guard.
  */
-template < typename T >
+template <typename T>
 class LockGuard {
  public:
   /**
@@ -405,24 +389,19 @@ class LockGuard {
    *
    * @param lock Lockable object.
    */
-  LockGuard(T& lock) : lock(&lock) {
-    lock.Enter();
-  }
+  LockGuard(T& lock) : lock(&lock) { lock.Enter(); }
 
   /**
    * Destructor.
    */
   ~LockGuard() {
-    if (lock)
-      lock->Leave();
+    if (lock) lock->Leave();
   }
 
   /**
    * Releases control over lock without unlocking it.
    */
-  void Forget() {
-    lock = 0;
-  }
+  void Forget() { lock = 0; }
 
   /**
    * Releases control over lock and unlocks it as if it would
@@ -440,13 +419,13 @@ class LockGuard {
   T* lock;
 };
 
-typedef LockGuard< CriticalSection > CsLockGuard;
+typedef LockGuard<CriticalSection> CsLockGuard;
 
 /**
  * Shared lock guard.
  * Locks guard in shared mode.
  */
-template < typename T >
+template <typename T>
 class SharedLockGuard {
  public:
   /**
@@ -454,24 +433,19 @@ class SharedLockGuard {
    *
    * @param lock Lockable object.
    */
-  SharedLockGuard(T& lock) : lock(&lock) {
-    lock.LockShared();
-  }
+  SharedLockGuard(T& lock) : lock(&lock) { lock.LockShared(); }
 
   /**
    * Destructor.
    */
   ~SharedLockGuard() {
-    if (lock)
-      lock->ReleaseShared();
+    if (lock) lock->ReleaseShared();
   }
 
   /**
    * Releases control over lock without unlocking it.
    */
-  void Forget() {
-    lock = 0;
-  }
+  void Forget() { lock = 0; }
 
   /**
    * Releases control over lock and unlocks it as if it would
@@ -489,13 +463,13 @@ class SharedLockGuard {
   T* lock;
 };
 
-typedef SharedLockGuard< ReadWriteLock > RwSharedLockGuard;
+typedef SharedLockGuard<ReadWriteLock> RwSharedLockGuard;
 
 /**
  * Exclusive lock guard.
  * Locks guard in exclusive mode.
  */
-template < typename T >
+template <typename T>
 class ExclusiveLockGuard {
  public:
   /**
@@ -503,24 +477,19 @@ class ExclusiveLockGuard {
    *
    * @param lock Lockable object.
    */
-  ExclusiveLockGuard(T& lock) : lock(&lock) {
-    lock.LockExclusive();
-  }
+  ExclusiveLockGuard(T& lock) : lock(&lock) { lock.LockExclusive(); }
 
   /**
    * Destructor.
    */
   ~ExclusiveLockGuard() {
-    if (lock)
-      lock->ReleaseExclusive();
+    if (lock) lock->ReleaseExclusive();
   }
 
   /**
    * Releases control over lock without unlocking it.
    */
-  void Forget() {
-    lock = 0;
-  }
+  void Forget() { lock = 0; }
 
   /**
    * Releases control over lock and unlocks it as if it would
@@ -538,7 +507,7 @@ class ExclusiveLockGuard {
   T* lock;
 };
 
-typedef ExclusiveLockGuard< ReadWriteLock > RwExclusiveLockGuard;
+typedef ExclusiveLockGuard<ReadWriteLock> RwExclusiveLockGuard;
 }  // namespace concurrent
 }  // namespace common
 }  // namespace odbc

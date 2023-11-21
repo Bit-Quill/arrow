@@ -35,7 +35,7 @@ class Connection;
 class IGNITE_IMPORT_EXPORT Environment : public diagnostic::DiagnosableAdapter {
  public:
   /** Connection set type. */
-  typedef std::set< Connection* > ConnectionSet;
+  typedef std::set<Connection*> ConnectionSet;
 
   /**
    * Constructor.
@@ -113,8 +113,7 @@ class IGNITE_IMPORT_EXPORT Environment : public diagnostic::DiagnosableAdapter {
    * @param buffer Buffer to put value to.
    * @return Operation result.
    */
-  SqlResult::Type InternalGetAttribute(int32_t attr,
-                                       app::ApplicationDataBuffer& buffer);
+  SqlResult::Type InternalGetAttribute(int32_t attr, app::ApplicationDataBuffer& buffer);
 
   /** ODBC version. */
   int32_t odbcVersion;

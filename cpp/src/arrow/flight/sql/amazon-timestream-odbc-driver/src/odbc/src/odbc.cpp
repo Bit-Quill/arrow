@@ -68,24 +68,20 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValue,
   using odbc::config::ConnectionInfo;
 
   LOG_DEBUG_MSG("SQLGetInfo called: "
-                << infoType << " ("
-                << ConnectionInfo::InfoTypeToString(infoType) << "), "
-                << std::hex << reinterpret_cast< size_t >(infoValue) << ", "
-                << infoValueMax << ", " << std::hex
-                << reinterpret_cast< size_t >(length));
+                << infoType << " (" << ConnectionInfo::InfoTypeToString(infoType) << "), "
+                << std::hex << reinterpret_cast<size_t>(infoValue) << ", " << infoValueMax
+                << ", " << std::hex << reinterpret_cast<size_t>(length));
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
-  if (!connection)
-    return SQL_INVALID_HANDLE;
+  if (!connection) return SQL_INVALID_HANDLE;
 
   connection->GetInfo(infoType, infoValue, infoValueMax, length);
 
   return connection->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent,
-                         SQLHANDLE* result) {
+SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
   LOG_DEBUG_MSG("SQLAllocHandle called with type " << type);
   switch (type) {
     case SQL_HANDLE_ENV:
@@ -114,7 +110,7 @@ SQLRETURN SQLAllocEnv(SQLHENV* env) {
 
   LOG_DEBUG_MSG("SQLAllocEnv called");
 
-  *env = reinterpret_cast< SQLHENV >(new Environment());
+  *env = reinterpret_cast<SQLHENV>(new Environment());
 
   return SQL_SUCCESS;
 }
@@ -127,7 +123,7 @@ SQLRETURN SQLAllocConnect(SQLHENV env, SQLHDBC* conn) {
 
   *conn = SQL_NULL_HDBC;
 
-  Environment* environment = reinterpret_cast< Environment* >(env);
+  Environment* environment = reinterpret_cast<Environment*>(env);
 
   if (!environment) {
     LOG_ERROR_MSG("environment is nullptr");
@@ -141,7 +137,7 @@ SQLRETURN SQLAllocConnect(SQLHENV env, SQLHDBC* conn) {
     return environment->GetDiagnosticRecords().GetReturnCode();
   }
 
-  *conn = reinterpret_cast< SQLHDBC >(connection);
+  *conn = reinterpret_cast<SQLHDBC>(connection);
 
   return SQL_SUCCESS;
 }
@@ -153,7 +149,7 @@ SQLRETURN SQLAllocStmt(SQLHDBC conn, SQLHSTMT* stmt) {
 
   *stmt = SQL_NULL_HDBC;
 
-  auto connection = static_cast< Connection* >(conn);
+  auto connection = static_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
@@ -162,7 +158,7 @@ SQLRETURN SQLAllocStmt(SQLHDBC conn, SQLHSTMT* stmt) {
 
   Statement* statement = connection->CreateStatement();
 
-  *stmt = reinterpret_cast< SQLHSTMT >(statement);
+  *stmt = reinterpret_cast<SQLHSTMT>(statement);
 
   return connection->GetDiagnosticRecords().GetReturnCode();
 }
@@ -170,7 +166,7 @@ SQLRETURN SQLAllocStmt(SQLHDBC conn, SQLHSTMT* stmt) {
 SQLRETURN SQLAllocDesc(SQLHDBC conn, SQLHDESC* desc) {
   using odbc::Connection;
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
@@ -179,7 +175,7 @@ SQLRETURN SQLAllocDesc(SQLHDBC conn, SQLHDESC* desc) {
 
   Descriptor* descriptor = connection->CreateDescriptor();
 
-  *desc = reinterpret_cast< SQLHDESC >(descriptor);
+  *desc = reinterpret_cast<SQLHDESC>(descriptor);
 
   return connection->GetDiagnosticRecords().GetReturnCode();
 }
@@ -212,7 +208,7 @@ SQLRETURN SQLFreeEnv(SQLHENV env) {
 
   LOG_DEBUG_MSG("SQLFreeEnv called: " << env);
 
-  Environment* environment = reinterpret_cast< Environment* >(env);
+  Environment* environment = reinterpret_cast<Environment*>(env);
 
   if (!environment) {
     LOG_ERROR_MSG("environment is nullptr");
@@ -229,7 +225,7 @@ SQLRETURN SQLFreeConnect(SQLHDBC conn) {
 
   LOG_DEBUG_MSG("SQLFreeConnect called");
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
@@ -246,7 +242,7 @@ SQLRETURN SQLFreeConnect(SQLHDBC conn) {
 SQLRETURN SQLFreeStmt(SQLHSTMT stmt, SQLUSMALLINT option) {
   LOG_DEBUG_MSG("SQLFreeStmt called [option=" << option << ']');
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -271,7 +267,7 @@ SQLRETURN SQLFreeDescriptor(SQLHDESC desc) {
 
   LOG_DEBUG_MSG("SQLFreeDescriptor called");
 
-  Descriptor* descriptor = reinterpret_cast< Descriptor* >(desc);
+  Descriptor* descriptor = reinterpret_cast<Descriptor*>(desc);
 
   if (!descriptor) {
     LOG_ERROR_MSG("descriptor is nullptr");
@@ -289,7 +285,7 @@ SQLRETURN SQLFreeDescriptor(SQLHDESC desc) {
 SQLRETURN SQLCloseCursor(SQLHSTMT stmt) {
   LOG_DEBUG_MSG("SQLCloseCursor called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   statement->Close();
 
@@ -311,14 +307,13 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
 
   LOG_DEBUG_MSG("SQLDriverConnect called");
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
     return SQL_INVALID_HANDLE;
   }
-  std::string connectStr =
-      SqlWcharToString(inConnectionString, inConnectionStringLen);
+  std::string connectStr = SqlWcharToString(inConnectionString, inConnectionStringLen);
   connection->Establish(connectStr, windowHandle);
 
   DiagnosticRecordStorage& diag = connection->GetDiagnosticRecords();
@@ -331,26 +326,24 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
 
   bool isTruncated = false;
 
-  size_t reslen = CopyStringToBuffer(
-      connectStr, outConnectionString,
-      static_cast< size_t >(outConnectionStringBufferLen), isTruncated);
+  size_t reslen =
+      CopyStringToBuffer(connectStr, outConnectionString,
+                         static_cast<size_t>(outConnectionStringBufferLen), isTruncated);
 
-  if (outConnectionStringLen)
-    *outConnectionStringLen = static_cast< SQLSMALLINT >(reslen);
+  if (outConnectionStringLen) *outConnectionStringLen = static_cast<SQLSMALLINT>(reslen);
 
   return diag.GetReturnCode();
 }
 
-SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
-                     SQLSMALLINT serverNameLen, SQLWCHAR* userName,
-                     SQLSMALLINT userNameLen, SQLWCHAR* auth,
+SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName, SQLSMALLINT serverNameLen,
+                     SQLWCHAR* userName, SQLSMALLINT userNameLen, SQLWCHAR* auth,
                      SQLSMALLINT authLen) {
   using odbc::Connection;
   using odbc::config::Configuration;
 
   LOG_DEBUG_MSG("SQLConnect called\n");
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
@@ -363,8 +356,7 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
 
   LOG_INFO_MSG("DSN: " << dsn);
 
-  odbc::ReadDsnConfiguration(dsn.c_str(), config,
-                             &connection->GetDiagnosticRecords());
+  odbc::ReadDsnConfiguration(dsn.c_str(), config, &connection->GetDiagnosticRecords());
   if (userName) {
     std::string userNameStr = SqlWcharToString(userName, userNameLen);
     config.SetUid(userNameStr);
@@ -384,7 +376,7 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
 
   LOG_DEBUG_MSG("SQLDisconnect called");
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
@@ -399,7 +391,7 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
 SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
   LOG_DEBUG_MSG("SQLPrepare called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -418,7 +410,7 @@ SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
 SQLRETURN SQLExecute(SQLHSTMT stmt) {
   LOG_DEBUG_MSG("SQLExecute called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -433,7 +425,7 @@ SQLRETURN SQLExecute(SQLHSTMT stmt) {
 SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
   LOG_DEBUG_MSG("SQLExecDirect called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -452,7 +444,7 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
 SQLRETURN SQLCancel(SQLHSTMT stmt) {
   LOG_DEBUG_MSG("SQLCancel called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -472,11 +464,11 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
 
   LOG_DEBUG_MSG("SQLBindCol called: index="
                 << colNum << ", type=" << targetType
-                << ", targetValue=" << reinterpret_cast< size_t >(targetValue)
-                << ", bufferLength=" << bufferLength << ", lengthInd="
-                << reinterpret_cast< size_t >(strLengthOrIndicator));
+                << ", targetValue=" << reinterpret_cast<size_t>(targetValue)
+                << ", bufferLength=" << bufferLength
+                << ", lengthInd=" << reinterpret_cast<size_t>(strLengthOrIndicator));
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -492,7 +484,7 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
 SQLRETURN SQLFetch(SQLHSTMT stmt) {
   LOG_DEBUG_MSG("SQLFetch called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -504,12 +496,11 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT orientation,
-                         SQLLEN offset) {
-  LOG_DEBUG_MSG("SQLFetchScroll called with Orientation "
-                << orientation << " Offset " << offset);
+SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT orientation, SQLLEN offset) {
+  LOG_DEBUG_MSG("SQLFetchScroll called with Orientation " << orientation << " Offset "
+                                                          << offset);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -521,19 +512,16 @@ SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT orientation,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation,
-                           SQLLEN offset, SQLULEN* rowCount,
-                           SQLUSMALLINT* rowStatusArray) {
+SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation, SQLLEN offset,
+                           SQLULEN* rowCount, SQLUSMALLINT* rowStatusArray) {
   LOG_DEBUG_MSG("SQLExtendedFetch called");
 
   SQLRETURN res = SQLFetchScroll(stmt, orientation, offset);
 
   if (res == SQL_SUCCESS) {
-    if (rowCount)
-      *rowCount = 1;
+    if (rowCount) *rowCount = 1;
 
-    if (rowStatusArray)
-      rowStatusArray[0] = SQL_ROW_SUCCESS;
+    if (rowStatusArray) rowStatusArray[0] = SQL_ROW_SUCCESS;
   } else if (res == SQL_NO_DATA && rowCount)
     *rowCount = 0;
 
@@ -544,8 +532,7 @@ SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation,
   // is passed from driver manager based on RowCountPtr value.
   // The rowCount is nullptr on Linux but not nullptr on Windows.
   // This behavior is determined by driver manager.
-  if (rowCount)
-    LOG_DEBUG_MSG("*rowCount is " << *rowCount);
+  if (rowCount) LOG_DEBUG_MSG("*rowCount is " << *rowCount);
 
   return res;
 }
@@ -555,7 +542,7 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum) {
 
   LOG_DEBUG_MSG("SQLNumResultCols called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -565,35 +552,30 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum) {
   int32_t res = statement->GetColumnNumber();
 
   if (columnNum) {
-    *columnNum = static_cast< SQLSMALLINT >(res);
+    *columnNum = static_cast<SQLSMALLINT>(res);
     LOG_DEBUG_MSG("columnNum: " << *columnNum);
   }
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
-                     SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
-                     SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
+SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
+                     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                      SQLSMALLINT tableNameLen, SQLWCHAR* columnName,
                      SQLSMALLINT columnNameLen) {
   LOG_DEBUG_MSG("SQLColumns called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
     return SQL_INVALID_HANDLE;
   }
 
-  boost::optional< std::string > catalog =
-      SqlWcharToOptString(catalogName, catalogNameLen);
-  boost::optional< std::string > schema =
-      SqlWcharToOptString(schemaName, schemaNameLen);
-  boost::optional< std::string > table =
-      SqlWcharToOptString(tableName, tableNameLen);
-  boost::optional< std::string > column =
-      SqlWcharToOptString(columnName, columnNameLen);
+  boost::optional<std::string> catalog = SqlWcharToOptString(catalogName, catalogNameLen);
+  boost::optional<std::string> schema = SqlWcharToOptString(schemaName, schemaNameLen);
+  boost::optional<std::string> table = SqlWcharToOptString(tableName, tableNameLen);
+  boost::optional<std::string> column = SqlWcharToOptString(columnName, columnNameLen);
 
   LOG_INFO_MSG("catalog: " << catalog.get_value_or("")
                            << ", schema: " << schema.get_value_or("")
@@ -626,7 +608,7 @@ SQLRETURN SQLColumnPrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
   IGNITE_UNUSED(columnName);
   IGNITE_UNUSED(columnNameLen);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG(
@@ -640,31 +622,27 @@ SQLRETURN SQLColumnPrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
-                    SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
-                    SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
+SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
+                    SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                     SQLSMALLINT tableNameLen, SQLWCHAR* tableType,
                     SQLSMALLINT tableTypeLen) {
   LOG_DEBUG_MSG("SQLTables called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
     return SQL_INVALID_HANDLE;
   }
 
-  boost::optional< std::string > catalog =
-      SqlWcharToOptString(catalogName, catalogNameLen);
-  boost::optional< std::string > schema =
-      SqlWcharToOptString(schemaName, schemaNameLen);
-  boost::optional< std::string > table =
-      SqlWcharToOptString(tableName, tableNameLen);
-  boost::optional< std::string > tableTypeStr =
+  boost::optional<std::string> catalog = SqlWcharToOptString(catalogName, catalogNameLen);
+  boost::optional<std::string> schema = SqlWcharToOptString(schemaName, schemaNameLen);
+  boost::optional<std::string> table = SqlWcharToOptString(tableName, tableNameLen);
+  boost::optional<std::string> tableTypeStr =
       SqlWcharToOptString(tableType, tableTypeLen);
 
-  LOG_INFO_MSG("catalog: " << catalog << ", schema: " << schema << ", table: "
-                           << table << ", tableType: " << tableTypeStr);
+  LOG_INFO_MSG("catalog: " << catalog << ", schema: " << schema << ", table: " << table
+                           << ", tableType: " << tableTypeStr);
 
   statement->ExecuteGetTablesMetaQuery(catalog, schema, table, tableTypeStr);
 
@@ -684,7 +662,7 @@ SQLRETURN SQLTablePrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
   IGNITE_UNUSED(tableName);
   IGNITE_UNUSED(tableNameLen);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG(
@@ -701,7 +679,7 @@ SQLRETURN SQLTablePrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
 SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
   LOG_DEBUG_MSG("SQLMoreResults called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -720,36 +698,33 @@ SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
 
   LOG_DEBUG_MSG("SQLNativeSql called");
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
     return SQL_INVALID_HANDLE;
   }
 
   int64_t outQueryLenLocal = 0;
-  connection->NativeSql(
-      inQuery, static_cast< int64_t >(inQueryLen), outQueryBuffer,
-      static_cast< int64_t >(outQueryBufferLen), &outQueryLenLocal);
+  connection->NativeSql(inQuery, static_cast<int64_t>(inQueryLen), outQueryBuffer,
+                        static_cast<int64_t>(outQueryBufferLen), &outQueryLenLocal);
   if (outQueryLen) {
-    *outQueryLen = static_cast< SQLINTEGER >(outQueryLenLocal);
+    *outQueryLen = static_cast<SQLINTEGER>(outQueryLenLocal);
     LOG_DEBUG_MSG("*outQueryLen is " << *outQueryLen);
   }
 
   return connection->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
-                          SQLUSMALLINT fieldId, SQLPOINTER strAttr,
-                          SQLSMALLINT bufferLen, SQLSMALLINT* strAttrLen,
-                          SQLLEN* numericAttr) {
+SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum, SQLUSMALLINT fieldId,
+                          SQLPOINTER strAttr, SQLSMALLINT bufferLen,
+                          SQLSMALLINT* strAttrLen, SQLLEN* numericAttr) {
   using odbc::meta::ColumnMeta;
   using odbc::meta::ColumnMetaVector;
 
-  LOG_DEBUG_MSG("SQLColAttribute called: "
-                << fieldId << " (" << ColumnMeta::AttrIdToString(fieldId)
-                << ")");
+  LOG_DEBUG_MSG("SQLColAttribute called: " << fieldId << " ("
+                                           << ColumnMeta::AttrIdToString(fieldId) << ")");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -762,42 +737,38 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
 
     SQLRETURN res = SQLNumResultCols(stmt, &val);
 
-    if (numericAttr && res == SQL_SUCCESS)
-      *numericAttr = val;
+    if (numericAttr && res == SQL_SUCCESS) *numericAttr = val;
 
     return res;
   }
 
-  statement->GetColumnAttribute(columnNum, fieldId,
-                                reinterpret_cast< SQLWCHAR* >(strAttr),
+  statement->GetColumnAttribute(columnNum, fieldId, reinterpret_cast<SQLWCHAR*>(strAttr),
                                 bufferLen, strAttrLen, numericAttr);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
-                         SQLWCHAR* columnNameBuf, SQLSMALLINT columnNameBufLen,
-                         SQLSMALLINT* columnNameLen, SQLSMALLINT* dataType,
-                         SQLULEN* columnSize, SQLSMALLINT* decimalDigits,
-                         SQLSMALLINT* nullable) {
+SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum, SQLWCHAR* columnNameBuf,
+                         SQLSMALLINT columnNameBufLen, SQLSMALLINT* columnNameLen,
+                         SQLSMALLINT* dataType, SQLULEN* columnSize,
+                         SQLSMALLINT* decimalDigits, SQLSMALLINT* nullable) {
   using odbc::SqlLen;
 
   LOG_DEBUG_MSG("SQLDescribeCol called with columnNum "
                 << columnNum << ", columnNameBuf " << columnNameBuf
-                << ", columnNameBufLen" << columnNameBufLen
-                << ", columnNameLen " << columnNameLen << ", dataType "
-                << dataType << ", columnSize " << columnSize
-                << ", decimalDigits " << decimalDigits << ", nullable "
+                << ", columnNameBufLen" << columnNameBufLen << ", columnNameLen "
+                << columnNameLen << ", dataType " << dataType << ", columnSize "
+                << columnSize << ", decimalDigits " << decimalDigits << ", nullable "
                 << nullable);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
     return SQL_INVALID_HANDLE;
   }
 
-  std::vector< SQLRETURN > returnCodes;
+  std::vector<SQLRETURN> returnCodes;
 
   // Convert from length in characters to bytes.
   SQLSMALLINT columnNameLenInBytes = 0;
@@ -816,44 +787,35 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
   SqlLen decimalDigitsRes;
   SqlLen nullableRes;
 
-  statement->GetColumnAttribute(columnNum, SQL_DESC_TYPE, 0, 0, 0,
-                                &dataTypeRes);
+  statement->GetColumnAttribute(columnNum, SQL_DESC_TYPE, 0, 0, 0, &dataTypeRes);
   // Save status of getting column type.
   returnCodes.push_back(statement->GetDiagnosticRecords().GetReturnCode());
-  statement->GetColumnAttribute(columnNum, SQL_DESC_PRECISION, 0, 0, 0,
-                                &columnSizeRes);
+  statement->GetColumnAttribute(columnNum, SQL_DESC_PRECISION, 0, 0, 0, &columnSizeRes);
   // Save status of getting column precision.
   returnCodes.push_back(statement->GetDiagnosticRecords().GetReturnCode());
-  statement->GetColumnAttribute(columnNum, SQL_DESC_SCALE, 0, 0, 0,
-                                &decimalDigitsRes);
+  statement->GetColumnAttribute(columnNum, SQL_DESC_SCALE, 0, 0, 0, &decimalDigitsRes);
   // Save status of getting column scale.
   returnCodes.push_back(statement->GetDiagnosticRecords().GetReturnCode());
-  statement->GetColumnAttribute(columnNum, SQL_DESC_NULLABLE, 0, 0, 0,
-                                &nullableRes);
+  statement->GetColumnAttribute(columnNum, SQL_DESC_NULLABLE, 0, 0, 0, &nullableRes);
   // Save status of getting column nullable.
   returnCodes.push_back(statement->GetDiagnosticRecords().GetReturnCode());
 
-  LOG_INFO_MSG("columnNum: "
-               << columnNum << ", dataTypeRes: " << dataTypeRes
-               << ", columnSizeRes: " << columnSizeRes
-               << ", decimalDigitsRes: " << decimalDigitsRes
-               << ", nullableRes: " << nullableRes << ", columnNameBuf: "
-               << (columnNameBuf
-                       ? reinterpret_cast< const char* >(columnNameBuf)
-                       : "<null>")
-               << ", columnNameLen: " << (columnNameLen ? *columnNameLen : -1));
+  LOG_INFO_MSG(
+      "columnNum: " << columnNum << ", dataTypeRes: " << dataTypeRes
+                    << ", columnSizeRes: " << columnSizeRes
+                    << ", decimalDigitsRes: " << decimalDigitsRes
+                    << ", nullableRes: " << nullableRes << ", columnNameBuf: "
+                    << (columnNameBuf ? reinterpret_cast<const char*>(columnNameBuf)
+                                      : "<null>")
+                    << ", columnNameLen: " << (columnNameLen ? *columnNameLen : -1));
 
-  if (dataType)
-    *dataType = static_cast< SQLSMALLINT >(dataTypeRes);
+  if (dataType) *dataType = static_cast<SQLSMALLINT>(dataTypeRes);
 
-  if (columnSize)
-    *columnSize = static_cast< SQLULEN >(columnSizeRes);
+  if (columnSize) *columnSize = static_cast<SQLULEN>(columnSizeRes);
 
-  if (decimalDigits)
-    *decimalDigits = static_cast< SQLSMALLINT >(decimalDigitsRes);
+  if (decimalDigits) *decimalDigits = static_cast<SQLSMALLINT>(decimalDigitsRes);
 
-  if (nullable)
-    *nullable = static_cast< SQLSMALLINT >(nullableRes);
+  if (nullable) *nullable = static_cast<SQLSMALLINT>(nullableRes);
 
   // Return error code, if any.
   for (auto returnCode : returnCodes) {
@@ -876,7 +838,7 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
 SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
   LOG_DEBUG_MSG("SQLRowCount called");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -887,20 +849,18 @@ SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
 
   LOG_DEBUG_MSG("Row count: " << res);
 
-  if (rowCnt)
-    *rowCnt = static_cast< SQLLEN >((res > 0 ? res : -1));
+  if (rowCnt) *rowCnt = static_cast<SQLLEN>((res > 0 ? res : -1));
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLForeignKeys(
-    SQLHSTMT stmt, SQLWCHAR* primaryCatalogName,
-    SQLSMALLINT primaryCatalogNameLen, SQLWCHAR* primarySchemaName,
-    SQLSMALLINT primarySchemaNameLen, SQLWCHAR* primaryTableName,
-    SQLSMALLINT primaryTableNameLen, SQLWCHAR* foreignCatalogName,
-    SQLSMALLINT foreignCatalogNameLen, SQLWCHAR* foreignSchemaName,
-    SQLSMALLINT foreignSchemaNameLen, SQLWCHAR* foreignTableName,
-    SQLSMALLINT foreignTableNameLen) {
+SQLRETURN SQLForeignKeys(SQLHSTMT stmt, SQLWCHAR* primaryCatalogName,
+                         SQLSMALLINT primaryCatalogNameLen, SQLWCHAR* primarySchemaName,
+                         SQLSMALLINT primarySchemaNameLen, SQLWCHAR* primaryTableName,
+                         SQLSMALLINT primaryTableNameLen, SQLWCHAR* foreignCatalogName,
+                         SQLSMALLINT foreignCatalogNameLen, SQLWCHAR* foreignSchemaName,
+                         SQLSMALLINT foreignSchemaNameLen, SQLWCHAR* foreignTableName,
+                         SQLSMALLINT foreignTableNameLen) {
   LOG_DEBUG_MSG("SQLForeignKeys called");
 
   IGNITE_UNUSED(primaryCatalogName);
@@ -916,7 +876,7 @@ SQLRETURN SQLForeignKeys(
   IGNITE_UNUSED(foreignTableName);
   IGNITE_UNUSED(foreignTableNameLen);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG(
@@ -937,11 +897,10 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER valueBuf,
 #ifdef _DEBUG
   using odbc::type_traits::StatementAttrIdToString;
 
-  LOG_DEBUG_MSG("Attr: " << StatementAttrIdToString(attr) << " (" << attr
-                         << ")");
+  LOG_DEBUG_MSG("Attr: " << StatementAttrIdToString(attr) << " (" << attr << ")");
 #endif  //_DEBUG
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -958,11 +917,11 @@ SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER value,
   LOG_DEBUG_MSG("SQLSetStmtAttr called: " << attr);
 
 #ifdef _DEBUG
-  LOG_DEBUG_MSG("Attr: " << odbc::type_traits::StatementAttrIdToString(attr)
-                         << " (" << attr << ")");
+  LOG_DEBUG_MSG("Attr: " << odbc::type_traits::StatementAttrIdToString(attr) << " ("
+                         << attr << ")");
 #endif  //_DEBUG
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -974,10 +933,9 @@ SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER value,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
-                         SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
-                         SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
-                         SQLSMALLINT tableNameLen) {
+SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
+                         SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
+                         SQLWCHAR* tableName, SQLSMALLINT tableNameLen) {
   LOG_DEBUG_MSG("SQLPrimaryKeys called");
 
   IGNITE_UNUSED(catalogName);
@@ -987,7 +945,7 @@ SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
   IGNITE_UNUSED(tableName);
   IGNITE_UNUSED(tableNameLen);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG(
@@ -1001,9 +959,8 @@ SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
-                          SQLSMALLINT recNum, SQLSMALLINT diagId,
-                          SQLPOINTER buffer, SQLSMALLINT bufferLen,
+SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT recNum,
+                          SQLSMALLINT diagId, SQLPOINTER buffer, SQLSMALLINT bufferLen,
                           SQLSMALLINT* resLen) {
   using namespace odbc;
   using namespace odbc::diagnostic;
@@ -1012,8 +969,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
   using odbc::app::ApplicationDataBuffer;
 
   LOG_DEBUG_MSG("SQLGetDiagField called with handleType "
-                << handleType << ", recNum " << recNum << ", diagId "
-                << diagId);
+                << handleType << ", recNum " << recNum << ", diagId " << diagId);
 
   SqlLen outResLen;
   ApplicationDataBuffer outBuffer(OdbcNativeType::AI_DEFAULT, buffer, bufferLen,
@@ -1027,7 +983,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
     case SQL_HANDLE_ENV:
     case SQL_HANDLE_DBC:
     case SQL_HANDLE_STMT: {
-      Diagnosable* diag = reinterpret_cast< Diagnosable* >(handle);
+      Diagnosable* diag = reinterpret_cast<Diagnosable*>(handle);
 
       result = diag->GetDiagnosticRecords().GetField(recNum, field, outBuffer);
 
@@ -1041,14 +997,13 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
   }
 
   if (resLen && result == SqlResult::AI_SUCCESS)
-    *resLen = static_cast< SQLSMALLINT >(outResLen);
+    *resLen = static_cast<SQLSMALLINT>(outResLen);
 
   return SqlResultToReturnCode(result);
 }
 
-SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
-                        SQLSMALLINT recNum, SQLWCHAR* sqlState,
-                        SQLINTEGER* nativeError, SQLWCHAR* msgBuffer,
+SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT recNum,
+                        SQLWCHAR* sqlState, SQLINTEGER* nativeError, SQLWCHAR* msgBuffer,
                         SQLSMALLINT msgBufferLen, SQLSMALLINT* msgLen) {
   using namespace odbc::utility;
   using namespace odbc;
@@ -1060,8 +1015,8 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
   LOG_DEBUG_MSG("SQLGetDiagRec called with handleType "
                 << handleType << ", handle " << handle << ", recNum " << recNum
                 << ", sqlState " << sqlState << ", nativeError " << nativeError
-                << ", msgBuffer " << msgBuffer << ", msgBufferLen "
-                << msgBufferLen << ", msgLen " << msgLen);
+                << ", msgBuffer " << msgBuffer << ", msgBufferLen " << msgBufferLen
+                << ", msgLen " << msgLen);
 
   const DiagnosticRecordStorage* records = 0;
   bool isTruncated = false;
@@ -1071,7 +1026,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
     case SQL_HANDLE_DBC:
     case SQL_HANDLE_STMT:
     case SQL_HANDLE_DESC: {
-      Diagnosable* diag = reinterpret_cast< Diagnosable* >(handle);
+      Diagnosable* diag = reinterpret_cast<Diagnosable*>(handle);
 
       if (!diag) {
         LOG_ERROR_MSG("diag is null");
@@ -1084,8 +1039,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
     }
 
     default:
-      LOG_ERROR_MSG(
-          "SQLGetDiagRec exiting with SQL_INVALID_HANDLE on default case");
+      LOG_ERROR_MSG("SQLGetDiagRec exiting with SQL_INVALID_HANDLE on default case");
       return SQL_INVALID_HANDLE;
   }
 
@@ -1112,35 +1066,30 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
 
   const DiagnosticRecord& record = records->GetStatusRecord(recNum);
 
-  if (sqlState)
-    CopyStringToBuffer(record.GetSqlState(), sqlState, 6, isTruncated);
+  if (sqlState) CopyStringToBuffer(record.GetSqlState(), sqlState, 6, isTruncated);
 
-  if (nativeError)
-    *nativeError = 0;
+  if (nativeError) *nativeError = 0;
 
   const std::string& errMsg = record.GetMessageText();
 
-  if (!msgBuffer
-      || msgBufferLen < static_cast< SQLSMALLINT >(errMsg.size() + 1)) {
+  if (!msgBuffer || msgBufferLen < static_cast<SQLSMALLINT>(errMsg.size() + 1)) {
     if (!msgLen) {
-      LOG_ERROR_MSG(
-          "SQLGetDiagRec exiting with SQL_ERROR. msgLen must not be NULL.");
+      LOG_ERROR_MSG("SQLGetDiagRec exiting with SQL_ERROR. msgLen must not be NULL.");
       return SQL_ERROR;
     }
 
     // Length is given in characters
-    *msgLen = CopyStringToBuffer(
-        errMsg, msgBuffer, static_cast< size_t >(msgBufferLen), isTruncated);
+    *msgLen = CopyStringToBuffer(errMsg, msgBuffer, static_cast<size_t>(msgBufferLen),
+                                 isTruncated);
 
     return SQL_SUCCESS_WITH_INFO;
   }
 
   // Length is given in characters
-  size_t msgLen0 = CopyStringToBuffer(
-      errMsg, msgBuffer, static_cast< size_t >(msgBufferLen), isTruncated);
+  size_t msgLen0 = CopyStringToBuffer(errMsg, msgBuffer,
+                                      static_cast<size_t>(msgBufferLen), isTruncated);
 
-  if (msgLen)
-    *msgLen = msgLen0;
+  if (msgLen) *msgLen = msgLen0;
 
   return SQL_SUCCESS;
 }
@@ -1148,14 +1097,14 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
 SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT type) {
   LOG_DEBUG_MSG("SQLGetTypeInfo called: [type=" << type << ']');
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
     return SQL_INVALID_HANDLE;
   }
 
-  statement->ExecuteGetTypeInfoQuery(static_cast< int16_t >(type));
+  statement->ExecuteGetTypeInfoQuery(static_cast<int16_t>(type));
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
@@ -1170,7 +1119,7 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
   LOG_DEBUG_MSG("SQLGetData called with colNum " << colNum << ", targetType "
                                                  << targetType);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -1194,7 +1143,7 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value,
   LOG_DEBUG_MSG("SQLSetEnvAttr called with Attribute " << attr << ", Value "
                                                        << (size_t)value);
 
-  Environment* environment = reinterpret_cast< Environment* >(env);
+  Environment* environment = reinterpret_cast<Environment*>(env);
 
   if (!environment) {
     LOG_ERROR_MSG("environment is nullptr");
@@ -1215,29 +1164,26 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valueBuf,
 
   LOG_DEBUG_MSG("SQLGetEnvAttr called with attr " << attr);
 
-  Environment* environment = reinterpret_cast< Environment* >(env);
+  Environment* environment = reinterpret_cast<Environment*>(env);
 
-  if (!environment)
-    return SQL_INVALID_HANDLE;
+  if (!environment) return SQL_INVALID_HANDLE;
 
   SqlLen outResLen;
   ApplicationDataBuffer outBuffer(OdbcNativeType::AI_SIGNED_LONG, valueBuf,
-                                  static_cast< int32_t >(valueBufLen),
-                                  &outResLen);
+                                  static_cast<int32_t>(valueBufLen), &outResLen);
 
   environment->GetAttribute(attr, outBuffer);
 
-  if (valueResLen)
-    *valueResLen = static_cast< SQLSMALLINT >(outResLen);
+  if (valueResLen) *valueResLen = static_cast<SQLSMALLINT>(outResLen);
 
   return environment->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
-                            SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
-                            SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
-                            SQLWCHAR* tableName, SQLSMALLINT tableNameLen,
-                            SQLSMALLINT scope, SQLSMALLINT nullable) {
+SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType, SQLWCHAR* catalogName,
+                            SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
+                            SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
+                            SQLSMALLINT tableNameLen, SQLSMALLINT scope,
+                            SQLSMALLINT nullable) {
   LOG_DEBUG_MSG("SQLSpecialColumns called");
 
   IGNITE_UNUSED(idType);
@@ -1250,7 +1196,7 @@ SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
   IGNITE_UNUSED(scope);
   IGNITE_UNUSED(nullable);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG(
@@ -1264,11 +1210,10 @@ SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName,
-                        SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
-                        SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
-                        SQLSMALLINT tableNameLen, SQLUSMALLINT unique,
-                        SQLUSMALLINT reserved) {
+SQLRETURN SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
+                        SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
+                        SQLWCHAR* tableName, SQLSMALLINT tableNameLen,
+                        SQLUSMALLINT unique, SQLUSMALLINT reserved) {
   LOG_DEBUG_MSG("SQLStatistics called");
 
   IGNITE_UNUSED(catalogName);
@@ -1280,7 +1225,7 @@ SQLRETURN SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName,
   IGNITE_UNUSED(unique);
   IGNITE_UNUSED(reserved);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG(
@@ -1310,7 +1255,7 @@ SQLRETURN SQLProcedureColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
   IGNITE_UNUSED(columnName);
   IGNITE_UNUSED(columnNameLen);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG(
@@ -1324,10 +1269,9 @@ SQLRETURN SQLProcedureColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLProcedures(SQLHSTMT stmt, SQLWCHAR* catalogName,
-                        SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
-                        SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
-                        SQLSMALLINT tableNameLen) {
+SQLRETURN SQLProcedures(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
+                        SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
+                        SQLWCHAR* tableName, SQLSMALLINT tableNameLen) {
   LOG_DEBUG_MSG("SQLProcedures called");
 
   IGNITE_UNUSED(catalogName);
@@ -1337,7 +1281,7 @@ SQLRETURN SQLProcedures(SQLHSTMT stmt, SQLWCHAR* catalogName,
   IGNITE_UNUSED(tableName);
   IGNITE_UNUSED(tableNameLen);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG(
@@ -1362,24 +1306,24 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
   using timestream::odbc::app::ApplicationDataBuffer;
 
   LOG_DEBUG_MSG("SQLError is called with env "
-                << env << ", conn " << conn << ", stmt " << stmt << ", state "
-                << state << ", error " << error << ", msgBuf " << msgBuf
-                << ", msgBufLen " << msgBufLen << " msgResLen " << msgResLen);
+                << env << ", conn " << conn << ", stmt " << stmt << ", state " << state
+                << ", error " << error << ", msgBuf " << msgBuf << ", msgBufLen "
+                << msgBufLen << " msgResLen " << msgResLen);
 
   SQLHANDLE handle = 0;
 
   if (env != 0)
-    handle = static_cast< SQLHANDLE >(env);
+    handle = static_cast<SQLHANDLE>(env);
   else if (conn != 0)
-    handle = static_cast< SQLHANDLE >(conn);
+    handle = static_cast<SQLHANDLE>(conn);
   else if (stmt != 0)
-    handle = static_cast< SQLHANDLE >(stmt);
+    handle = static_cast<SQLHANDLE>(stmt);
   else {
     LOG_ERROR_MSG("SQLError exiting with SQL_INVALID_HANDLE");
     return SQL_INVALID_HANDLE;
   }
 
-  Diagnosable* diag = reinterpret_cast< Diagnosable* >(handle);
+  Diagnosable* diag = reinterpret_cast<Diagnosable*>(handle);
 
   DiagnosticRecordStorage& records = diag->GetDiagnosticRecords();
 
@@ -1396,19 +1340,16 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
   record.MarkRetrieved();
 
   bool isTruncated = false;
-  if (state)
-    CopyStringToBuffer(record.GetSqlState(), state, 6, isTruncated);
+  if (state) CopyStringToBuffer(record.GetSqlState(), state, 6, isTruncated);
 
-  if (error)
-    *error = 0;
+  if (error) *error = 0;
 
   std::string errMsg = record.GetMessageText();
   // NOTE: msgBufLen is in characters.
-  size_t outResLen = CopyStringToBuffer(
-      errMsg, msgBuf, static_cast< size_t >(msgBufLen), isTruncated);
+  size_t outResLen =
+      CopyStringToBuffer(errMsg, msgBuf, static_cast<size_t>(msgBufLen), isTruncated);
 
-  if (msgResLen)
-    *msgResLen = static_cast< SQLSMALLINT >(outResLen);
+  if (msgResLen) *msgResLen = static_cast<SQLSMALLINT>(outResLen);
 
   return SQL_SUCCESS;
 }
@@ -1422,7 +1363,7 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER valueBuf,
 
   LOG_DEBUG_MSG("SQLGetConnectAttr called with attr " << attr);
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
@@ -1440,7 +1381,7 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value,
 
   LOG_DEBUG_MSG("SQLSetConnectAttr called(" << attr << ", " << value << ")");
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
@@ -1452,11 +1393,11 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value,
   return connection->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf,
-                           SQLSMALLINT nameBufLen, SQLSMALLINT* nameResLen) {
+SQLRETURN SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf, SQLSMALLINT nameBufLen,
+                           SQLSMALLINT* nameResLen) {
   LOG_DEBUG_MSG("SQLGetCursorName called with nameBufLen " << nameBufLen);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -1468,10 +1409,9 @@ SQLRETURN SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf,
 }
 
 SQLRETURN SQLSetCursorName(SQLHSTMT stmt, SQLWCHAR* name, SQLSMALLINT nameLen) {
-  LOG_DEBUG_MSG("SQLSetCursorName called with name " << name << ", nameLen "
-                                                     << nameLen);
+  LOG_DEBUG_MSG("SQLSetCursorName called with name " << name << ", nameLen " << nameLen);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -1482,13 +1422,12 @@ SQLRETURN SQLSetCursorName(SQLHSTMT stmt, SQLWCHAR* name, SQLSMALLINT nameLen) {
 
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
-SQLRETURN SQLSetDescField(SQLHDESC descr, SQLSMALLINT recNum,
-                          SQLSMALLINT fieldId, SQLPOINTER buffer,
-                          SQLINTEGER bufferLen) {
+SQLRETURN SQLSetDescField(SQLHDESC descr, SQLSMALLINT recNum, SQLSMALLINT fieldId,
+                          SQLPOINTER buffer, SQLINTEGER bufferLen) {
   LOG_DEBUG_MSG("SQLSetDescField called with recNum " << recNum << ", fieldId "
                                                       << fieldId);
 
-  Descriptor* descriptor = reinterpret_cast< Descriptor* >(descr);
+  Descriptor* descriptor = reinterpret_cast<Descriptor*>(descr);
 
   if (!descriptor) {
     LOG_ERROR_MSG("descriptor is nullptr");
@@ -1500,12 +1439,11 @@ SQLRETURN SQLSetDescField(SQLHDESC descr, SQLSMALLINT recNum,
   return descriptor->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
-                          SQLSMALLINT fieldId, SQLPOINTER buffer,
-                          SQLINTEGER bufferLen, SQLINTEGER* resLen) {
+SQLRETURN SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum, SQLSMALLINT fieldId,
+                          SQLPOINTER buffer, SQLINTEGER bufferLen, SQLINTEGER* resLen) {
   LOG_DEBUG_MSG("SQLGetDescField called with recNum " << recNum << ", fieldId "
                                                       << fieldId);
-  Descriptor* descriptor = reinterpret_cast< Descriptor* >(descr);
+  Descriptor* descriptor = reinterpret_cast<Descriptor*>(descr);
 
   if (!descriptor) {
     LOG_ERROR_MSG("descriptor is nullptr");
@@ -1520,14 +1458,14 @@ SQLRETURN SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
 SQLRETURN SQLCopyDesc(SQLHDESC src, SQLHDESC dst) {
   LOG_DEBUG_MSG("SQLCopyDesc called");
 
-  Descriptor* srcDesc = reinterpret_cast< Descriptor* >(src);
+  Descriptor* srcDesc = reinterpret_cast<Descriptor*>(src);
 
   if (!srcDesc) {
     LOG_ERROR_MSG("source descriptor is nullptr");
     return SQL_INVALID_HANDLE;
   }
 
-  Descriptor* dstDesc = reinterpret_cast< Descriptor* >(dst);
+  Descriptor* dstDesc = reinterpret_cast<Descriptor*>(dst);
 
   if (!dstDesc) {
     LOG_ERROR_MSG("destination descriptor is nullptr");
@@ -1546,7 +1484,7 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC conn, SQLUSMALLINT funcId,
 
   LOG_DEBUG_MSG("SQLGetFunctions called with funcId " << funcId);
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
@@ -1559,14 +1497,12 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC conn, SQLUSMALLINT funcId,
 }
 #endif
 
-SQLRETURN SQLSetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
-                              SQLULEN value) {
+SQLRETURN SQLSetConnectOption(SQLHDBC conn, SQLUSMALLINT option, SQLULEN value) {
   using odbc::Connection;
 
-  LOG_DEBUG_MSG("SQLSetConnectOption called(" << option << ", " << value
-                                              << ")");
+  LOG_DEBUG_MSG("SQLSetConnectOption called(" << option << ", " << value << ")");
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
@@ -1577,13 +1513,12 @@ SQLRETURN SQLSetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
   return connection->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLGetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
-                              SQLPOINTER value) {
+SQLRETURN SQLGetConnectOption(SQLHDBC conn, SQLUSMALLINT option, SQLPOINTER value) {
   using odbc::Connection;
 
   LOG_DEBUG_MSG("SQLGetConnectOption called(" << option << ")");
 
-  Connection* connection = reinterpret_cast< Connection* >(conn);
+  Connection* connection = reinterpret_cast<Connection*>(conn);
 
   if (!connection) {
     LOG_ERROR_MSG("connection is nullptr");
@@ -1594,11 +1529,10 @@ SQLRETURN SQLGetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
   return connection->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLGetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
-                           SQLPOINTER value) {
+SQLRETURN SQLGetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option, SQLPOINTER value) {
   LOG_DEBUG_MSG("SQLGetStmtOption called with option " << option);
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -1610,15 +1544,14 @@ SQLRETURN SQLGetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
   return statement->GetDiagnosticRecords().GetReturnCode();
 }
 
-SQLRETURN SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
-                           SQLUSMALLINT fieldId, SQLPOINTER strAttrBuf,
-                           SQLSMALLINT strAttrBufLen,
+SQLRETURN SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLUSMALLINT fieldId,
+                           SQLPOINTER strAttrBuf, SQLSMALLINT strAttrBufLen,
                            SQLSMALLINT* strAttrResLen, SQLLEN* numAttrBuf) {
   LOG_DEBUG_MSG("SQLColAttributes called: "
-                << fieldId << " ("
-                << odbc::meta::ColumnMeta::AttrIdToString(fieldId) << ")");
+                << fieldId << " (" << odbc::meta::ColumnMeta::AttrIdToString(fieldId)
+                << ")");
 
-  Statement* statement = reinterpret_cast< Statement* >(stmt);
+  Statement* statement = reinterpret_cast<Statement*>(stmt);
 
   if (!statement) {
     LOG_ERROR_MSG("statement is nullptr");
@@ -1633,8 +1566,8 @@ SQLRETURN SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
     fieldId = SQL_DESC_COUNT;
   }
 
-  SQLRETURN ret = SQLColAttribute(stmt, colNum, fieldId, strAttrBuf,
-                                  strAttrBufLen, strAttrResLen, numAttrBuf);
+  SQLRETURN ret = SQLColAttribute(stmt, colNum, fieldId, strAttrBuf, strAttrBufLen,
+                                  strAttrResLen, numAttrBuf);
 
   int32_t odbcVer = statement->GetConnection().GetEnvODBCVer();
   if (odbcVer == SQL_OV_ODBC2) {

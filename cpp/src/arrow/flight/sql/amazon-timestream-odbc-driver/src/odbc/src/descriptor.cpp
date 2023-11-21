@@ -17,35 +17,31 @@
 #include "timestream/odbc/log.h"
 #include "timestream/odbc/statement.h"
 
-#define ALLOWED_DESC_TYPE1(type, fieldId, allowed_type)                    \
-  if (type != allowed_type) {                                              \
-    std::stringstream ss;                                                  \
-    ss << "Current descriptor type " << Descriptor::DescTypeToString(type) \
-       << " is not allowed to get field "                                  \
-       << Descriptor::FieldIdToString(fieldId);                            \
-    AddStatusRecord(SqlState::SHY000_GENERAL_ERROR, ss.str());             \
-    return SqlResult::AI_ERROR;                                            \
+#define ALLOWED_DESC_TYPE1(type, fieldId, allowed_type)                            \
+  if (type != allowed_type) {                                                      \
+    std::stringstream ss;                                                          \
+    ss << "Current descriptor type " << Descriptor::DescTypeToString(type)         \
+       << " is not allowed to get field " << Descriptor::FieldIdToString(fieldId); \
+    AddStatusRecord(SqlState::SHY000_GENERAL_ERROR, ss.str());                     \
+    return SqlResult::AI_ERROR;                                                    \
   }
 
-#define ALLOWED_DESC_TYPE2(type, fieldId, allowed_type1, allowed_type2)    \
-  if (type != allowed_type1 && type != allowed_type2) {                    \
-    std::stringstream ss;                                                  \
-    ss << "Current descriptor type " << Descriptor::DescTypeToString(type) \
-       << " is not allowed to get field "                                  \
-       << Descriptor::FieldIdToString(fieldId);                            \
-    AddStatusRecord(SqlState::SHY000_GENERAL_ERROR, ss.str());             \
-    return SqlResult::AI_ERROR;                                            \
+#define ALLOWED_DESC_TYPE2(type, fieldId, allowed_type1, allowed_type2)            \
+  if (type != allowed_type1 && type != allowed_type2) {                            \
+    std::stringstream ss;                                                          \
+    ss << "Current descriptor type " << Descriptor::DescTypeToString(type)         \
+       << " is not allowed to get field " << Descriptor::FieldIdToString(fieldId); \
+    AddStatusRecord(SqlState::SHY000_GENERAL_ERROR, ss.str());                     \
+    return SqlResult::AI_ERROR;                                                    \
   }
 
-#define GET_DESC_FIELD_VALUE(type, value)        \
-  type* val = reinterpret_cast< type* >(buffer); \
+#define GET_DESC_FIELD_VALUE(type, value)      \
+  type* val = reinterpret_cast<type*>(buffer); \
   *val = value;
 
 namespace timestream {
 namespace odbc {
-Descriptor::Descriptor()
-    : type_(DescType::UNKNOWN), conn_(nullptr), stmt_(nullptr) {
-}
+Descriptor::Descriptor() : type_(DescType::UNKNOWN), conn_(nullptr), stmt_(nullptr) {}
 
 void Descriptor::InitAppHead(bool implicit) {
   header_.allocType = implicit ? SQL_DESC_ALLOC_AUTO : SQL_DESC_ALLOC_USER;
@@ -73,8 +69,7 @@ void Descriptor::SetField(int recNum, int fieldId, SQLPOINTER buffer,
   IGNITE_ODBC_API_CALL(InternalSetField(recNum, fieldId, buffer, bufferLen));
 }
 
-SqlResult::Type Descriptor::InternalSetField(int recNum, int fieldId,
-                                             SQLPOINTER buffer,
+SqlResult::Type Descriptor::InternalSetField(int recNum, int fieldId, SQLPOINTER buffer,
                                              SQLINTEGER bufferLen) {
   if (bufferLen < 0 && (bufferLen != SQL_NTS && bufferLen != SQL_IS_POINTER)) {
     std::stringstream ss;
@@ -100,8 +95,7 @@ SqlResult::Type Descriptor::InternalSetField(int recNum, int fieldId,
     }
 
     case SQL_DESC_CONCISE_TYPE: {
-      int value =
-          static_cast< SQLSMALLINT >(reinterpret_cast< ptrdiff_t >(buffer));
+      int value = static_cast<SQLSMALLINT>(reinterpret_cast<ptrdiff_t>(buffer));
       if (!IsValidConciseType(value)) {
         std::stringstream ss;
         ss << "Invalid concise type " << Descriptor::SQLTypeToString(value);
@@ -127,8 +121,7 @@ SqlResult::Type Descriptor::InternalSetField(int recNum, int fieldId,
     }
 
     case SQL_DESC_DATETIME_INTERVAL_CODE: {
-      int code =
-          static_cast< SQLSMALLINT >(reinterpret_cast< ptrdiff_t >(buffer));
+      int code = static_cast<SQLSMALLINT>(reinterpret_cast<ptrdiff_t>(buffer));
       if (!IsValidIntervalCode(record, code)) {
         std::stringstream ss;
         ss << "Invalid interval code " << Descriptor::IntervalCodeToString(code)
@@ -149,28 +142,26 @@ SqlResult::Type Descriptor::InternalSetField(int recNum, int fieldId,
         return SqlResult::AI_ERROR;
       }
       record.datetimeIntervalPrecision =
-          static_cast< SQLINTEGER >(reinterpret_cast< ptrdiff_t >(buffer));
+          static_cast<SQLINTEGER>(reinterpret_cast<ptrdiff_t>(buffer));
       break;
     }
 
     case SQL_DESC_INDICATOR_PTR: {
-      record.indicatorPtr = reinterpret_cast< SQLLEN* >(buffer);
+      record.indicatorPtr = reinterpret_cast<SQLLEN*>(buffer);
       break;
     }
 
     case SQL_DESC_OCTET_LENGTH_PTR: {
-      record.octetLengthPtr = reinterpret_cast< SQLLEN* >(buffer);
+      record.octetLengthPtr = reinterpret_cast<SQLLEN*>(buffer);
       break;
     }
 
     case SQL_DESC_OCTET_LENGTH:
     case SQL_DESC_LENGTH: {
-      if (record.conciseType == SQL_CHAR || record.conciseType == SQL_VARCHAR
-          || record.conciseType == SQL_LONGVARCHAR
-          || record.conciseType == SQL_WCHAR
-          || record.conciseType == SQL_WVARCHAR
-          || record.conciseType == SQL_WLONGVARCHAR) {
-        record.length = reinterpret_cast< SQLULEN >(buffer);
+      if (record.conciseType == SQL_CHAR || record.conciseType == SQL_VARCHAR ||
+          record.conciseType == SQL_LONGVARCHAR || record.conciseType == SQL_WCHAR ||
+          record.conciseType == SQL_WVARCHAR || record.conciseType == SQL_WLONGVARCHAR) {
+        record.length = reinterpret_cast<SQLULEN>(buffer);
         record.octetLength = record.length;
       } else {
         std::stringstream ss;
@@ -183,8 +174,7 @@ SqlResult::Type Descriptor::InternalSetField(int recNum, int fieldId,
       break;
     }
     case SQL_DESC_TYPE: {
-      int value =
-          static_cast< SQLSMALLINT >(reinterpret_cast< ptrdiff_t >(buffer));
+      int value = static_cast<SQLSMALLINT>(reinterpret_cast<ptrdiff_t>(buffer));
       if (!IsValidType(value)) {
         std::stringstream ss;
         ss << "Invalid type " << Descriptor::SQLTypeToString(value);
@@ -208,14 +198,11 @@ SqlResult::Type Descriptor::InternalSetField(int recNum, int fieldId,
 
 void Descriptor::GetField(int recNum, int fieldId, SQLPOINTER buffer,
                           SQLINTEGER bufferLen, SQLINTEGER* resLen) {
-  IGNITE_ODBC_API_CALL(
-      InternalGetField(recNum, fieldId, buffer, bufferLen, resLen));
+  IGNITE_ODBC_API_CALL(InternalGetField(recNum, fieldId, buffer, bufferLen, resLen));
 }
 
-SqlResult::Type Descriptor::InternalGetField(int recNum, int fieldId,
-                                             SQLPOINTER buffer,
-                                             SQLINTEGER bufferLen,
-                                             SQLINTEGER* resLen) {
+SqlResult::Type Descriptor::InternalGetField(int recNum, int fieldId, SQLPOINTER buffer,
+                                             SQLINTEGER bufferLen, SQLINTEGER* resLen) {
   DescriptorRecord& record = records_[recNum];
   switch (fieldId) {
     case SQL_DESC_ALLOC_TYPE: {
@@ -509,8 +496,7 @@ bool Descriptor::IsValidType(int value) {
 
 bool Descriptor::IsValidIntervalCode(DescriptorRecord& record, int value) {
   if (record.type == SQL_DATETIME) {
-    if (value == SQL_CODE_DATE || value == SQL_CODE_TIME
-        || value == SQL_CODE_TIMESTAMP) {
+    if (value == SQL_CODE_DATE || value == SQL_CODE_TIME || value == SQL_CODE_TIMESTAMP) {
       return true;
     }
   } else if (record.type == SQL_INTERVAL) {
@@ -523,8 +509,7 @@ bool Descriptor::IsValidIntervalCode(DescriptorRecord& record, int value) {
 
 void Descriptor::SetConciseType(DescriptorRecord& record, int value) {
   record.conciseType = value;
-  if (value == SQL_TYPE_DATE || value == SQL_TYPE_TIME
-      || value == SQL_TYPE_TIMESTAMP) {
+  if (value == SQL_TYPE_DATE || value == SQL_TYPE_TIME || value == SQL_TYPE_TIMESTAMP) {
     record.type = SQL_DATETIME;
     if (value == SQL_TYPE_DATE) {
       record.datetimeIntervalCode = SQL_CODE_DATE;
@@ -533,8 +518,7 @@ void Descriptor::SetConciseType(DescriptorRecord& record, int value) {
     } else {
       record.datetimeIntervalCode = SQL_CODE_TIMESTAMP;
     }
-  } else if (value == SQL_INTERVAL_YEAR_TO_MONTH
-             || value == SQL_INTERVAL_DAY_TO_SECOND) {
+  } else if (value == SQL_INTERVAL_YEAR_TO_MONTH || value == SQL_INTERVAL_DAY_TO_SECOND) {
     record.type = SQL_INTERVAL;
     if (value == SQL_INTERVAL_YEAR_TO_MONTH) {
       record.datetimeIntervalCode = SQL_CODE_YEAR_TO_MONTH;
@@ -560,8 +544,8 @@ void Descriptor::SetDescType(DescriptorRecord& record, int value) {
   }
 
   if (value == SQL_DATETIME) {
-    if (record.datetimeIntervalCode == SQL_CODE_DATE
-        || record.datetimeIntervalCode == SQL_CODE_TIME) {
+    if (record.datetimeIntervalCode == SQL_CODE_DATE ||
+        record.datetimeIntervalCode == SQL_CODE_TIME) {
       record.precision = 0;
     } else if (record.datetimeIntervalCode == SQL_CODE_TIMESTAMP) {
       record.precision = 6;

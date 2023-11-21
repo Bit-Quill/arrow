@@ -189,11 +189,10 @@ DiagnosticRecord::DiagnosticRecord()
   // No-op.
 }
 
-DiagnosticRecord::DiagnosticRecord(SqlState::Type sqlState,
-                                   const std::string& message,
+DiagnosticRecord::DiagnosticRecord(SqlState::Type sqlState, const std::string& message,
                                    const std::string& connectionName,
-                                   const std::string& serverName,
-                                   int32_t rowNum, int32_t columnNum)
+                                   const std::string& serverName, int32_t rowNum,
+                                   int32_t columnNum)
     : sqlState(sqlState),
       message(message),
       connectionName(connectionName),
@@ -211,14 +210,13 @@ DiagnosticRecord::~DiagnosticRecord() {
 const std::string& DiagnosticRecord::GetClassOrigin() const {
   const std::string& state = GetSqlState();
 
-  if (state[0] == 'I' && state[1] == 'M')
-    return ORIGIN_ODBC_3_0;
+  if (state[0] == 'I' && state[1] == 'M') return ORIGIN_ODBC_3_0;
 
   return ORIGIN_ISO_9075;
 }
 
 const std::string& DiagnosticRecord::GetSubclassOrigin() const {
-  static std::set< std::string > odbcSubclasses;
+  static std::set<std::string> odbcSubclasses;
 
   if (odbcSubclasses.empty()) {
     // This is a fixed list taken from ODBC doc.
@@ -270,23 +268,16 @@ const std::string& DiagnosticRecord::GetSubclassOrigin() const {
 
   const std::string& state = GetSqlState();
 
-  if (odbcSubclasses.find(state) != odbcSubclasses.end())
-    return ORIGIN_ODBC_3_0;
+  if (odbcSubclasses.find(state) != odbcSubclasses.end()) return ORIGIN_ODBC_3_0;
 
   return ORIGIN_ISO_9075;
 }
 
-const std::string& DiagnosticRecord::GetMessageText() const {
-  return message;
-}
+const std::string& DiagnosticRecord::GetMessageText() const { return message; }
 
-const std::string& DiagnosticRecord::GetConnectionName() const {
-  return connectionName;
-}
+const std::string& DiagnosticRecord::GetConnectionName() const { return connectionName; }
 
-const std::string& DiagnosticRecord::GetServerName() const {
-  return serverName;
-}
+const std::string& DiagnosticRecord::GetServerName() const { return serverName; }
 
 const std::string& DiagnosticRecord::GetSqlState() const {
   switch (sqlState) {
@@ -435,21 +426,13 @@ const std::string& DiagnosticRecord::GetSqlState() const {
   return STATE_UNKNOWN;
 }
 
-int32_t DiagnosticRecord::GetRowNumber() const {
-  return rowNum;
-}
+int32_t DiagnosticRecord::GetRowNumber() const { return rowNum; }
 
-int32_t DiagnosticRecord::GetColumnNumber() const {
-  return columnNum;
-}
+int32_t DiagnosticRecord::GetColumnNumber() const { return columnNum; }
 
-bool DiagnosticRecord::IsRetrieved() const {
-  return retrieved;
-}
+bool DiagnosticRecord::IsRetrieved() const { return retrieved; }
 
-void DiagnosticRecord::MarkRetrieved() {
-  retrieved = true;
-}
+void DiagnosticRecord::MarkRetrieved() { retrieved = true; }
 }  // namespace diagnostic
 }  // namespace odbc
 }  // namespace timestream

@@ -22,15 +22,14 @@
 
 namespace {
 std::wstring StringToWstring(const std::string& str) {
-  int wslen = MultiByteToWideChar(CP_UTF8, 0, str.c_str(),
-                                  static_cast< int >(str.size()), NULL, 0);
+  int wslen =
+      MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()), NULL, 0);
 
-  if (!wslen)
-    return std::wstring();
+  if (!wslen) return std::wstring();
 
-  std::vector< WCHAR > converted(wslen);
+  std::vector<WCHAR> converted(wslen);
 
-  MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast< int >(str.size()),
+  MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.size()),
                       &converted[0], wslen);
 
   std::wstring res(converted.begin(), converted.end());
@@ -65,13 +64,9 @@ Module& Module::operator=(const Module& other) {
   return *this;
 }
 
-void* Module::FindSymbol(const char* name) {
-  return GetProcAddress(handle, name);
-}
+void* Module::FindSymbol(const char* name) { return GetProcAddress(handle, name); }
 
-bool Module::IsLoaded() const {
-  return handle != NULL;
-}
+bool Module::IsLoaded() const { return handle != NULL; }
 
 void Module::Unload() {
   if (IsLoaded()) {
@@ -87,9 +82,7 @@ Module LoadModule(const wchar_t* path) {
   return Module(handle);
 }
 
-Module LoadModule(const std::wstring& path) {
-  return LoadModule(path.c_str());
-}
+Module LoadModule(const std::wstring& path) { return LoadModule(path.c_str()); }
 
 Module GetCurrent() {
   HMODULE handle = GetModuleHandle(NULL);

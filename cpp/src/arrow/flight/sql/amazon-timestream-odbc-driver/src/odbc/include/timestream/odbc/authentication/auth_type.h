@@ -17,8 +17,8 @@
 #ifndef _TIMESTREAM_ODBC_AUTHENTICATION_AUTH_TYPE
 #define _TIMESTREAM_ODBC_AUTHENTICATION_AUTH_TYPE
 
-#include <string>
 #include <ignite/common/common.h>
+#include <string>
 
 namespace timestream {
 namespace odbc {

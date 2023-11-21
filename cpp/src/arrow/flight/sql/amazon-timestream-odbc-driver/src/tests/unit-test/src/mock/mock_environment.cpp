@@ -14,8 +14,8 @@
  *
  */
 
-#include <mock/mock_environment.h>
 #include <mock/mock_connection.h>
+#include <mock/mock_environment.h>
 
 namespace timestream {
 namespace odbc {
@@ -27,8 +27,7 @@ MockEnvironment::~MockEnvironment() {
   // No-op.
 }
 
-SqlResult::Type MockEnvironment::InternalCreateConnection(
-    Connection*& connection) {
+SqlResult::Type MockEnvironment::InternalCreateConnection(Connection*& connection) {
   connection = new MockConnection(this);
 
   if (!connection) {

@@ -18,8 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#if defined(__unix__) || defined(__unix) \
-    || (defined(__APPLE__) && defined(__MACH__))
+#if defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 #define PREDEF_PLATFORM_UNIX_OR_APPLE 1
 #endif
 
@@ -39,19 +38,17 @@ using timestream::odbc::Logger;
 using timestream::odbc::config::Configuration;
 
 // logger_ pointer will  initialized in first call to GetLoggerInstance
-std::shared_ptr< Logger > Logger::logger_;
+std::shared_ptr<Logger> Logger::logger_;
 CriticalSection Logger::mutexForCreation;
 
 namespace timestream {
 namespace odbc {
 LogStream::LogStream(Logger* parent)
-    : std::basic_ostream< char >(0), strbuf(), logger(parent) {
+    : std::basic_ostream<char>(0), strbuf(), logger(parent) {
   init(&strbuf);
 }
 
-bool LogStream::operator()() const {
-  return logger != nullptr;
-}
+bool LogStream::operator()() const { return logger != nullptr; }
 
 LogStream::~LogStream() {
   if (logger) {
@@ -66,8 +63,7 @@ std::string Logger::GetDefaultLogPath() {
   defPath = ignite::odbc::common::GetEnv("HOME");
   if (defPath.empty()) {
     struct passwd* pwd = getpwuid(getuid());
-    if (pwd)
-      defPath = pwd->pw_dir;
+    if (pwd) defPath = pwd->pw_dir;
   }
 #elif defined(_WIN32)
   defPath = ignite::odbc::common::GetEnv("USERPROFILE");
@@ -117,8 +113,8 @@ void Logger::SetLogPath(const std::string& path) {
   std::string oldLogFilePath = logFilePath;
   logPath = path;
   if (IsEnabled() && logLevel != LogLevel::Type::OFF) {
-    LOG_INFO_MSG("Reset log path: Log path is changed to " + logPath
-                 + ". Log file is in format timestream_odbc_YYYYMMDD.log");
+    LOG_INFO_MSG("Reset log path: Log path is changed to " + logPath +
+                 ". Log file is in format timestream_odbc_YYYYMMDD.log");
 
     {
       // close file stream and erase log file name to allow new log file path
@@ -127,23 +123,16 @@ void Logger::SetLogPath(const std::string& path) {
       logFileName.erase();
     }
 
-    LOG_INFO_MSG("Previously logged information is stored in log file "
-                 + oldLogFilePath);
+    LOG_INFO_MSG("Previously logged information is stored in log file " + oldLogFilePath);
   }
   SetLogStream(&fileStream);
 }
 
-void Logger::SetLogStream(std::ostream* logStream) {
-  stream = logStream;
-}
+void Logger::SetLogStream(std::ostream* logStream) { stream = logStream; }
 
-void Logger::SetLogLevel(LogLevel::Type level) {
-  logLevel = level;
-}
+void Logger::SetLogLevel(LogLevel::Type level) { logLevel = level; }
 
-bool Logger::IsFileStreamOpen() const {
-  return fileStream.is_open();
-}
+bool Logger::IsFileStreamOpen() const { return fileStream.is_open(); }
 
 bool Logger::IsEnabled() const {
   return stream != nullptr && (stream != &fileStream || IsFileStreamOpen());
@@ -151,11 +140,9 @@ bool Logger::IsEnabled() const {
 
 bool Logger::EnableLog() {
   // if stream is not set, set the stream as filestream
-  if (stream == nullptr)
-    SetLogStream(&fileStream);
+  if (stream == nullptr) SetLogStream(&fileStream);
 
-  if (!IsEnabled() && logLevel != LogLevel::Type::OFF
-      && stream == &fileStream) {
+  if (!IsEnabled() && logLevel != LogLevel::Type::OFF && stream == &fileStream) {
     // The filename creation and stream open is not multi-thread safe
     CsLockGuard guard(mutex);
     if (logFileName.empty()) {
@@ -165,8 +152,7 @@ bool Logger::EnableLog() {
       logFilePath = tmpStream.str();
       if (ignite::odbc::common::FileExists(logFilePath)) {
         std::cout << "log file at \"" << logFilePath
-                  << "\" already exists. Appending logs to the log file."
-                  << '\n';
+                  << "\" already exists. Appending logs to the log file." << '\n';
       }
       std::cout << "logFilePath: " << logFilePath << '\n';
     }
@@ -183,12 +169,8 @@ void Logger::WriteMessage(std::string const& message) {
   }
 }
 
-LogLevel::Type Logger::GetLogLevel() const {
-  return logLevel;
-}
+LogLevel::Type Logger::GetLogLevel() const { return logLevel; }
 
-std::string& Logger::GetLogPath() {
-  return logPath;
-}
+std::string& Logger::GetLogPath() { return logPath; }
 }  // namespace odbc
 }  // namespace timestream

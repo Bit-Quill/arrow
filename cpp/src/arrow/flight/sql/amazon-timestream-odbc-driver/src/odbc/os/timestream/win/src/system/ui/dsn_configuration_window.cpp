@@ -20,15 +20,15 @@
 
 #include "timestream/odbc/system/ui/dsn_configuration_window.h"
 
-#include <Shlwapi.h>
 #include <ShlObj_core.h>
+#include <Shlwapi.h>
 #include <Windowsx.h>
 #include <commctrl.h>
 
+#include "timestream/odbc/authentication/auth_type.h"
+#include "timestream/odbc/ignite_error.h"
 #include "timestream/odbc/log.h"
 #include "timestream/odbc/log_level.h"
-#include "timestream/odbc/ignite_error.h"
-#include "timestream/odbc/authentication/auth_type.h"
 
 #define TRIM_UTF8(str) utility::Trim(utility::ToUtf8(str))
 
@@ -38,8 +38,7 @@ namespace system {
 namespace ui {
 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
                                                config::Configuration& config)
-    : CustomWindow(parent, L"TimestreamConfigureDsn",
-                   L"Configure Amazon Timestream DSN"),
+    : CustomWindow(parent, L"TimestreamConfigureDsn", L"Configure Amazon Timestream DSN"),
       width(450),
       height(425),
       nameEdit(),
@@ -116,14 +115,12 @@ void DsnConfigurationWindow::Create() {
   GetWindowRect(parent->GetHandle(), &parentRect);
 
   // Positioning window to the center of parent window.
-  const int posX =
-      parentRect.left + (parentRect.right - parentRect.left - width) / 2;
-  const int posY =
-      parentRect.top + (parentRect.bottom - parentRect.top - height) / 2;
+  const int posX = parentRect.left + (parentRect.right - parentRect.left - width) / 2;
+  const int posY = parentRect.top + (parentRect.bottom - parentRect.top - height) / 2;
 
   RECT desiredRect = {posX, posY, posX + width, posY + height};
-  AdjustWindowRect(&desiredRect,
-                   WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME, FALSE);
+  AdjustWindowRect(&desiredRect, WS_BORDER | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME,
+                   FALSE);
 
   Window::Create(WS_OVERLAPPED | WS_SYSMENU, desiredRect.left, desiredRect.top,
                  desiredRect.right - desiredRect.left,
@@ -150,8 +147,7 @@ void DsnConfigurationWindow::OnCreate() {
   // Advance Authentication group is the tallest UI group, so the positions of
   // Ok button and Cancel button will be right below the end of Advance Auth
   groupPosYLeft +=
-      tabGroupPosY
-      + CreateAuthenticationSettingsGroup(MARGIN, tabGroupPosY, groupSizeY);
+      tabGroupPosY + CreateAuthenticationSettingsGroup(MARGIN, tabGroupPosY, groupSizeY);
   CreateLogSettingsGroup(MARGIN, tabGroupPosY, groupSizeY);
 
   // Hide all tab windows except Authentication Window
@@ -163,20 +159,19 @@ void DsnConfigurationWindow::OnCreate() {
   int okPosX = cancelPosX - INTERVAL - BUTTON_WIDTH;
   int testPosX = okPosX - INTERVAL - BUTTON_WIDTH;
 
-  testButton = CreateButton(testPosX, groupPosYLeft, BUTTON_WIDTH,
-                            BUTTON_HEIGHT, L"Test", ChildId::TEST_BUTTON);
-  okButton = CreateButton(okPosX, groupPosYLeft, BUTTON_WIDTH, BUTTON_HEIGHT,
-                          L"Ok", ChildId::OK_BUTTON);
-  cancelButton = CreateButton(cancelPosX, groupPosYLeft, BUTTON_WIDTH,
-                              BUTTON_HEIGHT, L"Cancel", ChildId::CANCEL_BUTTON);
+  testButton = CreateButton(testPosX, groupPosYLeft, BUTTON_WIDTH, BUTTON_HEIGHT, L"Test",
+                            ChildId::TEST_BUTTON);
+  okButton = CreateButton(okPosX, groupPosYLeft, BUTTON_WIDTH, BUTTON_HEIGHT, L"Ok",
+                          ChildId::OK_BUTTON);
+  cancelButton = CreateButton(cancelPosX, groupPosYLeft, BUTTON_WIDTH, BUTTON_HEIGHT,
+                              L"Cancel", ChildId::CANCEL_BUTTON);
 
   int versionPosX = MARGIN + INTERVAL;
   // re-use BUTTON_WIDTH because the version string has the same size
   // adjust y-position of version label to make it on the same level with the Ok
   // button
-  versionLabel =
-      CreateLabel(versionPosX, groupPosYLeft + 5, BUTTON_WIDTH, ROW_HEIGHT,
-                  GetParsedDriverVersion(), ChildId::VERSION_LABEL);
+  versionLabel = CreateLabel(versionPosX, groupPosYLeft + 5, BUTTON_WIDTH, ROW_HEIGHT,
+                             GetParsedDriverVersion(), ChildId::VERSION_LABEL);
 
   // check whether the required fields are filled. If not, Ok button is
   // disabled.
@@ -189,8 +184,7 @@ void DsnConfigurationWindow::TestConnection() const {
   // Changes will not be committed until OK button is pressed.
   config::Configuration tempConfig;
   RetrieveParameters(tempConfig);
-  std::vector< SQLWCHAR > dsnVec =
-      utility::ToWCHARVector(tempConfig.ToConnectString());
+  std::vector<SQLWCHAR> dsnVec = utility::ToWCHARVector(tempConfig.ToConnectString());
 
   // Allocate an environment handle
   SQLHENV env = {};
@@ -203,8 +197,8 @@ void DsnConfigurationWindow::TestConnection() const {
   }
 
   // We want ODBC 3 support
-  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION,
-                      reinterpret_cast< void* >(SQL_OV_ODBC3), 0);
+  ret =
+      SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(SQL_OV_ODBC3), 0);
   if (!SQL_SUCCEEDED(ret)) {
     MessageBox(handle, L"Unable to set ODBC version.", L"Error!",
                MB_ICONEXCLAMATION | MB_OK);
@@ -223,8 +217,8 @@ void DsnConfigurationWindow::TestConnection() const {
   }
 
   // Test the connection.
-  ret = SQLDriverConnect(dbc, nullptr, dsnVec.data(), dsnVec.size(), nullptr, 0,
-                         nullptr, SQL_DRIVER_COMPLETE);
+  ret = SQLDriverConnect(dbc, nullptr, dsnVec.data(), dsnVec.size(), nullptr, 0, nullptr,
+                         SQL_DRIVER_COMPLETE);
   if (!SQL_SUCCEEDED(ret)) {
     SQLWCHAR sqlState[7];
     SQLINTEGER nativeCode;
@@ -232,18 +226,15 @@ void DsnConfigurationWindow::TestConnection() const {
     SQLGetDiagRec(SQL_HANDLE_DBC, dbc, 1, sqlState, &nativeCode, errMessage,
                   sizeof(errMessage) / sizeof(SQLWCHAR), nullptr);
     std::stringstream buf;
-    buf << "Connection failed: '" << utility::SqlWcharToString(errMessage)
-        << "'";
-    std::vector< SQLWCHAR > errMessageVec = utility::ToWCHARVector(buf.str());
-    MessageBox(handle, errMessageVec.data(), L"Error!",
-               MB_ICONEXCLAMATION | MB_OK);
+    buf << "Connection failed: '" << utility::SqlWcharToString(errMessage) << "'";
+    std::vector<SQLWCHAR> errMessageVec = utility::ToWCHARVector(buf.str());
+    MessageBox(handle, errMessageVec.data(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
     SQLFreeHandle(SQL_HANDLE_DBC, dbc);
     SQLFreeHandle(SQL_HANDLE_ENV, env);
     return;
   }
 
-  MessageBox(handle, L"Connection succeeded.", L"Success!",
-             MB_ICONINFORMATION | MB_OK);
+  MessageBox(handle, L"Connection succeeded.", L"Success!", MB_ICONINFORMATION | MB_OK);
 
   // Cleanup
   SQLDisconnect(dbc);
@@ -251,8 +242,7 @@ void DsnConfigurationWindow::TestConnection() const {
   SQLFreeHandle(SQL_HANDLE_ENV, env);
 }
 
-std::wstring DsnConfigurationWindow::GetParsedDriverVersion(
-    std::string driverVersion) {
+std::wstring DsnConfigurationWindow::GetParsedDriverVersion(std::string driverVersion) {
   std::stringstream tmpStream;
   tmpStream << "V.";
   for (int i = 0; i < driverVersion.size(); i++) {
@@ -263,8 +253,8 @@ std::wstring DsnConfigurationWindow::GetParsedDriverVersion(
 
         break;
       case 8:
-        if (driverVersion[i] != '0' || driverVersion[i - 1] != '0'
-            || driverVersion[i - 2] != '0')
+        if (driverVersion[i] != '0' || driverVersion[i - 1] != '0' ||
+            driverVersion[i - 2] != '0')
           tmpStream << driverVersion[i];
 
         break;
@@ -280,8 +270,7 @@ std::wstring DsnConfigurationWindow::GetParsedDriverVersion(
       case 3:
       case 6:
         // continue if driverVersion[i] is not 0
-        if (driverVersion[i] == '0')
-          break;
+        if (driverVersion[i] == '0') break;
       default:
         tmpStream << driverVersion[i];
     }
@@ -388,8 +377,8 @@ void DsnConfigurationWindow::OnSelChanged(TabIndex::Type idx) {
       break;
     default:
       // log wrong index value
-      LOG_DEBUG_MSG("wrong idx value: "
-                    << idx << ", this should not happen. Suggest to debug.");
+      LOG_DEBUG_MSG("wrong idx value: " << idx
+                                        << ", this should not happen. Suggest to debug.");
   }
 
   // Hide all balloons when tabs switch
@@ -405,7 +394,7 @@ void DsnConfigurationWindow::OnSelChanged(TabIndex::Type idx) {
 void DsnConfigurationWindow::OnAuthTypeChanged() const {
   // get value of authType
   AuthType::Type authType =
-      static_cast< AuthType::Type >(authTypeComboBox->GetCBSelection());
+      static_cast<AuthType::Type>(authTypeComboBox->GetCBSelection());
   // If authType is not none/unknown, authTypeEqSaml is true.
   bool authTypeEqSaml =
       authType == AuthType::Type::OKTA || authType == AuthType::Type::AAD;
@@ -478,8 +467,8 @@ void DsnConfigurationWindow::OnAuthTypeChanged() const {
 void DsnConfigurationWindow::OnLogLevelChanged() const {
   std::wstring logLevelWStr;
   logLevelComboBox->GetText(logLevelWStr);
-  if (LogLevel::FromString(TRIM_UTF8(logLevelWStr), LogLevel::Type::UNKNOWN)
-      == LogLevel::Type::OFF) {
+  if (LogLevel::FromString(TRIM_UTF8(logLevelWStr), LogLevel::Type::UNKNOWN) ==
+      LogLevel::Type::OFF) {
     logPathEdit->SetEnabled(false);
     browseButton->SetEnabled(false);
   } else {
@@ -488,8 +477,7 @@ void DsnConfigurationWindow::OnLogLevelChanged() const {
   }
 }
 
-int DsnConfigurationWindow::CreateBasicSettingsGroup(int posX, int posY,
-                                                     int sizeX) {
+int DsnConfigurationWindow::CreateBasicSettingsGroup(int posX, int posY, int sizeX) {
   enum { LABEL_WIDTH = 120 };
 
   int labelPosX = posX + INTERVAL;
@@ -505,45 +493,43 @@ int DsnConfigurationWindow::CreateBasicSettingsGroup(int posX, int posY,
   std::wstring wVal = utility::FromUtf8(config.GetDsn());
   nameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                           L"Data Source Name*:", ChildId::NAME_LABEL);
-  nameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                        ChildId::NAME_EDIT);
-  nameBalloon = CreateBalloon(L"Required Field",
-                              L"DSN name is a required field.", TTI_ERROR);
+  nameEdit =
+      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal, ChildId::NAME_EDIT);
+  nameBalloon =
+      CreateBalloon(L"Required Field", L"DSN name is a required field.", TTI_ERROR);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = utility::FromUtf8(config.GetEndpoint());
   endpointLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                               L"Endpoint Override:", ChildId::ENDPOINT_LABEL);
-  endpointEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                            ChildId::ENDPOINT_EDIT);
+  endpointEdit =
+      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal, ChildId::ENDPOINT_EDIT);
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = utility::FromUtf8(config.GetRegion());
-  regionLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                            L"Region:", ChildId::REGION_LABEL);
-  regionEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                          ChildId::REGION_EDIT);
+  regionLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"Region:",
+                            ChildId::REGION_LABEL);
+  regionEdit =
+      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal, ChildId::REGION_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
-  tabs = CreateTab(labelPosX, rowPos, tabSizeX, ROW_HEIGHT, L"Tabs",
-                   ChildId::TABS);
+  tabs = CreateTab(labelPosX, rowPos, tabSizeX, ROW_HEIGHT, L"Tabs", ChildId::TABS);
 
   tabs->AddTab(TabIndex::Type::AUTHENTICATION, L"Authentication");
   tabs->AddTab(TabIndex::Type::ADVANCED_OPTIONS, L"Advanced Options");
   tabs->AddTab(TabIndex::Type::LOG_SETTINGS, L"Logging Options");
 
-  tabsGroupBox = CreateGroupBox(posX, rowPos + 15, sizeX, 260, L"",
-                                ChildId::TABS_GROUP_BOX);
+  tabsGroupBox =
+      CreateGroupBox(posX, rowPos + 15, sizeX, 260, L"", ChildId::TABS_GROUP_BOX);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   return rowPos - posY;
 }
 
-int DsnConfigurationWindow::CreateAuthenticationSettingsGroup(int posX,
-                                                              int posY,
+int DsnConfigurationWindow::CreateAuthenticationSettingsGroup(int posX, int posY,
                                                               int sizeX) {
   enum { LABEL_WIDTH = 120 };
 
@@ -555,29 +541,26 @@ int DsnConfigurationWindow::CreateAuthenticationSettingsGroup(int posX,
   int rowPos = posY;
 
   AuthType::Type authType = config.GetAuthType();
-  authTypeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                              L"Auth Type:", ChildId::AUTH_TYPE_LABEL);
-  authTypeComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT,
-                                    L"", ChildId::AUTH_TYPE_COMBO_BOX);
+  authTypeLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"Auth Type:",
+                              ChildId::AUTH_TYPE_LABEL);
+  authTypeComboBox = CreateComboBox(editPosX, rowPos, editSizeX, ROW_HEIGHT, L"",
+                                    ChildId::AUTH_TYPE_COMBO_BOX);
 
   // the order of add string needs to match the definition of the auth_type.h
   // file
   for (int i = 0; i <= 3; i++) {
-    authTypeComboBox->AddString(
-        AuthType::ToCBString(static_cast< AuthType::Type >(i)));
+    authTypeComboBox->AddString(AuthType::ToCBString(static_cast<AuthType::Type>(i)));
   }
 
-  authTypeComboBox->SetCBSelection(
-      static_cast< int >(authType));  // set default
+  authTypeComboBox->SetCBSelection(static_cast<int>(authType));  // set default
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   int authTypeRowPos = rowPos;
 
   std::wstring wVal = utility::FromUtf8(config.GetAccessKeyId());
-  accessKeyIdLabel =
-      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"Access Key ID:",
-                  ChildId::ACCESS_KEY_ID_LABEL);
+  accessKeyIdLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                 L"Access Key ID:", ChildId::ACCESS_KEY_ID_LABEL);
   accessKeyIdEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                                ChildId::ACCESS_KEY_ID_EDIT);
 
@@ -585,18 +568,16 @@ int DsnConfigurationWindow::CreateAuthenticationSettingsGroup(int posX,
 
   wVal = utility::FromUtf8(config.GetSecretKey());
   secretAccessKeyLabel =
-      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                  L"Secret Access Key:", ChildId::SECRET_ACCESS_KEY_LABEL);
-  secretAccessKeyEdit =
-      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                 ChildId::SECRET_ACCESS_KEY_EDIT, ES_PASSWORD);
+      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"Secret Access Key:",
+                  ChildId::SECRET_ACCESS_KEY_LABEL);
+  secretAccessKeyEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
+                                   ChildId::SECRET_ACCESS_KEY_EDIT, ES_PASSWORD);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = utility::FromUtf8(config.GetSessionToken());
-  sessionTokenLabel =
-      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"Session Token:",
-                  ChildId::SESSION_TOKEN_LABEL);
+  sessionTokenLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                  L"Session Token:", ChildId::SESSION_TOKEN_LABEL);
   sessionTokenEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                                 ChildId::SESSION_TOKEN_EDIT);
 
@@ -613,17 +594,16 @@ int DsnConfigurationWindow::CreateAuthenticationSettingsGroup(int posX,
   rowPos = authTypeRowPos;
 
   wVal = utility::FromUtf8(config.GetRoleArn());
-  roleArnLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                             L"Role ARN:", ChildId::ROLE_ARN_LABEL);
-  roleArnEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                           ChildId::ROLE_ARN_EDIT);
+  roleArnLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"Role ARN:",
+                             ChildId::ROLE_ARN_LABEL);
+  roleArnEdit =
+      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal, ChildId::ROLE_ARN_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = utility::FromUtf8(config.GetIdPUserName());
-  idPUserNameLabel =
-      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"IdP User Name:",
-                  ChildId::IDP_USER_NAME_LABEL);
+  idPUserNameLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                 L"IdP User Name:", ChildId::IDP_USER_NAME_LABEL);
   idPUserNameEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                                ChildId::IDP_USER_NAME_EDIT);
 
@@ -638,10 +618,10 @@ int DsnConfigurationWindow::CreateAuthenticationSettingsGroup(int posX,
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = utility::FromUtf8(config.GetIdPArn());
-  idPArnLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                            L"IdP ARN:", ChildId::IDP_ARN_LABEL);
-  idPArnEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                          ChildId::IDP_ARN_EDIT);
+  idPArnLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"IdP ARN:",
+                            ChildId::IDP_ARN_LABEL);
+  idPArnEdit =
+      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal, ChildId::IDP_ARN_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -649,17 +629,16 @@ int DsnConfigurationWindow::CreateAuthenticationSettingsGroup(int posX,
   int arnRowPos = rowPos;
 
   wVal = utility::FromUtf8(config.GetIdPHost());
-  idPHostLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                             L"IdP Host:", ChildId::IDP_HOST_LABEL);
-  idPHostEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                           ChildId::IDP_HOST_EDIT);
+  idPHostLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"IdP Host:",
+                             ChildId::IDP_HOST_LABEL);
+  idPHostEdit =
+      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal, ChildId::IDP_HOST_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = utility::FromUtf8(config.GetOktaAppId());
-  oktaAppIdLabel =
-      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                  L"Okta Application ID:", ChildId::OKTA_APP_ID_LABEL);
+  oktaAppIdLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                               L"Okta Application ID:", ChildId::OKTA_APP_ID_LABEL);
   oktaAppIdEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                              ChildId::OKTA_APP_ID_EDIT);
 
@@ -669,29 +648,27 @@ int DsnConfigurationWindow::CreateAuthenticationSettingsGroup(int posX,
 
   // AAD specific fields
   wVal = utility::FromUtf8(config.GetAADAppId());
-  aadAppIdLabel =
-      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                  L"AAD Application ID:", ChildId::AAD_APP_ID_LABEL);
-  aadAppIdEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                            ChildId::AAD_APP_ID_EDIT);
+  aadAppIdLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                              L"AAD Application ID:", ChildId::AAD_APP_ID_LABEL);
+  aadAppIdEdit =
+      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal, ChildId::AAD_APP_ID_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = utility::FromUtf8(config.GetAADClientSecret());
   aadClientSecretLabel =
-      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                  L"AAD Client Secret:", ChildId::AAD_CLIENT_SECRET_LABEL);
-  aadClientSecretEdit =
-      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                 ChildId::AAD_CLIENT_SECRET_EDIT, ES_PASSWORD);
+      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"AAD Client Secret:",
+                  ChildId::AAD_CLIENT_SECRET_LABEL);
+  aadClientSecretEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
+                                   ChildId::AAD_CLIENT_SECRET_EDIT, ES_PASSWORD);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = utility::FromUtf8(config.GetAADTenant());
-  aadTenantLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                               L"AAD Tenant:", ChildId::AAD_TENANT_LABEL);
-  aadTenantEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                             ChildId::AAD_TENANT_EDIT);
+  aadTenantLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"AAD Tenant:",
+                               ChildId::AAD_TENANT_LABEL);
+  aadTenantEdit =
+      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal, ChildId::AAD_TENANT_EDIT);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -700,8 +677,7 @@ int DsnConfigurationWindow::CreateAuthenticationSettingsGroup(int posX,
   return rowPos - posY;
 }
 
-int DsnConfigurationWindow::CreateAdvancedOptionsGroup(int posX, int posY,
-                                                       int sizeX) {
+int DsnConfigurationWindow::CreateAdvancedOptionsGroup(int posX, int posY, int sizeX) {
   enum { LABEL_WIDTH = 120 };
 
   int labelPosX = posX + INTERVAL;
@@ -712,51 +688,46 @@ int DsnConfigurationWindow::CreateAdvancedOptionsGroup(int posX, int posY,
   int rowPos = posY;
 
   std::wstring wVal = std::to_wstring(config.GetConnectionTimeout());
-  connectionTimeoutLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
-                                       ROW_HEIGHT, L"Connection Timeout (ms):",
-                                       ChildId::CONNECTION_TIMEOUT_LABEL);
-  connectionTimeoutEdit =
-      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                 ChildId::CONNECTION_TIMEOUT_EDIT, ES_NUMBER);
+  connectionTimeoutLabel =
+      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"Connection Timeout (ms):",
+                  ChildId::CONNECTION_TIMEOUT_LABEL);
+  connectionTimeoutEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
+                                     ChildId::CONNECTION_TIMEOUT_EDIT, ES_NUMBER);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = std::to_wstring(config.GetReqTimeout());
-  reqTimeoutLabel =
-      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                  L"Request Timeout (ms):", ChildId::REQ_TIMEOUT_LABEL);
+  reqTimeoutLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                L"Request Timeout (ms):", ChildId::REQ_TIMEOUT_LABEL);
   reqTimeoutEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                               ChildId::REQ_TIMEOUT_EDIT, ES_NUMBER);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = std::to_wstring(config.GetMaxRetryCountClient());
-  maxRetryCountClientLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH,
-                                         ROW_HEIGHT, L"Max retry count client:",
-                                         ChildId::MAX_RETRY_COUNT_CLIENT_LABEL);
-  maxRetryCountClientEdit =
-      CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
-                 ChildId::MAX_RETRY_COUNT_CLIENT_EDIT, ES_NUMBER);
+  maxRetryCountClientLabel =
+      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"Max retry count client:",
+                  ChildId::MAX_RETRY_COUNT_CLIENT_LABEL);
+  maxRetryCountClientEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
+                                       ChildId::MAX_RETRY_COUNT_CLIENT_EDIT, ES_NUMBER);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   wVal = std::to_wstring(config.GetMaxConnections());
-  maxConnectionsLabel =
-      CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                  L"Max connections:", ChildId::MAX_CONNECTIONS_LABEL);
+  maxConnectionsLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
+                                    L"Max connections:", ChildId::MAX_CONNECTIONS_LABEL);
   maxConnectionsEdit = CreateEdit(editPosX, rowPos, editSizeX, ROW_HEIGHT, wVal,
                                   ChildId::MAX_CONNECTIONS_EDIT, ES_NUMBER);
-  maxConnectionsBalloon = CreateBalloon(
-      L"Positive Number Only",
-      L"Number of connections must be a positive number.", TTI_ERROR);
+  maxConnectionsBalloon =
+      CreateBalloon(L"Positive Number Only",
+                    L"Number of connections must be a positive number.", TTI_ERROR);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
   return rowPos - posY;
 }
 
-int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY,
-                                                   int sizeX) {
+int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY, int sizeX) {
   enum { LABEL_WIDTH = 120 };
 
   int labelPosX = posX + INTERVAL;
@@ -769,21 +740,19 @@ int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY,
 
   LogLevel::Type logLevel = config.GetLogLevel();
 
-  logLevelLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
-                              L"Log Level:", ChildId::LOG_LEVEL_LABEL);
-  logLevelComboBox = CreateComboBox(comboPosX, rowPos, comboSizeX, ROW_HEIGHT,
-                                    L"", ChildId::LOG_LEVEL_COMBO_BOX);
+  logLevelLabel = CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT, L"Log Level:",
+                              ChildId::LOG_LEVEL_LABEL);
+  logLevelComboBox = CreateComboBox(comboPosX, rowPos, comboSizeX, ROW_HEIGHT, L"",
+                                    ChildId::LOG_LEVEL_COMBO_BOX);
 
   // the order of add string needs to match the definition of the log_level.h
   // file
-  int logLevelUpperLimit = static_cast< int >(LogLevel::Type::UNKNOWN);
+  int logLevelUpperLimit = static_cast<int>(LogLevel::Type::UNKNOWN);
   for (int i = 0; i < logLevelUpperLimit; i++) {
-    logLevelComboBox->AddString(
-        LogLevel::ToCBString(static_cast< LogLevel::Type >(i)));
+    logLevelComboBox->AddString(LogLevel::ToCBString(static_cast<LogLevel::Type>(i)));
   }
 
-  logLevelComboBox->SetCBSelection(
-      static_cast< int >(logLevel));  // set default
+  logLevelComboBox->SetCBSelection(static_cast<int>(logLevel));  // set default
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -795,14 +764,13 @@ int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY,
 
   rowPos += INTERVAL * 2 + ROW_HEIGHT;
 
-  logPathEdit = CreateEdit(editPosX, rowPos, pathSizeX, ROW_HEIGHT, wVal,
-                           ChildId::LOG_PATH_EDIT);
+  logPathEdit =
+      CreateEdit(editPosX, rowPos, pathSizeX, ROW_HEIGHT, wVal, ChildId::LOG_PATH_EDIT);
 
   // Slightly adjust the browse button position to align with the log path field
   // on the same level
-  browseButton =
-      CreateButton(editPosX + pathSizeX + INTERVAL, rowPos - 2, BUTTON_WIDTH,
-                   BUTTON_HEIGHT, L"Browse", ChildId::BROWSE_BUTTON);
+  browseButton = CreateButton(editPosX + pathSizeX + INTERVAL, rowPos - 2, BUTTON_WIDTH,
+                              BUTTON_HEIGHT, L"Browse", ChildId::BROWSE_BUTTON);
 
   rowPos += INTERVAL + ROW_HEIGHT;
 
@@ -812,12 +780,10 @@ int DsnConfigurationWindow::CreateLogSettingsGroup(int posX, int posY,
 }
 
 // Callback function to set the initial path.
-int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam,
-                                LPARAM lpData) {
+int CALLBACK BrowseCallbackProc(HWND hwnd, UINT uMsg, LPARAM lParam, LPARAM lpData) {
   switch (uMsg) {
     case BFFM_INITIALIZED: {
-      if (lpData != NULL)
-        SendMessage(hwnd, BFFM_SETSELECTION, (WPARAM)TRUE, lpData);
+      if (lpData != NULL) SendMessage(hwnd, BFFM_SETSELECTION, (WPARAM)TRUE, lpData);
     } break;
   }
   return 0;
@@ -842,8 +808,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
             PostMessage(GetHandle(), WM_CLOSE, 0, 0);
           } catch (IgniteError& err) {
             std::wstring errWText = utility::FromUtf8(err.GetText());
-            MessageBox(NULL, errWText.c_str(), L"Error!",
-                       MB_ICONEXCLAMATION | MB_OK);
+            MessageBox(NULL, errWText.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
           }
 
           break;
@@ -879,8 +844,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
 
             std::string maxConStr = TRIM_UTF8(maxConWStr);
 
-            int16_t maxCon =
-                timestream::odbc::common::LexicalCast< int16_t >(maxConStr);
+            int16_t maxCon = timestream::odbc::common::LexicalCast<int16_t>(maxConStr);
 
             if (!shownMaxConBalloon && maxCon <= 0) {
               Edit_ShowBalloonTip(maxConnectionsEdit->GetHandle(),
@@ -909,12 +873,12 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
         case ChildId::BROWSE_BUTTON: {
           std::wstring initLogPath;
           logPathEdit->GetText(initLogPath);
-          std::unique_ptr< BROWSEINFO > bi(std::make_unique< BROWSEINFO >());
+          std::unique_ptr<BROWSEINFO> bi(std::make_unique<BROWSEINFO>());
           bi->lpszTitle = L"Choose log file target directory:";
           bi->ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
           bi->hwndOwner = browseButton->GetHandle();
           bi->lpfn = BrowseCallbackProc;
-          bi->lParam = reinterpret_cast< LPARAM >(initLogPath.c_str());
+          bi->lParam = reinterpret_cast<LPARAM>(initLogPath.c_str());
 
           const LPITEMIDLIST& pidl = SHBrowseForFolder(bi.get());
 
@@ -922,7 +886,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
             // get the name of the folder and put it in the log path field
             wchar_t logPath[_MAX_PATH];
             SHGetPathFromIDList(pidl, logPath);
-            logPathEdit->SetText(static_cast< std::wstring >(logPath));
+            logPathEdit->SetText(static_cast<std::wstring>(logPath));
           }
 
           break;
@@ -944,11 +908,10 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
     case WM_NOTIFY: {
       switch (LOWORD(wParam)) {
         case ChildId::TABS: {
-          LOG_DEBUG_MSG("current Tab selection index (without cast): "
-                        << tabs->GetTabSelection());
+          LOG_DEBUG_MSG(
+              "current Tab selection index (without cast): " << tabs->GetTabSelection());
 
-          TabIndex::Type curSel =
-              static_cast< TabIndex::Type >(tabs->GetTabSelection());
+          TabIndex::Type curSel = static_cast<TabIndex::Type>(tabs->GetTabSelection());
 
           LOG_DEBUG_MSG("current Tab selection index (with cast): " << curSel);
 
@@ -970,8 +933,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wParam, LPARAM lParam) {
   return true;
 }
 
-void DsnConfigurationWindow::RetrieveParameters(
-    config::Configuration& cfg) const {
+void DsnConfigurationWindow::RetrieveParameters(config::Configuration& cfg) const {
   // Intentioanlly retrieve log parameters first
   RetrieveLogParameters(cfg);
   RetrieveBasicParameters(cfg);
@@ -980,8 +942,7 @@ void DsnConfigurationWindow::RetrieveParameters(
   RetrieveConnectionParameters(cfg);
 }
 
-void DsnConfigurationWindow::RetrieveBasicParameters(
-    config::Configuration& cfg) const {
+void DsnConfigurationWindow::RetrieveBasicParameters(config::Configuration& cfg) const {
   std::wstring dsnWStr;
   std::wstring endpointWStr;
   std::wstring regionWStr;
@@ -1029,10 +990,8 @@ void DsnConfigurationWindow::RetrieveBasicAuthParameters(
   LOG_INFO_MSG("Retrieving arguments:");
   LOG_INFO_MSG("Session Token:                   " << sessionTokenStr);
   LOG_INFO_MSG("Profile Name: " << profileNameStr);
-  LOG_INFO_MSG("Access Key Id is "
-               << (accessKeyIdStr.empty() ? "empty" : "not empty"));
-  LOG_INFO_MSG("Secret key is  "
-               << (secretKeyStr.empty() ? "empty" : "not empty"));
+  LOG_INFO_MSG("Access Key Id is " << (accessKeyIdStr.empty() ? "empty" : "not empty"));
+  LOG_INFO_MSG("Secret key is  " << (secretKeyStr.empty() ? "empty" : "not empty"));
   // username and password intentionally not logged for security reasons
 }
 
@@ -1072,7 +1031,7 @@ void DsnConfigurationWindow::RetrieveAdvanceAuthParameters(
   std::string aadTenantStr = TRIM_UTF8(aadTenantWStr);
 
   AuthType::Type authType =
-      static_cast< AuthType::Type >(authTypeComboBox->GetCBSelection());
+      static_cast<AuthType::Type>(authTypeComboBox->GetCBSelection());
 
   cfg.SetAuthType(authType);
   cfg.SetRoleArn(roleArnStr);
@@ -1087,7 +1046,7 @@ void DsnConfigurationWindow::RetrieveAdvanceAuthParameters(
 
   LOG_INFO_MSG("Auth Type:    " << AuthType::ToString(authType));
   LOG_DEBUG_MSG("Auth Type string from combobox" << TRIM_UTF8(authTypeWStr));
-  LOG_DEBUG_MSG("AuthType::Type authType: " << static_cast< int >(authType));
+  LOG_DEBUG_MSG("AuthType::Type authType: " << static_cast<int>(authType));
   LOG_INFO_MSG("Role ARN:     " << roleArnStr);
   LOG_INFO_MSG("IdP User Name:     " << idPUserNameStr);
   LOG_INFO_MSG("IdP ARN:     " << idPArnStr);
@@ -1118,8 +1077,7 @@ void DsnConfigurationWindow::RetrieveConnectionParameters(
   int32_t connectionTimeout =
       connectionTimeoutStr.empty()
           ? 0
-          : timestream::odbc::common::LexicalCast< int32_t >(
-              connectionTimeoutStr);
+          : timestream::odbc::common::LexicalCast<int32_t>(connectionTimeoutStr);
   if (connectionTimeout < 0) {
     connectionTimeout = config::Configuration::DefaultValue::connectionTimeout;
   }
@@ -1127,7 +1085,7 @@ void DsnConfigurationWindow::RetrieveConnectionParameters(
   int32_t reqTimeout =
       reqTimeoutStr.empty()
           ? 0
-          : timestream::odbc::common::LexicalCast< int32_t >(reqTimeoutStr);
+          : timestream::odbc::common::LexicalCast<int32_t>(reqTimeoutStr);
   if (reqTimeout < 0) {
     reqTimeout = config::Configuration::DefaultValue::reqTimeout;
   }
@@ -1135,16 +1093,13 @@ void DsnConfigurationWindow::RetrieveConnectionParameters(
   int32_t maxRetryCountClient =
       maxRetryCountStr.empty()
           ? 0
-          : timestream::odbc::common::LexicalCast< int32_t >(maxRetryCountStr);
+          : timestream::odbc::common::LexicalCast<int32_t>(maxRetryCountStr);
   if (maxRetryCountClient < 0) {
-    maxRetryCountClient =
-        config::Configuration::DefaultValue::maxRetryCountClient;
+    maxRetryCountClient = config::Configuration::DefaultValue::maxRetryCountClient;
   }
 
   int32_t maxCon =
-      maxConStr.empty()
-          ? 0
-          : timestream::odbc::common::LexicalCast< int32_t >(maxConStr);
+      maxConStr.empty() ? 0 : timestream::odbc::common::LexicalCast<int32_t>(maxConStr);
 
   if (maxCon <= 0)
     throw IgniteError(
@@ -1166,8 +1121,7 @@ void DsnConfigurationWindow::RetrieveConnectionParameters(
 // path as soon as possible. If user set log level to OFF, then nothing should
 // be logged. Therefore, the LOG_MSG calls are after log level and log path are
 // set.
-void DsnConfigurationWindow::RetrieveLogParameters(
-    config::Configuration& cfg) const {
+void DsnConfigurationWindow::RetrieveLogParameters(config::Configuration& cfg) const {
   std::wstring logLevelWStr;
   std::wstring logPathWStr;
 
@@ -1178,14 +1132,14 @@ void DsnConfigurationWindow::RetrieveLogParameters(
   std::string logPathStr = TRIM_UTF8(logPathWStr);
 
   LogLevel::Type logLevel =
-      static_cast< LogLevel::Type >(logLevelComboBox->GetCBSelection());
+      static_cast<LogLevel::Type>(logLevelComboBox->GetCBSelection());
 
   cfg.SetLogLevel(logLevel);
   cfg.SetLogPath(logPathStr);
 
   LOG_INFO_MSG("Log level:    " << logLevelStr);
   LOG_DEBUG_MSG("LogLevel Type string from combobox" << logLevelStr);
-  LOG_DEBUG_MSG("LogLevel::Type logLevel: " << static_cast< int >(logLevel));
+  LOG_DEBUG_MSG("LogLevel::Type logLevel: " << static_cast<int>(logLevel));
   LOG_INFO_MSG("Log path:     " << logPathStr);
 }
 }  // namespace ui

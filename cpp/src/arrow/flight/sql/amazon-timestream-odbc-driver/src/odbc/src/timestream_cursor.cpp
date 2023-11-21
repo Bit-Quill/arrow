@@ -22,9 +22,8 @@
 
 namespace timestream {
 namespace odbc {
-TimestreamCursor::TimestreamCursor(
-    const Aws::Vector< Row > rowVec,
-    const meta::ColumnMetaVector& columnMetadataVec)
+TimestreamCursor::TimestreamCursor(const Aws::Vector<Row> rowVec,
+                                   const meta::ColumnMetaVector& columnMetadataVec)
     : rowVec_(rowVec),
       iterator_(rowVec_.begin()),
       columnMetadataVec_(columnMetadataVec),
@@ -47,9 +46,7 @@ bool TimestreamCursor::Increment() {
   return curPos_ <= rowVec_.size();
 }
 
-bool TimestreamCursor::HasData() const {
-  return curPos_ <= rowVec_.size();
-}
+bool TimestreamCursor::HasData() const { return curPos_ <= rowVec_.size(); }
 
 app::ConversionResult::Type TimestreamCursor::ReadColumnToBuffer(
     uint32_t columnIdx, app::ApplicationDataBuffer& dataBuf) {
@@ -60,7 +57,7 @@ app::ConversionResult::Type TimestreamCursor::ReadColumnToBuffer(
   }
 
   TimestreamColumn& column = GetColumn(columnIdx);
-  const Datum& datum = iterator_->GetData()[columnIdx-1];
+  const Datum& datum = iterator_->GetData()[columnIdx - 1];
   return column.ReadToBuffer(datum, dataBuf);
 }
 
@@ -71,8 +68,7 @@ bool TimestreamCursor::EnsureColumnDiscovered(uint32_t columnIdx) {
     return false;
   }
 
-  LOG_DEBUG_MSG("columns_ size is " << columns_.size()
-                                    << ", columnMetadataVec_ size is "
+  LOG_DEBUG_MSG("columns_ size is " << columns_.size() << ", columnMetadataVec_ size is "
                                     << columnMetadataVec_.size());
   if (columns_.size() == columnMetadataVec_.size()) {
     return true;

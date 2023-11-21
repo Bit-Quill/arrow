@@ -27,10 +27,8 @@
 namespace timestream {
 namespace odbc {
 namespace query {
-StatisticsQuery::StatisticsQuery(diagnostic::DiagnosableAdapter& diag,
-                                 int32_t odbcVer)
-    : Query(diag, timestream::odbc::query::QueryType::STATISTICS),
-      columnsMeta() {
+StatisticsQuery::StatisticsQuery(diagnostic::DiagnosableAdapter& diag, int32_t odbcVer)
+    : Query(diag, timestream::odbc::query::QueryType::STATISTICS), columnsMeta() {
   LOG_DEBUG_MSG("StatisticsQuery is called");
   using namespace timestream::odbc::type_traits;
 
@@ -55,32 +53,32 @@ StatisticsQuery::StatisticsQuery(diagnostic::DiagnosableAdapter& diag,
     sort_order_name = "COLLATION";
   }
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, catalog_meta_name,
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, schema_meta_name,
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", ScalarType::VARCHAR,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "NON_UNIQUE", ScalarType::INTEGER,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "INDEX_QUALIFIER",
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "INDEX_NAME", ScalarType::VARCHAR,
+  columnsMeta.push_back(ColumnMeta(sch, tbl, catalog_meta_name, ScalarType::VARCHAR,
                                    Nullability::NULLABLE));
   columnsMeta.push_back(
+      ColumnMeta(sch, tbl, schema_meta_name, ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "NON_UNIQUE", ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "INDEX_QUALIFIER", ScalarType::VARCHAR,
+                                   Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "INDEX_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
       ColumnMeta(sch, tbl, "TYPE", ScalarType::INTEGER, Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, ordinal_pos_name,
-                                   ScalarType::INTEGER, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_NAME", ScalarType::VARCHAR,
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, ordinal_pos_name, ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "COLUMN_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, sort_order_name, ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "CARDINALITY", ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "PAGES", ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "FILTER_CONDITION", ScalarType::VARCHAR,
                                    Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, sort_order_name,
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "CARDINALITY", ScalarType::INTEGER,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PAGES", ScalarType::INTEGER,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "FILTER_CONDITION",
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
 }
 
 StatisticsQuery::~StatisticsQuery() {
@@ -88,24 +86,18 @@ StatisticsQuery::~StatisticsQuery() {
 }
 
 SqlResult::Type StatisticsQuery::Execute() {
-  diag.AddStatusRecord(
-      SqlState::S01000_GENERAL_WARNING,
-      "SQLStatistics is not supported. Return empty result set.",
-      LogLevel::Type::WARNING_LEVEL);
+  diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
+                       "SQLStatistics is not supported. Return empty result set.",
+                       LogLevel::Type::WARNING_LEVEL);
 
   return SqlResult::AI_SUCCESS_WITH_INFO;
 }
 
-SqlResult::Type StatisticsQuery::Cancel() {
-  return SqlResult::AI_SUCCESS;
-}
+SqlResult::Type StatisticsQuery::Cancel() { return SqlResult::AI_SUCCESS; }
 
-const meta::ColumnMetaVector* StatisticsQuery::GetMeta() {
-  return &columnsMeta;
-}
+const meta::ColumnMetaVector* StatisticsQuery::GetMeta() { return &columnsMeta; }
 
-SqlResult::Type StatisticsQuery::FetchNextRow(
-    app::ColumnBindingMap& columnBindings) {
+SqlResult::Type StatisticsQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
   diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
                        "SQLStatistics is not supported. No data is returned.",
                        LogLevel::Type::WARNING_LEVEL);
@@ -122,20 +114,12 @@ SqlResult::Type StatisticsQuery::GetColumn(uint16_t columnIdx,
   return SqlResult::AI_NO_DATA;
 }
 
-SqlResult::Type StatisticsQuery::Close() {
-  return SqlResult::AI_SUCCESS;
-}
+SqlResult::Type StatisticsQuery::Close() { return SqlResult::AI_SUCCESS; }
 
-bool StatisticsQuery::DataAvailable() const {
-  return false;
-}
-int64_t StatisticsQuery::AffectedRows() const {
-  return 0;
-}
+bool StatisticsQuery::DataAvailable() const { return false; }
+int64_t StatisticsQuery::AffectedRows() const { return 0; }
 
-SqlResult::Type StatisticsQuery::NextResultSet() {
-  return SqlResult::AI_NO_DATA;
-}
+SqlResult::Type StatisticsQuery::NextResultSet() { return SqlResult::AI_NO_DATA; }
 }  // namespace query
 }  // namespace odbc
 }  // namespace timestream

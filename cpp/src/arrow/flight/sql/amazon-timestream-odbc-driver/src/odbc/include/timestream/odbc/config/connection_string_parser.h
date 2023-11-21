@@ -156,8 +156,7 @@ class IGNITE_IMPORT_EXPORT ConnectionStringParser {
    * @param str String to parse.
    * @param diag Diagnostics collector.
    */
-  void ParseConfigAttributes(const char* str,
-                             diagnostic::DiagnosticRecordStorage* diag);
+  void ParseConfigAttributes(const char* str, diagnostic::DiagnosticRecordStorage* diag);
 
  private:
   /**
@@ -193,8 +192,7 @@ class IGNITE_IMPORT_EXPORT ConnectionStringParser {
    * @param value Value.
    * @return Resulting error message.
    */
-  static std::string MakeErrorMessage(const std::string& msg,
-                                      const std::string& key,
+  static std::string MakeErrorMessage(const std::string& msg, const std::string& key,
                                       const std::string& value);
 
   /** Configuration. */

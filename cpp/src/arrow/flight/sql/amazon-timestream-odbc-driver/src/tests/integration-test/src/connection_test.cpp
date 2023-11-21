@@ -26,19 +26,19 @@
 #include <sql.h>
 #include <sqlext.h>
 
-#include <boost/test/unit_test.hpp>
 #include <boost/test/data/monomorphic.hpp>
+#include <boost/test/unit_test.hpp>
 #include <string>
 #include <thread>
 
+#include <ignite/common/include/common/platform_utils.h>
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 #include "timestream/odbc/utility.h"
-#include <ignite/common/include/common/platform_utils.h>
 
-#include <boost/thread.hpp>
-#include <boost/chrono.hpp>
 #include <boost/bind.hpp>
+#include <boost/chrono.hpp>
+#include <boost/thread.hpp>
 
 using boost::unit_test::precondition;
 using timestream::odbc::AuthType;
@@ -96,8 +96,7 @@ BOOST_AUTO_TEST_CASE(TestDriverConnection) {
 
 BOOST_AUTO_TEST_CASE(TestDriverConnectionWithEndpoint) {
   std::string connectionString;
-  std::string misc(
-      "EndpointOverride=query.timestream.us-west-2.amazonaws.com;");
+  std::string misc("EndpointOverride=query.timestream.us-west-2.amazonaws.com;");
 
   CreateDsnConnectionStringForAWS(connectionString, "", "", misc);
 
@@ -126,9 +125,8 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingDupCredString) {
   std::string secretKey;
   GetIAMCredentials(accessKeyId, secretKey);
 
-  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM,
-                                   accessKeyId, secretKey, true, accessKeyId,
-                                   secretKey);
+  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, accessKeyId,
+                                   secretKey, true, accessKeyId, secretKey);
 
   std::string username;
   std::string password;
@@ -149,17 +147,15 @@ BOOST_AUTO_TEST_CASE(TestDriverConnectionUsingDupCredString) {
   std::string secretKey;
   GetIAMCredentials(accessKeyId, secretKey);
 
-  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM,
-                                   accessKeyId, secretKey, true, accessKeyId,
-                                   secretKey);
+  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, accessKeyId,
+                                   secretKey, true, accessKeyId, secretKey);
 
   Connect(connectionString);
 
   Disconnect();
 }
 
-BOOST_AUTO_TEST_CASE(
-    TestDriverConnectionUsingDupCredStringWithWrongIAMCredentials) {
+BOOST_AUTO_TEST_CASE(TestDriverConnectionUsingDupCredStringWithWrongIAMCredentials) {
   // Test passing uid/pwd with correct credentials and accessKeyId/secretKey
   // with wrong credentials in the connection string. Since uid/pwd take
   // precendence in making a connection, the connection should succeed
@@ -171,8 +167,8 @@ BOOST_AUTO_TEST_CASE(
   std::string pwd;
   GetIAMCredentials(uid, pwd);
 
-  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid,
-                                   pwd, true, accessKeyId, secretKey);
+  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid, pwd, true,
+                                   accessKeyId, secretKey);
 
   Connect(connectionString);
 
@@ -192,8 +188,8 @@ BOOST_AUTO_TEST_CASE(TestDriverConnectionUsingDupCredStringWithEmptyUidPwd) {
   std::string secretKey;
   GetIAMCredentials(accessKeyId, secretKey);
 
-  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid,
-                                   pwd, true, accessKeyId, secretKey);
+  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid, pwd, true,
+                                   accessKeyId, secretKey);
 
   Connect(connectionString);
 
@@ -212,8 +208,8 @@ BOOST_AUTO_TEST_CASE(TestDriverConnectionUsingDupCredStringWithWrongUidPwd) {
   std::string secretKey;
   GetIAMCredentials(accessKeyId, secretKey);
 
-  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid,
-                                   pwd, true, accessKeyId, secretKey);
+  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid, pwd, true,
+                                   accessKeyId, secretKey);
 
   ExpectConnectionReject(
       connectionString, "08001",
@@ -236,8 +232,8 @@ BOOST_AUTO_TEST_CASE(TestDriverConnectionUsingDupCredStringWithWrongUid) {
   std::string secretKey;
   GetIAMCredentials(accessKeyId, secretKey);
 
-  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid,
-                                   pwd, true, accessKeyId, secretKey);
+  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid, pwd, true,
+                                   accessKeyId, secretKey);
 
   ExpectConnectionReject(
       connectionString, "08001",
@@ -260,8 +256,8 @@ BOOST_AUTO_TEST_CASE(TestDriverConnectionUsingDupCredStringWithWrongPwd) {
   std::string secretKey;
   GetIAMCredentials(accessKeyId, secretKey);
 
-  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid,
-                                   pwd, true, accessKeyId, secretKey);
+  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid, pwd, true,
+                                   accessKeyId, secretKey);
 
   ExpectConnectionReject(
       connectionString, "08001",
@@ -309,21 +305,41 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionGenericConnectionStringUsingAAD) {
     std::string region = GetEnv("AWS_REGION", "us-west-2");
 
     connectionString =
-      "driver={Amazon Timestream ODBC Driver};"
-      "dsn={" + dsn + "};"
-      "auth=" + AuthType::ToString(AuthType::Type::AAD) + ";"
-      "region=" + region + ";"
-      "logOutput=" + logPath + ";"
-      "logLevel=" + logLevel + ";";
+        "driver={Amazon Timestream ODBC Driver};"
+        "dsn={" +
+        dsn +
+        "};"
+        "auth=" +
+        AuthType::ToString(AuthType::Type::AAD) +
+        ";"
+        "region=" +
+        region +
+        ";"
+        "logOutput=" +
+        logPath +
+        ";"
+        "logLevel=" +
+        logLevel + ";";
 
-    std::string tsAuthentication = 
-      "uid=" + uid + ";"
-      "pwd=" + pwd + ";"
-      "aadApplicationID=" + appId + ";"
-      "aadClientSecret=" + clientSecret + ";"
-      "aadTenant=" + tenantId + ";"
-      "roleARN=" + roleArn + ";"
-      "idPARN=" + idpArn + ";";
+    std::string tsAuthentication = "uid=" + uid +
+                                   ";"
+                                   "pwd=" +
+                                   pwd +
+                                   ";"
+                                   "aadApplicationID=" +
+                                   appId +
+                                   ";"
+                                   "aadClientSecret=" +
+                                   clientSecret +
+                                   ";"
+                                   "aadTenant=" +
+                                   tenantId +
+                                   ";"
+                                   "roleARN=" +
+                                   roleArn +
+                                   ";"
+                                   "idPARN=" +
+                                   idpArn + ";";
 
     connectionString.append(tsAuthentication);
 
@@ -343,10 +359,9 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADInvalidUser) {
 
     CreateAADDsnConnectionString(connectionString, "invalid-user");
 
-    ExpectConnectionReject(
-        connectionString, "08001",
-        "Failed to establish connection to Timestream.\n"
-        "Request to Azure Active Directory for access token failed.");
+    ExpectConnectionReject(connectionString, "08001",
+                           "Failed to establish connection to Timestream.\n"
+                           "Request to Azure Active Directory for access token failed.");
 
     Disconnect();
   } else {
@@ -362,12 +377,11 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADEmptyUser) {
 
     CreateAADDsnConnectionString(connectionString, "");
 
-    ExpectConnectionReject(
-        connectionString, "01S00",
-        "The following is required to connect:\n"
-        "AUTH is \"AAD\" and "
-        "UID or IdpUserName, PWD or IdpPassword, and "
-        "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
+    ExpectConnectionReject(connectionString, "01S00",
+                           "The following is required to connect:\n"
+                           "AUTH is \"AAD\" and "
+                           "UID or IdpUserName, PWD or IdpPassword, and "
+                           "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
 
     Disconnect();
   } else {
@@ -383,10 +397,9 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADInvalidPassword) {
 
     CreateAADDsnConnectionString(connectionString, nullptr, "invalid-password");
 
-    ExpectConnectionReject(
-        connectionString, "08001",
-        "Failed to establish connection to Timestream.\n"
-        "Request to Azure Active Directory for access token failed.");
+    ExpectConnectionReject(connectionString, "08001",
+                           "Failed to establish connection to Timestream.\n"
+                           "Request to Azure Active Directory for access token failed.");
 
     Disconnect();
   } else {
@@ -402,12 +415,11 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADEmptyPassword) {
 
     CreateAADDsnConnectionString(connectionString, nullptr, "");
 
-    ExpectConnectionReject(
-        connectionString, "01S00",
-        "The following is required to connect:\n"
-        "AUTH is \"AAD\" and "
-        "UID or IdpUserName, PWD or IdpPassword, and "
-        "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
+    ExpectConnectionReject(connectionString, "01S00",
+                           "The following is required to connect:\n"
+                           "AUTH is \"AAD\" and "
+                           "UID or IdpUserName, PWD or IdpPassword, and "
+                           "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
 
     Disconnect();
   } else {
@@ -424,10 +436,9 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADInvalidAPPId) {
     CreateAADDsnConnectionString(connectionString, nullptr, nullptr,
                                  "invalid-application-id");
 
-    ExpectConnectionReject(
-        connectionString, "08001",
-        "Failed to establish connection to Timestream.\n"
-        "Request to Azure Active Directory for access token failed.");
+    ExpectConnectionReject(connectionString, "08001",
+                           "Failed to establish connection to Timestream.\n"
+                           "Request to Azure Active Directory for access token failed.");
 
     Disconnect();
   } else {
@@ -443,12 +454,11 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADEmptyAppId) {
 
     CreateAADDsnConnectionString(connectionString, nullptr, nullptr, "");
 
-    ExpectConnectionReject(
-        connectionString, "01S00",
-        "The following is required to connect:\n"
-        "AUTH is \"AAD\" and "
-        "UID or IdpUserName, PWD or IdpPassword, and "
-        "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
+    ExpectConnectionReject(connectionString, "01S00",
+                           "The following is required to connect:\n"
+                           "AUTH is \"AAD\" and "
+                           "UID or IdpUserName, PWD or IdpPassword, and "
+                           "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
 
     Disconnect();
   } else {
@@ -465,10 +475,9 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADInvalidTenant) {
     CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
                                  "invalid_tenant_id");
 
-    ExpectConnectionReject(
-        connectionString, "08001",
-        "Failed to establish connection to Timestream.\n"
-        "Request to Azure Active Directory for access token failed.");
+    ExpectConnectionReject(connectionString, "08001",
+                           "Failed to establish connection to Timestream.\n"
+                           "Request to Azure Active Directory for access token failed.");
 
     Disconnect();
   } else {
@@ -482,15 +491,13 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADEmptyTenant) {
     // Test AAD authentication given empty tenant id
     std::string connectionString;
 
-    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                 "");
+    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr, "");
 
-    ExpectConnectionReject(
-        connectionString, "01S00",
-        "The following is required to connect:\n"
-        "AUTH is \"AAD\" and "
-        "UID or IdpUserName, PWD or IdpPassword, and "
-        "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
+    ExpectConnectionReject(connectionString, "01S00",
+                           "The following is required to connect:\n"
+                           "AUTH is \"AAD\" and "
+                           "UID or IdpUserName, PWD or IdpPassword, and "
+                           "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
 
     Disconnect();
   } else {
@@ -504,13 +511,12 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADInvalidClientSecret) {
     // Test AAD authentication given invalid client secret
     std::string connectionString;
 
-    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                 nullptr, "invalid-client-secret");
+    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr, nullptr,
+                                 "invalid-client-secret");
 
-    ExpectConnectionReject(
-        connectionString, "08001",
-        "Failed to establish connection to Timestream.\n"
-        "Request to Azure Active Directory for access token failed.");
+    ExpectConnectionReject(connectionString, "08001",
+                           "Failed to establish connection to Timestream.\n"
+                           "Request to Azure Active Directory for access token failed.");
 
     Disconnect();
   } else {
@@ -524,15 +530,14 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADEmptyClientSecret) {
     // Test AAD authentication given empty client secret
     std::string connectionString;
 
-    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                 nullptr, "");
+    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr, nullptr,
+                                 "");
 
-    ExpectConnectionReject(
-        connectionString, "01S00",
-        "The following is required to connect:\n"
-        "AUTH is \"AAD\" and "
-        "UID or IdpUserName, PWD or IdpPassword, and "
-        "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
+    ExpectConnectionReject(connectionString, "01S00",
+                           "The following is required to connect:\n"
+                           "AUTH is \"AAD\" and "
+                           "UID or IdpUserName, PWD or IdpPassword, and "
+                           "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
 
     Disconnect();
   } else {
@@ -546,8 +551,8 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADInvalidRoleArn) {
     // Test AAD authentication given invalid role arn
     std::string connectionString;
 
-    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                 nullptr, nullptr, "invalid-role-arn");
+    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr, nullptr,
+                                 nullptr, "invalid-role-arn");
 
     ExpectConnectionReject(
         connectionString, "08001",
@@ -569,15 +574,14 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADEmptyRoleArn) {
     // Test AAD authentication given empty role arn
     std::string connectionString;
 
-    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                 nullptr, nullptr, "");
+    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr, nullptr,
+                                 nullptr, "");
 
-    ExpectConnectionReject(
-        connectionString, "01S00",
-        "The following is required to connect:\n"
-        "AUTH is \"AAD\" and "
-        "UID or IdpUserName, PWD or IdpPassword, and "
-        "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
+    ExpectConnectionReject(connectionString, "01S00",
+                           "The following is required to connect:\n"
+                           "AUTH is \"AAD\" and "
+                           "UID or IdpUserName, PWD or IdpPassword, and "
+                           "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
 
     Disconnect();
   } else {
@@ -591,8 +595,8 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADInvalidIdpArn) {
     // Test AAD authentication given invalid idp arn
     std::string connectionString;
 
-    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                 nullptr, nullptr, nullptr, "invalid-idp-arn");
+    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr, nullptr,
+                                 nullptr, nullptr, "invalid-idp-arn");
 
     ExpectConnectionReject(
         connectionString, "08001",
@@ -614,15 +618,14 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingAADEmptyIdpArn) {
     // Test AAD authentication given empty idp arn
     std::string connectionString;
 
-    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                 nullptr, nullptr, nullptr, "");
+    CreateAADDsnConnectionString(connectionString, nullptr, nullptr, nullptr, nullptr,
+                                 nullptr, nullptr, "");
 
-    ExpectConnectionReject(
-        connectionString, "01S00",
-        "The following is required to connect:\n"
-        "AUTH is \"AAD\" and "
-        "UID or IdpUserName, PWD or IdpPassword, and "
-        "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
+    ExpectConnectionReject(connectionString, "01S00",
+                           "The following is required to connect:\n"
+                           "AUTH is \"AAD\" and "
+                           "UID or IdpUserName, PWD or IdpPassword, and "
+                           "AADAppId, RoleArn, IdpArn, AADTenant and AADClientSecret");
 
     Disconnect();
   } else {
@@ -652,21 +655,37 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingOktaUidPwd) {
     // Test Okta authentication given all correct configuration parameters
     // which are from environment variables by default.
     // Using Uid/Pwd instead of idPUsername/idPPassword
-    std::string  connectionString =
-      "driver={Amazon Timestream ODBC Driver};"
-      "dsn={" + Configuration::DefaultValue::dsn + "};"
-      "auth=" + AuthType::ToString(AuthType::Type::OKTA) + ";"
-      "region=" + GetEnv("AWS_REGION", "us-west-2") + ";"
-      "logOutput=" + GetEnv("TIMESTREAM_LOG_PATH", "") + ";"
-      "logLevel=" + GetEnv("TIMESTREAM_LOG_LEVEL", "2") + ";";
+    std::string connectionString =
+        "driver={Amazon Timestream ODBC Driver};"
+        "dsn={" +
+        Configuration::DefaultValue::dsn +
+        "};"
+        "auth=" +
+        AuthType::ToString(AuthType::Type::OKTA) +
+        ";"
+        "region=" +
+        GetEnv("AWS_REGION", "us-west-2") +
+        ";"
+        "logOutput=" +
+        GetEnv("TIMESTREAM_LOG_PATH", "") +
+        ";"
+        "logLevel=" +
+        GetEnv("TIMESTREAM_LOG_LEVEL", "2") + ";";
 
-    std::string tsAuthentication = 
-      "idPHost=" + GetEnv("OKTA_HOST") + ";" +
-      "Uid=" + GetEnv("OKTA_USER") + ";"
-      "Pwd=" + GetEnv("OKTA_USER_PWD") + ";"
-      "OktaApplicationID=" +  GetEnv("OKTA_APP_ID") + ";"
-      "roleARN=" +  GetEnv("OKTA_ROLE_ARN") + ";"
-      "idPARN=" + GetEnv("OKTA_IDP_ARN") + ";";
+    std::string tsAuthentication = "idPHost=" + GetEnv("OKTA_HOST") + ";" +
+                                   "Uid=" + GetEnv("OKTA_USER") +
+                                   ";"
+                                   "Pwd=" +
+                                   GetEnv("OKTA_USER_PWD") +
+                                   ";"
+                                   "OktaApplicationID=" +
+                                   GetEnv("OKTA_APP_ID") +
+                                   ";"
+                                   "roleARN=" +
+                                   GetEnv("OKTA_ROLE_ARN") +
+                                   ";"
+                                   "idPARN=" +
+                                   GetEnv("OKTA_IDP_ARN") + ";";
 
     connectionString.append(tsAuthentication);
     Connect(connectionString);
@@ -763,8 +782,7 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingOktaInvalidPasswd) {
   if (CheckEnvVarSetToTrue("ENABLE_OKTA_TEST")) {
     // Test Okta authentication with invalid password
     std::string connectionString;
-    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr,
-                                  "invalid_password");
+    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, "invalid_password");
 
     ExpectConnectionReject(connectionString, "08001",
                            "Failed to establish connection to Timestream.\n"
@@ -818,8 +836,7 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingOktaEmptyAppId) {
   if (CheckEnvVarSetToTrue("ENABLE_OKTA_TEST")) {
     // Test Okta authentication with empty application id
     std::string connectionString;
-    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                  "");
+    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, nullptr, "");
 
     ExpectConnectionReject(connectionString, "01S00",
                            "The following is required to connect:\n"
@@ -838,8 +855,8 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingOktaInvalidRoleArn) {
   if (CheckEnvVarSetToTrue("ENABLE_OKTA_TEST")) {
     // Test Okta authentication with invalid role arn
     std::string connectionString;
-    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                  nullptr, "invalid_role_arn");
+    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, nullptr, nullptr,
+                                  "invalid_role_arn");
 
     ExpectConnectionReject(
         connectionString, "08001",
@@ -860,8 +877,8 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingOktaEmptyRoleArn) {
   if (CheckEnvVarSetToTrue("ENABLE_OKTA_TEST")) {
     // Test Okta authentication with empty role arn
     std::string connectionString;
-    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                  nullptr, "");
+    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, nullptr, nullptr,
+                                  "");
 
     ExpectConnectionReject(connectionString, "01S00",
                            "The following is required to connect:\n"
@@ -880,8 +897,8 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingOktaInvalidIdpArn) {
   if (CheckEnvVarSetToTrue("ENABLE_OKTA_TEST")) {
     // Test Okta authentication with invalid IDP arn
     std::string connectionString;
-    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                  nullptr, nullptr, "invalid_idp_arn");
+    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, nullptr, nullptr,
+                                  nullptr, "invalid_idp_arn");
 
     ExpectConnectionReject(
         connectionString, "08001",
@@ -903,8 +920,8 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingOktaEmptyIdpArn) {
   if (CheckEnvVarSetToTrue("ENABLE_OKTA_TEST")) {
     // Test Okta authentication with empty IDP arn
     std::string connectionString;
-    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, nullptr,
-                                  nullptr, nullptr, "");
+    CreateOktaDsnConnectionString(connectionString, nullptr, nullptr, nullptr, nullptr,
+                                  nullptr, "");
 
     ExpectConnectionReject(connectionString, "01S00",
                            "The following is required to connect:\n"
@@ -927,8 +944,7 @@ BOOST_AUTO_TEST_CASE(TestSQLConnectionUsingGenericIAMString) {
   std::string pwd;
   GetIAMCredentials(uid, pwd);
 
-  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid,
-                                   pwd);
+  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid, pwd);
 
   std::string username;
   std::string password;
@@ -947,8 +963,7 @@ BOOST_AUTO_TEST_CASE(TestDriverConnectionUsingGenericIAMString) {
   std::string pwd;
   GetIAMCredentials(uid, pwd);
 
-  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid,
-                                   pwd);
+  CreateGenericDsnConnectionString(connectionString, AuthType::Type::IAM, uid, pwd);
 
   Connect(connectionString);
 
@@ -965,15 +980,30 @@ BOOST_AUTO_TEST_CASE(TestDriverConnectionWithUIDSecretKey) {
   std::string logLevel = GetEnv("TIMESTREAM_LOG_LEVEL", "2");
 
   connectionString =
-            "driver={Amazon Timestream ODBC Driver};"
-            "dsn={" + Configuration::DefaultValue::dsn + "};"
-            "auth=" + AuthType::ToString(AuthType::Type::IAM) + ";"
-            "secretKey=" + secretKey + ";"
-            "uid=" + accessKeyId + ";"
-            "sessionToken=" + sessionToken + ";"
-            "region=" + region + ";"
-            "logOutput=" + logPath + ";"
-            "logLevel=" + logLevel + ";";
+      "driver={Amazon Timestream ODBC Driver};"
+      "dsn={" +
+      Configuration::DefaultValue::dsn +
+      "};"
+      "auth=" +
+      AuthType::ToString(AuthType::Type::IAM) +
+      ";"
+      "secretKey=" +
+      secretKey +
+      ";"
+      "uid=" +
+      accessKeyId +
+      ";"
+      "sessionToken=" +
+      sessionToken +
+      ";"
+      "region=" +
+      region +
+      ";"
+      "logOutput=" +
+      logPath +
+      ";"
+      "logLevel=" +
+      logLevel + ";";
 
   Connect(connectionString);
 
@@ -990,15 +1020,30 @@ BOOST_AUTO_TEST_CASE(TestDriverConnectionWithAccessKeyIdPWD) {
   std::string logLevel = GetEnv("TIMESTREAM_LOG_LEVEL", "2");
 
   connectionString =
-            "driver={Amazon Timestream ODBC Driver};"
-            "dsn={" + Configuration::DefaultValue::dsn + "};"
-            "auth=" + AuthType::ToString(AuthType::Type::IAM) + ";"
-            "pwd=" + secretKey + ";"
-            "accessKeyId=" + accessKeyId + ";"
-            "sessionToken=" + sessionToken + ";"
-            "region=" + region + ";"
-            "logOutput=" + logPath + ";"
-            "logLevel=" + logLevel + ";";
+      "driver={Amazon Timestream ODBC Driver};"
+      "dsn={" +
+      Configuration::DefaultValue::dsn +
+      "};"
+      "auth=" +
+      AuthType::ToString(AuthType::Type::IAM) +
+      ";"
+      "pwd=" +
+      secretKey +
+      ";"
+      "accessKeyId=" +
+      accessKeyId +
+      ";"
+      "sessionToken=" +
+      sessionToken +
+      ";"
+      "region=" +
+      region +
+      ";"
+      "logOutput=" +
+      logPath +
+      ";"
+      "logLevel=" +
+      logLevel + ";";
 
   Connect(connectionString);
 
@@ -1009,8 +1054,8 @@ BOOST_AUTO_TEST_CASE(TestConnectionUsingProfile) {
   if (CheckEnvVarSetToTrue("ENABLE_PROFILE_TEST")) {
     const std::string profile = "test-profile";
     std::string connectionString;
-    CreateDsnConnectionStringForAWS(connectionString,
-                                    AuthType::Type::AWS_PROFILE, profile);
+    CreateDsnConnectionStringForAWS(connectionString, AuthType::Type::AWS_PROFILE,
+                                    profile);
     Connect(connectionString);
     Disconnect();
   } else {
@@ -1024,8 +1069,8 @@ BOOST_AUTO_TEST_CASE(TestConnectionUsingIncompleteProfile) {
     const std::string profile = "incomplete-profile";
 
     std::string connectionString;
-    CreateDsnConnectionStringForAWS(connectionString,
-                                    AuthType::Type::AWS_PROFILE, profile);
+    CreateDsnConnectionStringForAWS(connectionString, AuthType::Type::AWS_PROFILE,
+                                    profile);
 
     ExpectConnectionReject(
         connectionString, "08001",
@@ -1042,8 +1087,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionUsingIncompleteProfile) {
 BOOST_AUTO_TEST_CASE(TestConnectionUsingNonExistProfile) {
   const std::string profile = "nonexist-profile";
   std::string connectionString;
-  CreateDsnConnectionStringForAWS(connectionString, AuthType::Type::AWS_PROFILE,
-                                  profile);
+  CreateDsnConnectionStringForAWS(connectionString, AuthType::Type::AWS_PROFILE, profile);
 
   ExpectConnectionReject(connectionString, "08001",
                          "Failed to establish connection to Timestream.\n"
@@ -1055,8 +1099,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionUsingNonExistProfile) {
 BOOST_AUTO_TEST_CASE(TestConnectionUsingEmptyProfile) {
   const std::string profile = "";
   std::string connectionString;
-  CreateDsnConnectionStringForAWS(connectionString, AuthType::Type::AWS_PROFILE,
-                                  profile);
+  CreateDsnConnectionStringForAWS(connectionString, AuthType::Type::AWS_PROFILE, profile);
 
   ExpectConnectionReject(connectionString, "08001",
                          "Failed to establish connection to Timestream.\n"
@@ -1068,15 +1111,13 @@ BOOST_AUTO_TEST_CASE(TestConnectionConcurrency) {
   ConnectionTestSuiteFixture testConn[10];
   bool result[10] = {false};
 
-  std::vector< std::thread > threads;
+  std::vector<std::thread> threads;
 
   for (int i = 0; i < 10; ++i)
-    threads.push_back(
-        std::thread(&ConnectionTestSuiteFixture::connectForMultiThread,
-                    testConn[i], std::ref(result[i])));
+    threads.push_back(std::thread(&ConnectionTestSuiteFixture::connectForMultiThread,
+                                  testConn[i], std::ref(result[i])));
 
-  for (auto& th : threads)
-    th.join();
+  for (auto& th : threads) th.join();
 
   // verify the thread execution result
   // boost macro could be used as multi-thread execution is finished
@@ -1091,9 +1132,7 @@ BOOST_AUTO_TEST_CASE(TestConnectionOnlyConnect) {
   Connect(connectionString);
 }
 
-BOOST_AUTO_TEST_CASE(TestConnectionOnlyDisconnect) {
-  Disconnect();
-}
+BOOST_AUTO_TEST_CASE(TestConnectionOnlyDisconnect) { Disconnect(); }
 
 BOOST_AUTO_TEST_CASE(TestSQLConnectionIncompleteBasicProperties) {
   const std::string dsn = "IncompleteBasicProperties";

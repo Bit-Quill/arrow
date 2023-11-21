@@ -39,9 +39,7 @@ class MockEnvironment : public Environment {
   /**
    * Get the number of connections created.
    */
-  size_t ConnectionsNum() {
-    return connections.size();
-  }
+  size_t ConnectionsNum() { return connections.size(); }
 
  private:
   /**

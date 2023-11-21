@@ -23,8 +23,8 @@
 #include <algorithm>
 #include <cstring>
 
-#include "timestream/odbc/system/odbc_constants.h"
 #include "timestream/odbc/log.h"
+#include "timestream/odbc/system/odbc_constants.h"
 #include "timestream/odbc/utility.h"
 
 // Temporary workaround.
@@ -1058,9 +1058,8 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // This InfoType has been renamed for ODBC 3.0 from the ODBC 2.0 InfoType
   // SQL_OWNER_USAGE.
   if (DATABASE_AS_SCHEMA) {
-    intParams[SQL_SCHEMA_USAGE] =
-        SQL_SU_DML_STATEMENTS | SQL_SU_TABLE_DEFINITION
-        | SQL_SU_PRIVILEGE_DEFINITION | SQL_SU_INDEX_DEFINITION;
+    intParams[SQL_SCHEMA_USAGE] = SQL_SU_DML_STATEMENTS | SQL_SU_TABLE_DEFINITION |
+                                  SQL_SU_PRIVILEGE_DEFINITION | SQL_SU_INDEX_DEFINITION;
   } else
     intParams[SQL_SCHEMA_USAGE] = 0;  // I.e., not supported
 #endif                                // SQL_SCHEMA_USAGE
@@ -1074,45 +1073,45 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Bitmask enumerating the scalar numeric functions supported by the driver
   // and associated data source.
   intParams[SQL_NUMERIC_FUNCTIONS] =
-      SQL_FN_NUM_ABS | SQL_FN_NUM_ATAN | SQL_FN_NUM_ATAN2 | SQL_FN_NUM_COS
-      | SQL_FN_NUM_COT | SQL_FN_NUM_DEGREES | SQL_FN_NUM_FLOOR | SQL_FN_NUM_LOG
-      | SQL_FN_NUM_LOG10 | SQL_FN_NUM_PI | SQL_FN_NUM_POWER | SQL_FN_NUM_RADIANS
-      | SQL_FN_NUM_ROUND | SQL_FN_NUM_SIGN | SQL_FN_NUM_SIN | SQL_FN_NUM_SQRT
-      | SQL_FN_NUM_TAN;
+      SQL_FN_NUM_ABS | SQL_FN_NUM_ATAN | SQL_FN_NUM_ATAN2 | SQL_FN_NUM_COS |
+      SQL_FN_NUM_COT | SQL_FN_NUM_DEGREES | SQL_FN_NUM_FLOOR | SQL_FN_NUM_LOG |
+      SQL_FN_NUM_LOG10 | SQL_FN_NUM_PI | SQL_FN_NUM_POWER | SQL_FN_NUM_RADIANS |
+      SQL_FN_NUM_ROUND | SQL_FN_NUM_SIGN | SQL_FN_NUM_SIN | SQL_FN_NUM_SQRT |
+      SQL_FN_NUM_TAN;
 #endif  // SQL_NUMERIC_FUNCTIONS
 
 #ifdef SQL_STRING_FUNCTIONS
   // Bitmask enumerating the scalar string functions supported by the driver and
   // associated data source.
-  intParams[SQL_STRING_FUNCTIONS] = SQL_FN_STR_ASCII | SQL_FN_STR_LENGTH
-                                    | SQL_FN_STR_LTRIM | SQL_FN_STR_REPLACE
-                                    | SQL_FN_STR_RTRIM | SQL_FN_STR_SUBSTRING;
+  intParams[SQL_STRING_FUNCTIONS] = SQL_FN_STR_ASCII | SQL_FN_STR_LENGTH |
+                                    SQL_FN_STR_LTRIM | SQL_FN_STR_REPLACE |
+                                    SQL_FN_STR_RTRIM | SQL_FN_STR_SUBSTRING;
 #endif  // SQL_STRING_FUNCTIONS
 
 #ifdef SQL_TIMEDATE_FUNCTIONS
   // Bitmask enumerating the scalar date and time functions supported by the
   // driver and associated data source.
-  intParams[SQL_TIMEDATE_FUNCTIONS] = SQL_FN_TD_CURDATE | SQL_FN_TD_DAYOFMONTH
-                                      | SQL_FN_TD_MONTH | SQL_FN_TD_MONTHNAME
-                                      | SQL_FN_TD_NOW | SQL_FN_TD_YEAR;
+  intParams[SQL_TIMEDATE_FUNCTIONS] = SQL_FN_TD_CURDATE | SQL_FN_TD_DAYOFMONTH |
+                                      SQL_FN_TD_MONTH | SQL_FN_TD_MONTHNAME |
+                                      SQL_FN_TD_NOW | SQL_FN_TD_YEAR;
 #endif  // SQL_TIMEDATE_FUNCTIONS
 
 #ifdef SQL_TIMEDATE_ADD_INTERVALS
   // Bitmask enumerating timestamp intervals supported by the driver and
   // associated data source for the TIMESTAMPADD scalar function.
   intParams[SQL_TIMEDATE_ADD_INTERVALS] =
-      SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE
-      | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH
-      | SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR;
+      SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE | SQL_FN_TSI_HOUR |
+      SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH | SQL_FN_TSI_QUARTER |
+      SQL_FN_TSI_YEAR;
 #endif  // SQL_TIMEDATE_ADD_INTERVALS
 
 #ifdef SQL_TIMEDATE_DIFF_INTERVALS
   // Bitmask enumerating timestamp intervals supported by the driver and
   // associated data source for the TIMESTAMPDIFF scalar function.
   intParams[SQL_TIMEDATE_DIFF_INTERVALS] =
-      SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE
-      | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH
-      | SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR;
+      SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE | SQL_FN_TSI_HOUR |
+      SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH | SQL_FN_TSI_QUARTER |
+      SQL_FN_TSI_YEAR;
 #endif  // SQL_TIMEDATE_DIFF_INTERVALS
 
 #ifdef SQL_DATETIME_LITERALS
@@ -1136,9 +1135,8 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_OJ_CAPABILITIES
   // Bitmask enumerating the types of outer joins supported by the driver and
   // data source.
-  intParams[SQL_OJ_CAPABILITIES] = SQL_OJ_LEFT | SQL_OJ_RIGHT
-                                   | SQL_OJ_NOT_ORDERED
-                                   | SQL_OJ_ALL_COMPARISON_OPS;
+  intParams[SQL_OJ_CAPABILITIES] =
+      SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_NOT_ORDERED | SQL_OJ_ALL_COMPARISON_OPS;
 #endif  // SQL_OJ_CAPABILITIES
 
 #ifdef SQL_POS_OPERATIONS
@@ -1163,14 +1161,14 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_SNVF_OCTET_LENGTH
   // SQL_SNVF_POSITION
   intParams[SQL_SQL92_NUMERIC_VALUE_FUNCTIONS] = 0;  // i.e., not supported
-#endif  // SQL_SQL92_NUMERIC_VALUE_FUNCTIONS
+#endif                                               // SQL_SQL92_NUMERIC_VALUE_FUNCTIONS
 
 #ifdef SQL_SQL92_STRING_FUNCTIONS
   // Bitmask enumerating the string scalar functions.
-  intParams[SQL_SQL92_STRING_FUNCTIONS] =
-      SQL_SSF_CONVERT | SQL_SSF_LOWER | SQL_SSF_UPPER | SQL_SSF_SUBSTRING
-      | SQL_SSF_TRANSLATE | SQL_SSF_TRIM_BOTH | SQL_SSF_TRIM_LEADING
-      | SQL_SSF_TRIM_TRAILING;
+  intParams[SQL_SQL92_STRING_FUNCTIONS] = SQL_SSF_CONVERT | SQL_SSF_LOWER |
+                                          SQL_SSF_UPPER | SQL_SSF_SUBSTRING |
+                                          SQL_SSF_TRANSLATE | SQL_SSF_TRIM_BOTH |
+                                          SQL_SSF_TRIM_LEADING | SQL_SSF_TRIM_TRAILING;
 #endif  // SQL_SQL92_STRING_FUNCTIONS
 
 #ifdef SQL_SQL92_DATETIME_FUNCTIONS
@@ -1186,16 +1184,16 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 
 #ifdef SQL_SQL92_PREDICATES
   // Bitmask enumerating the datetime scalar functions.
-  intParams[SQL_SQL92_PREDICATES] = SQL_SP_BETWEEN | SQL_SP_COMPARISON
-                                    | SQL_SP_IN | SQL_SP_ISNULL | SQL_SP_LIKE;
+  intParams[SQL_SQL92_PREDICATES] =
+      SQL_SP_BETWEEN | SQL_SP_COMPARISON | SQL_SP_IN | SQL_SP_ISNULL | SQL_SP_LIKE;
 #endif  // SQL_SQL92_PREDICATES
 
 #ifdef SQL_SQL92_RELATIONAL_JOIN_OPERATORS
   // Bitmask enumerating the relational join operators supported in a SELECT
   // statement, as defined in SQL-92.
   intParams[SQL_SQL92_RELATIONAL_JOIN_OPERATORS] =
-      SQL_SRJO_CROSS_JOIN | SQL_SRJO_INNER_JOIN | SQL_SRJO_LEFT_OUTER_JOIN
-      | SQL_SRJO_RIGHT_OUTER_JOIN;
+      SQL_SRJO_CROSS_JOIN | SQL_SRJO_INNER_JOIN | SQL_SRJO_LEFT_OUTER_JOIN |
+      SQL_SRJO_RIGHT_OUTER_JOIN;
 #endif  // SQL_SQL92_RELATIONAL_JOIN_OPERATORS
 
 #ifdef SQL_STATIC_CURSOR_ATTRIBUTES1
@@ -1203,8 +1201,8 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // by the driver. This bitmask contains the first subset of attributes; for
   // the second subset, see SQL_STATIC_CURSOR_ATTRIBUTES2.
   intParams[SQL_STATIC_CURSOR_ATTRIBUTES1] =
-      SQL_CA1_NEXT | SQL_CA1_ABSOLUTE | SQL_CA1_RELATIVE | SQL_CA1_BOOKMARK
-      | SQL_CA1_LOCK_NO_CHANGE | SQL_CA1_POS_POSITION | SQL_CA1_POS_REFRESH;
+      SQL_CA1_NEXT | SQL_CA1_ABSOLUTE | SQL_CA1_RELATIVE | SQL_CA1_BOOKMARK |
+      SQL_CA1_LOCK_NO_CHANGE | SQL_CA1_POS_POSITION | SQL_CA1_POS_REFRESH;
 #endif  // SQL_STATIC_CURSOR_ATTRIBUTES1
 
 #ifdef SQL_STATIC_CURSOR_ATTRIBUTES2
@@ -1290,8 +1288,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_CONVERT_DOUBLE
   // Bitmask indicates the conversions supported by the CONVERT scalar function
   // for target type DOUBLE
-  intParams[SQL_CONVERT_DOUBLE] =
-      SQL_CVT_INTEGER | SQL_CVT_BIGINT | SQL_CVT_DOUBLE;
+  intParams[SQL_CONVERT_DOUBLE] = SQL_CVT_INTEGER | SQL_CVT_BIGINT | SQL_CVT_DOUBLE;
 #endif  // SQL_CONVERT_DOUBLE
 
 #ifdef SQL_CONVERT_FLOAT
@@ -1309,8 +1306,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
 #ifdef SQL_CONVERT_INTEGER
   // Bitmask indicates the conversions supported by the CONVERT scalar function
   // for target type INTEGER
-  intParams[SQL_CONVERT_INTEGER] =
-      SQL_CVT_INTEGER | SQL_CVT_BIGINT | SQL_CVT_DOUBLE;
+  intParams[SQL_CONVERT_INTEGER] = SQL_CVT_INTEGER | SQL_CVT_BIGINT | SQL_CVT_DOUBLE;
 #endif  // SQL_CONVERT_INTEGER
 
 #ifdef SQL_CONVERT_NUMERIC
@@ -1347,13 +1343,13 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // Bitmask indicates the conversions supported by the CONVERT scalar function
   // for target type INTERVAL_DAY_TIME
   intParams[SQL_CONVERT_INTERVAL_DAY_TIME] = 0;  // i.e., unsupported
-#endif  // SQL_CONVERT_INTERVAL_DAY_TIME
+#endif                                           // SQL_CONVERT_INTERVAL_DAY_TIME
 
 #ifdef SQL_CONVERT_INTERVAL_YEAR_MONTH
   // Bitmask indicates the conversions supported by the CONVERT scalar function
   // for target type INTERVAL_YEAR_MONTH
   intParams[SQL_CONVERT_INTERVAL_YEAR_MONTH] = 0;  // i.e., unsupported
-#endif  // SQL_CONVERT_INTERVAL_YEAR_MONTH
+#endif                                             // SQL_CONVERT_INTERVAL_YEAR_MONTH
 
 #ifdef SQL_CONVERT_VARBINARY
   // Bitmask indicates the conversions supported by the CONVERT scalar function
@@ -1898,7 +1894,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // support, however, scrollable cursors may not be supported, even for an
   // SQL-92 Intermediate level-conformant driver.
   intParams[SQL_DYNAMIC_CURSOR_ATTRIBUTES1] = 0;  // i.e., unsupported
-#endif  // SQL_DYNAMIC_CURSOR_ATTRIBUTES1
+#endif                                            // SQL_DYNAMIC_CURSOR_ATTRIBUTES1
 
 #ifdef SQL_DYNAMIC_CURSOR_ATTRIBUTES2
   // A bitmask that describes the attributes of a dynamic cursor that are
@@ -1986,7 +1982,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   //     this behavior, the application calls SQLSetStmtAttr with the
   //     SQL_ATTR_SIMULATE_CURSOR attribute set to SQL_SC_UNIQUE.
   intParams[SQL_DYNAMIC_CURSOR_ATTRIBUTES2] = 0;  // i.e., unsupported
-#endif  // SQL_DYNAMIC_CURSOR_ATTRIBUTES2
+#endif                                            // SQL_DYNAMIC_CURSOR_ATTRIBUTES2
 
 #ifdef SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES1
   // A bitmask that describes the attributes of a forward-only cursor that are
@@ -2183,7 +2179,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL support, however, scrollable cursors may not be supported, even for an
   // SQL-92 Intermediate level-conformant driver.
   intParams[SQL_KEYSET_CURSOR_ATTRIBUTES1] = 0;  // i.e., unsupported
-#endif  // SQL_KEYSET_CURSOR_ATTRIBUTES1
+#endif                                           // SQL_KEYSET_CURSOR_ATTRIBUTES1
 
 #ifdef SQL_KEYSET_CURSOR_ATTRIBUTES2
   // A bitmask that describes the attributes of a keyset cursor that are
@@ -2212,7 +2208,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // substitute "keyset-driven cursor" for "dynamic cursor" in the
   // descriptions).
   intParams[SQL_KEYSET_CURSOR_ATTRIBUTES2] = 0;  // I.e., not supported
-#endif  // SQL_KEYSET_CURSOR_ATTRIBUTES2
+#endif                                           // SQL_KEYSET_CURSOR_ATTRIBUTES2
 
 #ifdef SQL_MAX_ASYNC_CONCURRENT_STATEMENTS
   // Value that specifies the maximum number of active concurrent statements in
@@ -2280,7 +2276,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // An FIPS Transitional level-conformant driver will always return all of
   // these options as supported.
   intParams[SQL_SQL92_FOREIGN_KEY_DELETE_RULE] = 0;  // i.e., unsupported
-#endif  // SQL_SQL92_FOREIGN_KEY_DELETE_RULE
+#endif                                               // SQL_SQL92_FOREIGN_KEY_DELETE_RULE
 
 #ifdef SQL_SQL92_FOREIGN_KEY_UPDATE_RULE
   // A bitmask enumerating the rules supported for a foreign key in an UPDATE
@@ -2293,7 +2289,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // An SQL-92 Full level-conformant driver will always return all of these
   // options as supported.
   intParams[SQL_SQL92_FOREIGN_KEY_UPDATE_RULE] = 0;  // i.e., unsupported
-#endif  // SQL_SQL92_FOREIGN_KEY_UPDATE_RULE
+#endif                                               // SQL_SQL92_FOREIGN_KEY_UPDATE_RULE
 
 #ifdef SQL_SQL92_GRANT
   // A bitmask enumerating the clauses supported in the GRANT statement, as
@@ -2348,8 +2344,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_SRVC_NULL
   // SQL_SRVC_DEFAULT
   // SQL_SRVC_ROW_SUBQUERY
-  intParams[SQL_SQL92_ROW_VALUE_CONSTRUCTOR] =
-      SQL_SRVC_VALUE_EXPRESSION | SQL_SRVC_NULL;
+  intParams[SQL_SQL92_ROW_VALUE_CONSTRUCTOR] = SQL_SRVC_VALUE_EXPRESSION | SQL_SRVC_NULL;
 #endif  // SQL_SQL92_ROW_VALUE_CONSTRUCTOR
 
 #ifdef SQL_STANDARD_CLI_CONFORMANCE
@@ -2420,9 +2415,8 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // SQL_FD_FETCH_RELATIVE (ODBC 1.0)
   // SQL_FD_FETCH_BOOKMARK (ODBC 2.0)
   intParams[SQL_FETCH_DIRECTION] =
-      SQL_FD_FETCH_NEXT | SQL_FD_FETCH_FIRST | SQL_FD_FETCH_LAST
-      | SQL_FD_FETCH_PRIOR | SQL_FD_FETCH_ABSOLUTE | SQL_FD_FETCH_RELATIVE
-      | SQL_FD_FETCH_BOOKMARK;
+      SQL_FD_FETCH_NEXT | SQL_FD_FETCH_FIRST | SQL_FD_FETCH_LAST | SQL_FD_FETCH_PRIOR |
+      SQL_FD_FETCH_ABSOLUTE | SQL_FD_FETCH_RELATIVE | SQL_FD_FETCH_BOOKMARK;
 #endif  // SQL_FETCH_DIRECTION
 
 #ifdef SQL_LOCK_TYPES
@@ -2536,7 +2530,7 @@ ConnectionInfo::ConnectionInfo(const Configuration& config)
   // The maximum number of active statements that the driver can  support for a
   // connection. Zero mean no limit.
   shortParams[SQL_MAX_CONCURRENT_ACTIVITIES] = 0;  // I.e., no limit
-#endif  // SQL_MAX_CONCURRENT_ACTIVITIES
+#endif                                             // SQL_MAX_CONCURRENT_ACTIVITIES
 
 #ifdef SQL_TXN_CAPABLE
   // Describs the transaction support in the driver or data source.
@@ -2809,34 +2803,30 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
   StringInfoMap::const_iterator itStr = strParams.find(type);
 
   if (itStr != strParams.end()) {
-    if (buf && !buflen)
-      return SqlResult::AI_ERROR;
+    if (buf && !buflen) return SqlResult::AI_ERROR;
 
     bool isTruncated = false;
     // Length is given in bytes, implicitly handles if buf is NULL.
-    unsigned short strlen = static_cast< short >(utility::CopyStringToBuffer(
-        itStr->second, reinterpret_cast< SQLWCHAR* >(buf), buflen, isTruncated,
-        true));
+    unsigned short strlen = static_cast<short>(utility::CopyStringToBuffer(
+        itStr->second, reinterpret_cast<SQLWCHAR*>(buf), buflen, isTruncated, true));
 
     if (type != SQL_USER_NAME) {
       LOG_INFO_MSG(type << " (" << ConnectionInfo::InfoTypeToString(type)
                         << ") string result: \"" << itStr->second << "\"");
     }
 
-    if (reslen)
-      *reslen = strlen;
+    if (reslen) *reslen = strlen;
 
     return SqlResult::AI_SUCCESS;
   }
 
   // Numeric results must have a buffer to write to!
-  if (!buf)
-    return SqlResult::AI_ERROR;
+  if (!buf) return SqlResult::AI_ERROR;
 
   UintInfoMap::const_iterator itInt = intParams.find(type);
 
   if (itInt != intParams.end()) {
-    unsigned int* res = reinterpret_cast< unsigned int* >(buf);
+    unsigned int* res = reinterpret_cast<unsigned int*>(buf);
 
     *res = itInt->second;
 
@@ -2849,7 +2839,7 @@ SqlResult::Type ConnectionInfo::GetInfo(InfoType type, void* buf, short buflen,
   UshortInfoMap::const_iterator itShort = shortParams.find(type);
 
   if (itShort != shortParams.end()) {
-    unsigned short* res = reinterpret_cast< unsigned short* >(buf);
+    unsigned short* res = reinterpret_cast<unsigned short*>(buf);
 
     *res = itShort->second;
 

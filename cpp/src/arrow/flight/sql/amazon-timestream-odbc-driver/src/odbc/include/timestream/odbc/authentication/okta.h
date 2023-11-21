@@ -34,10 +34,9 @@ class IGNITE_IMPORT_EXPORT TimestreamOktaCredentialsProvider
    * @param httpClient Shared pointer to httpClient
    * @param stsClient Shared pointer to STSClient
    */
-  TimestreamOktaCredentialsProvider(
-      const config::Configuration& config,
-      std::shared_ptr< Aws::Http::HttpClient > httpClient,
-      std::shared_ptr< Aws::STS::STSClient > stsClient)
+  TimestreamOktaCredentialsProvider(const config::Configuration& config,
+                                    std::shared_ptr<Aws::Http::HttpClient> httpClient,
+                                    std::shared_ptr<Aws::STS::STSClient> stsClient)
       : TimestreamSAMLCredentialsProvider(config, httpClient, stsClient) {
     // No-op.
   }
@@ -57,7 +56,7 @@ class IGNITE_IMPORT_EXPORT TimestreamOktaCredentialsProvider
    *
    * @return The created http request.
    */
-  std::shared_ptr< Aws::Http::HttpRequest > CreateSessionTokenReq();
+  std::shared_ptr<Aws::Http::HttpRequest> CreateSessionTokenReq();
 
   /**
    * Decode numberic character reference in SAMLResponse

@@ -51,8 +51,7 @@ class IGNITE_IMPORT_EXPORT DiagnosableAdapter
    * @param connection Pointer to connection. Used to create
    *     diagnostic records with connection info.
    */
-  DiagnosableAdapter(const Connection* connection = 0)
-      : connection(connection) {
+  DiagnosableAdapter(const Connection* connection = 0) : connection(connection) {
     // No-op.
   }
 
@@ -77,9 +76,7 @@ class IGNITE_IMPORT_EXPORT DiagnosableAdapter
    *
    * @return Diagnostic record.
    */
-  virtual DiagnosticRecordStorage& GetDiagnosticRecords() {
-    return diagnosticRecords;
-  }
+  virtual DiagnosticRecordStorage& GetDiagnosticRecords() { return diagnosticRecords; }
 
   /**
    * Add new status record.
@@ -89,10 +86,9 @@ class IGNITE_IMPORT_EXPORT DiagnosableAdapter
    * @param rowNum Associated row number.
    * @param columnNum Associated column number.
    */
-  virtual void AddStatusRecord(SqlState::Type sqlState,
-                               const std::string& message,
-                               timestream::odbc::LogLevel::Type logLevel,
-                               int32_t rowNum, int32_t columnNum);
+  virtual void AddStatusRecord(SqlState::Type sqlState, const std::string& message,
+                               timestream::odbc::LogLevel::Type logLevel, int32_t rowNum,
+                               int32_t columnNum);
 
   /**
    * Add new status record.
@@ -101,10 +97,9 @@ class IGNITE_IMPORT_EXPORT DiagnosableAdapter
    * @param message Message.
    * @param logLevel Log level
    */
-  virtual void AddStatusRecord(
-      SqlState::Type sqlState, const std::string& message,
-      timestream::odbc::LogLevel::Type logLevel =
-          timestream::odbc::LogLevel::Type::ERROR_LEVEL);
+  virtual void AddStatusRecord(SqlState::Type sqlState, const std::string& message,
+                               timestream::odbc::LogLevel::Type logLevel =
+                                   timestream::odbc::LogLevel::Type::ERROR_LEVEL);
 
   /**
    * Add new status record with SqlState::SHY000_GENERAL_ERROR state.

@@ -16,28 +16,23 @@
 
 #include "timestream/odbc/log_level.h"
 
-#include <timestream/odbc/utils.h>
 #include <timestream/odbc/utility.h>
+#include <timestream/odbc/utils.h>
 
 namespace timestream {
 namespace odbc {
 LogLevel::Type LogLevel::FromString(const std::string& val, Type dflt) {
   std::string logLevel = utility::Trim(val);
 
-  if (logLevel == "4")
-    return LogLevel::Type::DEBUG_LEVEL;
+  if (logLevel == "4") return LogLevel::Type::DEBUG_LEVEL;
 
-  if (logLevel == "3")
-    return LogLevel::Type::INFO_LEVEL;
+  if (logLevel == "3") return LogLevel::Type::INFO_LEVEL;
 
-  if (logLevel == "2")
-    return LogLevel::Type::WARNING_LEVEL;
+  if (logLevel == "2") return LogLevel::Type::WARNING_LEVEL;
 
-  if (logLevel == "1")
-    return LogLevel::Type::ERROR_LEVEL;
+  if (logLevel == "1") return LogLevel::Type::ERROR_LEVEL;
 
-  if (logLevel == "0")
-    return LogLevel::Type::OFF;
+  if (logLevel == "0") return LogLevel::Type::OFF;
 
   return dflt;
 }

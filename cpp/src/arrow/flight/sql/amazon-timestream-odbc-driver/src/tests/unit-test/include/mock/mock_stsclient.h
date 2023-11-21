@@ -46,7 +46,7 @@ class MockSTSClient : public STSClient {
    * @return Mocked outcome.
    */
   virtual Model::AssumeRoleWithSAMLOutcome AssumeRoleWithSAML(
-      const Model::AssumeRoleWithSAMLRequest &request) const;
+      const Model::AssumeRoleWithSAMLRequest& request) const;
 };
 }  // namespace odbc
 }  // namespace timestream

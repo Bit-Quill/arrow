@@ -21,10 +21,10 @@
 #ifndef _TIMESTREAM_ODBC_IGNITE_COLUMN
 #define _TIMESTREAM_ODBC_IGNITE_COLUMN
 
+#include <aws/timestream-query/model/Row.h>
 #include <stdint.h>
 #include <timestream/odbc/app/application_data_buffer.h>
 #include "timestream/odbc/meta/column_meta.h"
-#include <aws/timestream-query/model/Row.h>
 
 using Aws::TimestreamQuery::Model::Datum;
 using Aws::TimestreamQuery::Model::Row;
@@ -44,8 +44,7 @@ class TimestreamColumn {
    * @param columnIdx The column index, start from 0.
    * @param columnMetadata The column metadata.
    */
-  TimestreamColumn(
-                   uint32_t columnIdx, const meta::ColumnMeta& columnMetadata);
+  TimestreamColumn(uint32_t columnIdx, const meta::ColumnMeta& columnMetadata);
 
   /**
    * Copy constructor.
@@ -105,8 +104,8 @@ class TimestreamColumn {
    * @param dataBuf Application data buffer.
    * @return Operation result.
    */
-  ConversionResult::Type ParseTimeSeriesType(
-      const Datum& datum, ApplicationDataBuffer& dataBuf) const;
+  ConversionResult::Type ParseTimeSeriesType(const Datum& datum,
+                                             ApplicationDataBuffer& dataBuf) const;
 
   /**
    * Parse Array data type in datum and save result to dataBuf.

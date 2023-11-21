@@ -28,10 +28,10 @@
 
 #include "timestream/odbc/app/application_data_buffer.h"
 #include "timestream/odbc/common_types.h"
+#include "timestream/odbc/descriptor.h"
 #include "timestream/odbc/diagnostic/diagnosable_adapter.h"
 #include "timestream/odbc/meta/column_meta.h"
 #include "timestream/odbc/query/query.h"
-#include "timestream/odbc/descriptor.h"
 
 using timestream::odbc::query::Query;
 
@@ -110,8 +110,7 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    * @param bufLen Buffer length.
    * @param valueLen Resulting value length.
    */
-  void GetAttribute(int attr, void* buf, SQLINTEGER bufLen,
-                    SQLINTEGER* valueLen);
+  void GetAttribute(int attr, void* buf, SQLINTEGER bufLen, SQLINTEGER* valueLen);
 
   /**
    * Get statement option.
@@ -161,10 +160,10 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    * @param table Table search pattern, nullable.
    * @param column Column search pattern, nullable.
    */
-  void ExecuteGetColumnsMetaQuery(const boost::optional< std::string >& catalog,
-                                  const boost::optional< std::string >& schema,
-                                  const boost::optional< std::string >& table,
-                                  const boost::optional< std::string >& column);
+  void ExecuteGetColumnsMetaQuery(const boost::optional<std::string>& catalog,
+                                  const boost::optional<std::string>& schema,
+                                  const boost::optional<std::string>& table,
+                                  const boost::optional<std::string>& column);
 
   /**
    * Get tables metadata.
@@ -174,11 +173,10 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    * @param table Table search pattern.
    * @param tableType Table type search pattern, nullable.
    */
-  void ExecuteGetTablesMetaQuery(
-      const boost::optional< std::string >& catalog,
-      const boost::optional< std::string >& schema,
-      const boost::optional< std::string >& table,
-      const boost::optional< std::string >& tableType);
+  void ExecuteGetTablesMetaQuery(const boost::optional<std::string>& catalog,
+                                 const boost::optional<std::string>& schema,
+                                 const boost::optional<std::string>& table,
+                                 const boost::optional<std::string>& tableType);
 
   /**
    * Get foreign keys. Empty result will be returned.
@@ -333,8 +331,7 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    * @param nameBufLen Cursor name buffer length.
    * @param nameResLen Returned cursor name result length.
    */
-  void GetCursorName(SQLWCHAR* nameBuf, SQLSMALLINT nameBufLen,
-                     SQLSMALLINT* nameResLen);
+  void GetCursorName(SQLWCHAR* nameBuf, SQLSMALLINT nameBufLen, SQLSMALLINT* nameResLen);
 
   /**
    * Set cursor name.
@@ -349,9 +346,7 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    *
    * @return connection object reference.
    */
-  Connection& GetConnection() {
-    return connection;
-  }
+  Connection& GetConnection() { return connection; }
 
   /**
    * Unbind specified column buffer.
@@ -385,8 +380,7 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    * @param columnIdx Column index.
    * @param buffer Buffer to put column data to.
    */
-  void SafeBindColumn(uint16_t columnIdx,
-                      const app::ApplicationDataBuffer& buffer);
+  void SafeBindColumn(uint16_t columnIdx, const app::ApplicationDataBuffer& buffer);
 
   /**
    * Unbind all column buffers.
@@ -416,9 +410,8 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    * @param bufferLength Length of target buffer.
    * @param strLengthOrIndicator Pointer to the length/indicator buffer.
    */
-  void SetDescriptorFields(uint16_t columnIdx, int16_t targetType,
-                           void* targetValue, SqlLen bufferLength,
-                           SqlLen* strLengthOrIndicator);
+  void SetDescriptorFields(uint16_t columnIdx, int16_t targetType, void* targetValue,
+                           SqlLen bufferLength, SqlLen* strLengthOrIndicator);
 
   /**
    * Set statement attribute.
@@ -429,8 +422,7 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    * @param valueLen Value length.
    * @return Operation result.
    */
-  SqlResult::Type InternalSetAttribute(int attr, void* value,
-                                       SQLINTEGER valueLen);
+  SqlResult::Type InternalSetAttribute(int attr, void* value, SQLINTEGER valueLen);
 
   /**
    * Get statement attribute.
@@ -558,10 +550,10 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    * @return Operation result.
    */
   SqlResult::Type InternalExecuteGetColumnsMetaQuery(
-      const boost::optional< std::string >& catalog,
-      const boost::optional< std::string >& schema,
-      const boost::optional< std::string >& table,
-      const boost::optional< std::string >& column);
+      const boost::optional<std::string>& catalog,
+      const boost::optional<std::string>& schema,
+      const boost::optional<std::string>& table,
+      const boost::optional<std::string>& column);
 
   /**
    * Get tables metadata.
@@ -573,10 +565,10 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    * @return Operation result.
    */
   SqlResult::Type InternalExecuteGetTablesMetaQuery(
-      const boost::optional< std::string >& catalog,
-      const boost::optional< std::string >& schema,
-      const boost::optional< std::string >& table,
-      const boost::optional< std::string >& tableType);
+      const boost::optional<std::string>& catalog,
+      const boost::optional<std::string>& schema,
+      const boost::optional<std::string>& table,
+      const boost::optional<std::string>& tableType);
 
   /**
    * Get foreign keys. Empty result will be returned.
@@ -674,8 +666,7 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
    */
   SqlResult::Type InternalAffectedRows(int64_t& rowCnt);
 
-  SqlResult::Type InternalGetCursorName(SQLWCHAR* nameBuf,
-                                        SQLSMALLINT nameBufLen,
+  SqlResult::Type InternalGetCursorName(SQLWCHAR* nameBuf, SQLSMALLINT nameBufLen,
                                         SQLSMALLINT* nameResLen);
 
   SqlResult::Type InternalSetCursorName(SQLWCHAR* name, SQLSMALLINT nameLen);
@@ -694,7 +685,7 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
   app::ColumnBindingMap columnBindings;
 
   /** Underlying query. */
-  std::unique_ptr< Query > currentQuery;
+  std::unique_ptr<Query> currentQuery;
 
   /** Buffer to store number of rows fetched by the last fetch. */
   SQLULEN* rowsFetched;
@@ -709,16 +700,16 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
   SqlUlen rowArraySize;
 
   /** implicitly allocated ARD */
-  std::unique_ptr< Descriptor > ardi;
+  std::unique_ptr<Descriptor> ardi;
 
   /** implicitly allocated APD(not in use now) */
-  std::unique_ptr< Descriptor > apdi;
+  std::unique_ptr<Descriptor> apdi;
 
   /** implicitly allocated IRD(not in use now) */
-  std::unique_ptr< Descriptor > irdi;
+  std::unique_ptr<Descriptor> irdi;
 
   /** implicitly allocated IPD(not in use now) */
-  std::unique_ptr< Descriptor > ipdi;
+  std::unique_ptr<Descriptor> ipdi;
 
   /** ARD current in use */
   Descriptor* ard;

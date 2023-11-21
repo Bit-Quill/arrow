@@ -21,8 +21,8 @@
 #ifndef _TIMESTREAM_ODBC_QUERY_COLUMN_METADATA_QUERY
 #define _TIMESTREAM_ODBC_QUERY_COLUMN_METADATA_QUERY
 
-#include "timestream/odbc/query/query.h"
 #include "timestream/odbc/query/data_query.h"
+#include "timestream/odbc/query/query.h"
 #include "timestream/odbc/query/table_metadata_query.h"
 
 namespace timestream {
@@ -45,12 +45,11 @@ class ColumnMetadataQuery : public timestream::odbc::query::Query {
    * @param table Table search pattern.
    * @param column Column search pattern.
    */
-  ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag,
-                      Connection& connection,
-                      const boost::optional< std::string >& catalog,
-                      const boost::optional< std::string >& schema,
-                      const boost::optional< std::string >& table,
-                      const boost::optional< std::string >& column);
+  ColumnMetadataQuery(diagnostic::DiagnosableAdapter& diag, Connection& connection,
+                      const boost::optional<std::string>& catalog,
+                      const boost::optional<std::string>& schema,
+                      const boost::optional<std::string>& table,
+                      const boost::optional<std::string>& column);
 
   /**
    * Destructor.
@@ -143,7 +142,7 @@ class ColumnMetadataQuery : public timestream::odbc::query::Query {
    * @return Operation result.
    */
   SqlResult::Type GetColumnsWithDatabaseSearchPattern(
-      const boost::optional< std::string >& databasePattern,
+      const boost::optional<std::string>& databasePattern,
       TableMetadataQuery::ResultColumn::Type databaseType);
 
   /**
@@ -162,23 +161,23 @@ class ColumnMetadataQuery : public timestream::odbc::query::Query {
    *
    * @return Operation result.
    */
-  SqlResult::Type MakeRequestGetColumnsMetaPerTable(
-      const std::string& databaseName, const std::string& tableName);
+  SqlResult::Type MakeRequestGetColumnsMetaPerTable(const std::string& databaseName,
+                                                    const std::string& tableName);
 
   /** Connection associated with the statement. */
   Connection& connection;
 
   /** Catalog search pattern. */
-  boost::optional< std::string > catalog;
+  boost::optional<std::string> catalog;
 
   /** Schema search pattern. */
-  boost::optional< std::string > schema;
+  boost::optional<std::string> schema;
 
   /** Table search pattern. */
-  boost::optional< std::string > table;
+  boost::optional<std::string> table;
 
   /** Column search pattern. */
-  boost::optional< std::string > column;
+  boost::optional<std::string> column;
 
   /** Query executed. */
   bool executed;
@@ -196,10 +195,10 @@ class ColumnMetadataQuery : public timestream::odbc::query::Query {
   meta::ColumnMetaVector columnsMeta;
 
   /** DataQuery pointer for "describe" command to run **/
-  std::shared_ptr< DataQuery > dataQuery_;
+  std::shared_ptr<DataQuery> dataQuery_;
 
   /** TableMetadataQuery pointer for fetching table **/
-  std::shared_ptr< TableMetadataQuery > tableMetadataQuery_;
+  std::shared_ptr<TableMetadataQuery> tableMetadataQuery_;
 };
 }  // namespace query
 }  // namespace odbc

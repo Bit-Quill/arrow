@@ -24,7 +24,7 @@
 namespace ignite {
 namespace odbc {
 namespace common {
-typedef std::basic_ostream< char, std::char_traits< char > > StdCharOutStream;
+typedef std::basic_ostream<char, std::char_traits<char> > StdCharOutStream;
 
 /**
  * Convert struct tm to time_t (UTC).
@@ -75,8 +75,7 @@ IGNITE_IMPORT_EXPORT std::string GetEnv(const std::string& name);
  * @param dflt Default value to return on fail.
  * @return Environment variable value if found and @c dflt otherwise.
  */
-IGNITE_IMPORT_EXPORT std::string GetEnv(const std::string& name,
-                                        const std::string& dflt);
+IGNITE_IMPORT_EXPORT std::string GetEnv(const std::string& name, const std::string& dflt);
 
 /**
  * Ensure that file on the given path exists in the system.

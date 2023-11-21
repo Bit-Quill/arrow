@@ -120,8 +120,7 @@ class DsnConfigurationWindow : public CustomWindow {
    *
    * @param parent Parent window handle.
    */
-  explicit DsnConfigurationWindow(Window* parent,
-                                  config::Configuration& config);
+  explicit DsnConfigurationWindow(Window* parent, config::Configuration& config);
 
   /**
    * Destructor.
@@ -300,169 +299,169 @@ class DsnConfigurationWindow : public CustomWindow {
   int height;
 
   /** DSN name edit field. */
-  std::unique_ptr< Window > nameEdit;
+  std::unique_ptr<Window> nameEdit;
 
   /** DSN name field label. */
-  std::unique_ptr< Window > nameLabel;
+  std::unique_ptr<Window> nameLabel;
 
   /** DSN name balloon. */
-  std::unique_ptr< EDITBALLOONTIP > nameBalloon;
+  std::unique_ptr<EDITBALLOONTIP> nameBalloon;
 
   /** Endpoint edit. */
-  std::unique_ptr< Window > endpointEdit;
+  std::unique_ptr<Window> endpointEdit;
 
   /** Endpoint label. */
-  std::unique_ptr< Window > endpointLabel;
+  std::unique_ptr<Window> endpointLabel;
 
   /** Region edit. */
-  std::unique_ptr< Window > regionEdit;
+  std::unique_ptr<Window> regionEdit;
 
   /** Region label. */
-  std::unique_ptr< Window > regionLabel;
+  std::unique_ptr<Window> regionLabel;
 
   /** Tabs. */
-  std::unique_ptr< Window > tabs;
+  std::unique_ptr<Window> tabs;
 
   /** TabsGroupBox. */
-  std::unique_ptr< Window > tabsGroupBox;
+  std::unique_ptr<Window> tabsGroupBox;
 
   /** Auth Type comboBox **/
-  std::unique_ptr< Window > authTypeComboBox;
+  std::unique_ptr<Window> authTypeComboBox;
 
   /** Auth Type label. */
-  std::unique_ptr< Window > authTypeLabel;
+  std::unique_ptr<Window> authTypeLabel;
 
   /** Access key Id edit. */
-  std::unique_ptr< Window > accessKeyIdEdit;
+  std::unique_ptr<Window> accessKeyIdEdit;
 
   /** Access key Id label. */
-  std::unique_ptr< Window > accessKeyIdLabel;
+  std::unique_ptr<Window> accessKeyIdLabel;
 
   /** Secret Access Key edit. */
-  std::unique_ptr< Window > secretAccessKeyEdit;
+  std::unique_ptr<Window> secretAccessKeyEdit;
 
   /** Secret Access Key label. */
-  std::unique_ptr< Window > secretAccessKeyLabel;
+  std::unique_ptr<Window> secretAccessKeyLabel;
 
   /** Session Token edit. */
-  std::unique_ptr< Window > sessionTokenEdit;
+  std::unique_ptr<Window> sessionTokenEdit;
 
   /** Session Token label. */
-  std::unique_ptr< Window > sessionTokenLabel;
+  std::unique_ptr<Window> sessionTokenLabel;
 
   /** Profile Name edit. */
-  std::unique_ptr< Window > profileNameEdit;
+  std::unique_ptr<Window> profileNameEdit;
 
   /** Profile Name label. */
-  std::unique_ptr< Window > profileNameLabel;
+  std::unique_ptr<Window> profileNameLabel;
 
   /** Role ARN edit. */
-  std::unique_ptr< Window > roleArnEdit;
+  std::unique_ptr<Window> roleArnEdit;
 
   /** Role ARN label. */
-  std::unique_ptr< Window > roleArnLabel;
+  std::unique_ptr<Window> roleArnLabel;
 
   /** IdP User Name edit. */
-  std::unique_ptr< Window > idPUserNameEdit;
+  std::unique_ptr<Window> idPUserNameEdit;
 
   /** IdP User Name label. */
-  std::unique_ptr< Window > idPUserNameLabel;
+  std::unique_ptr<Window> idPUserNameLabel;
 
   /** IdP Password edit. */
-  std::unique_ptr< Window > idPPasswordEdit;
+  std::unique_ptr<Window> idPPasswordEdit;
 
   /** IdP Password label. */
-  std::unique_ptr< Window > idPPasswordLabel;
+  std::unique_ptr<Window> idPPasswordLabel;
 
   /** IdP ARN edit. */
-  std::unique_ptr< Window > idPArnEdit;
+  std::unique_ptr<Window> idPArnEdit;
 
   /** IdP ARN label. */
-  std::unique_ptr< Window > idPArnLabel;
+  std::unique_ptr<Window> idPArnLabel;
 
   /** IdP Host edit. */
-  std::unique_ptr< Window > idPHostEdit;
+  std::unique_ptr<Window> idPHostEdit;
 
   /** IdP Host label. */
-  std::unique_ptr< Window > idPHostLabel;
+  std::unique_ptr<Window> idPHostLabel;
 
   /** Okta Application Id edit. */
-  std::unique_ptr< Window > oktaAppIdEdit;
+  std::unique_ptr<Window> oktaAppIdEdit;
 
   /** Okta Application Id label. */
-  std::unique_ptr< Window > oktaAppIdLabel;
+  std::unique_ptr<Window> oktaAppIdLabel;
 
   /** AAD Application Id edit. */
-  std::unique_ptr< Window > aadAppIdEdit;
+  std::unique_ptr<Window> aadAppIdEdit;
 
   /** AAD Application Id label. */
-  std::unique_ptr< Window > aadAppIdLabel;
+  std::unique_ptr<Window> aadAppIdLabel;
 
   /** AAD Client Secret edit. */
-  std::unique_ptr< Window > aadClientSecretEdit;
+  std::unique_ptr<Window> aadClientSecretEdit;
 
   /** AAD Client Secret label. */
-  std::unique_ptr< Window > aadClientSecretLabel;
+  std::unique_ptr<Window> aadClientSecretLabel;
 
   /** AAD Tenant edit. */
-  std::unique_ptr< Window > aadTenantEdit;
+  std::unique_ptr<Window> aadTenantEdit;
 
   /** AAD Tenant label. */
-  std::unique_ptr< Window > aadTenantLabel;
+  std::unique_ptr<Window> aadTenantLabel;
 
   /** Connection timeout edit. */
-  std::unique_ptr< Window > connectionTimeoutEdit;
+  std::unique_ptr<Window> connectionTimeoutEdit;
 
   /** Connection timeout field label. */
-  std::unique_ptr< Window > connectionTimeoutLabel;
+  std::unique_ptr<Window> connectionTimeoutLabel;
 
   /** Request timeout edit. */
-  std::unique_ptr< Window > reqTimeoutEdit;
+  std::unique_ptr<Window> reqTimeoutEdit;
 
   /** Request timeout field label. */
-  std::unique_ptr< Window > reqTimeoutLabel;
+  std::unique_ptr<Window> reqTimeoutLabel;
 
   /** Max retry count client edit. */
-  std::unique_ptr< Window > maxRetryCountClientEdit;
+  std::unique_ptr<Window> maxRetryCountClientEdit;
 
   /** Max retry count client field label. */
-  std::unique_ptr< Window > maxRetryCountClientLabel;
+  std::unique_ptr<Window> maxRetryCountClientLabel;
 
   /** Max connections edit. */
-  std::unique_ptr< Window > maxConnectionsEdit;
+  std::unique_ptr<Window> maxConnectionsEdit;
 
   /** Max connections field label. */
-  std::unique_ptr< Window > maxConnectionsLabel;
+  std::unique_ptr<Window> maxConnectionsLabel;
 
   /** Max connections balloon. */
-  std::unique_ptr< EDITBALLOONTIP > maxConnectionsBalloon;
+  std::unique_ptr<EDITBALLOONTIP> maxConnectionsBalloon;
 
   /** Log Level comboBox **/
-  std::unique_ptr< Window > logLevelComboBox;
+  std::unique_ptr<Window> logLevelComboBox;
 
   /** Log Level label. */
-  std::unique_ptr< Window > logLevelLabel;
+  std::unique_ptr<Window> logLevelLabel;
 
   /** Log Path edit. */
-  std::unique_ptr< Window > logPathEdit;
+  std::unique_ptr<Window> logPathEdit;
 
   /** Log Path label. */
-  std::unique_ptr< Window > logPathLabel;
+  std::unique_ptr<Window> logPathLabel;
 
   /** Browse button. */
-  std::unique_ptr< Window > browseButton;
+  std::unique_ptr<Window> browseButton;
 
   /** Test button. */
-  std::unique_ptr< Window > testButton;
+  std::unique_ptr<Window> testButton;
 
   /** Ok button. */
-  std::unique_ptr< Window > okButton;
+  std::unique_ptr<Window> okButton;
 
   /** Cancel button. */
-  std::unique_ptr< Window > cancelButton;
+  std::unique_ptr<Window> cancelButton;
 
   /* Driver Version Label */
-  std::unique_ptr< Window > versionLabel;
+  std::unique_ptr<Window> versionLabel;
 
   /** Configuration. */
   config::Configuration& config;

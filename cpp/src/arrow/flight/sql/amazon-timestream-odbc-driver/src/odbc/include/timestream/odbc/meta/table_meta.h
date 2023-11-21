@@ -102,61 +102,51 @@ class TableMeta {
    * Get catalog name.
    * @return Catalog name.
    */
-  const boost::optional< std::string >& GetCatalogName() const {
-    return catalogName;
-  }
+  const boost::optional<std::string>& GetCatalogName() const { return catalogName; }
 
   /**
    * Get schema name.
    * @return Schema name.
    */
-  const boost::optional< std::string >& GetSchemaName() const {
-    return schemaName;
-  }
+  const boost::optional<std::string>& GetSchemaName() const { return schemaName; }
 
   /**
    * Get table name.
    * @return Table name.
    */
-  const boost::optional< std::string >& GetTableName() const {
-    return tableName;
-  }
+  const boost::optional<std::string>& GetTableName() const { return tableName; }
 
   /**
    * Get table type.
    * @return Table type.
    */
-  const boost::optional< std::string >& GetTableType() const {
-    return tableType;
-  }
+  const boost::optional<std::string>& GetTableType() const { return tableType; }
 
   /**
    * Get the remarks.
    * @return Remarks.
    */
-  const boost::optional< std::string >& GetRemarks() const {
-    return remarks;
-  }
+  const boost::optional<std::string>& GetRemarks() const { return remarks; }
 
  private:
   /** Catalog name. */
-  boost::optional< std::string > catalogName;
+  boost::optional<std::string> catalogName;
 
   /** Schema name. */
-  boost::optional< std::string > schemaName;
+  boost::optional<std::string> schemaName;
 
   /** Table name. */
-  boost::optional< std::string > tableName;
+  boost::optional<std::string> tableName;
 
   /** Table type. */
-  boost::optional< std::string > tableType;
+  boost::optional<std::string> tableType;
 
   /** Remarks */
-  boost::optional< std::string > remarks;
+  boost::optional<std::string> remarks;
 };
 
 /** Table metadata vector alias. */
-typedef std::vector< TableMeta > TableMetaVector;
+typedef std::vector<TableMeta> TableMetaVector;
 }  // namespace meta
 }  // namespace odbc
 }  // namespace timestream

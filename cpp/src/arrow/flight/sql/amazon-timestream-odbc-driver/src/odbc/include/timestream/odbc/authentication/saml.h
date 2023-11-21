@@ -21,8 +21,8 @@
 
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentials.h>
-#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
 #include <aws/sts/STSClient.h>
+#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
 
 namespace timestream {
 namespace odbc {
@@ -36,10 +36,9 @@ class IGNITE_IMPORT_EXPORT TimestreamSAMLCredentialsProvider {
    * @param httpClient Shared pointer to httpClient
    * @param stsClient Shared pointer to STSClient
    */
-  TimestreamSAMLCredentialsProvider(
-      const config::Configuration& config,
-      std::shared_ptr< Aws::Http::HttpClient > httpClient,
-      std::shared_ptr< Aws::STS::STSClient > stsClient)
+  TimestreamSAMLCredentialsProvider(const config::Configuration& config,
+                                    std::shared_ptr<Aws::Http::HttpClient> httpClient,
+                                    std::shared_ptr<Aws::STS::STSClient> stsClient)
       : config_(config), httpClient_(httpClient), stsClient_(stsClient) {
     // No-op.
   }
@@ -51,8 +50,7 @@ class IGNITE_IMPORT_EXPORT TimestreamSAMLCredentialsProvider {
    * @param errInfo Error message when there is a failure
    * @return @c true on success and @c false otherwise.
    */
-  bool GetAWSCredentials(Aws::Auth::AWSCredentials& credentials,
-                         std::string& errInfo);
+  bool GetAWSCredentials(Aws::Auth::AWSCredentials& credentials, std::string& errInfo);
 
   /**
    * Get SAML asseration which is a base64 encoded SAML authentication response
@@ -80,10 +78,10 @@ class IGNITE_IMPORT_EXPORT TimestreamSAMLCredentialsProvider {
   config::Configuration config_;
 
   /** STSClient pointer */
-  std::shared_ptr< Aws::STS::STSClient > stsClient_;
+  std::shared_ptr<Aws::STS::STSClient> stsClient_;
 
   /** HttpClient pointer */
-  std::shared_ptr< Aws::Http::HttpClient > httpClient_;
+  std::shared_ptr<Aws::Http::HttpClient> httpClient_;
 };
 
 }  // namespace odbc

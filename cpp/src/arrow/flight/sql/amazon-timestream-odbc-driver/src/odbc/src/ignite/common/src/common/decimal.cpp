@@ -40,8 +40,7 @@ Decimal::Decimal(const int8_t* mag, int32_t len, int32_t scale, int32_t sign,
   // No-op.
 }
 
-Decimal::Decimal(const Decimal& other)
-    : scale(other.scale), magnitude(other.magnitude) {
+Decimal::Decimal(const Decimal& other) : scale(other.scale), magnitude(other.magnitude) {
   // No-op.
 }
 
@@ -53,8 +52,7 @@ Decimal::Decimal(int64_t val, int32_t scale) : scale(scale), magnitude(val) {
   // No-op.
 }
 
-Decimal::Decimal(const BigInteger& val, int32_t scale)
-    : scale(scale), magnitude(val) {
+Decimal::Decimal(const BigInteger& val, int32_t scale) : scale(scale), magnitude(val) {
   // No-op.
 }
 
@@ -73,21 +71,16 @@ Decimal& Decimal::operator=(const Decimal& other) {
   return *this;
 }
 
-Decimal::operator double() const {
-  return ToDouble();
-}
+Decimal::operator double() const { return ToDouble(); }
 
-Decimal::operator int64_t() const {
-  return ToInt64();
-}
+Decimal::operator int64_t() const { return ToInt64(); }
 
 double Decimal::ToDouble() const {
-  return timestream::odbc::common::LexicalCast< double >(*this);
+  return timestream::odbc::common::LexicalCast<double>(*this);
 }
 
 int64_t Decimal::ToInt64() const {
-  if (scale == 0)
-    return magnitude.ToInt64();
+  if (scale == 0) return magnitude.ToInt64();
 
   Decimal zeroScaled;
 
@@ -96,13 +89,10 @@ int64_t Decimal::ToInt64() const {
   return zeroScaled.magnitude.ToInt64();
 }
 
-int32_t Decimal::GetScale() const {
-  return scale;
-}
+int32_t Decimal::GetScale() const { return scale; }
 
 void Decimal::SetScale(int32_t newScale, Decimal& res) const {
-  if (scale == newScale)
-    return;
+  if (scale == newScale) return;
 
   int32_t diff = scale - newScale;
 
@@ -121,13 +111,9 @@ void Decimal::SetScale(int32_t newScale, Decimal& res) const {
   res.scale = newScale;
 }
 
-int32_t Decimal::GetPrecision() const {
-  return magnitude.GetPrecision();
-}
+int32_t Decimal::GetPrecision() const { return magnitude.GetPrecision(); }
 
-const BigInteger& Decimal::GetUnscaledValue() const {
-  return magnitude;
-}
+const BigInteger& Decimal::GetUnscaledValue() const { return magnitude; }
 
 void Decimal::Swap(Decimal& second) {
   using std::swap;
@@ -136,9 +122,7 @@ void Decimal::Swap(Decimal& second) {
   magnitude.Swap(second.magnitude);
 }
 
-int32_t Decimal::GetMagnitudeLength() const {
-  return magnitude.mag.GetSize();
-}
+int32_t Decimal::GetMagnitudeLength() const { return magnitude.mag.GetSize(); }
 
 void Decimal::AssignString(const char* val, int32_t len) {
   std::stringstream converter;
@@ -170,8 +154,7 @@ void Decimal::AssignUint64(uint64_t val) {
 }
 
 int32_t Decimal::Compare(const Decimal& other) const {
-  if (IsZero() && other.IsZero())
-    return 0;
+  if (IsZero() && other.IsZero()) return 0;
 
   if (scale == other.scale)
     return magnitude.Compare(other.magnitude);
@@ -190,17 +173,11 @@ int32_t Decimal::Compare(const Decimal& other) const {
   }
 }
 
-bool Decimal::IsNegative() const {
-  return magnitude.IsNegative();
-}
+bool Decimal::IsNegative() const { return magnitude.IsNegative(); }
 
-bool Decimal::IsZero() const {
-  return magnitude.IsZero();
-}
+bool Decimal::IsZero() const { return magnitude.IsZero(); }
 
-bool Decimal::IsPositive() const {
-  return magnitude.IsPositive();
-}
+bool Decimal::IsPositive() const { return magnitude.IsPositive(); }
 
 bool operator==(const Decimal& val1, const Decimal& val2) {
   return val1.Compare(val2) == 0;

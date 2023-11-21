@@ -21,17 +21,17 @@
 #ifndef _TIMESTREAM_ODBC_QUERY_DATA_QUERY
 #define _TIMESTREAM_ODBC_QUERY_DATA_QUERY
 
-#include "timestream/odbc/timestream_cursor.h"
-#include "timestream/odbc/query/query.h"
 #include "timestream/odbc/connection.h"
+#include "timestream/odbc/query/query.h"
+#include "timestream/odbc/timestream_cursor.h"
 
+#include <aws/timestream-query/model/ColumnInfo.h>
 #include <aws/timestream-query/model/QueryRequest.h>
 #include <aws/timestream-query/model/QueryResult.h>
-#include <aws/timestream-query/model/ColumnInfo.h>
 
-#include <queue>
-#include <mutex>
 #include <condition_variable>
+#include <mutex>
+#include <queue>
 
 using Aws::TimestreamQuery::Model::ColumnInfo;
 using Aws::TimestreamQuery::Model::QueryRequest;
@@ -48,8 +48,7 @@ namespace query {
  */
 class IGNITE_IMPORT_EXPORT DataQueryContext {
  public:
-  DataQueryContext() : isClosing_(false) {
-  }
+  DataQueryContext() : isClosing_(false) {}
 
   ~DataQueryContext() = default;
 
@@ -60,7 +59,7 @@ class IGNITE_IMPORT_EXPORT DataQueryContext {
   std::condition_variable cv_;
 
   /** queue to save query execution outcome objects. */
-  std::queue< Aws::TimestreamQuery::Model::QueryOutcome > queue_;
+  std::queue<Aws::TimestreamQuery::Model::QueryOutcome> queue_;
 
   /** Flag to indicate if the main thread is exiting or not. */
   bool isClosing_;
@@ -166,9 +165,7 @@ class IGNITE_IMPORT_EXPORT DataQuery : public timestream::odbc::query::Query {
    *
    * @return SQL query string.
    */
-  const std::string& GetSql() const {
-    return sql_;
-  }
+  const std::string& GetSql() const { return sql_; }
 
  private:
   IGNITE_NO_COPY_ASSIGNMENT(DataQuery);
@@ -216,7 +213,7 @@ class IGNITE_IMPORT_EXPORT DataQuery : public timestream::odbc::query::Query {
    *
    * @param tsVector Aws::TimestreamQuery::Model::ColumnInfo vector.
    */
-  void ReadColumnMetadataVector(const Aws::Vector< ColumnInfo >& tsVector);
+  void ReadColumnMetadataVector(const Aws::Vector<ColumnInfo>& tsVector);
 
   /**
    * Process column conversion operation result.
@@ -256,9 +253,7 @@ class IGNITE_IMPORT_EXPORT DataQuery : public timestream::odbc::query::Query {
    *
    * @return void.
    */
-  void addThreads(std::thread& thread) {
-    threads_.push(std::move(thread));
-  }
+  void addThreads(std::thread& thread) { threads_.push(std::move(thread)); }
 
   /** Connection associated with the statement. */
   Connection& connection_;
@@ -276,19 +271,19 @@ class IGNITE_IMPORT_EXPORT DataQuery : public timestream::odbc::query::Query {
   QueryRequest request_;
 
   /** Current TS Query Result. */
-  std::shared_ptr< QueryResult > result_;
+  std::shared_ptr<QueryResult> result_;
 
   /** Cursor. */
-  std::unique_ptr< TimestreamCursor > cursor_;
+  std::unique_ptr<TimestreamCursor> cursor_;
 
   /** Timestream query client. */
-  std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient > queryClient_;
+  std::shared_ptr<Aws::TimestreamQuery::TimestreamQueryClient> queryClient_;
 
   /** Context for asynchornous result fetching. */
   DataQueryContext context_;
 
   /** Queue for threads. */
-  std::queue< std::thread > threads_;
+  std::queue<std::thread> threads_;
 
   /** Flag indicating asynchronous fetch is started. */
   bool hasAsyncFetch;

@@ -23,9 +23,9 @@
 #include <boost/optional.hpp>
 #include <limits>
 
+#include "ignite/odbc/odbc_error.h"
 #include "timestream/odbc/connection.h"
 #include "timestream/odbc/log.h"
-#include "ignite/odbc/odbc_error.h"
 #include "timestream/odbc/query/column_metadata_query.h"
 #include "timestream/odbc/query/column_privileges_query.h"
 #include "timestream/odbc/query/data_query.h"
@@ -33,8 +33,8 @@
 #include "timestream/odbc/query/primary_keys_query.h"
 #include "timestream/odbc/query/procedure_columns_query.h"
 #include "timestream/odbc/query/procedures_query.h"
-#include "timestream/odbc/query/statistics_query.h"
 #include "timestream/odbc/query/special_columns_query.h"
+#include "timestream/odbc/query/statistics_query.h"
 #include "timestream/odbc/query/table_metadata_query.h"
 #include "timestream/odbc/query/table_privileges_query.h"
 #include "timestream/odbc/query/type_info_query.h"
@@ -55,7 +55,7 @@ Statement::Statement(Connection& parent)
   // descriptors. But besides implicit ARD, they are not in use because there is
   // no clear document about how to set and use them. This could be done in
   // future when there is a need or clear guide about how to use them.
-  ardi = std::unique_ptr< Descriptor >(new Descriptor);
+  ardi = std::unique_ptr<Descriptor>(new Descriptor);
   ardi->SetType(ARD);
   ardi->SetStatement(this);
   ardi->InitAppHead(true);
@@ -63,12 +63,12 @@ Statement::Statement(Connection& parent)
   // set active ARD to this implicit one
   ard = ardi.get();
 
-  apdi = std::unique_ptr< Descriptor >(new Descriptor);
+  apdi = std::unique_ptr<Descriptor>(new Descriptor);
   apdi->SetType(APD);
   apdi->SetStatement(this);
   apdi->InitAppHead(true);
 
-  irdi = std::unique_ptr< Descriptor >(new Descriptor);
+  irdi = std::unique_ptr<Descriptor>(new Descriptor);
   irdi->SetType(IRD);
   irdi->SetStatement(this);
   irdi->InitImpHead();
@@ -76,14 +76,13 @@ Statement::Statement(Connection& parent)
   // set active IRD to this implicit one
   ird = irdi.get();
 
-  ipdi = std::unique_ptr< Descriptor >(new Descriptor);
+  ipdi = std::unique_ptr<Descriptor>(new Descriptor);
   ipdi->SetType(IPD);
   ipdi->SetStatement(this);
   ipdi->InitImpHead();
 }
 
-Statement::~Statement() {
-}
+Statement::~Statement() {}
 
 void Statement::RestoreDescriptor(DescType type) {
   if (type == ARD) {
@@ -95,23 +94,19 @@ void Statement::RestoreDescriptor(DescType type) {
   }
 }
 
-void Statement::BindColumn(uint16_t columnIdx, int16_t targetType,
-                           void* targetValue, SqlLen bufferLength,
-                           SqlLen* strLengthOrIndicator) {
+void Statement::BindColumn(uint16_t columnIdx, int16_t targetType, void* targetValue,
+                           SqlLen bufferLength, SqlLen* strLengthOrIndicator) {
   IGNITE_ODBC_API_CALL(InternalBindColumn(columnIdx, targetType, targetValue,
                                           bufferLength, strLengthOrIndicator));
 }
 
-SqlResult::Type Statement::InternalBindColumn(uint16_t columnIdx,
-                                              int16_t targetType,
-                                              void* targetValue,
-                                              SqlLen bufferLength,
+SqlResult::Type Statement::InternalBindColumn(uint16_t columnIdx, int16_t targetType,
+                                              void* targetValue, SqlLen bufferLength,
                                               SqlLen* strLengthOrIndicator) {
   LOG_DEBUG_MSG("InternalBindColumn is called with columnIdx "
-                << columnIdx << ", targetType " << targetType
-                << ", targetValue " << targetValue << ", bufferLength "
-                << bufferLength << ", strLengthOrIndicator "
-                << strLengthOrIndicator);
+                << columnIdx << ", targetType " << targetType << ", targetValue "
+                << targetValue << ", bufferLength " << bufferLength
+                << ", strLengthOrIndicator " << strLengthOrIndicator);
   using namespace type_traits;
   OdbcNativeType::Type driverType = ToDriverType(targetType);
 
@@ -122,10 +117,9 @@ SqlResult::Type Statement::InternalBindColumn(uint16_t columnIdx,
     return SqlResult::AI_ERROR;
   }
 
-  if (bufferLength < 0
-      || (bufferLength == 0
-          && (driverType == OdbcNativeType::AI_CHAR
-              || driverType == OdbcNativeType::AI_WCHAR))) {
+  if (bufferLength < 0 ||
+      (bufferLength == 0 && (driverType == OdbcNativeType::AI_CHAR ||
+                             driverType == OdbcNativeType::AI_WCHAR))) {
     AddStatusRecord(SqlState::SHY090_INVALID_STRING_OR_BUFFER_LENGTH,
                     "The value specified for the argument BufferLength was "
                     "less than 0 or 0 for string types.");
@@ -156,8 +150,8 @@ void Statement::SetDescriptorFields(uint16_t columnIdx, int16_t targetType,
   }
 
   DescriptorRecord& record = ard->GetRecords()[columnIdx];
-  if (targetType == SQL_C_TYPE_DATE || targetType == SQL_TYPE_TIME
-      || targetType == SQL_TYPE_TIMESTAMP) {
+  if (targetType == SQL_C_TYPE_DATE || targetType == SQL_TYPE_TIME ||
+      targetType == SQL_TYPE_TIMESTAMP) {
     record.type = SQL_DATETIME;
     if (targetType == SQL_C_TYPE_DATE) {
       record.conciseType = SQL_TYPE_DATE;
@@ -169,8 +163,8 @@ void Statement::SetDescriptorFields(uint16_t columnIdx, int16_t targetType,
       record.conciseType = SQL_TYPE_TIMESTAMP;
       record.datetimeIntervalCode = SQL_CODE_TIMESTAMP;
     }
-  } else if (targetType == SQL_C_INTERVAL_YEAR_TO_MONTH
-             || targetType == SQL_C_INTERVAL_DAY_TO_SECOND) {
+  } else if (targetType == SQL_C_INTERVAL_YEAR_TO_MONTH ||
+             targetType == SQL_C_INTERVAL_DAY_TO_SECOND) {
     record.type = SQL_INTERVAL;
     if (targetType == SQL_C_INTERVAL_YEAR_TO_MONTH) {
       record.conciseType = SQL_INTERVAL_YEAR_TO_MONTH;
@@ -184,10 +178,10 @@ void Statement::SetDescriptorFields(uint16_t columnIdx, int16_t targetType,
     record.conciseType = targetType;
   }
 
-  boost::optional< int16_t > type(targetType);
-  if (targetType == SQL_VARCHAR || targetType == SQL_WVARCHAR
-      || targetType == SQL_CHAR || targetType == SQL_WCHAR
-      || targetType == SQL_LONGVARCHAR || targetType == SQL_WLONGVARCHAR) {
+  boost::optional<int16_t> type(targetType);
+  if (targetType == SQL_VARCHAR || targetType == SQL_WVARCHAR || targetType == SQL_CHAR ||
+      targetType == SQL_WCHAR || targetType == SQL_LONGVARCHAR ||
+      targetType == SQL_WLONGVARCHAR) {
     record.length = bufferLength;
   } else {
     record.length = type_traits::SqlTypeTransferLength(type).get();
@@ -206,21 +200,13 @@ void Statement::SafeBindColumn(uint16_t columnIdx,
   columnBindings[columnIdx] = buffer;
 }
 
-void Statement::SafeUnbindColumn(uint16_t columnIdx) {
-  columnBindings.erase(columnIdx);
-}
+void Statement::SafeUnbindColumn(uint16_t columnIdx) { columnBindings.erase(columnIdx); }
 
-void Statement::SafeUnbindAllColumns() {
-  columnBindings.clear();
-}
+void Statement::SafeUnbindAllColumns() { columnBindings.clear(); }
 
-void Statement::SetColumnBindOffsetPtr(int* ptr) {
-  columnBindOffset = ptr;
-}
+void Statement::SetColumnBindOffsetPtr(int* ptr) { columnBindOffset = ptr; }
 
-int* Statement::GetColumnBindOffsetPtr() {
-  return columnBindOffset;
-}
+int* Statement::GetColumnBindOffsetPtr() { return columnBindOffset; }
 
 int32_t Statement::GetColumnNumber() {
   int32_t res;
@@ -240,7 +226,7 @@ SqlResult::Type Statement::InternalGetColumnNumber(int32_t& res) {
     return SqlResult::AI_ERROR;
   }
 
-  res = static_cast< int32_t >(meta->size());
+  res = static_cast<int32_t>(meta->size());
 
   return SqlResult::AI_SUCCESS;
 }
@@ -249,12 +235,11 @@ void Statement::SetAttribute(int attr, void* value, SQLINTEGER valueLen) {
   IGNITE_ODBC_API_CALL(InternalSetAttribute(attr, value, valueLen));
 }
 
-SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
-                                                SQLINTEGER) {
+SqlResult::Type Statement::InternalSetAttribute(int attr, void* value, SQLINTEGER) {
   LOG_DEBUG_MSG("InternalSetAttribute is called with attr " << attr);
   switch (attr) {
     case SQL_ATTR_CONCURRENCY: {
-      SqlUlen concurrency = reinterpret_cast< SqlUlen >(value);
+      SqlUlen concurrency = reinterpret_cast<SqlUlen>(value);
 
       if (concurrency != SQL_CONCUR_READ_ONLY) {
         AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
@@ -267,7 +252,7 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_CURSOR_TYPE: {
-      SqlUlen cursorType = reinterpret_cast< SqlUlen >(value);
+      SqlUlen cursorType = reinterpret_cast<SqlUlen>(value);
 
       if (cursorType != SQL_CURSOR_FORWARD_ONLY) {
         AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
@@ -280,7 +265,7 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_METADATA_ID: {
-      SqlUlen id = reinterpret_cast< SqlUlen >(value);
+      SqlUlen id = reinterpret_cast<SqlUlen>(value);
 
       if (id != SQL_TRUE && id != SQL_FALSE) {
         AddStatusRecord(SqlState::SHY024_INVALID_ATTRIBUTE_VALUE,
@@ -289,19 +274,17 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
         return SqlResult::AI_ERROR;
       }
 
-      connection.SetAttribute(SQL_ATTR_METADATA_ID,
-                              reinterpret_cast< SQLPOINTER >(id), 0);
+      connection.SetAttribute(SQL_ATTR_METADATA_ID, reinterpret_cast<SQLPOINTER>(id), 0);
 
       break;
     }
 
     case SQL_ATTR_RETRIEVE_DATA: {
-      SqlUlen retrievData = reinterpret_cast< SqlUlen >(value);
+      SqlUlen retrievData = reinterpret_cast<SqlUlen>(value);
 
       if (retrievData != SQL_RD_ON) {
-        AddStatusRecord(
-            SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-            "SQLFetch can only retrieve data after it positions the cursor");
+        AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
+                        "SQLFetch can only retrieve data after it positions the cursor");
 
         return SqlResult::AI_ERROR;
       }
@@ -310,7 +293,7 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_PARAM_BIND_TYPE: {
-      SqlUlen paramBindType = reinterpret_cast< SqlUlen >(value);
+      SqlUlen paramBindType = reinterpret_cast<SqlUlen>(value);
 
       if (paramBindType != SQL_PARAM_BIND_BY_COLUMN) {
         AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
@@ -323,12 +306,11 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_APP_ROW_DESC: {
-      Descriptor* desc = reinterpret_cast< Descriptor* >(value);
+      Descriptor* desc = reinterpret_cast<Descriptor*>(value);
       if (desc) {
         if (desc->GetConnection() != &connection) {
-          AddStatusRecord(
-              SqlState::SHY024_INVALID_ATTRIBUTE_VALUE,
-              "Descriptor does not belong to the statement connection.");
+          AddStatusRecord(SqlState::SHY024_INVALID_ATTRIBUTE_VALUE,
+                          "Descriptor does not belong to the statement connection.");
           return SqlResult::AI_ERROR;
         }
 
@@ -345,14 +327,13 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_ROW_ARRAY_SIZE: {
-      SqlUlen val = reinterpret_cast< SqlUlen >(value);
+      SqlUlen val = reinterpret_cast<SqlUlen>(value);
 
       LOG_DEBUG_MSG("SQL_ATTR_ROW_ARRAY_SIZE: " << val);
 
       if (val > 1000) {
-        AddStatusRecord(
-            SqlState::SIM001_FUNCTION_NOT_SUPPORTED,
-            "Array size value cannot be set to a value other than 1000");
+        AddStatusRecord(SqlState::SIM001_FUNCTION_NOT_SUPPORTED,
+                        "Array size value cannot be set to a value other than 1000");
 
         return SqlResult::AI_ERROR;
       }
@@ -367,13 +348,12 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_ROW_BIND_OFFSET_PTR: {
-      SetColumnBindOffsetPtr(reinterpret_cast< int* >(value));
+      SetColumnBindOffsetPtr(reinterpret_cast<int*>(value));
 
-      SQLLEN offset = *(reinterpret_cast< SQLLEN* >(value));
-      ard->GetHeader().bindOffsetPtr = reinterpret_cast< SQLLEN* >(value);
+      SQLLEN offset = *(reinterpret_cast<SQLLEN*>(value));
+      ard->GetHeader().bindOffsetPtr = reinterpret_cast<SQLLEN*>(value);
       for (auto& itr : ard->GetRecords()) {
-        itr.second.dataPtr =
-            reinterpret_cast< SQLCHAR* >(itr.second.dataPtr) + offset;
+        itr.second.dataPtr = reinterpret_cast<SQLCHAR*>(itr.second.dataPtr) + offset;
         itr.second.indicatorPtr += offset;
         itr.second.octetLengthPtr += offset;
       }
@@ -381,7 +361,7 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_ROW_BIND_TYPE: {
-      SqlUlen rowBindType = reinterpret_cast< SqlUlen >(value);
+      SqlUlen rowBindType = reinterpret_cast<SqlUlen>(value);
 
       if (rowBindType != SQL_BIND_BY_COLUMN) {
         AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
@@ -395,7 +375,7 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_ROW_OPERATION_PTR: {
-      SQLUSMALLINT* array = reinterpret_cast< SQLUSMALLINT* >(value);
+      SQLUSMALLINT* array = reinterpret_cast<SQLUSMALLINT*>(value);
 
       ard->GetHeader().arrayStatusPtr = array;
 
@@ -403,7 +383,7 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_ROW_STATUS_PTR: {
-      SQLUSMALLINT* array = reinterpret_cast< SQLUSMALLINT* >(value);
+      SQLUSMALLINT* array = reinterpret_cast<SQLUSMALLINT*>(value);
       SetRowStatusesPtr(array);
 
       ird->GetHeader().arrayStatusPtr = array;
@@ -411,7 +391,7 @@ SqlResult::Type Statement::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_ROWS_FETCHED_PTR: {
-      SQLULEN* buf = reinterpret_cast< SQLULEN* >(value);
+      SQLULEN* buf = reinterpret_cast<SQLULEN*>(value);
       SetRowsFetchedPtr(buf);
 
       ird->GetHeader().rowsProcessedPtr = buf;
@@ -453,50 +433,46 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
 
   switch (attr) {
     case SQL_ATTR_APP_ROW_DESC: {
-      SQLPOINTER* val = reinterpret_cast< SQLPOINTER* >(buf);
+      SQLPOINTER* val = reinterpret_cast<SQLPOINTER*>(buf);
 
-      *val = static_cast< SQLPOINTER >(ard);
+      *val = static_cast<SQLPOINTER>(ard);
 
-      if (valueLen)
-        *valueLen = SQL_IS_POINTER;
+      if (valueLen) *valueLen = SQL_IS_POINTER;
 
       break;
     }
 
     case SQL_ATTR_IMP_ROW_DESC: {
-      SQLPOINTER* val = reinterpret_cast< SQLPOINTER* >(buf);
+      SQLPOINTER* val = reinterpret_cast<SQLPOINTER*>(buf);
 
-      *val = static_cast< SQLPOINTER >(ird);
+      *val = static_cast<SQLPOINTER>(ird);
 
-      if (valueLen)
-        *valueLen = SQL_IS_POINTER;
+      if (valueLen) *valueLen = SQL_IS_POINTER;
 
       break;
     }
     case SQL_ATTR_APP_PARAM_DESC: {
-      SQLPOINTER* val = reinterpret_cast< SQLPOINTER* >(buf);
+      SQLPOINTER* val = reinterpret_cast<SQLPOINTER*>(buf);
 
-      *val = static_cast< SQLPOINTER >(apdi.get());
+      *val = static_cast<SQLPOINTER>(apdi.get());
 
-      if (valueLen)
-        *valueLen = SQL_IS_POINTER;
+      if (valueLen) *valueLen = SQL_IS_POINTER;
 
       break;
     }
 
     case SQL_ATTR_IMP_PARAM_DESC: {
-      SQLPOINTER* val = reinterpret_cast< SQLPOINTER* >(buf);
+      SQLPOINTER* val = reinterpret_cast<SQLPOINTER*>(buf);
 
-      *val = static_cast< SQLPOINTER >(ipdi.get());
+      *val = static_cast<SQLPOINTER>(ipdi.get());
 
-      if (valueLen)
-        *valueLen = SQL_IS_POINTER;
+      if (valueLen) *valueLen = SQL_IS_POINTER;
 
       break;
     }
 
     case SQL_ATTR_CONCURRENCY: {
-      SqlUlen* val = reinterpret_cast< SqlUlen* >(buf);
+      SqlUlen* val = reinterpret_cast<SqlUlen*>(buf);
 
       *val = SQL_CONCUR_READ_ONLY;
 
@@ -504,7 +480,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_CURSOR_SCROLLABLE: {
-      SqlUlen* val = reinterpret_cast< SqlUlen* >(buf);
+      SqlUlen* val = reinterpret_cast<SqlUlen*>(buf);
 
       *val = SQL_NONSCROLLABLE;
 
@@ -512,7 +488,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_CURSOR_SENSITIVITY: {
-      SqlUlen* val = reinterpret_cast< SqlUlen* >(buf);
+      SqlUlen* val = reinterpret_cast<SqlUlen*>(buf);
 
       *val = SQL_INSENSITIVE;
 
@@ -520,7 +496,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_CURSOR_TYPE: {
-      SqlUlen* val = reinterpret_cast< SqlUlen* >(buf);
+      SqlUlen* val = reinterpret_cast<SqlUlen*>(buf);
 
       *val = SQL_CURSOR_FORWARD_ONLY;
 
@@ -528,7 +504,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_ENABLE_AUTO_IPD: {
-      SqlUlen* val = reinterpret_cast< SqlUlen* >(buf);
+      SqlUlen* val = reinterpret_cast<SqlUlen*>(buf);
 
       *val = SQL_FALSE;
 
@@ -536,7 +512,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_METADATA_ID: {
-      SqlUlen* val = reinterpret_cast< SqlUlen* >(buf);
+      SqlUlen* val = reinterpret_cast<SqlUlen*>(buf);
 
       *val = connection.GetMetadataID() ? SQL_TRUE : SQL_FALSE;
 
@@ -544,7 +520,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_RETRIEVE_DATA: {
-      SqlUlen* val = reinterpret_cast< SqlUlen* >(buf);
+      SqlUlen* val = reinterpret_cast<SqlUlen*>(buf);
 
       *val = SQL_RD_ON;
 
@@ -552,19 +528,18 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_ROW_ARRAY_SIZE: {
-      SQLINTEGER* val = reinterpret_cast< SQLINTEGER* >(buf);
+      SQLINTEGER* val = reinterpret_cast<SQLINTEGER*>(buf);
 
-      *val = static_cast< SQLINTEGER >(rowArraySize);
+      *val = static_cast<SQLINTEGER>(rowArraySize);
 
-      if (valueLen)
-        *valueLen = SQL_IS_INTEGER;
+      if (valueLen) *valueLen = SQL_IS_INTEGER;
       LOG_DEBUG_MSG("*val is " << *val << ", *valueLen is "
                                << (valueLen ? *valueLen : 0));
       break;
     }
 
     case SQL_ATTR_ROW_BIND_TYPE: {
-      SqlUlen* val = reinterpret_cast< SqlUlen* >(buf);
+      SqlUlen* val = reinterpret_cast<SqlUlen*>(buf);
 
       *val = SQL_BIND_BY_COLUMN;
 
@@ -572,12 +547,11 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_ROWS_FETCHED_PTR: {
-      SqlUlen** val = reinterpret_cast< SqlUlen** >(buf);
+      SqlUlen** val = reinterpret_cast<SqlUlen**>(buf);
 
-      *val = reinterpret_cast< SqlUlen* >(GetRowsFetchedPtr());
+      *val = reinterpret_cast<SqlUlen*>(GetRowsFetchedPtr());
 
-      if (valueLen)
-        *valueLen = SQL_IS_POINTER;
+      if (valueLen) *valueLen = SQL_IS_POINTER;
 
       LOG_DEBUG_MSG("*val is " << *val << ", *valueLen is "
                                << (valueLen ? *valueLen : 0));
@@ -585,7 +559,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_ROW_NUMBER: {
-      SqlUlen* val = reinterpret_cast< SqlUlen* >(buf);
+      SqlUlen* val = reinterpret_cast<SqlUlen*>(buf);
 
       if (!currentQuery.get()) {
         std::string warnMsg =
@@ -595,19 +569,18 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
 
         *val = 0;
       } else {
-        *val = static_cast< SqlUlen >(currentQuery->RowNumber());
+        *val = static_cast<SqlUlen>(currentQuery->RowNumber());
       }
 
       break;
     }
 
     case SQL_ATTR_ROW_STATUS_PTR: {
-      SQLUSMALLINT** val = reinterpret_cast< SQLUSMALLINT** >(buf);
+      SQLUSMALLINT** val = reinterpret_cast<SQLUSMALLINT**>(buf);
 
-      *val = reinterpret_cast< SQLUSMALLINT* >(GetRowStatusesPtr());
+      *val = reinterpret_cast<SQLUSMALLINT*>(GetRowStatusesPtr());
 
-      if (valueLen)
-        *valueLen = SQL_IS_POINTER;
+      if (valueLen) *valueLen = SQL_IS_POINTER;
 
       LOG_DEBUG_MSG("*val is " << *val << ", *valueLen is "
                                << (valueLen ? *valueLen : 0));
@@ -615,7 +588,7 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_PARAM_BIND_TYPE: {
-      SqlUlen* val = reinterpret_cast< SqlUlen* >(buf);
+      SqlUlen* val = reinterpret_cast<SqlUlen*>(buf);
 
       *val = SQL_PARAM_BIND_BY_COLUMN;
 
@@ -623,12 +596,11 @@ SqlResult::Type Statement::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
     }
 
     case SQL_ATTR_ROW_BIND_OFFSET_PTR: {
-      SqlUlen** val = reinterpret_cast< SqlUlen** >(buf);
+      SqlUlen** val = reinterpret_cast<SqlUlen**>(buf);
 
-      *val = reinterpret_cast< SqlUlen* >(GetColumnBindOffsetPtr());
+      *val = reinterpret_cast<SqlUlen*>(GetColumnBindOffsetPtr());
 
-      if (valueLen)
-        *valueLen = SQL_IS_POINTER;
+      if (valueLen) *valueLen = SQL_IS_POINTER;
 
       LOG_DEBUG_MSG("*val is " << *val << ", *valueLen is "
                                << (valueLen ? *valueLen : 0));
@@ -650,8 +622,7 @@ void Statement::GetStmtOption(SQLUSMALLINT option, SQLPOINTER value) {
   IGNITE_ODBC_API_CALL(InternalGetStmtOption(option, value));
 }
 
-SqlResult::Type Statement::InternalGetStmtOption(SQLUSMALLINT option,
-                                                 SQLPOINTER value) {
+SqlResult::Type Statement::InternalGetStmtOption(SQLUSMALLINT option, SQLPOINTER value) {
   LOG_DEBUG_MSG("InternalGetStmtOption is called");
 
   if (!value) {
@@ -675,13 +646,12 @@ SqlResult::Type Statement::InternalGetStmtOption(SQLUSMALLINT option,
   }
 }
 
-void Statement::GetColumnData(uint16_t columnIdx,
-                              app::ApplicationDataBuffer& buffer) {
+void Statement::GetColumnData(uint16_t columnIdx, app::ApplicationDataBuffer& buffer) {
   IGNITE_ODBC_API_CALL(InternalGetColumnData(columnIdx, buffer));
 }
 
-SqlResult::Type Statement::InternalGetColumnData(
-    uint16_t columnIdx, app::ApplicationDataBuffer& buffer) {
+SqlResult::Type Statement::InternalGetColumnData(uint16_t columnIdx,
+                                                 app::ApplicationDataBuffer& buffer) {
   LOG_DEBUG_MSG("InternalGetColumnData is called");
   if (!currentQuery.get()) {
     std::string errMsg = "Cursor is not in the open state.";
@@ -704,8 +674,7 @@ SqlResult::Type Statement::ProcessInternalCommand(const std::string& query) {
 }
 
 SqlResult::Type Statement::InternalPrepareSqlQuery(const std::string& query) {
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
   currentQuery.reset(new query::DataQuery(*this, connection, query));
 
@@ -720,15 +689,12 @@ SqlResult::Type Statement::InternalExecuteSqlQuery(const std::string& query) {
   LOG_DEBUG_MSG("InternalExecuteSqlQuery is called for query " << query);
   SqlResult::Type result = InternalPrepareSqlQuery(query);
 
-  if (result != SqlResult::AI_SUCCESS)
-    return result;
+  if (result != SqlResult::AI_SUCCESS) return result;
 
   return InternalExecuteSqlQuery();
 }
 
-void Statement::ExecuteSqlQuery() {
-  IGNITE_ODBC_API_CALL(InternalExecuteSqlQuery());
-}
+void Statement::ExecuteSqlQuery() { IGNITE_ODBC_API_CALL(InternalExecuteSqlQuery()); }
 
 SqlResult::Type Statement::InternalExecuteSqlQuery() {
   LOG_DEBUG_MSG("InternalExecuteSqlQuery is called");
@@ -750,9 +716,7 @@ SqlResult::Type Statement::InternalExecuteSqlQuery() {
   return retval;
 }
 
-void Statement::CancelSqlQuery() {
-  IGNITE_ODBC_API_CALL(InternalCancelSqlQuery());
-}
+void Statement::CancelSqlQuery() { IGNITE_ODBC_API_CALL(InternalCancelSqlQuery()); }
 
 SqlResult::Type Statement::InternalCancelSqlQuery() {
   LOG_DEBUG_MSG("InternalCancelSqlQuery is called");
@@ -765,49 +729,43 @@ SqlResult::Type Statement::InternalCancelSqlQuery() {
   return currentQuery->Cancel();
 }
 
-void Statement::ExecuteGetColumnsMetaQuery(
-    const boost::optional< std::string >& catalog,
-    const boost::optional< std::string >& schema,
-    const boost::optional< std::string >& table,
-    const boost::optional< std::string >& column) {
+void Statement::ExecuteGetColumnsMetaQuery(const boost::optional<std::string>& catalog,
+                                           const boost::optional<std::string>& schema,
+                                           const boost::optional<std::string>& table,
+                                           const boost::optional<std::string>& column) {
   IGNITE_ODBC_API_CALL(
       InternalExecuteGetColumnsMetaQuery(catalog, schema, table, column));
 }
 
 SqlResult::Type Statement::InternalExecuteGetColumnsMetaQuery(
-    const boost::optional< std::string >& catalog,
-    const boost::optional< std::string >& schema,
-    const boost::optional< std::string >& table,
-    const boost::optional< std::string >& column) {
-  if (currentQuery.get())
-    currentQuery->Close();
+    const boost::optional<std::string>& catalog,
+    const boost::optional<std::string>& schema, const boost::optional<std::string>& table,
+    const boost::optional<std::string>& column) {
+  if (currentQuery.get()) currentQuery->Close();
 
-  currentQuery.reset(new query::ColumnMetadataQuery(*this, connection, catalog,
-                                                    schema, table, column));
+  currentQuery.reset(
+      new query::ColumnMetadataQuery(*this, connection, catalog, schema, table, column));
 
   return currentQuery->Execute();
 }
 
-void Statement::ExecuteGetTablesMetaQuery(
-    const boost::optional< std::string >& catalog,
-    const boost::optional< std::string >& schema,
-    const boost::optional< std::string >& table,
-    const boost::optional< std::string >& tableType) {
+void Statement::ExecuteGetTablesMetaQuery(const boost::optional<std::string>& catalog,
+                                          const boost::optional<std::string>& schema,
+                                          const boost::optional<std::string>& table,
+                                          const boost::optional<std::string>& tableType) {
   IGNITE_ODBC_API_CALL(
       InternalExecuteGetTablesMetaQuery(catalog, schema, table, tableType));
 }
 
 SqlResult::Type Statement::InternalExecuteGetTablesMetaQuery(
-    const boost::optional< std::string >& catalog,
-    const boost::optional< std::string >& schema,
-    const boost::optional< std::string >& table,
-    const boost::optional< std::string >& tableType) {
+    const boost::optional<std::string>& catalog,
+    const boost::optional<std::string>& schema, const boost::optional<std::string>& table,
+    const boost::optional<std::string>& tableType) {
   LOG_DEBUG_MSG("InternalExecuteGetTablesMetaQuery is called");
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
-  currentQuery.reset(new query::TableMetadataQuery(*this, connection, catalog,
-                                                   schema, table, tableType));
+  currentQuery.reset(new query::TableMetadataQuery(*this, connection, catalog, schema,
+                                                   table, tableType));
 
   return currentQuery->Execute();
 }
@@ -817,8 +775,7 @@ void Statement::ExecuteGetForeignKeysQuery() {
 }
 
 SqlResult::Type Statement::InternalExecuteGetForeignKeysQuery() {
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
   currentQuery.reset(new query::ForeignKeysQuery(*this));
 
@@ -830,8 +787,7 @@ void Statement::ExecuteGetPrimaryKeysQuery() {
 }
 
 SqlResult::Type Statement::InternalExecuteGetPrimaryKeysQuery() {
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
   currentQuery.reset(new query::PrimaryKeysQuery(*this));
 
@@ -843,8 +799,7 @@ void Statement::ExecuteSpecialColumnsQuery() {
 }
 
 SqlResult::Type Statement::InternalExecuteSpecialColumnsQuery() {
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
   currentQuery.reset(new query::SpecialColumnsQuery(*this));
 
@@ -856,11 +811,9 @@ void Statement::ExecuteStatisticsQuery() {
 }
 
 SqlResult::Type Statement::InternalExecuteStatisticsQuery() {
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
-  currentQuery.reset(
-      new query::StatisticsQuery(*this, connection.GetEnvODBCVer()));
+  currentQuery.reset(new query::StatisticsQuery(*this, connection.GetEnvODBCVer()));
 
   return currentQuery->Execute();
 }
@@ -870,8 +823,7 @@ void Statement::ExecuteProcedureColumnsQuery() {
 }
 
 SqlResult::Type Statement::InternalExecuteProcedureColumnsQuery() {
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
   currentQuery.reset(new query::ProcedureColumnsQuery(*this));
 
@@ -883,8 +835,7 @@ void Statement::ExecuteProceduresQuery() {
 }
 
 SqlResult::Type Statement::InternalExecuteProceduresQuery() {
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
   currentQuery.reset(new query::ProceduresQuery(*this));
 
@@ -896,8 +847,7 @@ void Statement::ExecuteColumnPrivilegesQuery() {
 }
 
 SqlResult::Type Statement::InternalExecuteColumnPrivilegesQuery() {
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
   currentQuery.reset(new query::ColumnPrivilegesQuery(*this));
 
@@ -909,8 +859,7 @@ void Statement::ExecuteTablePrivilegesQuery() {
 }
 
 SqlResult::Type Statement::InternalExecuteTablePrivilegesQuery() {
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
   currentQuery.reset(new query::TablePrivilegesQuery(*this));
 
@@ -922,20 +871,17 @@ void Statement::ExecuteGetTypeInfoQuery(int16_t sqlType) {
 }
 
 SqlResult::Type Statement::InternalExecuteGetTypeInfoQuery(int16_t sqlType) {
-  LOG_DEBUG_MSG("InternalExecuteGetTypeInfoQuery is called with sqlType "
-                << sqlType);
+  LOG_DEBUG_MSG("InternalExecuteGetTypeInfoQuery is called with sqlType " << sqlType);
   if (sqlType != SQL_ALL_TYPES && !type_traits::IsSqlTypeSupported(sqlType)) {
     std::stringstream builder;
     builder << "Data type is not supported. [typeId=" << sqlType << ']';
 
-    AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-                    builder.str());
+    AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED, builder.str());
 
     return SqlResult::AI_ERROR;
   }
 
-  if (currentQuery.get())
-    currentQuery->Close();
+  if (currentQuery.get()) currentQuery->Close();
 
   currentQuery.reset(new query::TypeInfoQuery(*this, sqlType));
 
@@ -966,26 +912,21 @@ SqlResult::Type Statement::InternalFreeResources(int16_t option) {
     }
 
     default: {
-      AddStatusRecord(
-          SqlState::SHY092_OPTION_TYPE_OUT_OF_RANGE,
-          "The value specified for the argument Option was invalid");
+      AddStatusRecord(SqlState::SHY092_OPTION_TYPE_OUT_OF_RANGE,
+                      "The value specified for the argument Option was invalid");
       return SqlResult::AI_ERROR;
     }
   }
   return SqlResult::AI_SUCCESS;
 }
 
-void Statement::Close() {
-  IGNITE_ODBC_API_CALL(InternalClose());
-}
+void Statement::Close() { IGNITE_ODBC_API_CALL(InternalClose()); }
 
 SqlResult::Type Statement::InternalClose() {
-  if (!currentQuery.get())
-    return SqlResult::AI_SUCCESS;
+  if (!currentQuery.get()) return SqlResult::AI_SUCCESS;
 
   if (!currentQuery->DataAvailable()) {
-    AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE,
-                    "No cursor was open");
+    AddStatusRecord(SqlState::S24000_INVALID_CURSOR_STATE, "No cursor was open");
     return SqlResult::AI_ERROR;
   }
 
@@ -998,10 +939,8 @@ void Statement::FetchScroll(int16_t orientation, int64_t offset) {
   IGNITE_ODBC_API_CALL(InternalFetchScroll(orientation, offset));
 }
 
-SqlResult::Type Statement::InternalFetchScroll(int16_t orientation,
-                                               int64_t offset) {
-  LOG_DEBUG_MSG("InternalFetchScroll is called with orientation "
-                << orientation);
+SqlResult::Type Statement::InternalFetchScroll(int16_t orientation, int64_t offset) {
+  LOG_DEBUG_MSG("InternalFetchScroll is called with orientation " << orientation);
   UNREFERENCED_PARAMETER(offset);
 
   if (orientation != SQL_FETCH_NEXT) {
@@ -1014,14 +953,11 @@ SqlResult::Type Statement::InternalFetchScroll(int16_t orientation,
   return InternalFetchRow();
 }
 
-void Statement::FetchRow() {
-  IGNITE_ODBC_API_CALL(InternalFetchRow());
-}
+void Statement::FetchRow() { IGNITE_ODBC_API_CALL(InternalFetchRow()); }
 
 SqlResult::Type Statement::InternalFetchRow() {
   LOG_DEBUG_MSG("InternalFetchRow is called");
-  if (rowsFetched)
-    *rowsFetched = 0;
+  if (rowsFetched) *rowsFetched = 0;
 
   if (!currentQuery.get()) {
     std::string errMsg = "Cursor is not in the open state.";
@@ -1051,16 +987,14 @@ SqlResult::Type Statement::InternalFetchRow() {
     else if (res != SqlResult::AI_NO_DATA)
       ++errors;
 
-    if (rowStatuses)
-      rowStatuses[i] = SqlResultToRowResult(res);
+    if (rowStatuses) rowStatuses[i] = SqlResultToRowResult(res);
   }
 
   if (rowsFetched)
-    *rowsFetched = fetched < 0 ? static_cast< SQLULEN >(rowArraySize) : fetched;
+    *rowsFetched = fetched < 0 ? static_cast<SQLULEN>(rowArraySize) : fetched;
 
   if (fetched > 0)
-    return errors == 0 ? SqlResult::AI_SUCCESS
-                       : SqlResult::AI_SUCCESS_WITH_INFO;
+    return errors == 0 ? SqlResult::AI_SUCCESS : SqlResult::AI_SUCCESS_WITH_INFO;
 
   LOG_DEBUG_MSG("rowsFetched is " << rowsFetched << ", fetched is " << fetched
                                   << ", errors is " << errors);
@@ -1082,9 +1016,7 @@ bool Statement::DataAvailable() const {
   return currentQuery.get() && currentQuery->DataAvailable();
 }
 
-void Statement::MoreResults() {
-  IGNITE_ODBC_API_CALL(InternalMoreResults());
-}
+void Statement::MoreResults() { IGNITE_ODBC_API_CALL(InternalMoreResults()); }
 
 SqlResult::Type Statement::InternalMoreResults() {
   LOG_DEBUG_MSG("InternalMoreResults is called");
@@ -1097,20 +1029,18 @@ SqlResult::Type Statement::InternalMoreResults() {
   return currentQuery->NextResultSet();
 }
 
-void Statement::GetColumnAttribute(uint16_t colIdx, uint16_t attrId,
-                                   SQLWCHAR* strbuf, int16_t buflen,
-                                   int16_t* reslen, SqlLen* numbuf) {
-  IGNITE_ODBC_API_CALL(InternalGetColumnAttribute(colIdx, attrId, strbuf,
-                                                  buflen, reslen, numbuf));
+void Statement::GetColumnAttribute(uint16_t colIdx, uint16_t attrId, SQLWCHAR* strbuf,
+                                   int16_t buflen, int16_t* reslen, SqlLen* numbuf) {
+  IGNITE_ODBC_API_CALL(
+      InternalGetColumnAttribute(colIdx, attrId, strbuf, buflen, reslen, numbuf));
 }
 
-SqlResult::Type Statement::InternalGetColumnAttribute(
-    uint16_t colIdx, uint16_t attrId, SQLWCHAR* strbuf, int16_t buflen,
-    int16_t* reslen, SqlLen* numbuf) {
+SqlResult::Type Statement::InternalGetColumnAttribute(uint16_t colIdx, uint16_t attrId,
+                                                      SQLWCHAR* strbuf, int16_t buflen,
+                                                      int16_t* reslen, SqlLen* numbuf) {
   LOG_DEBUG_MSG("InternalGetColumnAttribute is called with Column ID: "
                 << colIdx << ", Attribute ID: " << attrId << " ("
-                << meta::ColumnMeta::AttrIdToString(attrId)
-                << "), buflen: " << buflen);
+                << meta::ColumnMeta::AttrIdToString(attrId) << "), buflen: " << buflen);
   const meta::ColumnMetaVector* meta = GetMeta();
 
   if (!meta) {
@@ -1121,8 +1051,7 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
   }
 
   if (colIdx > meta->size() || colIdx < 1) {
-    AddStatusRecord(SqlState::SHY000_GENERAL_ERROR,
-                    "Column index is out of range.",
+    AddStatusRecord(SqlState::SHY000_GENERAL_ERROR, "Column index is out of range.",
                     timestream::odbc::LogLevel::Type::ERROR_LEVEL, 0, colIdx);
 
     return SqlResult::AI_ERROR;
@@ -1152,16 +1081,12 @@ SqlResult::Type Statement::InternalGetColumnAttribute(
       bool isTruncated = false;
       if (strbuf) {
         // Length is given in bytes
-        outSize =
-            utility::CopyStringToBuffer(out, strbuf, buflen, isTruncated, true);
-        LOG_DEBUG_MSG("strbuf is " << strbuf << ", out is " << out
-                                   << ", outSize is " << outSize
-                                   << ", isTruncated is " << isTruncated);
+        outSize = utility::CopyStringToBuffer(out, strbuf, buflen, isTruncated, true);
+        LOG_DEBUG_MSG("strbuf is " << strbuf << ", out is " << out << ", outSize is "
+                                   << outSize << ", isTruncated is " << isTruncated);
       }
-      if (reslen)
-        *reslen = static_cast< int16_t >(outSize);
-      if (isTruncated)
-        return SqlResult::AI_SUCCESS_WITH_INFO;
+      if (reslen) *reslen = static_cast<int16_t>(outSize);
+      if (isTruncated) return SqlResult::AI_SUCCESS_WITH_INFO;
     }
   }
 
@@ -1196,21 +1121,13 @@ SqlResult::Type Statement::InternalAffectedRows(int64_t& rowCnt) {
   return SqlResult::AI_SUCCESS;
 }
 
-void Statement::SetRowsFetchedPtr(SQLULEN* ptr) {
-  rowsFetched = ptr;
-}
+void Statement::SetRowsFetchedPtr(SQLULEN* ptr) { rowsFetched = ptr; }
 
-SQLULEN* Statement::GetRowsFetchedPtr() {
-  return rowsFetched;
-}
+SQLULEN* Statement::GetRowsFetchedPtr() { return rowsFetched; }
 
-void Statement::SetRowStatusesPtr(SQLUSMALLINT* ptr) {
-  rowStatuses = ptr;
-}
+void Statement::SetRowStatusesPtr(SQLUSMALLINT* ptr) { rowStatuses = ptr; }
 
-SQLUSMALLINT* Statement::GetRowStatusesPtr() {
-  return rowStatuses;
-}
+SQLUSMALLINT* Statement::GetRowStatusesPtr() { return rowStatuses; }
 
 uint16_t Statement::SqlResultToRowResult(SqlResult::Type value) {
   LOG_DEBUG_MSG("SqlResultToRowResult is called with value " << value);
@@ -1253,8 +1170,7 @@ SqlResult::Type Statement::InternalGetCursorName(SQLWCHAR* nameBuf,
   // nameBufLen is the number of characters in nameBuf, not include the ending
   // '\0'
   size_t resultLen = timestream::odbc::utility::CopyUtf8StringToSqlWcharString(
-      cursorName.c_str(), nameBuf, (nameBufLen + 1) * sizeof(SQLWCHAR),
-      isTruncated);
+      cursorName.c_str(), nameBuf, (nameBufLen + 1) * sizeof(SQLWCHAR), isTruncated);
   *nameResLen = resultLen / sizeof(SQLWCHAR);
 
   if (isTruncated) {
@@ -1272,25 +1188,21 @@ void Statement::SetCursorName(SQLWCHAR* name, SQLSMALLINT nameLen) {
 
 #define CURSOR_NAME_MAX_LENGTH 18
 
-SqlResult::Type Statement::InternalSetCursorName(SQLWCHAR* name,
-                                                 SQLSMALLINT nameLen) {
+SqlResult::Type Statement::InternalSetCursorName(SQLWCHAR* name, SQLSMALLINT nameLen) {
   if (nameLen > CURSOR_NAME_MAX_LENGTH) {
     std::stringstream ss;
     ss << "The number of characters in cursor name (" << nameLen
-       << ") exceeds the maximum allowed number (" << CURSOR_NAME_MAX_LENGTH
-       << ")";
+       << ") exceeds the maximum allowed number (" << CURSOR_NAME_MAX_LENGTH << ")";
     AddStatusRecord(SqlState::S3C000_DUPLICATE_CURSOR_NAME, ss.str());
 
     return SqlResult::AI_ERROR;
   }
 
-  std::string cursorName =
-      timestream::odbc::utility::SqlWcharToString(name, nameLen);
+  std::string cursorName = timestream::odbc::utility::SqlWcharToString(name, nameLen);
   std::string pattern("SQL_CUR");
-  if (cursorName.length() >= pattern.length()
-      && Aws::Utils::StringUtils::ToUpper(
-             cursorName.substr(0, pattern.length()).data())
-             == pattern) {
+  if (cursorName.length() >= pattern.length() &&
+      Aws::Utils::StringUtils::ToUpper(cursorName.substr(0, pattern.length()).data()) ==
+          pattern) {
     std::stringstream ss;
     ss << "Cursor name should not start with " << pattern;
     AddStatusRecord(SqlState::S34000_INVALID_CURSOR_NAME, ss.str());

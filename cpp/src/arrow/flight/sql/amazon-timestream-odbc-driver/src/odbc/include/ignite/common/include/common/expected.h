@@ -31,7 +31,7 @@ namespace common {
 /**
  * Helper class to construct Expected class with error value.
  */
-template < typename E >
+template <typename E>
 struct Unexpected {
   /** Value type. */
   typedef E ValueType;
@@ -60,8 +60,8 @@ struct Unexpected {
  * @tparam AR Allocator type used for the Result type.
  * @tparam AE Allocator type used for the Error type.
  */
-template < typename R, typename E, typename AR = std::allocator< R >,
-           typename AE = std::allocator< E > >
+template <typename R, typename E, typename AR = std::allocator<R>,
+          typename AE = std::allocator<E> >
 class Expected {
  public:
   /** Result type. */
@@ -94,7 +94,7 @@ class Expected {
    * Creates new instance, containing error.
    * @param err Result.
    */
-  explicit Expected(Unexpected< ErrorType > err) : ok(false) {
+  explicit Expected(Unexpected<ErrorType> err) : ok(false) {
     ErrorAllocatorType ral;
 
     ral.construct(AsError(), err.err);
@@ -137,9 +137,7 @@ class Expected {
    *
    * @return @c false if the value is an error and @c true otherwise.
    */
-  bool IsOk() const {
-    return ok;
-  }
+  bool IsOk() const { return ok; }
 
   /**
    * Get result. Constant accesser.
@@ -148,8 +146,7 @@ class Expected {
    * @throw ErrorType if there is no result.
    */
   const ResultType& GetResult() const {
-    if (!ok)
-      throw *AsError();
+    if (!ok) throw *AsError();
 
     return *AsResult();
   }
@@ -161,8 +158,7 @@ class Expected {
    * @throw ErrorType if there is no result.
    */
   ResultType& GetResult() {
-    if (!ok)
-      throw *AsError();
+    if (!ok) throw *AsError();
 
     return *AsResult();
   }
@@ -173,9 +169,7 @@ class Expected {
    * @return Result if it was set before.
    * @throw ErrorType if there is no result.
    */
-  const ResultType& operator*() const {
-    return GetResult();
-  }
+  const ResultType& operator*() const { return GetResult(); }
 
   /**
    * Get result.
@@ -183,9 +177,7 @@ class Expected {
    * @return Result if it was set before.
    * @throw ErrorType if there is no result.
    */
-  ResultType& operator*() {
-    return GetResult();
-  }
+  ResultType& operator*() { return GetResult(); }
 
   /**
    * Get result. Constant accesser.
@@ -193,9 +185,7 @@ class Expected {
    * @return Result if it was set before.
    * @throw ErrorType if there is no result.
    */
-  const ResultType& operator->() const {
-    return GetResult();
-  }
+  const ResultType& operator->() const { return GetResult(); }
 
   /**
    * Get result.
@@ -203,9 +193,7 @@ class Expected {
    * @return Result if it was set before.
    * @throw ErrorType if there is no result.
    */
-  ResultType& operator->() {
-    return GetResult();
-  }
+  ResultType& operator->() { return GetResult(); }
 
   /**
    * Get error.
@@ -216,8 +204,7 @@ class Expected {
   const ErrorType& GetError() const {
     static ErrorType noError;
 
-    if (ok)
-      return noError;
+    if (ok) return noError;
 
     return *AsError();
   }
@@ -228,9 +215,7 @@ class Expected {
    *
    * @return Storage pointer as an result pointer.
    */
-  ResultType* AsResult() {
-    return reinterpret_cast< ResultType* >(&storage);
-  }
+  ResultType* AsResult() { return reinterpret_cast<ResultType*>(&storage); }
 
   /**
    * Get storage as an result.
@@ -238,7 +223,7 @@ class Expected {
    * @return Storage pointer as an result pointer.
    */
   const ResultType* AsResult() const {
-    return reinterpret_cast< const ResultType* >(&storage);
+    return reinterpret_cast<const ResultType*>(&storage);
   }
 
   /**
@@ -246,9 +231,7 @@ class Expected {
    *
    * @return Storage pointer as an error pointer.
    */
-  ErrorType* AsError() {
-    return reinterpret_cast< ErrorType* >(&storage);
-  }
+  ErrorType* AsError() { return reinterpret_cast<ErrorType*>(&storage); }
 
   /**
    * Get storage as an error.
@@ -256,12 +239,12 @@ class Expected {
    * @return Storage pointer as an error pointer.
    */
   const ErrorType* AsError() const {
-    return reinterpret_cast< const ErrorType* >(&storage);
+    return reinterpret_cast<const ErrorType*>(&storage);
   }
 
   /** Storage. */
-  int8_t storage[sizeof(typename timestream::odbc::common::Bigger<
-                        ResultType, ErrorType >::type)];
+  int8_t storage[sizeof(
+      typename timestream::odbc::common::Bigger<ResultType, ErrorType>::type)];
 
   /** Result flag. Set to @c false if the value is an error. */
   bool ok;

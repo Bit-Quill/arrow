@@ -14,9 +14,9 @@
  *
  */
 
+#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
 #include <mock/mock_stsclient.h>
 #include <mock/mock_timestream_service.h>
-#include <aws/sts/model/AssumeRoleWithSAMLRequest.h>
 
 namespace timestream {
 namespace odbc {
@@ -32,9 +32,9 @@ Model::AssumeRoleWithSAMLOutcome MockSTSClient::AssumeRoleWithSAML(
       "c3BvbnNlPg==");
 
   // The outcome is determined by role arn.
-  if ((request.GetRoleArn() == "arn:role:nocredentials")
-      || (request.GetRoleArn() == "arn:role:checkSAMLAssertion"
-          && request.GetSAMLAssertion() != predefinedSAMLAssertion)) {
+  if ((request.GetRoleArn() == "arn:role:nocredentials") ||
+      (request.GetRoleArn() == "arn:role:checkSAMLAssertion" &&
+       request.GetSAMLAssertion() != predefinedSAMLAssertion)) {
     // no credentials in the result
     Model::AssumeRoleWithSAMLOutcome outcome;
 
@@ -43,7 +43,7 @@ Model::AssumeRoleWithSAMLOutcome MockSTSClient::AssumeRoleWithSAML(
     // a valid credentials in the result
     Model::AssumeRoleWithSAMLResult result;
     Model::Credentials credentials;
-    const std::map< Aws::String, Aws::String >& credMap =
+    const std::map<Aws::String, Aws::String>& credMap =
         MockTimestreamService::GetInstance()->GetCredentialMap();
     if (!credMap.empty()) {
       credentials.SetAccessKeyId(credMap.begin()->first);

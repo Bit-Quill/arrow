@@ -16,25 +16,21 @@
 
 #include "timestream/odbc/authentication/auth_type.h"
 
-#include <timestream/odbc/utils.h>
 #include <timestream/odbc/utility.h>
+#include <timestream/odbc/utils.h>
 
 namespace timestream {
 namespace odbc {
 AuthType::Type AuthType::FromString(const std::string& val, Type dflt) {
   std::string lowerVal = utility::Trim(timestream::odbc::common::ToLower(val));
 
-  if (lowerVal == "aws_profile")
-    return AuthType::Type::AWS_PROFILE;
+  if (lowerVal == "aws_profile") return AuthType::Type::AWS_PROFILE;
 
-  if (lowerVal == "iam")
-    return AuthType::Type::IAM;
+  if (lowerVal == "iam") return AuthType::Type::IAM;
 
-  if (lowerVal == "aad")
-    return AuthType::Type::AAD;
+  if (lowerVal == "aad") return AuthType::Type::AAD;
 
-  if (lowerVal == "okta")
-    return AuthType::Type::OKTA;
+  if (lowerVal == "okta") return AuthType::Type::OKTA;
 
   return dflt;
 }

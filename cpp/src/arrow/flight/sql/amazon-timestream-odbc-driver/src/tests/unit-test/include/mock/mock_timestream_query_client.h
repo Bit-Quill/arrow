@@ -28,27 +28,22 @@ namespace odbc {
  * Mock TimestreamQueryClient so its behavior could be controlled by us.
  * All interfaces should be kept same as TimestreamQueryClient.
  */
-class MockTimestreamQueryClient
-    : public Aws::TimestreamQuery::TimestreamQueryClient {
+class MockTimestreamQueryClient : public Aws::TimestreamQuery::TimestreamQueryClient {
  public:
   /**
    * Constructor.
    */
-  MockTimestreamQueryClient(
-      const Aws::Auth::AWSCredentials &credentials,
-      const Aws::Client::ClientConfiguration &clientConfiguration =
-          Aws::Client::ClientConfiguration())
-      : Aws::TimestreamQuery::TimestreamQueryClient(credentials,
-                                                    clientConfiguration),
+  MockTimestreamQueryClient(const Aws::Auth::AWSCredentials& credentials,
+                            const Aws::Client::ClientConfiguration& clientConfiguration =
+                                Aws::Client::ClientConfiguration())
+      : Aws::TimestreamQuery::TimestreamQueryClient(credentials, clientConfiguration),
         credentials_(credentials),
-        clientConfiguration_(clientConfiguration) {
-  }
+        clientConfiguration_(clientConfiguration) {}
 
   /**
    * Destructor.
    */
-  ~MockTimestreamQueryClient() {
-  }
+  ~MockTimestreamQueryClient() {}
 
   /**
    * Run a query.
@@ -57,7 +52,7 @@ class MockTimestreamQueryClient
    * @return Operation outcome.
    */
   virtual Aws::TimestreamQuery::Model::QueryOutcome Query(
-      const Aws::TimestreamQuery::Model::QueryRequest &request) const;
+      const Aws::TimestreamQuery::Model::QueryRequest& request) const;
 
  private:
   Aws::Auth::AWSCredentials credentials_;

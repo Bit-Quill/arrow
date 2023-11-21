@@ -42,9 +42,7 @@ class MockTimestreamService {
   /**
    * Get the singleton object pointer.
    */
-  static MockTimestreamService* GetInstance() {
-    return instance_;
-  }
+  static MockTimestreamService* GetInstance() { return instance_; }
 
   /**
    * Destructor.
@@ -71,9 +69,7 @@ class MockTimestreamService {
    *
    * @return The credential map
    */
-  std::map< Aws::String, Aws::String > GetCredentialMap() {
-    return credMap_;
-  }
+  std::map<Aws::String, Aws::String> GetCredentialMap() { return credMap_; }
 
   /**
    * Verify credentials provided by user
@@ -95,16 +91,13 @@ class MockTimestreamService {
   /**
    * Constructor.
    */
-  MockTimestreamService() {
-  }
+  MockTimestreamService() {}
 
-  void SetupResultForMockTable(
-      Aws::TimestreamQuery::Model::QueryResult& result);
+  void SetupResultForMockTable(Aws::TimestreamQuery::Model::QueryResult& result);
 
   static std::mutex mutex_;
   static MockTimestreamService* instance_;
-  std::map< Aws::String, Aws::String >
-      credMap_;  // credentials configured by user
+  std::map<Aws::String, Aws::String> credMap_;  // credentials configured by user
   static int token;
   static int errorToken;
 };

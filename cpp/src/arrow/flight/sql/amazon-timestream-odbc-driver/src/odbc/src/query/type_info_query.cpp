@@ -112,10 +112,8 @@ struct ResultColumn {
 namespace timestream {
 namespace odbc {
 namespace query {
-TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
-                             int16_t sqlType)
-    : timestream::odbc::query::Query(
-        diag, timestream::odbc::query::QueryType::TYPE_INFO),
+TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag, int16_t sqlType)
+    : timestream::odbc::query::Query(diag, timestream::odbc::query::QueryType::TYPE_INFO),
       columnsMeta(),
       executed(false),
       fetched(false),
@@ -133,62 +131,62 @@ TypeInfoQuery::TypeInfoQuery(diagnostic::DiagnosableAdapter& diag,
   const std::string sch;
   const std::string tbl;
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TYPE_NAME", ScalarType::VARCHAR,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DATA_TYPE", ScalarType::INTEGER,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "COLUMN_SIZE", ScalarType::INTEGER,
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "TYPE_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "DATA_TYPE", ScalarType::INTEGER, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "COLUMN_SIZE", ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "LITERAL_PREFIX", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "LITERAL_SUFFIX", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "CREATE_PARAMS", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "NULLABLE", ScalarType::INTEGER, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "CASE_SENSITIVE", ScalarType::INTEGER, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "SEARCHABLE", ScalarType::INTEGER, Nullability::NO_NULL));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "UNSIGNED_ATTRIBUTE", ScalarType::INTEGER,
                                    Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "LITERAL_PREFIX",
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "LITERAL_SUFFIX",
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "CREATE_PARAMS",
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "NULLABLE", ScalarType::INTEGER,
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "FIXED_PREC_SCALE", ScalarType::INTEGER,
                                    Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "CASE_SENSITIVE",
-                                   ScalarType::INTEGER, Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "SEARCHABLE", ScalarType::INTEGER,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "UNSIGNED_ATTRIBUTE",
-                                   ScalarType::INTEGER, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "FIXED_PREC_SCALE",
-                                   ScalarType::INTEGER, Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "AUTO_UNIQUE_VALUE",
-                                   ScalarType::INTEGER, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "LOCAL_TYPE_NAME",
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "MINIMUM_SCALE",
-                                   ScalarType::INTEGER, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "MAXIMUM_SCALE",
-                                   ScalarType::INTEGER, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATA_TYPE",
-                                   ScalarType::INTEGER, Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB",
-                                   ScalarType::INTEGER, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "NUM_PREC_RADIX",
-                                   ScalarType::INTEGER, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "INTERVAL_PRECISION",
-                                   ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "AUTO_UNIQUE_VALUE", ScalarType::INTEGER,
+                                   Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "LOCAL_TYPE_NAME", ScalarType::VARCHAR,
+                                   Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "MINIMUM_SCALE", ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "MAXIMUM_SCALE", ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "SQL_DATA_TYPE", ScalarType::INTEGER, Nullability::NO_NULL));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "SQL_DATETIME_SUB", ScalarType::INTEGER,
+                                   Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "NUM_PREC_RADIX", ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(ColumnMeta(sch, tbl, "INTERVAL_PRECISION", ScalarType::INTEGER,
+                                   Nullability::NULLABLE));
 
   assert(IsSqlTypeSupported(sqlType) || sqlType == SQL_ALL_TYPES);
 
   if (sqlType == SQL_ALL_TYPES) {
-    types.push_back(static_cast< int8_t >(ScalarType::VARCHAR));
-    types.push_back(static_cast< int8_t >(ScalarType::BOOLEAN));
-    types.push_back(static_cast< int8_t >(ScalarType::BIGINT));
-    types.push_back(static_cast< int8_t >(ScalarType::DOUBLE));
-    types.push_back(static_cast< int8_t >(ScalarType::TIMESTAMP));
-    types.push_back(static_cast< int8_t >(ScalarType::DATE));
-    types.push_back(static_cast< int8_t >(ScalarType::TIME));
-    types.push_back(static_cast< int8_t >(ScalarType::INTERVAL_DAY_TO_SECOND));
-    types.push_back(static_cast< int8_t >(ScalarType::INTERVAL_YEAR_TO_MONTH));
-    types.push_back(static_cast< int8_t >(ScalarType::INTEGER));
-    types.push_back(static_cast< int8_t >(ScalarType::NOT_SET));
-    types.push_back(static_cast< int8_t >(ScalarType::UNKNOWN));
+    types.push_back(static_cast<int8_t>(ScalarType::VARCHAR));
+    types.push_back(static_cast<int8_t>(ScalarType::BOOLEAN));
+    types.push_back(static_cast<int8_t>(ScalarType::BIGINT));
+    types.push_back(static_cast<int8_t>(ScalarType::DOUBLE));
+    types.push_back(static_cast<int8_t>(ScalarType::TIMESTAMP));
+    types.push_back(static_cast<int8_t>(ScalarType::DATE));
+    types.push_back(static_cast<int8_t>(ScalarType::TIME));
+    types.push_back(static_cast<int8_t>(ScalarType::INTERVAL_DAY_TO_SECOND));
+    types.push_back(static_cast<int8_t>(ScalarType::INTERVAL_YEAR_TO_MONTH));
+    types.push_back(static_cast<int8_t>(ScalarType::INTEGER));
+    types.push_back(static_cast<int8_t>(ScalarType::NOT_SET));
+    types.push_back(static_cast<int8_t>(ScalarType::UNKNOWN));
   } else {
-    types.push_back(static_cast< int8_t >(SqlTypeToBinary(sqlType)));
+    types.push_back(static_cast<int8_t>(SqlTypeToBinary(sqlType)));
   }
 }
 
@@ -214,17 +212,13 @@ SqlResult::Type TypeInfoQuery::Cancel() {
   return SqlResult::AI_SUCCESS;
 }
 
-const meta::ColumnMetaVector* TypeInfoQuery::GetMeta() {
-  return &columnsMeta;
-}
+const meta::ColumnMetaVector* TypeInfoQuery::GetMeta() { return &columnsMeta; }
 
-SqlResult::Type TypeInfoQuery::FetchNextRow(
-    app::ColumnBindingMap& columnBindings) {
+SqlResult::Type TypeInfoQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
   LOG_DEBUG_MSG("FetchNextRow is called with columnBindings size "
                 << columnBindings.size());
   if (!executed) {
-    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                         "Query was not executed.");
+    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR, "Query was not executed.");
 
     return SqlResult::AI_ERROR;
   }
@@ -251,8 +245,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
   LOG_DEBUG_MSG("GetColumn is called with columnIdx " << columnIdx);
 
   if (!executed) {
-    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                         "Query was not executed.");
+    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR, "Query was not executed.");
 
     return SqlResult::AI_ERROR;
   }
@@ -287,7 +280,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     }
 
     case ResultColumn::LITERAL_PREFIX: {
-      if (currentType == static_cast< int8_t >(ScalarType::VARCHAR))
+      if (currentType == static_cast<int8_t>(ScalarType::VARCHAR))
         buffer.PutString("'");
       else
         buffer.PutNull();
@@ -295,7 +288,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     }
 
     case ResultColumn::LITERAL_SUFFIX: {
-      if (currentType == static_cast< int8_t >(ScalarType::VARCHAR))
+      if (currentType == static_cast<int8_t>(ScalarType::VARCHAR))
         buffer.PutString("'");
       else
         buffer.PutNull();
@@ -315,7 +308,7 @@ SqlResult::Type TypeInfoQuery::GetColumn(uint16_t columnIdx,
     }
 
     case ResultColumn::CASE_SENSITIVE: {
-      if (currentType == static_cast< int8_t >(ScalarType::VARCHAR))
+      if (currentType == static_cast<int8_t>(ScalarType::VARCHAR))
         buffer.PutInt16(SQL_TRUE);
       else
         buffer.PutInt16(SQL_FALSE);
@@ -387,13 +380,9 @@ SqlResult::Type TypeInfoQuery::Close() {
   return SqlResult::AI_SUCCESS;
 }
 
-bool TypeInfoQuery::DataAvailable() const {
-  return executed && cursor != types.end();
-}
+bool TypeInfoQuery::DataAvailable() const { return executed && cursor != types.end(); }
 
-int64_t TypeInfoQuery::AffectedRows() const {
-  return 0;
-}
+int64_t TypeInfoQuery::AffectedRows() const { return 0; }
 
 int64_t TypeInfoQuery::RowNumber() const {
   if (!executed || cursor == types.end()) {
@@ -412,9 +401,7 @@ int64_t TypeInfoQuery::RowNumber() const {
   return rowNumber;
 }
 
-SqlResult::Type TypeInfoQuery::NextResultSet() {
-  return SqlResult::AI_NO_DATA;
-}
+SqlResult::Type TypeInfoQuery::NextResultSet() { return SqlResult::AI_NO_DATA; }
 }  // namespace query
 }  // namespace odbc
 }  // namespace timestream

@@ -99,12 +99,11 @@ const char* StatementAttrIdToString(long id) {
 #undef DBG_STR_CASE
 #endif  // _DEBUG
 
-const boost::optional< std::string > BinaryTypeToSqlTypeName(
-    boost::optional< int16_t > binaryType) {
-  if (!binaryType)
-    return boost::none;
+const boost::optional<std::string> BinaryTypeToSqlTypeName(
+    boost::optional<int16_t> binaryType) {
+  if (!binaryType) return boost::none;
 
-  ScalarType scalarType = static_cast< ScalarType >(*binaryType);
+  ScalarType scalarType = static_cast<ScalarType>(*binaryType);
 
   switch (scalarType) {
     case ScalarType::BOOLEAN:
@@ -148,16 +147,15 @@ const boost::optional< std::string > BinaryTypeToSqlTypeName(
   }
 }
 
-bool IsApplicationTypeSupported(boost::optional< int16_t > type) {
+bool IsApplicationTypeSupported(boost::optional<int16_t> type) {
   if (type)
     return ToDriverType(*type) != OdbcNativeType::AI_UNSUPPORTED;
   else
     return false;
 }
 
-bool IsSqlTypeSupported(boost::optional< int16_t > type) {
-  if (!type)
-    return false;
+bool IsSqlTypeSupported(boost::optional<int16_t> type) {
+  if (!type) return false;
   switch (*type) {
     case SQL_BIT:
     case SQL_TINYINT:
@@ -203,9 +201,8 @@ bool IsSqlTypeSupported(boost::optional< int16_t > type) {
   }
 }
 
-ScalarType SqlTypeToBinary(boost::optional< int16_t > sqlType) {
-  if (!sqlType)
-    return ScalarType::UNKNOWN;
+ScalarType SqlTypeToBinary(boost::optional<int16_t> sqlType) {
+  if (!sqlType) return ScalarType::UNKNOWN;
 
   switch (*sqlType) {
     case SQL_BIT:
@@ -352,12 +349,10 @@ OdbcNativeType::Type ToDriverType(int16_t type) {
   }
 }
 
-boost::optional< int16_t > BinaryToSqlType(
-    boost::optional< int16_t > binaryType) {
-  if (!binaryType)
-    return boost::none;
+boost::optional<int16_t> BinaryToSqlType(boost::optional<int16_t> binaryType) {
+  if (!binaryType) return boost::none;
 
-  ScalarType scalarType = static_cast< ScalarType >(*binaryType);
+  ScalarType scalarType = static_cast<ScalarType>(*binaryType);
 
   switch (scalarType) {
     case ScalarType::BOOLEAN:
@@ -395,14 +390,11 @@ boost::optional< int16_t > BinaryToSqlType(
   }
 }
 
-int16_t BinaryTypeNullability(int16_t) {
-  return SQL_NULLABLE_UNKNOWN;
-}
+int16_t BinaryTypeNullability(int16_t) { return SQL_NULLABLE_UNKNOWN; }
 
-boost::optional< std::string > NullabilityToIsNullable(
-    boost::optional< int32_t > nullability) {
-  if (!nullability)
-    return boost::none;
+boost::optional<std::string> NullabilityToIsNullable(
+    boost::optional<int32_t> nullability) {
+  if (!nullability) return boost::none;
   switch (*nullability) {
     case SQL_NO_NULLS:
       return std::string("NO");
@@ -415,9 +407,8 @@ boost::optional< std::string > NullabilityToIsNullable(
   }
 }
 
-boost::optional< int32_t > SqlTypeDisplaySize(boost::optional< int16_t > type) {
-  if (!type)
-    return boost::none;
+boost::optional<int32_t> SqlTypeDisplaySize(boost::optional<int16_t> type) {
+  if (!type) return boost::none;
   switch (*type) {
     case SQL_VARCHAR:
     case SQL_WVARCHAR:
@@ -476,16 +467,14 @@ boost::optional< int32_t > SqlTypeDisplaySize(boost::optional< int16_t > type) {
   }
 }
 
-boost::optional< int32_t > BinaryTypeDisplaySize(
-    boost::optional< int16_t > type) {
-  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
+boost::optional<int32_t> BinaryTypeDisplaySize(boost::optional<int16_t> type) {
+  boost::optional<int16_t> sqlType = BinaryToSqlType(type);
 
   return SqlTypeDisplaySize(sqlType);
 }
 
-boost::optional< int32_t > SqlTypeColumnSize(boost::optional< int16_t > type) {
-  if (!type)
-    return boost::none;
+boost::optional<int32_t> SqlTypeColumnSize(boost::optional<int16_t> type) {
+  if (!type) return boost::none;
   switch (*type) {
     case SQL_VARCHAR:
     case SQL_WVARCHAR:
@@ -544,17 +533,14 @@ boost::optional< int32_t > SqlTypeColumnSize(boost::optional< int16_t > type) {
   }
 }
 
-boost::optional< int32_t > BinaryTypeColumnSize(
-    boost::optional< int16_t > type) {
-  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
+boost::optional<int32_t> BinaryTypeColumnSize(boost::optional<int16_t> type) {
+  boost::optional<int16_t> sqlType = BinaryToSqlType(type);
 
   return SqlTypeColumnSize(sqlType);
 }
 
-boost::optional< int32_t > SqlTypeTransferLength(
-    boost::optional< int16_t > type) {
-  if (!type)
-    return boost::none;
+boost::optional<int32_t> SqlTypeTransferLength(boost::optional<int16_t> type) {
+  if (!type) return boost::none;
   switch (*type) {
     case SQL_VARCHAR:
     case SQL_WVARCHAR:
@@ -607,9 +593,8 @@ boost::optional< int32_t > SqlTypeTransferLength(
   }
 }
 
-boost::optional< int32_t > SqlTypePrecision(boost::optional< int16_t > type) {
-  if (!type)
-    return boost::none;
+boost::optional<int32_t> SqlTypePrecision(boost::optional<int16_t> type) {
+  if (!type) return boost::none;
   switch (*type) {
     case SQL_DECIMAL:
     case SQL_NUMERIC:
@@ -646,9 +631,8 @@ boost::optional< int32_t > SqlTypePrecision(boost::optional< int16_t > type) {
   }
 }
 
-boost::optional< int32_t > SqlTypeScale(boost::optional< int16_t > type) {
-  if (!type)
-    return boost::none;
+boost::optional<int32_t> SqlTypeScale(boost::optional<int16_t> type) {
+  if (!type) return boost::none;
   switch (*type) {
     case SQL_DECIMAL:
     case SQL_NUMERIC:
@@ -663,17 +647,14 @@ boost::optional< int32_t > SqlTypeScale(boost::optional< int16_t > type) {
   }
 }
 
-boost::optional< int32_t > BinaryTypeTransferLength(
-    boost::optional< int16_t > type) {
-  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
+boost::optional<int32_t> BinaryTypeTransferLength(boost::optional<int16_t> type) {
+  boost::optional<int16_t> sqlType = BinaryToSqlType(type);
 
   return SqlTypeTransferLength(sqlType);
 }
 
-boost::optional< int32_t > SqlTypeNumPrecRadix(
-    boost::optional< int16_t > type) {
-  if (!type)
-    return boost::none;
+boost::optional<int32_t> SqlTypeNumPrecRadix(boost::optional<int16_t> type) {
+  if (!type) return boost::none;
   switch (*type) {
     case SQL_REAL:
     case SQL_FLOAT:
@@ -692,17 +673,14 @@ boost::optional< int32_t > SqlTypeNumPrecRadix(
   }
 }
 
-boost::optional< int32_t > BinaryTypeNumPrecRadix(
-    boost::optional< int16_t > type) {
-  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
+boost::optional<int32_t> BinaryTypeNumPrecRadix(boost::optional<int16_t> type) {
+  boost::optional<int16_t> sqlType = BinaryToSqlType(type);
 
   return SqlTypeNumPrecRadix(sqlType);
 }
 
-boost::optional< int16_t > SqlTypeDecimalDigits(
-    boost::optional< int16_t > type) {
-  if (!type)
-    return boost::none;
+boost::optional<int16_t> SqlTypeDecimalDigits(boost::optional<int16_t> type) {
+  if (!type) return boost::none;
   switch (*type) {
     case SQL_TINYINT:
     case SQL_SMALLINT:
@@ -718,17 +696,14 @@ boost::optional< int16_t > SqlTypeDecimalDigits(
   }
 }
 
-boost::optional< int16_t > BinaryTypeDecimalDigits(
-    boost::optional< int16_t > type) {
-  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
+boost::optional<int16_t> BinaryTypeDecimalDigits(boost::optional<int16_t> type) {
+  boost::optional<int16_t> sqlType = BinaryToSqlType(type);
 
   return SqlTypeDecimalDigits(sqlType);
 }
 
-boost::optional< int32_t > SqlTypeCharOctetLength(
-    boost::optional< int16_t > type) {
-  if (!type)
-    return boost::none;
+boost::optional<int32_t> SqlTypeCharOctetLength(boost::optional<int16_t> type) {
+  if (!type) return boost::none;
   switch (*type) {
     case SQL_CHAR:
     case SQL_VARCHAR:
@@ -746,16 +721,14 @@ boost::optional< int32_t > SqlTypeCharOctetLength(
   }
 }
 
-boost::optional< int32_t > BinaryTypeCharOctetLength(
-    boost::optional< int16_t > type) {
-  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
+boost::optional<int32_t> BinaryTypeCharOctetLength(boost::optional<int16_t> type) {
+  boost::optional<int16_t> sqlType = BinaryToSqlType(type);
 
   return SqlTypeCharOctetLength(sqlType);
 }
 
-bool SqlTypeUnsigned(boost::optional< int16_t > type) {
-  if (!type)
-    return false;
+bool SqlTypeUnsigned(boost::optional<int16_t> type) {
+  if (!type) return false;
   switch (*type) {
     case SQL_BIT:
     case SQL_TINYINT:
@@ -772,8 +745,8 @@ bool SqlTypeUnsigned(boost::optional< int16_t > type) {
   }
 }
 
-bool BinaryTypeUnsigned(boost::optional< int16_t > type) {
-  boost::optional< int16_t > sqlType = BinaryToSqlType(type);
+bool BinaryTypeUnsigned(boost::optional<int16_t> type) {
+  boost::optional<int16_t> sqlType = BinaryToSqlType(type);
 
   return SqlTypeUnsigned(sqlType);
 }

@@ -46,9 +46,8 @@ ApplicationDataBuffer::ApplicationDataBuffer()
   // No-op.
 }
 
-ApplicationDataBuffer::ApplicationDataBuffer(
-    type_traits::OdbcNativeType::Type type, void* buffer, SqlLen buflen,
-    SqlLen* reslen)
+ApplicationDataBuffer::ApplicationDataBuffer(type_traits::OdbcNativeType::Type type,
+                                             void* buffer, SqlLen buflen, SqlLen* reslen)
     : type(type),
       buffer(buffer),
       buflen(buflen),
@@ -84,7 +83,7 @@ ApplicationDataBuffer& ApplicationDataBuffer::operator=(
   return *this;
 }
 
-template < typename T >
+template <typename T>
 ConversionResult::Type ApplicationDataBuffer::PutNum(T value) {
   using namespace type_traits;
 
@@ -97,60 +96,59 @@ ConversionResult::Type ApplicationDataBuffer::PutNum(T value) {
 
   switch (type) {
     case OdbcNativeType::AI_SIGNED_TINYINT: {
-      return PutNumToNumBuffer< signed char >(value);
+      return PutNumToNumBuffer<signed char>(value);
     }
 
     case OdbcNativeType::AI_BIT:
     case OdbcNativeType::AI_UNSIGNED_TINYINT: {
-      return PutNumToNumBuffer< unsigned char >(value);
+      return PutNumToNumBuffer<unsigned char>(value);
     }
 
     case OdbcNativeType::AI_SIGNED_SHORT: {
-      return PutNumToNumBuffer< SQLSMALLINT >(value);
+      return PutNumToNumBuffer<SQLSMALLINT>(value);
     }
 
     case OdbcNativeType::AI_UNSIGNED_SHORT: {
-      return PutNumToNumBuffer< SQLUSMALLINT >(value);
+      return PutNumToNumBuffer<SQLUSMALLINT>(value);
     }
 
     case OdbcNativeType::AI_SIGNED_LONG: {
-      return PutNumToNumBuffer< SQLINTEGER >(value);
+      return PutNumToNumBuffer<SQLINTEGER>(value);
     }
 
     case OdbcNativeType::AI_UNSIGNED_LONG: {
-      return PutNumToNumBuffer< SQLUINTEGER >(value);
+      return PutNumToNumBuffer<SQLUINTEGER>(value);
     }
 
     case OdbcNativeType::AI_SIGNED_BIGINT: {
-      return PutNumToNumBuffer< SQLBIGINT >(value);
+      return PutNumToNumBuffer<SQLBIGINT>(value);
     }
 
     case OdbcNativeType::AI_UNSIGNED_BIGINT: {
-      return PutNumToNumBuffer< SQLUBIGINT >(value);
+      return PutNumToNumBuffer<SQLUBIGINT>(value);
     }
 
     case OdbcNativeType::AI_FLOAT: {
-      return PutNumToNumBuffer< SQLREAL >(value);
+      return PutNumToNumBuffer<SQLREAL>(value);
     }
 
     case OdbcNativeType::AI_DOUBLE: {
-      return PutNumToNumBuffer< SQLDOUBLE >(value);
+      return PutNumToNumBuffer<SQLDOUBLE>(value);
     }
 
     case OdbcNativeType::AI_CHAR: {
-      return PutValToStrBuffer< char >(value);
+      return PutValToStrBuffer<char>(value);
     }
 
     case OdbcNativeType::AI_WCHAR: {
-      return PutValToStrBuffer< SQLWCHAR >(value);
+      return PutValToStrBuffer<SQLWCHAR>(value);
     }
 
     case OdbcNativeType::AI_NUMERIC: {
       if (dataPtr) {
-        SQL_NUMERIC_STRUCT* out =
-            reinterpret_cast< SQL_NUMERIC_STRUCT* >(dataPtr);
+        SQL_NUMERIC_STRUCT* out = reinterpret_cast<SQL_NUMERIC_STRUCT*>(dataPtr);
 
-        uint64_t uval = static_cast< uint64_t >(value < 0 ? -value : value);
+        uint64_t uval = static_cast<uint64_t>(value < 0 ? -value : value);
 
         out->precision = ignite::odbc::common::bits::DigitLength(uval);
         out->scale = 0;
@@ -158,13 +156,11 @@ ConversionResult::Type ApplicationDataBuffer::PutNum(T value) {
 
         memset(out->val, 0, SQL_MAX_NUMERIC_LEN);
 
-        memcpy(out->val, &uval,
-               std::min< int >(SQL_MAX_NUMERIC_LEN, sizeof(uval)));
+        memcpy(out->val, &uval, std::min<int>(SQL_MAX_NUMERIC_LEN, sizeof(uval)));
         LOG_DEBUG_MSG("out->val: " << out->val);
       }
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_NUMERIC_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_NUMERIC_STRUCT));
 
       return ConversionResult::Type::AI_SUCCESS;
     }
@@ -172,27 +168,25 @@ ConversionResult::Type ApplicationDataBuffer::PutNum(T value) {
     case OdbcNativeType::AI_BINARY:
     case OdbcNativeType::AI_DEFAULT: {
       if (dataPtr)
-        memcpy(dataPtr, &value,
-               std::min(sizeof(value), static_cast< size_t >(buflen)));
+        memcpy(dataPtr, &value, std::min(sizeof(value), static_cast<size_t>(buflen)));
 
-      if (resLenPtr)
-        *resLenPtr = sizeof(value);
+      if (resLenPtr) *resLenPtr = sizeof(value);
 
-      return static_cast< size_t >(buflen) < sizeof(value)
+      return static_cast<size_t>(buflen) < sizeof(value)
                  ? ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED
                  : ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_TDATE: {
-      return PutDate(Date(static_cast< int64_t >(value)));
+      return PutDate(Date(static_cast<int64_t>(value)));
     }
 
     case OdbcNativeType::AI_TTIMESTAMP: {
-      return PutTimestamp(Timestamp(static_cast< int64_t >(value)));
+      return PutTimestamp(Timestamp(static_cast<int64_t>(value)));
     }
 
     case OdbcNativeType::AI_TTIME: {
-      return PutTime(Time(static_cast< int64_t >(value)));
+      return PutTime(Time(static_cast<int64_t>(value)));
     }
 
     default:
@@ -202,123 +196,114 @@ ConversionResult::Type ApplicationDataBuffer::PutNum(T value) {
   return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
-template < typename Tbuf, typename Tin >
+template <typename Tbuf, typename Tin>
 ConversionResult::Type ApplicationDataBuffer::PutNumToNumBuffer(Tin value) {
   LOG_DEBUG_MSG("PutNumToNumBuffer is called with value " << value);
   void* dataPtr = GetData();
   SqlLen* resLenPtr = GetResLen();
 
   if (dataPtr) {
-    Tbuf* out = reinterpret_cast< Tbuf* >(dataPtr);
-    *out = static_cast< Tbuf >(value);
+    Tbuf* out = reinterpret_cast<Tbuf*>(dataPtr);
+    *out = static_cast<Tbuf>(value);
   }
 
-  if (resLenPtr)
-    *resLenPtr = static_cast< SqlLen >(sizeof(Tbuf));
+  if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(Tbuf));
 
   return ConversionResult::Type::AI_SUCCESS;
 }
 
-template < typename CharT, typename Tin >
-ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
-    const Tin& value) {
+template <typename CharT, typename Tin>
+ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(const Tin& value) {
   LOG_DEBUG_MSG("PutValToStrBuffer is called with value " << value);
   std::stringstream converter;
   converter << value;
   int32_t written = 0;
-  return PutStrToStrBuffer< CharT >(converter.str(), written);
+  return PutStrToStrBuffer<CharT>(converter.str(), written);
 }
 
-template < typename CharT >
-ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
-    const int8_t& value) {
+template <typename CharT>
+ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(const int8_t& value) {
   LOG_DEBUG_MSG("PutValToStrBuffer is called with value " << value);
   std::stringstream converter;
   // NOTE: Need to cast to larger integer - or will mistake it for a character.
-  converter << static_cast< int32_t >(value);
+  converter << static_cast<int32_t>(value);
   int32_t written = 0;
-  return PutStrToStrBuffer< CharT >(converter.str(), written);
+  return PutStrToStrBuffer<CharT>(converter.str(), written);
 }
 
-template < typename OutCharT, typename InCharT >
+template <typename OutCharT, typename InCharT>
 ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
-    const std::basic_string< InCharT >& value, int32_t& written) {
+    const std::basic_string<InCharT>& value, int32_t& written) {
   LOG_DEBUG_MSG("PutStrToStrBuffer is called with value " << value);
   written = 0;
 
-  SqlLen inCharSize = static_cast< SqlLen >(sizeof(InCharT));
-  SqlLen outCharSize = static_cast< SqlLen >(sizeof(OutCharT));
-  LOG_DEBUG_MSG("inCharSize is " << inCharSize << ", outCharSize is "
-                                 << outCharSize << ", buflen is " << buflen);
+  SqlLen inCharSize = static_cast<SqlLen>(sizeof(InCharT));
+  SqlLen outCharSize = static_cast<SqlLen>(sizeof(OutCharT));
+  LOG_DEBUG_MSG("inCharSize is " << inCharSize << ", outCharSize is " << outCharSize
+                                 << ", buflen is " << buflen);
 
   SqlLen* resLenPtr = GetResLen();
   void* dataPtr = GetData();
 
-  if (!dataPtr)
-    return ConversionResult::Type::AI_SUCCESS;
+  if (!dataPtr) return ConversionResult::Type::AI_SUCCESS;
 
-  if (buflen < outCharSize)
-    return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
+  if (buflen < outCharSize) return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
   size_t lenWrittenOrRequired = 0;
   bool isTruncated = false;
   if (inCharSize == 1) {
     if (outCharSize == 2 || outCharSize == 4) {
       lenWrittenOrRequired = utility::CopyUtf8StringToSqlWcharString(
-          reinterpret_cast< const char* >(value.c_str()),
-          reinterpret_cast< SQLWCHAR* >(dataPtr), buflen, isTruncated);
+          reinterpret_cast<const char*>(value.c_str()),
+          reinterpret_cast<SQLWCHAR*>(dataPtr), buflen, isTruncated);
     } else if (sizeof(OutCharT) == 1) {
       lenWrittenOrRequired = utility::CopyUtf8StringToSqlCharString(
-          reinterpret_cast< const char* >(value.c_str()),
-          reinterpret_cast< SQLCHAR* >(dataPtr), buflen, isTruncated);
+          reinterpret_cast<const char*>(value.c_str()),
+          reinterpret_cast<SQLCHAR*>(dataPtr), buflen, isTruncated);
     } else {
       LOG_ERROR_MSG("Unexpected conversion from UTF8 string.");
       assert(false);
     }
   } else {
-    LOG_ERROR_MSG(
-        "Unexpected conversion from unknown type string, char size is "
-        << inCharSize);
+    LOG_ERROR_MSG("Unexpected conversion from unknown type string, char size is "
+                  << inCharSize);
     assert(false);
   }
 
-  written = static_cast< int32_t >(lenWrittenOrRequired);
+  written = static_cast<int32_t>(lenWrittenOrRequired);
   LOG_DEBUG_MSG("written is " << written);
   if (resLenPtr) {
-    *resLenPtr = static_cast< SqlLen >(written);
+    *resLenPtr = static_cast<SqlLen>(written);
   }
 
-  if (isTruncated)
-    return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
+  if (isTruncated) return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
   return ConversionResult::Type::AI_SUCCESS;
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(
-    const void* data, size_t len, int32_t& written) {
+ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(const void* data,
+                                                                 size_t len,
+                                                                 int32_t& written) {
   LOG_DEBUG_MSG("PutRawDataToBuffer is called with len " << len);
-  SqlLen iLen = static_cast< SqlLen >(len);
+  SqlLen iLen = static_cast<SqlLen>(len);
 
   SqlLen* resLenPtr = GetResLen();
   void* dataPtr = GetData();
 
-  if (resLenPtr)
-    *resLenPtr = iLen;
+  if (resLenPtr) *resLenPtr = iLen;
 
   SqlLen toCopy = std::min(buflen, iLen);
 
-  if (dataPtr != 0 && toCopy > 0)
-    memcpy(dataPtr, data, static_cast< size_t >(toCopy));
+  if (dataPtr != 0 && toCopy > 0) memcpy(dataPtr, data, static_cast<size_t>(toCopy));
 
-  written = static_cast< int32_t >(toCopy);
+  written = static_cast<int32_t>(toCopy);
   LOG_DEBUG_MSG("written is " << written);
 
   return toCopy < iLen ? ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED
                        : ConversionResult::Type::AI_SUCCESS;
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutInt8(
-    boost::optional< int8_t > value) {
+ConversionResult::Type ApplicationDataBuffer::PutInt8(boost::optional<int8_t> value) {
   LOG_DEBUG_MSG("PutInt8 is called");
   if (value)
     return PutInt8(*value);
@@ -330,8 +315,7 @@ ConversionResult::Type ApplicationDataBuffer::PutInt8(int8_t value) {
   return PutNum(value);
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutInt16(
-    boost::optional< int16_t > value) {
+ConversionResult::Type ApplicationDataBuffer::PutInt16(boost::optional<int16_t> value) {
   LOG_DEBUG_MSG("PutInt16 is called");
   if (value)
     return PutInt16(*value);
@@ -343,8 +327,7 @@ ConversionResult::Type ApplicationDataBuffer::PutInt16(int16_t value) {
   return PutNum(value);
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutInt32(
-    boost::optional< int32_t > value) {
+ConversionResult::Type ApplicationDataBuffer::PutInt32(boost::optional<int32_t> value) {
   LOG_DEBUG_MSG("PutInt32 is called");
   if (value)
     return PutInt32(*value);
@@ -356,8 +339,7 @@ ConversionResult::Type ApplicationDataBuffer::PutInt32(int32_t value) {
   return PutNum(value);
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutInt64(
-    boost::optional< int64_t > value) {
+ConversionResult::Type ApplicationDataBuffer::PutInt64(boost::optional<int64_t> value) {
   LOG_DEBUG_MSG("PutInt64 is called");
   if (value)
     return PutInt64(*value);
@@ -369,8 +351,7 @@ ConversionResult::Type ApplicationDataBuffer::PutInt64(int64_t value) {
   return PutNum(value);
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutFloat(
-    boost::optional< float > value) {
+ConversionResult::Type ApplicationDataBuffer::PutFloat(boost::optional<float> value) {
   LOG_DEBUG_MSG("PutFloat is called");
   if (value)
     return PutFloat(*value);
@@ -382,8 +363,7 @@ ConversionResult::Type ApplicationDataBuffer::PutFloat(float value) {
   return PutNum(value);
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutDouble(
-    boost::optional< double > value) {
+ConversionResult::Type ApplicationDataBuffer::PutDouble(boost::optional<double> value) {
   LOG_DEBUG_MSG("PutDouble is called");
   if (value)
     return PutDouble(*value);
@@ -396,7 +376,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDouble(double value) {
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutString(
-    const boost::optional< std::string >& value) {
+    const boost::optional<std::string>& value) {
   LOG_DEBUG_MSG("PutString is called");
   if (value)
     return PutString(*value);
@@ -404,18 +384,16 @@ ConversionResult::Type ApplicationDataBuffer::PutString(
     return PutNull();
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutString(
-    const std::string& value) {
+ConversionResult::Type ApplicationDataBuffer::PutString(const std::string& value) {
   int32_t written = 0;
 
   return PutString(value, written);
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutString(
-    const std::string& value, int32_t& written) {
+ConversionResult::Type ApplicationDataBuffer::PutString(const std::string& value,
+                                                        int32_t& written) {
   using namespace type_traits;
-  LOG_DEBUG_MSG("PutString is called with value " << value << ", type is "
-                                                  << type);
+  LOG_DEBUG_MSG("PutString is called with value " << value << ", type is " << type);
 
   switch (type) {
     case OdbcNativeType::AI_SIGNED_TINYINT:
@@ -436,7 +414,7 @@ ConversionResult::Type ApplicationDataBuffer::PutString(
 
       converter >> numValue;
 
-      written = static_cast< int32_t >(value.size());
+      written = static_cast<int32_t>(value.size());
 
       return PutNum(numValue);
     }
@@ -451,7 +429,7 @@ ConversionResult::Type ApplicationDataBuffer::PutString(
 
       converter >> numValue;
 
-      written = static_cast< int32_t >(value.size());
+      written = static_cast<int32_t>(value.size());
 
       return PutNum(numValue);
     }
@@ -459,11 +437,11 @@ ConversionResult::Type ApplicationDataBuffer::PutString(
     case OdbcNativeType::AI_CHAR:
     case OdbcNativeType::AI_BINARY:
     case OdbcNativeType::AI_DEFAULT: {
-      return PutStrToStrBuffer< char >(value, written);
+      return PutStrToStrBuffer<char>(value, written);
     }
 
     case OdbcNativeType::AI_WCHAR: {
-      return PutStrToStrBuffer< SQLWCHAR >(value, written);
+      return PutStrToStrBuffer<SQLWCHAR>(value, written);
     }
 
     default:
@@ -478,8 +456,7 @@ ConversionResult::Type ApplicationDataBuffer::PutNull() {
 
   SqlLen* resLenPtr = GetResLen();
 
-  if (!resLenPtr)
-    return ConversionResult::Type::AI_INDICATOR_NEEDED;
+  if (!resLenPtr) return ConversionResult::Type::AI_INDICATOR_NEEDED;
 
   *resLenPtr = SQL_NULL_DATA;
 
@@ -487,7 +464,7 @@ ConversionResult::Type ApplicationDataBuffer::PutNull() {
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutDecimal(
-    const boost::optional< ignite::odbc::common::Decimal >& value) {
+    const boost::optional<ignite::odbc::common::Decimal>& value) {
   LOG_DEBUG_MSG("PutDecimal is called");
   if (value)
     return PutDecimal(*value);
@@ -511,14 +488,14 @@ ConversionResult::Type ApplicationDataBuffer::PutDecimal(
     case OdbcNativeType::AI_UNSIGNED_LONG:
     case OdbcNativeType::AI_SIGNED_BIGINT:
     case OdbcNativeType::AI_UNSIGNED_BIGINT: {
-      PutNum< int64_t >(value.ToInt64());
+      PutNum<int64_t>(value.ToInt64());
 
       return ConversionResult::Type::AI_FRACTIONAL_TRUNCATED;
     }
 
     case OdbcNativeType::AI_FLOAT:
     case OdbcNativeType::AI_DOUBLE: {
-      PutNum< double >(value.ToDouble());
+      PutNum<double>(value.ToDouble());
 
       return ConversionResult::Type::AI_FRACTIONAL_TRUNCATED;
     }
@@ -535,16 +512,14 @@ ConversionResult::Type ApplicationDataBuffer::PutDecimal(
     }
 
     case OdbcNativeType::AI_NUMERIC: {
-      SQL_NUMERIC_STRUCT* numeric =
-          reinterpret_cast< SQL_NUMERIC_STRUCT* >(GetData());
+      SQL_NUMERIC_STRUCT* numeric = reinterpret_cast<SQL_NUMERIC_STRUCT*>(GetData());
 
       ignite::odbc::common::Decimal zeroScaled;
       value.SetScale(0, zeroScaled);
 
-      ignite::odbc::common::FixedSizeArray< int8_t > bytesBuffer;
+      ignite::odbc::common::FixedSizeArray<int8_t> bytesBuffer;
 
-      const ignite::odbc::common::BigInteger& unscaled =
-          zeroScaled.GetUnscaledValue();
+      const ignite::odbc::common::BigInteger& unscaled = zeroScaled.GetUnscaledValue();
 
       unscaled.MagnitudeToBytes(bytesBuffer);
 
@@ -560,8 +535,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDecimal(
       numeric->sign = unscaled.GetSign() < 0 ? 0 : 1;
       numeric->precision = unscaled.GetPrecision();
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_NUMERIC_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_NUMERIC_STRUCT));
 
       if (bytesBuffer.GetSize() > SQL_MAX_NUMERIC_LEN)
         return ConversionResult::Type::AI_FRACTIONAL_TRUNCATED;
@@ -579,7 +553,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDecimal(
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutDate(
-    const boost::optional< Date >& value) {
+    const boost::optional<Date>& value) {
   LOG_DEBUG_MSG("PutDate is called");
   if (value)
     return PutDate(*value);
@@ -607,22 +581,20 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
 
   switch (type) {
     case OdbcNativeType::AI_CHAR: {
-      char* buffer = reinterpret_cast< char* >(dataPtr);
+      char* buffer = reinterpret_cast<char*>(dataPtr);
       const size_t valLen = sizeof("HHHH-MM-DD") - 1;
 
-      if (resLenPtr)
-        *resLenPtr = valLen;
+      if (resLenPtr) *resLenPtr = valLen;
 
       if (buffer) {
         char tmpStr[32]{};
-        snprintf(tmpStr, 32, "%4d-%02d-%02d", tmTime.tm_year + 1900,
-                 tmTime.tm_mon + 1, tmTime.tm_mday);
-        strncpy(buffer, tmpStr,
-                std::min(buflen, static_cast< SqlLen >(valLen + 1)));
+        snprintf(tmpStr, 32, "%4d-%02d-%02d", tmTime.tm_year + 1900, tmTime.tm_mon + 1,
+                 tmTime.tm_mday);
+        strncpy(buffer, tmpStr, std::min(buflen, static_cast<SqlLen>(valLen + 1)));
 
-        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen
-                                   << ", tmpStr is " << tmpStr);
-        if (static_cast< SqlLen >(valLen) + 1 > buflen) {
+        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen << ", tmpStr is "
+                                   << tmpStr);
+        if (static_cast<SqlLen>(valLen) + 1 > buflen) {
           buffer[buflen - 1] = 0;
           return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
         }
@@ -632,46 +604,42 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
     }
 
     case OdbcNativeType::AI_WCHAR: {
-      SQLWCHAR* buffer = reinterpret_cast< SQLWCHAR* >(dataPtr);
+      SQLWCHAR* buffer = reinterpret_cast<SQLWCHAR*>(dataPtr);
       const size_t valLen = sizeof("HHHH-MM-DD") - 1;
 
-      if (resLenPtr)
-        *resLenPtr = valLen;
+      if (resLenPtr) *resLenPtr = valLen;
 
       if (buffer) {
         char tmpStr[32]{};
-        snprintf(tmpStr, 32, "%4d-%02d-%02d", tmTime.tm_year + 1900,
-                 tmTime.tm_mon + 1, tmTime.tm_mday);
+        snprintf(tmpStr, 32, "%4d-%02d-%02d", tmTime.tm_year + 1900, tmTime.tm_mon + 1,
+                 tmTime.tm_mday);
 
-        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen
-                                   << ", tmpStr is " << tmpStr);
+        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen << ", tmpStr is "
+                                   << tmpStr);
         bool isTruncated = false;
-        utility::CopyStringToBuffer(tmpStr, buffer, GetSize(), isTruncated,
-                                    true);
+        utility::CopyStringToBuffer(tmpStr, buffer, GetSize(), isTruncated, true);
       }
 
-      if (static_cast< SqlLen >(valLen) + 1 > GetSize())
+      if (static_cast<SqlLen>(valLen) + 1 > GetSize())
         return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
 
       return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_TDATE: {
-      SQL_DATE_STRUCT* buffer = reinterpret_cast< SQL_DATE_STRUCT* >(dataPtr);
+      SQL_DATE_STRUCT* buffer = reinterpret_cast<SQL_DATE_STRUCT*>(dataPtr);
 
       buffer->year = tmTime.tm_year + 1900;
       buffer->month = tmTime.tm_mon + 1;
       buffer->day = tmTime.tm_mday;
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_DATE_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_DATE_STRUCT));
 
       return ConversionResult::Type::AI_SUCCESS;
     }
 
     case OdbcNativeType::AI_TTIMESTAMP: {
-      SQL_TIMESTAMP_STRUCT* buffer =
-          reinterpret_cast< SQL_TIMESTAMP_STRUCT* >(dataPtr);
+      SQL_TIMESTAMP_STRUCT* buffer = reinterpret_cast<SQL_TIMESTAMP_STRUCT*>(dataPtr);
 
       buffer->year = tmTime.tm_year + 1900;
       buffer->month = tmTime.tm_mon + 1;
@@ -681,8 +649,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
       buffer->second = tmTime.tm_sec;
       buffer->fraction = 0;
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIMESTAMP_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_TIMESTAMP_STRUCT));
 
       return ConversionResult::Type::AI_SUCCESS;
     }
@@ -694,8 +661,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDate(const Date& value) {
   return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
 }
 
-std::string ApplicationDataBuffer::GetTimestampString(tm& tmTime,
-                                                      int32_t fraction,
+std::string ApplicationDataBuffer::GetTimestampString(tm& tmTime, int32_t fraction,
                                                       const char* pattern) {
   LOG_DEBUG_MSG("GetTimestampString is called with pattern " << pattern);
   char result[64]{};
@@ -708,7 +674,7 @@ std::string ApplicationDataBuffer::GetTimestampString(tm& tmTime,
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
-    const boost::optional< Timestamp >& value) {
+    const boost::optional<Timestamp>& value) {
   LOG_DEBUG_MSG("PutTimestamp is called");
   if (value)
     return PutTimestamp(*value);
@@ -716,8 +682,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
     return PutNull();
 }
 
-ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
-    const Timestamp& value) {
+ConversionResult::Type ApplicationDataBuffer::PutTimestamp(const Timestamp& value) {
   LOG_DEBUG_MSG("PutTimestamp is called with type " << type);
   tm tmTime;
   memset(&tmTime, 0, sizeof(tm));
@@ -738,19 +703,17 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
     case OdbcNativeType::AI_CHAR: {
       const size_t valLen = sizeof("HHHH-MM-DD HH:MM:SS.xxxxxxxxx");
 
-      if (resLenPtr)
-        *resLenPtr = valLen - 1;
+      if (resLenPtr) *resLenPtr = valLen - 1;
 
-      char* buffer = reinterpret_cast< char* >(dataPtr);
+      char* buffer = reinterpret_cast<char*>(dataPtr);
       if (buffer) {
-        std::string tmpStr = GetTimestampString(
-            tmTime, value.GetSecondFraction(), "%Y-%m-%d %H:%M:%S.");
-        strncpy(buffer, tmpStr.c_str(),
-                std::min(static_cast< SqlLen >(valLen), buflen));
+        std::string tmpStr =
+            GetTimestampString(tmTime, value.GetSecondFraction(), "%Y-%m-%d %H:%M:%S.");
+        strncpy(buffer, tmpStr.c_str(), std::min(static_cast<SqlLen>(valLen), buflen));
 
-        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen
-                                   << ", tmpStr is " << tmpStr);
-        if (static_cast< SqlLen >(valLen) > buflen) {
+        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen << ", tmpStr is "
+                                   << tmpStr);
+        if (static_cast<SqlLen>(valLen) > buflen) {
           buffer[buflen - 1] = 0;
           return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
         }
@@ -761,20 +724,18 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
     case OdbcNativeType::AI_WCHAR: {
       const size_t valLen = sizeof("HHHH-MM-DD HH:MM:SS.xxxxxxxxx");
 
-      if (resLenPtr)
-        *resLenPtr = valLen - 1;
+      if (resLenPtr) *resLenPtr = valLen - 1;
 
-      SQLWCHAR* buffer = reinterpret_cast< SQLWCHAR* >(dataPtr);
+      SQLWCHAR* buffer = reinterpret_cast<SQLWCHAR*>(dataPtr);
 
       if (buffer) {
-        std::string tmpStr = GetTimestampString(
-            tmTime, value.GetSecondFraction(), "%Y-%m-%d %H:%M:%S.");
+        std::string tmpStr =
+            GetTimestampString(tmTime, value.GetSecondFraction(), "%Y-%m-%d %H:%M:%S.");
 
-        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen
-                                   << ", tmpStr is " << tmpStr);
+        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen << ", tmpStr is "
+                                   << tmpStr);
         bool isTruncated = false;
-        utility::CopyStringToBuffer(&tmpStr[0], buffer, buflen, isTruncated,
-                                    true);
+        utility::CopyStringToBuffer(&tmpStr[0], buffer, buflen, isTruncated, true);
 
         if (isTruncated) {
           return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
@@ -785,34 +746,31 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
     }
 
     case OdbcNativeType::AI_TDATE: {
-      SQL_DATE_STRUCT* buffer = reinterpret_cast< SQL_DATE_STRUCT* >(dataPtr);
+      SQL_DATE_STRUCT* buffer = reinterpret_cast<SQL_DATE_STRUCT*>(dataPtr);
 
       buffer->year = tmTime.tm_year + 1900;
       buffer->month = tmTime.tm_mon + 1;
       buffer->day = tmTime.tm_mday;
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_DATE_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_DATE_STRUCT));
 
       return ConversionResult::Type::AI_FRACTIONAL_TRUNCATED;
     }
 
     case OdbcNativeType::AI_TTIME: {
-      SQL_TIME_STRUCT* buffer = reinterpret_cast< SQL_TIME_STRUCT* >(dataPtr);
+      SQL_TIME_STRUCT* buffer = reinterpret_cast<SQL_TIME_STRUCT*>(dataPtr);
 
       buffer->hour = tmTime.tm_hour;
       buffer->minute = tmTime.tm_min;
       buffer->second = tmTime.tm_sec;
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIME_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_TIME_STRUCT));
 
       return ConversionResult::Type::AI_FRACTIONAL_TRUNCATED;
     }
 
     case OdbcNativeType::AI_TTIMESTAMP: {
-      SQL_TIMESTAMP_STRUCT* buffer =
-          reinterpret_cast< SQL_TIMESTAMP_STRUCT* >(dataPtr);
+      SQL_TIMESTAMP_STRUCT* buffer = reinterpret_cast<SQL_TIMESTAMP_STRUCT*>(dataPtr);
 
       buffer->year = tmTime.tm_year + 1900;
       buffer->month = tmTime.tm_mon + 1;
@@ -822,14 +780,12 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
       buffer->second = tmTime.tm_sec;
       buffer->fraction = value.GetSecondFraction();
 
-      LOG_DEBUG_MSG("buffer content is "
-                    << buffer->year << " " << buffer->month << " "
-                    << buffer->day << " " << buffer->hour << ":"
-                    << buffer->minute << ":" << buffer->second << "."
-                    << buffer->fraction);
+      LOG_DEBUG_MSG("buffer content is " << buffer->year << " " << buffer->month << " "
+                                         << buffer->day << " " << buffer->hour << ":"
+                                         << buffer->minute << ":" << buffer->second << "."
+                                         << buffer->fraction);
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIMESTAMP_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_TIMESTAMP_STRUCT));
 
       return ConversionResult::Type::AI_SUCCESS;
     }
@@ -842,7 +798,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTimestamp(
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutTime(
-    const boost::optional< Time >& value) {
+    const boost::optional<Time>& value) {
   LOG_DEBUG_MSG("PutTime is called");
   if (value)
     return PutTime(*value);
@@ -873,20 +829,18 @@ ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {
     case OdbcNativeType::AI_CHAR: {
       const size_t valLen = sizeof("HH:MM:SS.xxxxxxxxx");
 
-      if (resLenPtr)
-        *resLenPtr = valLen - 1;
+      if (resLenPtr) *resLenPtr = valLen - 1;
 
-      char* buffer = reinterpret_cast< char* >(dataPtr);
+      char* buffer = reinterpret_cast<char*>(dataPtr);
 
       if (buffer) {
         std::string tmpStr =
             GetTimestampString(tmTime, value.GetSecondFraction(), "%H:%M:%S.");
-        strncpy(buffer, &tmpStr[0],
-                std::min(static_cast< SqlLen >(valLen), buflen));
+        strncpy(buffer, &tmpStr[0], std::min(static_cast<SqlLen>(valLen), buflen));
 
-        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen
-                                   << ", tmpStr is " << tmpStr);
-        if (static_cast< SqlLen >(valLen) > buflen) {
+        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen << ", tmpStr is "
+                                   << tmpStr);
+        if (static_cast<SqlLen>(valLen) > buflen) {
           buffer[buflen - 1] = 0;
           return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
         }
@@ -898,20 +852,18 @@ ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {
     case OdbcNativeType::AI_WCHAR: {
       const size_t valLen = sizeof("HH:MM:SS.xxxxxxxxx");
 
-      if (resLenPtr)
-        *resLenPtr = valLen - 1;
+      if (resLenPtr) *resLenPtr = valLen - 1;
 
-      SQLWCHAR* buffer = reinterpret_cast< SQLWCHAR* >(dataPtr);
+      SQLWCHAR* buffer = reinterpret_cast<SQLWCHAR*>(dataPtr);
 
       if (buffer) {
         std::string tmpStr =
             GetTimestampString(tmTime, value.GetSecondFraction(), "%H:%M:%S.");
 
-        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen
-                                   << ", tmpStr is " << tmpStr);
+        LOG_DEBUG_MSG("valLen is " << valLen << ", buflen is " << buflen << ", tmpStr is "
+                                   << tmpStr);
         bool isTruncated = false;
-        utility::CopyStringToBuffer(&tmpStr[0], buffer, buflen, isTruncated,
-                                    true);
+        utility::CopyStringToBuffer(&tmpStr[0], buffer, buflen, isTruncated, true);
 
         if (isTruncated) {
           return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
@@ -922,21 +874,19 @@ ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {
     }
 
     case OdbcNativeType::AI_TTIME: {
-      SQL_TIME_STRUCT* buffer = reinterpret_cast< SQL_TIME_STRUCT* >(dataPtr);
+      SQL_TIME_STRUCT* buffer = reinterpret_cast<SQL_TIME_STRUCT*>(dataPtr);
 
       buffer->hour = tmTime.tm_hour;
       buffer->minute = tmTime.tm_min;
       buffer->second = tmTime.tm_sec;
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIME_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_TIME_STRUCT));
 
       return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
     }
 
     case OdbcNativeType::AI_TTIMESTAMP: {
-      SQL_TIMESTAMP_STRUCT* buffer =
-          reinterpret_cast< SQL_TIMESTAMP_STRUCT* >(dataPtr);
+      SQL_TIMESTAMP_STRUCT* buffer = reinterpret_cast<SQL_TIMESTAMP_STRUCT*>(dataPtr);
 
       buffer->year = tmTime.tm_year + 1900;
       buffer->month = tmTime.tm_mon + 1;
@@ -946,8 +896,7 @@ ConversionResult::Type ApplicationDataBuffer::PutTime(const Time& value) {
       buffer->second = tmTime.tm_sec;
       buffer->fraction = value.GetSecondFraction();
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_TIMESTAMP_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_TIMESTAMP_STRUCT));
 
       return ConversionResult::Type::AI_SUCCESS;
     }
@@ -971,17 +920,16 @@ ConversionResult::Type ApplicationDataBuffer::PutInterval(
     case OdbcNativeType::AI_CHAR: {
       char tmp[32]{};
       snprintf(tmp, 32, "%d-%d", value.GetYear(), value.GetMonth());
-      SqlLen resLen = static_cast< SqlLen >(strlen(tmp));
+      SqlLen resLen = static_cast<SqlLen>(strlen(tmp));
 
-      if (resLenPtr)
-        *resLenPtr = resLen;
+      if (resLenPtr) *resLenPtr = resLen;
 
-      char* buffer = reinterpret_cast< char* >(dataPtr);
+      char* buffer = reinterpret_cast<char*>(dataPtr);
       if (buffer) {
         strncpy(buffer, tmp, std::min(resLen + 1, buflen));
 
-        LOG_DEBUG_MSG("resLen is " << resLen << ", buflen is " << buflen
-                                   << ", tmp is " << tmp);
+        LOG_DEBUG_MSG("resLen is " << resLen << ", buflen is " << buflen << ", tmp is "
+                                   << tmp);
         if (resLen + 1 > buflen) {
           buffer[buflen - 1] = 0;
           return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
@@ -994,20 +942,18 @@ ConversionResult::Type ApplicationDataBuffer::PutInterval(
     case OdbcNativeType::AI_WCHAR: {
       char tmp[32]{};
       snprintf(tmp, 32, "%d-%d", value.GetYear(), value.GetMonth());
-      SqlLen resLen = static_cast< SqlLen >(strlen(tmp));
+      SqlLen resLen = static_cast<SqlLen>(strlen(tmp));
 
-      if (resLenPtr)
-        *resLenPtr = resLen;
+      if (resLenPtr) *resLenPtr = resLen;
 
-      SQLWCHAR* buffer = reinterpret_cast< SQLWCHAR* >(dataPtr);
+      SQLWCHAR* buffer = reinterpret_cast<SQLWCHAR*>(dataPtr);
       if (buffer) {
         bool isTruncated = false;
         utility::CopyStringToBuffer(tmp, buffer, buflen, isTruncated, true);
 
-        LOG_DEBUG_MSG("resLen is " << resLen << ", buflen is " << buflen
-                                   << ", tmp is " << tmp);
-        if (isTruncated)
-          return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
+        LOG_DEBUG_MSG("resLen is " << resLen << ", buflen is " << buflen << ", tmp is "
+                                   << tmp);
+        if (isTruncated) return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
       }
 
       return ConversionResult::Type::AI_SUCCESS;
@@ -1026,12 +972,10 @@ ConversionResult::Type ApplicationDataBuffer::PutInterval(
     case OdbcNativeType::AI_INTERVAL_MINUTE_TO_SECOND:
     case OdbcNativeType::AI_INTERVAL_YEAR_TO_MONTH:
     case OdbcNativeType::AI_INTERVAL_DAY_TO_SECOND: {
-      SQL_INTERVAL_STRUCT* buffer =
-          reinterpret_cast< SQL_INTERVAL_STRUCT* >(dataPtr);
+      SQL_INTERVAL_STRUCT* buffer = reinterpret_cast<SQL_INTERVAL_STRUCT*>(dataPtr);
       SetIntervalBufferValue(buffer, value);
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_INTERVAL_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_INTERVAL_STRUCT));
 
       return ConversionResult::Type::AI_SUCCESS;
     }
@@ -1054,20 +998,18 @@ ConversionResult::Type ApplicationDataBuffer::PutInterval(
   switch (type) {
     case OdbcNativeType::AI_CHAR: {
       char tmp[32]{};
-      snprintf(tmp, 32, "%d %02d:%02d:%02d.%09d", value.GetDay(),
-               value.GetHour(), value.GetMinute(), value.GetSecond(),
-               value.GetFraction());
-      SqlLen resLen = static_cast< SqlLen >(strlen(tmp));
+      snprintf(tmp, 32, "%d %02d:%02d:%02d.%09d", value.GetDay(), value.GetHour(),
+               value.GetMinute(), value.GetSecond(), value.GetFraction());
+      SqlLen resLen = static_cast<SqlLen>(strlen(tmp));
 
-      if (resLenPtr)
-        *resLenPtr = resLen;
+      if (resLenPtr) *resLenPtr = resLen;
 
-      char* buffer = reinterpret_cast< char* >(dataPtr);
+      char* buffer = reinterpret_cast<char*>(dataPtr);
       if (buffer) {
         strncpy(buffer, tmp, std::min(resLen + 1, buflen));
 
-        LOG_DEBUG_MSG("resLen is " << resLen << ", buflen is " << buflen
-                                   << ", tmp is " << tmp);
+        LOG_DEBUG_MSG("resLen is " << resLen << ", buflen is " << buflen << ", tmp is "
+                                   << tmp);
         if (resLen + 1 > buflen) {
           buffer[buflen - 1] = 0;
           return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
@@ -1079,23 +1021,20 @@ ConversionResult::Type ApplicationDataBuffer::PutInterval(
 
     case OdbcNativeType::AI_WCHAR: {
       char tmp[32]{};
-      snprintf(tmp, 32, "%d %02d:%02d:%02d.%09d", value.GetDay(),
-               value.GetHour(), value.GetMinute(), value.GetSecond(),
-               value.GetFraction());
-      SqlLen resLen = static_cast< SqlLen >(strlen(tmp));
+      snprintf(tmp, 32, "%d %02d:%02d:%02d.%09d", value.GetDay(), value.GetHour(),
+               value.GetMinute(), value.GetSecond(), value.GetFraction());
+      SqlLen resLen = static_cast<SqlLen>(strlen(tmp));
 
-      if (resLenPtr)
-        *resLenPtr = resLen;
+      if (resLenPtr) *resLenPtr = resLen;
 
-      SQLWCHAR* buffer = reinterpret_cast< SQLWCHAR* >(dataPtr);
+      SQLWCHAR* buffer = reinterpret_cast<SQLWCHAR*>(dataPtr);
       if (buffer) {
         bool isTruncated = false;
         utility::CopyStringToBuffer(tmp, buffer, buflen, isTruncated, true);
 
-        LOG_DEBUG_MSG("resLen is " << resLen << ", buflen is " << buflen
-                                   << ", tmp is " << tmp);
-        if (isTruncated)
-          return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
+        LOG_DEBUG_MSG("resLen is " << resLen << ", buflen is " << buflen << ", tmp is "
+                                   << tmp);
+        if (isTruncated) return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
       }
 
       return ConversionResult::Type::AI_SUCCESS;
@@ -1114,12 +1053,10 @@ ConversionResult::Type ApplicationDataBuffer::PutInterval(
     case OdbcNativeType::AI_INTERVAL_MINUTE_TO_SECOND:
     case OdbcNativeType::AI_INTERVAL_YEAR_TO_MONTH:
     case OdbcNativeType::AI_INTERVAL_DAY_TO_SECOND: {
-      SQL_INTERVAL_STRUCT* buffer =
-          reinterpret_cast< SQL_INTERVAL_STRUCT* >(dataPtr);
+      SQL_INTERVAL_STRUCT* buffer = reinterpret_cast<SQL_INTERVAL_STRUCT*>(dataPtr);
       SetIntervalBufferValue(buffer, value);
 
-      if (resLenPtr)
-        *resLenPtr = static_cast< SqlLen >(sizeof(SQL_INTERVAL_STRUCT));
+      if (resLenPtr) *resLenPtr = static_cast<SqlLen>(sizeof(SQL_INTERVAL_STRUCT));
 
       return ConversionResult::Type::AI_SUCCESS;
     }
@@ -1140,17 +1077,14 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
     case OdbcNativeType::AI_CHAR: {
       size_t paramLen = GetInputSize();
 
-      if (!paramLen)
-        break;
+      if (!paramLen) break;
 
-      res = utility::SqlCharToString(
-          reinterpret_cast< const SQLCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen));
+      res = utility::SqlCharToString(reinterpret_cast<const SQLCHAR*>(GetData()),
+                                     static_cast<int32_t>(paramLen));
 
-      LOG_DEBUG_MSG("res is " << res << ", paramLen is " << paramLen
-                              << ", maxLen is " << maxLen);
-      if (res.size() > maxLen)
-        res.resize(maxLen);
+      LOG_DEBUG_MSG("res is " << res << ", paramLen is " << paramLen << ", maxLen is "
+                              << maxLen);
+      if (res.size() > maxLen) res.resize(maxLen);
 
       break;
     }
@@ -1158,17 +1092,14 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
     case OdbcNativeType::AI_WCHAR: {
       size_t paramLen = GetInputSize();
 
-      if (!paramLen)
-        break;
+      if (!paramLen) break;
 
-      res = utility::SqlWcharToString(
-          reinterpret_cast< const SQLWCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen), true);
+      res = utility::SqlWcharToString(reinterpret_cast<const SQLWCHAR*>(GetData()),
+                                      static_cast<int32_t>(paramLen), true);
 
-      LOG_DEBUG_MSG("res is " << res << ", paramLen is " << paramLen
-                              << ", maxLen is " << maxLen);
-      if (res.size() > maxLen)
-        res.resize(maxLen);
+      LOG_DEBUG_MSG("res is " << res << ", paramLen is " << paramLen << ", maxLen is "
+                              << maxLen);
+      if (res.size() > maxLen) res.resize(maxLen);
 
       break;
     }
@@ -1179,7 +1110,7 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
     case OdbcNativeType::AI_SIGNED_BIGINT: {
       std::stringstream converter;
 
-      converter << GetNum< int64_t >();
+      converter << GetNum<int64_t>();
 
       res = converter.str();
 
@@ -1193,7 +1124,7 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
     case OdbcNativeType::AI_UNSIGNED_BIGINT: {
       std::stringstream converter;
 
-      converter << GetNum< uint64_t >();
+      converter << GetNum<uint64_t>();
 
       res = converter.str();
 
@@ -1203,7 +1134,7 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
     case OdbcNativeType::AI_FLOAT: {
       std::stringstream converter;
 
-      converter << GetNum< float >();
+      converter << GetNum<float>();
 
       res = converter.str();
 
@@ -1214,7 +1145,7 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
     case OdbcNativeType::AI_DOUBLE: {
       std::stringstream converter;
 
-      converter << GetNum< double >();
+      converter << GetNum<double>();
 
       res = converter.str();
 
@@ -1228,29 +1159,17 @@ std::string ApplicationDataBuffer::GetString(size_t maxLen) const {
   return res;
 }
 
-int8_t ApplicationDataBuffer::GetInt8() const {
-  return GetNum< int8_t >();
-}
+int8_t ApplicationDataBuffer::GetInt8() const { return GetNum<int8_t>(); }
 
-int16_t ApplicationDataBuffer::GetInt16() const {
-  return GetNum< int16_t >();
-}
+int16_t ApplicationDataBuffer::GetInt16() const { return GetNum<int16_t>(); }
 
-int32_t ApplicationDataBuffer::GetInt32() const {
-  return GetNum< int32_t >();
-}
+int32_t ApplicationDataBuffer::GetInt32() const { return GetNum<int32_t>(); }
 
-int64_t ApplicationDataBuffer::GetInt64() const {
-  return GetNum< int64_t >();
-}
+int64_t ApplicationDataBuffer::GetInt64() const { return GetNum<int64_t>(); }
 
-float ApplicationDataBuffer::GetFloat() const {
-  return GetNum< float >();
-}
+float ApplicationDataBuffer::GetFloat() const { return GetNum<float>(); }
 
-double ApplicationDataBuffer::GetDouble() const {
-  return GetNum< double >();
-}
+double ApplicationDataBuffer::GetDouble() const { return GetNum<double>(); }
 
 const void* ApplicationDataBuffer::GetData() const {
   return ApplyOffset(buffer, GetElementSize());
@@ -1260,15 +1179,13 @@ const SqlLen* ApplicationDataBuffer::GetResLen() const {
   return ApplyOffset(reslen, sizeof(*reslen));
 }
 
-void* ApplicationDataBuffer::GetData() {
-  return ApplyOffset(buffer, GetElementSize());
-}
+void* ApplicationDataBuffer::GetData() { return ApplyOffset(buffer, GetElementSize()); }
 
 SqlLen* ApplicationDataBuffer::GetResLen() {
   return ApplyOffset(reslen, sizeof(*reslen));
 }
 
-template < typename T >
+template <typename T>
 T ApplicationDataBuffer::GetNum() const {
   LOG_DEBUG_MSG("GetNum is called with type " << type);
   using namespace type_traits;
@@ -1280,8 +1197,7 @@ T ApplicationDataBuffer::GetNum() const {
     case OdbcNativeType::AI_WCHAR: {
       SqlLen paramLen = GetInputSize();
 
-      if (!paramLen)
-        break;
+      if (!paramLen) break;
 
       std::string str = GetString(paramLen);
 
@@ -1296,78 +1212,72 @@ T ApplicationDataBuffer::GetNum() const {
 
         converter >> tmp;
 
-        res = static_cast< T >(tmp);
+        res = static_cast<T>(tmp);
       } else
         converter >> res;
       break;
     }
 
     case OdbcNativeType::AI_SIGNED_TINYINT: {
-      res =
-          static_cast< T >(*reinterpret_cast< const signed char* >(GetData()));
+      res = static_cast<T>(*reinterpret_cast<const signed char*>(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_BIT:
     case OdbcNativeType::AI_UNSIGNED_TINYINT: {
-      res = static_cast< T >(
-          *reinterpret_cast< const unsigned char* >(GetData()));
+      res = static_cast<T>(*reinterpret_cast<const unsigned char*>(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_SIGNED_SHORT: {
-      res =
-          static_cast< T >(*reinterpret_cast< const signed short* >(GetData()));
+      res = static_cast<T>(*reinterpret_cast<const signed short*>(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_UNSIGNED_SHORT: {
-      res = static_cast< T >(
-          *reinterpret_cast< const unsigned short* >(GetData()));
+      res = static_cast<T>(*reinterpret_cast<const unsigned short*>(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_SIGNED_LONG: {
-      res =
-          static_cast< T >(*reinterpret_cast< const signed long* >(GetData()));
+      res = static_cast<T>(*reinterpret_cast<const signed long*>(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_UNSIGNED_LONG: {
-      res = static_cast< T >(
-          *reinterpret_cast< const unsigned long* >(GetData()));
+      res = static_cast<T>(*reinterpret_cast<const unsigned long*>(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_SIGNED_BIGINT: {
-      res = static_cast< T >(*reinterpret_cast< const int64_t* >(GetData()));
+      res = static_cast<T>(*reinterpret_cast<const int64_t*>(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_UNSIGNED_BIGINT: {
-      res = static_cast< T >(*reinterpret_cast< const uint64_t* >(GetData()));
+      res = static_cast<T>(*reinterpret_cast<const uint64_t*>(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_FLOAT: {
-      res = static_cast< T >(*reinterpret_cast< const float* >(GetData()));
+      res = static_cast<T>(*reinterpret_cast<const float*>(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_DOUBLE: {
-      res = static_cast< T >(*reinterpret_cast< const double* >(GetData()));
+      res = static_cast<T>(*reinterpret_cast<const double*>(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_NUMERIC: {
       const SQL_NUMERIC_STRUCT* numeric =
-          reinterpret_cast< const SQL_NUMERIC_STRUCT* >(GetData());
+          reinterpret_cast<const SQL_NUMERIC_STRUCT*>(GetData());
 
-      ignite::odbc::common::Decimal dec(
-          reinterpret_cast< const int8_t* >(numeric->val), SQL_MAX_NUMERIC_LEN,
-          numeric->scale, numeric->sign ? 1 : -1, false);
+      ignite::odbc::common::Decimal dec(reinterpret_cast<const int8_t*>(numeric->val),
+                                        SQL_MAX_NUMERIC_LEN, numeric->scale,
+                                        numeric->sign ? 1 : -1, false);
 
-      res = static_cast< T >(dec.ToInt64());
+      res = static_cast<T>(dec.ToInt64());
 
       break;
     }
@@ -1390,8 +1300,7 @@ Date ApplicationDataBuffer::GetDate() const {
 
   switch (type) {
     case OdbcNativeType::AI_TDATE: {
-      const SQL_DATE_STRUCT* buffer =
-          reinterpret_cast< const SQL_DATE_STRUCT* >(GetData());
+      const SQL_DATE_STRUCT* buffer = reinterpret_cast<const SQL_DATE_STRUCT*>(GetData());
 
       tmTime.tm_year = buffer->year - 1900;
       tmTime.tm_mon = buffer->month - 1;
@@ -1401,8 +1310,7 @@ Date ApplicationDataBuffer::GetDate() const {
     }
 
     case OdbcNativeType::AI_TTIME: {
-      const SQL_TIME_STRUCT* buffer =
-          reinterpret_cast< const SQL_TIME_STRUCT* >(GetData());
+      const SQL_TIME_STRUCT* buffer = reinterpret_cast<const SQL_TIME_STRUCT*>(GetData());
 
       tmTime.tm_year = 70;
       tmTime.tm_mday = 1;
@@ -1415,7 +1323,7 @@ Date ApplicationDataBuffer::GetDate() const {
 
     case OdbcNativeType::AI_TTIMESTAMP: {
       const SQL_TIMESTAMP_STRUCT* buffer =
-          reinterpret_cast< const SQL_TIMESTAMP_STRUCT* >(GetData());
+          reinterpret_cast<const SQL_TIMESTAMP_STRUCT*>(GetData());
 
       tmTime.tm_year = buffer->year - 1900;
       tmTime.tm_mon = buffer->month - 1;
@@ -1430,12 +1338,10 @@ Date ApplicationDataBuffer::GetDate() const {
     case OdbcNativeType::AI_CHAR: {
       SqlLen paramLen = GetInputSize();
 
-      if (!paramLen)
-        break;
+      if (!paramLen) break;
 
       std::string str = utility::SqlCharToString(
-          reinterpret_cast< const SQLCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          reinterpret_cast<const SQLCHAR*>(GetData()), static_cast<int32_t>(paramLen));
 
       sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
@@ -1449,12 +1355,11 @@ Date ApplicationDataBuffer::GetDate() const {
     case OdbcNativeType::AI_WCHAR: {
       SqlLen paramLen = GetInputSize();
 
-      if (!paramLen)
-        break;
+      if (!paramLen) break;
 
-      std::string str = utility::SqlWcharToString(
-          reinterpret_cast< const SQLWCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen), true);
+      std::string str =
+          utility::SqlWcharToString(reinterpret_cast<const SQLWCHAR*>(GetData()),
+                                    static_cast<int32_t>(paramLen), true);
 
       sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
@@ -1499,8 +1404,7 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
 
   switch (type) {
     case OdbcNativeType::AI_TDATE: {
-      const SQL_DATE_STRUCT* buffer =
-          reinterpret_cast< const SQL_DATE_STRUCT* >(GetData());
+      const SQL_DATE_STRUCT* buffer = reinterpret_cast<const SQL_DATE_STRUCT*>(GetData());
 
       tmTime.tm_year = buffer->year - 1900;
       tmTime.tm_mon = buffer->month - 1;
@@ -1510,8 +1414,7 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
     }
 
     case OdbcNativeType::AI_TTIME: {
-      const SQL_TIME_STRUCT* buffer =
-          reinterpret_cast< const SQL_TIME_STRUCT* >(GetData());
+      const SQL_TIME_STRUCT* buffer = reinterpret_cast<const SQL_TIME_STRUCT*>(GetData());
 
       tmTime.tm_year = 70;
       tmTime.tm_mday = 1;
@@ -1524,7 +1427,7 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
 
     case OdbcNativeType::AI_TTIMESTAMP: {
       const SQL_TIMESTAMP_STRUCT* buffer =
-          reinterpret_cast< const SQL_TIMESTAMP_STRUCT* >(GetData());
+          reinterpret_cast<const SQL_TIMESTAMP_STRUCT*>(GetData());
 
       tmTime.tm_year = buffer->year - 1900;
       tmTime.tm_mon = buffer->month - 1;
@@ -1541,12 +1444,10 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
     case OdbcNativeType::AI_CHAR: {
       SqlLen paramLen = GetInputSize();
 
-      if (!paramLen)
-        break;
+      if (!paramLen) break;
 
       std::string str = utility::SqlCharToString(
-          reinterpret_cast< const SQLCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          reinterpret_cast<const SQLCHAR*>(GetData()), static_cast<int32_t>(paramLen));
 
       sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
@@ -1560,12 +1461,11 @@ Timestamp ApplicationDataBuffer::GetTimestamp() const {
     case OdbcNativeType::AI_WCHAR: {
       SqlLen paramLen = GetInputSize();
 
-      if (!paramLen)
-        break;
+      if (!paramLen) break;
 
-      std::string str = utility::SqlWcharToString(
-          reinterpret_cast< const SQLWCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen), true);
+      std::string str =
+          utility::SqlWcharToString(reinterpret_cast<const SQLWCHAR*>(GetData()),
+                                    static_cast<int32_t>(paramLen), true);
 
       sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tmTime.tm_year, &tmTime.tm_mon,
              &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
@@ -1597,8 +1497,7 @@ Time ApplicationDataBuffer::GetTime() const {
 
   switch (type) {
     case OdbcNativeType::AI_TTIME: {
-      const SQL_TIME_STRUCT* buffer =
-          reinterpret_cast< const SQL_TIME_STRUCT* >(GetData());
+      const SQL_TIME_STRUCT* buffer = reinterpret_cast<const SQL_TIME_STRUCT*>(GetData());
 
       tmTime.tm_hour = buffer->hour;
       tmTime.tm_min = buffer->minute;
@@ -1609,7 +1508,7 @@ Time ApplicationDataBuffer::GetTime() const {
 
     case OdbcNativeType::AI_TTIMESTAMP: {
       const SQL_TIMESTAMP_STRUCT* buffer =
-          reinterpret_cast< const SQL_TIMESTAMP_STRUCT* >(GetData());
+          reinterpret_cast<const SQL_TIMESTAMP_STRUCT*>(GetData());
 
       tmTime.tm_hour = buffer->hour;
       tmTime.tm_min = buffer->minute;
@@ -1621,15 +1520,12 @@ Time ApplicationDataBuffer::GetTime() const {
     case OdbcNativeType::AI_CHAR: {
       SqlLen paramLen = GetInputSize();
 
-      if (!paramLen)
-        break;
+      if (!paramLen) break;
 
       std::string str = utility::SqlCharToString(
-          reinterpret_cast< const SQLCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen));
+          reinterpret_cast<const SQLCHAR*>(GetData()), static_cast<int32_t>(paramLen));
 
-      sscanf(str.c_str(), "%d:%d:%d", &tmTime.tm_hour, &tmTime.tm_min,
-             &tmTime.tm_sec);
+      sscanf(str.c_str(), "%d:%d:%d", &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
 
       break;
     }
@@ -1637,15 +1533,13 @@ Time ApplicationDataBuffer::GetTime() const {
     case OdbcNativeType::AI_WCHAR: {
       SqlLen paramLen = GetInputSize();
 
-      if (!paramLen)
-        break;
+      if (!paramLen) break;
 
-      std::string str = utility::SqlWcharToString(
-          reinterpret_cast< const SQLWCHAR* >(GetData()),
-          static_cast< int32_t >(paramLen), true);
+      std::string str =
+          utility::SqlWcharToString(reinterpret_cast<const SQLWCHAR*>(GetData()),
+                                    static_cast<int32_t>(paramLen), true);
 
-      sscanf(str.c_str(), "%d:%d:%d", &tmTime.tm_hour, &tmTime.tm_min,
-             &tmTime.tm_sec);
+      sscanf(str.c_str(), "%d:%d:%d", &tmTime.tm_hour, &tmTime.tm_min, &tmTime.tm_sec);
 
       break;
     }
@@ -1665,8 +1559,7 @@ Time ApplicationDataBuffer::GetTime() const {
   return retval;
 }
 
-void ApplicationDataBuffer::GetDecimal(
-    ignite::odbc::common::Decimal& val) const {
+void ApplicationDataBuffer::GetDecimal(ignite::odbc::common::Decimal& val) const {
   LOG_DEBUG_MSG("GetDecimal is called with type " << type);
   using namespace type_traits;
 
@@ -1675,8 +1568,7 @@ void ApplicationDataBuffer::GetDecimal(
     case OdbcNativeType::AI_WCHAR: {
       SqlLen paramLen = GetInputSize();
 
-      if (!paramLen)
-        break;
+      if (!paramLen) break;
 
       std::string str = GetString(paramLen);
 
@@ -1694,7 +1586,7 @@ void ApplicationDataBuffer::GetDecimal(
     case OdbcNativeType::AI_SIGNED_SHORT:
     case OdbcNativeType::AI_SIGNED_LONG:
     case OdbcNativeType::AI_SIGNED_BIGINT: {
-      val.AssignInt64(GetNum< int64_t >());
+      val.AssignInt64(GetNum<int64_t>());
 
       break;
     }
@@ -1703,25 +1595,25 @@ void ApplicationDataBuffer::GetDecimal(
     case OdbcNativeType::AI_UNSIGNED_SHORT:
     case OdbcNativeType::AI_UNSIGNED_LONG:
     case OdbcNativeType::AI_UNSIGNED_BIGINT: {
-      val.AssignUint64(GetNum< uint64_t >());
+      val.AssignUint64(GetNum<uint64_t>());
 
       break;
     }
 
     case OdbcNativeType::AI_FLOAT:
     case OdbcNativeType::AI_DOUBLE: {
-      val.AssignDouble(GetNum< double >());
+      val.AssignDouble(GetNum<double>());
 
       break;
     }
 
     case OdbcNativeType::AI_NUMERIC: {
       const SQL_NUMERIC_STRUCT* numeric =
-          reinterpret_cast< const SQL_NUMERIC_STRUCT* >(GetData());
+          reinterpret_cast<const SQL_NUMERIC_STRUCT*>(GetData());
 
-      ignite::odbc::common::Decimal dec(
-          reinterpret_cast< const int8_t* >(numeric->val), SQL_MAX_NUMERIC_LEN,
-          numeric->scale, numeric->sign ? 1 : -1, false);
+      ignite::odbc::common::Decimal dec(reinterpret_cast<const int8_t*>(numeric->val),
+                                        SQL_MAX_NUMERIC_LEN, numeric->scale,
+                                        numeric->sign ? 1 : -1, false);
 
       val.Swap(dec);
 
@@ -1737,24 +1629,21 @@ void ApplicationDataBuffer::GetDecimal(
   LOG_DEBUG_MSG("val is " << val);
 }
 
-template < typename T >
+template <typename T>
 T* ApplicationDataBuffer::ApplyOffset(T* ptr, size_t elemSize) const {
   LOG_DEBUG_MSG("ApplyOffset is called");
-  if (!ptr)
-    return ptr;
+  if (!ptr) return ptr;
 
-  return utility::GetPointerWithOffset(ptr,
-                                       byteOffset + elemSize * elementOffset);
+  return utility::GetPointerWithOffset(ptr, byteOffset + elemSize * elementOffset);
 }
 
 bool ApplicationDataBuffer::IsDataAtExec() const {
   LOG_DEBUG_MSG("IsDataAtExec is called");
   const SqlLen* resLenPtr = GetResLen();
 
-  if (!resLenPtr)
-    return false;
+  if (!resLenPtr) return false;
 
-  int32_t ilen = static_cast< int32_t >(*resLenPtr);
+  int32_t ilen = static_cast<int32_t>(*resLenPtr);
 
   return ilen <= SQL_LEN_DATA_AT_EXEC_OFFSET || ilen == SQL_DATA_AT_EXEC;
 }
@@ -1769,18 +1658,16 @@ SqlLen ApplicationDataBuffer::GetDataAtExecSize() const {
     case OdbcNativeType::AI_BINARY: {
       const SqlLen* resLenPtr = GetResLen();
 
-      if (!resLenPtr)
-        return 0;
+      if (!resLenPtr) return 0;
 
-      int32_t ilen = static_cast< int32_t >(*resLenPtr);
+      int32_t ilen = static_cast<int32_t>(*resLenPtr);
 
       if (ilen <= SQL_LEN_DATA_AT_EXEC_OFFSET)
         ilen = SQL_LEN_DATA_AT_EXEC(ilen);
       else
         ilen = 0;
 
-      if (type == OdbcNativeType::AI_WCHAR)
-        ilen *= 2;
+      if (type == OdbcNativeType::AI_WCHAR) ilen *= 2;
 
       LOG_DEBUG_MSG("ilen is " << ilen);
       return ilen;
@@ -1788,38 +1675,38 @@ SqlLen ApplicationDataBuffer::GetDataAtExecSize() const {
 
     case OdbcNativeType::AI_SIGNED_SHORT:
     case OdbcNativeType::AI_UNSIGNED_SHORT:
-      return static_cast< SqlLen >(sizeof(short));
+      return static_cast<SqlLen>(sizeof(short));
 
     case OdbcNativeType::AI_SIGNED_LONG:
     case OdbcNativeType::AI_UNSIGNED_LONG:
-      return static_cast< SqlLen >(sizeof(long));
+      return static_cast<SqlLen>(sizeof(long));
 
     case OdbcNativeType::AI_FLOAT:
-      return static_cast< SqlLen >(sizeof(float));
+      return static_cast<SqlLen>(sizeof(float));
 
     case OdbcNativeType::AI_DOUBLE:
-      return static_cast< SqlLen >(sizeof(double));
+      return static_cast<SqlLen>(sizeof(double));
 
     case OdbcNativeType::AI_BIT:
     case OdbcNativeType::AI_SIGNED_TINYINT:
     case OdbcNativeType::AI_UNSIGNED_TINYINT:
-      return static_cast< SqlLen >(sizeof(char));
+      return static_cast<SqlLen>(sizeof(char));
 
     case OdbcNativeType::AI_SIGNED_BIGINT:
     case OdbcNativeType::AI_UNSIGNED_BIGINT:
-      return static_cast< SqlLen >(sizeof(SQLBIGINT));
+      return static_cast<SqlLen>(sizeof(SQLBIGINT));
 
     case OdbcNativeType::AI_TDATE:
-      return static_cast< SqlLen >(sizeof(SQL_DATE_STRUCT));
+      return static_cast<SqlLen>(sizeof(SQL_DATE_STRUCT));
 
     case OdbcNativeType::AI_TTIME:
-      return static_cast< SqlLen >(sizeof(SQL_TIME_STRUCT));
+      return static_cast<SqlLen>(sizeof(SQL_TIME_STRUCT));
 
     case OdbcNativeType::AI_TTIMESTAMP:
-      return static_cast< SqlLen >(sizeof(SQL_TIMESTAMP_STRUCT));
+      return static_cast<SqlLen>(sizeof(SQL_TIMESTAMP_STRUCT));
 
     case OdbcNativeType::AI_NUMERIC:
-      return static_cast< SqlLen >(sizeof(SQL_NUMERIC_STRUCT));
+      return static_cast<SqlLen>(sizeof(SQL_NUMERIC_STRUCT));
 
     case OdbcNativeType::AI_DEFAULT:
     case OdbcNativeType::AI_UNSUPPORTED:
@@ -1841,47 +1728,47 @@ SqlLen ApplicationDataBuffer::GetElementSize() const {
       return buflen;
 
     case OdbcNativeType::AI_SIGNED_SHORT:
-      return static_cast< SqlLen >(sizeof(SQLSMALLINT));
+      return static_cast<SqlLen>(sizeof(SQLSMALLINT));
 
     case OdbcNativeType::AI_UNSIGNED_SHORT:
-      return static_cast< SqlLen >(sizeof(SQLUSMALLINT));
+      return static_cast<SqlLen>(sizeof(SQLUSMALLINT));
 
     case OdbcNativeType::AI_SIGNED_LONG:
-      return static_cast< SqlLen >(sizeof(SQLUINTEGER));
+      return static_cast<SqlLen>(sizeof(SQLUINTEGER));
 
     case OdbcNativeType::AI_UNSIGNED_LONG:
-      return static_cast< SqlLen >(sizeof(SQLINTEGER));
+      return static_cast<SqlLen>(sizeof(SQLINTEGER));
 
     case OdbcNativeType::AI_FLOAT:
-      return static_cast< SqlLen >(sizeof(SQLREAL));
+      return static_cast<SqlLen>(sizeof(SQLREAL));
 
     case OdbcNativeType::AI_DOUBLE:
-      return static_cast< SqlLen >(sizeof(SQLDOUBLE));
+      return static_cast<SqlLen>(sizeof(SQLDOUBLE));
 
     case OdbcNativeType::AI_SIGNED_TINYINT:
-      return static_cast< SqlLen >(sizeof(SQLSCHAR));
+      return static_cast<SqlLen>(sizeof(SQLSCHAR));
 
     case OdbcNativeType::AI_BIT:
     case OdbcNativeType::AI_UNSIGNED_TINYINT:
-      return static_cast< SqlLen >(sizeof(SQLCHAR));
+      return static_cast<SqlLen>(sizeof(SQLCHAR));
 
     case OdbcNativeType::AI_SIGNED_BIGINT:
-      return static_cast< SqlLen >(sizeof(SQLBIGINT));
+      return static_cast<SqlLen>(sizeof(SQLBIGINT));
 
     case OdbcNativeType::AI_UNSIGNED_BIGINT:
-      return static_cast< SqlLen >(sizeof(SQLUBIGINT));
+      return static_cast<SqlLen>(sizeof(SQLUBIGINT));
 
     case OdbcNativeType::AI_TDATE:
-      return static_cast< SqlLen >(sizeof(SQL_DATE_STRUCT));
+      return static_cast<SqlLen>(sizeof(SQL_DATE_STRUCT));
 
     case OdbcNativeType::AI_TTIME:
-      return static_cast< SqlLen >(sizeof(SQL_TIME_STRUCT));
+      return static_cast<SqlLen>(sizeof(SQL_TIME_STRUCT));
 
     case OdbcNativeType::AI_TTIMESTAMP:
-      return static_cast< SqlLen >(sizeof(SQL_TIMESTAMP_STRUCT));
+      return static_cast<SqlLen>(sizeof(SQL_TIMESTAMP_STRUCT));
 
     case OdbcNativeType::AI_NUMERIC:
-      return static_cast< SqlLen >(sizeof(SQL_NUMERIC_STRUCT));
+      return static_cast<SqlLen>(sizeof(SQL_NUMERIC_STRUCT));
 
     case OdbcNativeType::AI_DEFAULT:
     case OdbcNativeType::AI_UNSUPPORTED:
@@ -1963,8 +1850,8 @@ void ApplicationDataBuffer::SetIntervalType(SQL_INTERVAL_STRUCT* buffer) {
   }
 }
 
-void ApplicationDataBuffer::SetIntervalBufferValue(
-    SQL_INTERVAL_STRUCT* buffer, const IntervalYearMonth& value) {
+void ApplicationDataBuffer::SetIntervalBufferValue(SQL_INTERVAL_STRUCT* buffer,
+                                                   const IntervalYearMonth& value) {
   SetIntervalType(buffer);
   if (value.GetYear() < 0 || (value.GetYear() == 0 && value.GetMonth() < 0)) {
     buffer->interval_sign = SQL_FALSE;
@@ -2047,15 +1934,15 @@ void ApplicationDataBuffer::SetIntervalBufferValue(
   }
 }
 
-void ApplicationDataBuffer::SetIntervalBufferValue(
-    SQL_INTERVAL_STRUCT* buffer, const IntervalDaySecond& value) {
+void ApplicationDataBuffer::SetIntervalBufferValue(SQL_INTERVAL_STRUCT* buffer,
+                                                   const IntervalDaySecond& value) {
   SetIntervalType(buffer);
-  if (value.GetDay() < 0 || (value.GetDay() == 0 && value.GetHour() < 0)
-      || (value.GetDay() == 0 && value.GetHour() == 0 && value.GetMinute() < 0)
-      || (value.GetDay() == 0 && value.GetHour() == 0 && value.GetMinute() == 0
-          && value.GetSecond() < 0)
-      || (value.GetDay() == 0 && value.GetHour() == 0 && value.GetMinute() == 0
-          && value.GetSecond() == 0 && value.GetFraction() < 0)) {
+  if (value.GetDay() < 0 || (value.GetDay() == 0 && value.GetHour() < 0) ||
+      (value.GetDay() == 0 && value.GetHour() == 0 && value.GetMinute() < 0) ||
+      (value.GetDay() == 0 && value.GetHour() == 0 && value.GetMinute() == 0 &&
+       value.GetSecond() < 0) ||
+      (value.GetDay() == 0 && value.GetHour() == 0 && value.GetMinute() == 0 &&
+       value.GetSecond() == 0 && value.GetFraction() < 0)) {
     buffer->interval_sign = SQL_FALSE;
   } else {
     buffer->interval_sign = SQL_TRUE;

@@ -100,8 +100,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator==(const Time& val1,
-                                              const Time& val2);
+  friend bool IGNITE_IMPORT_EXPORT operator==(const Time& val1, const Time& val2);
 
   /**
    * Comparison operator override.
@@ -110,8 +109,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if not equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator!=(const Time& val1,
-                                              const Time& val2);
+  friend bool IGNITE_IMPORT_EXPORT operator!=(const Time& val1, const Time& val2);
 
   /**
    * Comparison operator override.
@@ -120,8 +118,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if less.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator<(const Time& val1,
-                                             const Time& val2);
+  friend bool IGNITE_IMPORT_EXPORT operator<(const Time& val1, const Time& val2);
 
   /**
    * Comparison operator override.
@@ -130,8 +127,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if less or equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator<=(const Time& val1,
-                                              const Time& val2);
+  friend bool IGNITE_IMPORT_EXPORT operator<=(const Time& val1, const Time& val2);
 
   /**
    * Comparison operator override.
@@ -140,8 +136,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if gretter.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator>(const Time& val1,
-                                             const Time& val2);
+  friend bool IGNITE_IMPORT_EXPORT operator>(const Time& val1, const Time& val2);
 
   /**
    * Comparison operator override.
@@ -150,8 +145,7 @@ class IGNITE_IMPORT_EXPORT Time {
    * @param val2 Second value.
    * @return True if gretter or equal.
    */
-  friend bool IGNITE_IMPORT_EXPORT operator>=(const Time& val1,
-                                              const Time& val2);
+  friend bool IGNITE_IMPORT_EXPORT operator>=(const Time& val1, const Time& val2);
 
  private:
   /** Number of seconds since 00:00:00 UTC. */

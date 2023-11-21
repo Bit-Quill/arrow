@@ -27,13 +27,13 @@
 
 #include <sql.h>
 #include <sqlext.h>
-#include <string>
 #include <boost/test/unit_test.hpp>
+#include <string>
 
 #include <ignite/common/include/common/platform_utils.h>
+#include <timestream/odbc/authentication/auth_type.h>
 #include <timestream/odbc/config/configuration.h>
 #include <timestream/odbc/config/connection_string_parser.h>
-#include <timestream/odbc/authentication/auth_type.h>
 #include <timestream/odbc/system/odbc_constants.h>
 
 #ifndef BOOST_TEST_CONTEXT
@@ -78,8 +78,7 @@ struct OdbcTestSuite {
    * @param statement Statement to allocate.
    * @param connectStr Connection string.
    */
-  void Connect(SQLHDBC& conn, SQLHSTMT& statement,
-               const std::string& connectStr);
+  void Connect(SQLHDBC& conn, SQLHSTMT& statement, const std::string& connectStr);
 
   /**
    * Establish connection to node using default handles.
@@ -105,8 +104,7 @@ struct OdbcTestSuite {
    * @param connectionString the connection string to parse.
    * @param config the configuration to update.
    */
-  void ParseConnectionString(const std::string& connectionString,
-                             Configuration& config);
+  void ParseConnectionString(const std::string& connectionString, Configuration& config);
 
   /**
    * Writes the DSN configuration
@@ -125,8 +123,7 @@ struct OdbcTestSuite {
    * @param username the updated username for the connection.
    * @param password the updated password for the connection.
    */
-  void WriteDsnConfiguration(const std::string& dsn,
-                             const std::string& connectionString,
+  void WriteDsnConfiguration(const std::string& dsn, const std::string& connectionString,
                              std::string& username, std::string& password);
 
   /**
@@ -151,11 +148,12 @@ struct OdbcTestSuite {
    * @param expectedError Expected error message
    * @return SQL State.
    */
-  std::string ExpectSQLTablesReject(
-      SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
-      SQLSMALLINT schemaNameLen, SQLWCHAR* tableName, SQLSMALLINT tableNameLen,
-      SQLWCHAR* tableType, SQLSMALLINT tableTypeLen,
-      const std::string& expectedState, const std::string& expectedError);
+  std::string ExpectSQLTablesReject(SQLWCHAR* catalogName, SQLSMALLINT catalogNameLen,
+                                    SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
+                                    SQLWCHAR* tableName, SQLSMALLINT tableNameLen,
+                                    SQLWCHAR* tableType, SQLSMALLINT tableTypeLen,
+                                    const std::string& expectedState,
+                                    const std::string& expectedError);
 
   /**
    * Expect connection to be rejected by the server.
@@ -175,8 +173,7 @@ struct OdbcTestSuite {
    * @param password the password for the connection.
    * @return SQL State.
    */
-  std::string ExpectConnectionReject(const std::string& dsn,
-                                     const std::string& username,
+  std::string ExpectConnectionReject(const std::string& dsn, const std::string& username,
                                      const std::string& password,
                                      const std::string& expectedState,
                                      const std::string& expectedError);
@@ -389,7 +386,7 @@ struct OdbcTestSuite {
    * @param value Query.
    * @return Corresponding vector.
    */
-  static std::vector< SQLWCHAR > MakeSqlBuffer(const std::string& value);
+  static std::vector<SQLWCHAR> MakeSqlBuffer(const std::string& value);
 
   /**
    * Performs SQL query.
@@ -413,16 +410,14 @@ struct OdbcTestSuite {
    * @param accessKeyId AWSAccessKeyID
    * @param secretKey AWSSecretkey
    */
-  void GetIAMCredentials(std::string& accessKeyId,
-                         std::string& secretKey) const;
+  void GetIAMCredentials(std::string& accessKeyId, std::string& secretKey) const;
 
   /**
    * Creates the Okta DSN connection string
    */
   void CreateOktaDsnConnectionString(std::string& connectionString,
                                      const char* host = nullptr,
-                                     const char* uid = nullptr,
-                                     const char* pwd = nullptr,
+                                     const char* uid = nullptr, const char* pwd = nullptr,
                                      const char* appId = nullptr,
                                      const char* roleArn = nullptr,
                                      const char* idpArn = nullptr) const;
@@ -430,11 +425,13 @@ struct OdbcTestSuite {
   /**
    * Creates the AAD DSN connection string
    */
-  void CreateAADDsnConnectionString(
-      std::string& connectionString, const char* uid = nullptr,
-      const char* pwd = nullptr, const char* appId = nullptr,
-      const char* tenantId = nullptr, const char* clientSecret = nullptr,
-      const char* roleArn = nullptr, const char* idpArn = nullptr) const;
+  void CreateAADDsnConnectionString(std::string& connectionString,
+                                    const char* uid = nullptr, const char* pwd = nullptr,
+                                    const char* appId = nullptr,
+                                    const char* tenantId = nullptr,
+                                    const char* clientSecret = nullptr,
+                                    const char* roleArn = nullptr,
+                                    const char* idpArn = nullptr) const;
 
   /**
    * Creates the generic DSN connection string with uid/pwd and one of
@@ -442,9 +439,9 @@ struct OdbcTestSuite {
    * is set to true.
    */
   void CreateGenericDsnConnectionString(
-      std::string& connectionString, AuthType::Type testAuthType,
-      const std::string& uid, const std::string& pwd,
-      bool includeTSCred = false, const std::string& TSUsername = std::string(),
+      std::string& connectionString, AuthType::Type testAuthType, const std::string& uid,
+      const std::string& pwd, bool includeTSCred = false,
+      const std::string& TSUsername = std::string(),
       const std::string& TSPassword = std::string(),
       const std::string& miscOptions = std::string()) const;
 
@@ -461,8 +458,7 @@ struct OdbcTestSuite {
    * @param connectionString Connection string.
    * @param value The maxRowPerPage value.
    */
-  void AddMaxRowPerPage(std::string& connectionString,
-                        const std::string& value);
+  void AddMaxRowPerPage(std::string& connectionString, const std::string& value);
 
   /**
    * Creates the standard DSN connection string for AWS.

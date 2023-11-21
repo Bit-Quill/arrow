@@ -47,11 +47,10 @@ class MockHttpClient : public HttpClient {
    * @param writeLimiter Write limiter.
    * @return Mocked HttpResponse.
    */
-  virtual std::shared_ptr< HttpResponse > MakeRequest(
-      const std::shared_ptr< HttpRequest >& request,
+  virtual std::shared_ptr<HttpResponse> MakeRequest(
+      const std::shared_ptr<HttpRequest>& request,
       Aws::Utils::RateLimits::RateLimiterInterface* readLimiter = nullptr,
-      Aws::Utils::RateLimits::RateLimiterInterface* writeLimiter =
-          nullptr) const;
+      Aws::Utils::RateLimits::RateLimiterInterface* writeLimiter = nullptr) const;
 
  private:
   /**
@@ -60,9 +59,8 @@ class MockHttpClient : public HttpClient {
    * @param request The http request.
    * @param response The generated HttpResponse with session token
    */
-  void HandleSessionTokenRequest(
-      const std::shared_ptr< HttpRequest >& request,
-      std::shared_ptr< HttpResponse >& response) const;
+  void HandleSessionTokenRequest(const std::shared_ptr<HttpRequest>& request,
+                                 std::shared_ptr<HttpResponse>& response) const;
 
   /**
    * Handle Azure AD access token request
@@ -70,9 +68,8 @@ class MockHttpClient : public HttpClient {
    * @param request The http request.
    * @param response The generated HttpResponse with access token
    */
-  void HandleAADAccessTokenRequest(
-      const std::shared_ptr< HttpRequest >& request,
-      std::shared_ptr< HttpResponse >& response) const;
+  void HandleAADAccessTokenRequest(const std::shared_ptr<HttpRequest>& request,
+                                   std::shared_ptr<HttpResponse>& response) const;
 
   /**
    * Handle SAML Get request to get SAMLResponse
@@ -82,8 +79,8 @@ class MockHttpClient : public HttpClient {
    * @param response The http response with SAMLResponse
    */
   void HandleSAMLAssertion(const Aws::String& path,
-                           const std::shared_ptr< HttpRequest >& request,
-                           std::shared_ptr< HttpResponse >& response) const;
+                           const std::shared_ptr<HttpRequest>& request,
+                           std::shared_ptr<HttpResponse>& response) const;
 };
 }  // namespace odbc
 }  // namespace timestream

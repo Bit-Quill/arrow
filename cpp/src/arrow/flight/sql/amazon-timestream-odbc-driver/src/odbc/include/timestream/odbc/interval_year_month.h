@@ -60,18 +60,14 @@ class IGNITE_IMPORT_EXPORT IntervalYearMonth {
    *
    * @return number of years
    */
-  int32_t GetYear() const {
-    return year_;
-  }
+  int32_t GetYear() const { return year_; }
 
   /**
    * Returns number of months
    *
    * @return Number of months
    */
-  int32_t GetMonth() const {
-    return month_;
-  }
+  int32_t GetMonth() const { return month_; }
 
   /**
    * Comparison operator override.

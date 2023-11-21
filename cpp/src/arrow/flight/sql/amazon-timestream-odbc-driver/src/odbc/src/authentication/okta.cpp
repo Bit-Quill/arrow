@@ -14,8 +14,8 @@
  *
  */
 
-#include "timestream/odbc/log.h"
 #include "timestream/odbc/authentication/okta.h"
+#include "timestream/odbc/log.h"
 #include "timestream/odbc/utility.h"
 
 #include <aws/core/Aws.h>
@@ -30,17 +30,16 @@ namespace odbc {
 
 const size_t TimestreamOktaCredentialsProvider::SINGLE_NUM_CHAR_REF_LENGTH = 6;
 const std::string TimestreamOktaCredentialsProvider::SAML_RESPONSE_PATTERN =
-    std::string(
-        "<input name=\"SAMLResponse\" type=\"hidden\" value=\"(.*?)\"/>");
+    std::string("<input name=\"SAMLResponse\" type=\"hidden\" value=\"(.*?)\"/>");
 
-std::shared_ptr< Aws::Http::HttpRequest >
+std::shared_ptr<Aws::Http::HttpRequest>
 TimestreamOktaCredentialsProvider::CreateSessionTokenReq() {
   LOG_DEBUG_MSG("CreateSessionTokenReq is called");
 
   std::string baseUri = "https://" + config_.GetIdPHost() + "/api/v1/authn";
   LOG_DEBUG_MSG("baseUri is " << baseUri);
 
-  std::shared_ptr< Aws::Http::HttpRequest > req = Aws::Http::CreateHttpRequest(
+  std::shared_ptr<Aws::Http::HttpRequest> req = Aws::Http::CreateHttpRequest(
       baseUri, Aws::Http::HttpMethod::HTTP_POST,
       Aws::Utils::Stream::DefaultResponseStreamFactoryMethod);
 
@@ -55,8 +54,7 @@ TimestreamOktaCredentialsProvider::CreateSessionTokenReq() {
 
   // set content
   std::string body = idpCredentials.View().WriteReadable();
-  std::shared_ptr< Aws::StringStream > ss =
-      std::make_shared< Aws::StringStream >();
+  std::shared_ptr<Aws::StringStream> ss = std::make_shared<Aws::StringStream>();
   *ss << body;
 
   req->AddContentBody(ss);
@@ -65,18 +63,16 @@ TimestreamOktaCredentialsProvider::CreateSessionTokenReq() {
   return req;
 }
 
-std::string TimestreamOktaCredentialsProvider::GetSessionToken(
-    std::string& errInfo) {
+std::string TimestreamOktaCredentialsProvider::GetSessionToken(std::string& errInfo) {
   LOG_DEBUG_MSG("GetSessionToken is called");
 
   std::string sessionToken("");
 
   // create request
-  std::shared_ptr< Aws::Http::HttpRequest > req = CreateSessionTokenReq();
+  std::shared_ptr<Aws::Http::HttpRequest> req = CreateSessionTokenReq();
 
   // check response code
-  std::shared_ptr< Aws::Http::HttpResponse > response =
-      httpClient_->MakeRequest(req);
+  std::shared_ptr<Aws::Http::HttpResponse> response = httpClient_->MakeRequest(req);
   if (response->GetResponseCode() != Aws::Http::HttpResponseCode::OK) {
     errInfo = "Failed to get Okta session token.";
     if (response->HasClientError()) {
@@ -135,8 +131,7 @@ std::string TimestreamOktaCredentialsProvider::DecodeNumericCharacters(
   return result;
 }
 
-std::string TimestreamOktaCredentialsProvider::GetSAMLAssertion(
-    std::string& errInfo) {
+std::string TimestreamOktaCredentialsProvider::GetSAMLAssertion(std::string& errInfo) {
   LOG_DEBUG_MSG("GetSAMLAssertion is called");
   std::string samlResponse("");
 
@@ -147,17 +142,16 @@ std::string TimestreamOktaCredentialsProvider::GetSAMLAssertion(
     return samlResponse;
   }
 
-  std::string baseUri = "https://" + config_.GetIdPHost() + "/app/amazon_aws/"
-                        + config_.GetOktaAppId() + "/sso/saml";
+  std::string baseUri = "https://" + config_.GetIdPHost() + "/app/amazon_aws/" +
+                        config_.GetOktaAppId() + "/sso/saml";
 
   // create saml request
-  std::shared_ptr< Aws::Http::HttpRequest > samlGetRequest =
-      Aws::Http::CreateHttpRequest(
-          baseUri, Aws::Http::HttpMethod::HTTP_GET,
-          Aws::Utils::Stream::DefaultResponseStreamFactoryMethod);
+  std::shared_ptr<Aws::Http::HttpRequest> samlGetRequest = Aws::Http::CreateHttpRequest(
+      baseUri, Aws::Http::HttpMethod::HTTP_GET,
+      Aws::Utils::Stream::DefaultResponseStreamFactoryMethod);
   samlGetRequest->AddQueryStringParameter("onetimetoken", sessionToken);
 
-  std::shared_ptr< Aws::Http::HttpResponse > response =
+  std::shared_ptr<Aws::Http::HttpResponse> response =
       httpClient_->MakeRequest(samlGetRequest);
 
   // check response code
@@ -170,10 +164,9 @@ std::string TimestreamOktaCredentialsProvider::GetSAMLAssertion(
     return samlResponse;
   }
 
-  std::istreambuf_iterator< char > eos;
-  std::string body(
-      std::istreambuf_iterator< char >(response->GetResponseBody().rdbuf()),
-      eos);
+  std::istreambuf_iterator<char> eos;
+  std::string body(std::istreambuf_iterator<char>(response->GetResponseBody().rdbuf()),
+                   eos);
 
   // retrieve SAMLResponse value
   std::smatch matches;

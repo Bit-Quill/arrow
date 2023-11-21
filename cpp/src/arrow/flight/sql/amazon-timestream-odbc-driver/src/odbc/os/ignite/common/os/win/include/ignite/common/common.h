@@ -29,9 +29,9 @@
 
 #include <iostream>
 
-#define IGNITE_TRACE_ALLOC(addr)                                  \
-  std::cout << "ALLOC " << __FILE__ << "(" << __LINE__ << "): 0x" \
-            << (void*)addr << std::endl;
+#define IGNITE_TRACE_ALLOC(addr)                                                 \
+  std::cout << "ALLOC " << __FILE__ << "(" << __LINE__ << "): 0x" << (void*)addr \
+            << std::endl;
 
 /**
  * Common construction to disable copy constructor and assignment for class.

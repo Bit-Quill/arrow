@@ -32,20 +32,14 @@ static pthread_once_t tlsKeyInit = PTHREAD_ONCE_INIT;
  *
  * @param key Key.
  */
-void DestroyTlsKey(void* key) {
-  ThreadLocal::Clear0(key);
-}
+void DestroyTlsKey(void* key) { ThreadLocal::Clear0(key); }
 
 /**
  * Routine to allocate TLS key.
  */
-void AllocateTlsKey() {
-  pthread_key_create(&tlsKey, DestroyTlsKey);
-}
+void AllocateTlsKey() { pthread_key_create(&tlsKey, DestroyTlsKey); }
 
-void Memory::Fence() {
-  __asm__ volatile("" ::: "memory");
-}
+void Memory::Fence() { __asm__ volatile("" ::: "memory"); }
 
 CriticalSection::CriticalSection() {
   pthread_mutex_init(&mux, NULL);
@@ -77,25 +71,15 @@ ReadWriteLock::ReadWriteLock() : lock() {
   Memory::Fence();
 }
 
-ReadWriteLock::~ReadWriteLock() {
-  pthread_rwlock_destroy(&lock);
-}
+ReadWriteLock::~ReadWriteLock() { pthread_rwlock_destroy(&lock); }
 
-void ReadWriteLock::LockExclusive() {
-  pthread_rwlock_wrlock(&lock);
-}
+void ReadWriteLock::LockExclusive() { pthread_rwlock_wrlock(&lock); }
 
-void ReadWriteLock::ReleaseExclusive() {
-  pthread_rwlock_unlock(&lock);
-}
+void ReadWriteLock::ReleaseExclusive() { pthread_rwlock_unlock(&lock); }
 
-void ReadWriteLock::LockShared() {
-  pthread_rwlock_rdlock(&lock);
-}
+void ReadWriteLock::LockShared() { pthread_rwlock_rdlock(&lock); }
 
-void ReadWriteLock::ReleaseShared() {
-  pthread_rwlock_unlock(&lock);
-}
+void ReadWriteLock::ReleaseShared() { pthread_rwlock_unlock(&lock); }
 
 SingleLatch::SingleLatch() {
   pthread_mutex_init(&mux, NULL);
@@ -129,8 +113,7 @@ void SingleLatch::CountDown() {
 void SingleLatch::Await() {
   pthread_mutex_lock(&mux);
 
-  while (!ready)
-    pthread_cond_wait(&cond, &mux);
+  while (!ready) pthread_cond_wait(&cond, &mux);
 
   pthread_mutex_unlock(&mux);
 
@@ -141,8 +124,7 @@ bool Atomics::CompareAndSet32(int32_t* ptr, int32_t expVal, int32_t newVal) {
   return __sync_bool_compare_and_swap(ptr, expVal, newVal);
 }
 
-int32_t Atomics::CompareAndSet32Val(int32_t* ptr, int32_t expVal,
-                                    int32_t newVal) {
+int32_t Atomics::CompareAndSet32Val(int32_t* ptr, int32_t expVal, int32_t newVal) {
   return __sync_val_compare_and_swap(ptr, expVal, newVal);
 }
 
@@ -158,8 +140,7 @@ bool Atomics::CompareAndSet64(int64_t* ptr, int64_t expVal, int64_t newVal) {
   return __sync_bool_compare_and_swap(ptr, expVal, newVal);
 }
 
-int64_t Atomics::CompareAndSet64Val(int64_t* ptr, int64_t expVal,
-                                    int64_t newVal) {
+int64_t Atomics::CompareAndSet64Val(int64_t* ptr, int64_t expVal, int64_t newVal) {
   return __sync_val_compare_and_swap(ptr, expVal, newVal);
 }
 

@@ -32,8 +32,7 @@ namespace common {
  */
 inline bool StringEndsWith(const std::string& str, const std::string& ending) {
   if (str.length() > ending.length())
-    return str.compare(str.length() - ending.length(), ending.length(), ending)
-           == 0;
+    return str.compare(str.length() - ending.length(), ending.length(), ending) == 0;
 
   return false;
 }
@@ -58,18 +57,17 @@ void ReleaseChars(char* val) {
 uint32_t ToBigEndian(uint32_t value) {
   // The answer is 42
   static const int num = 42;
-  static const bool isLittleEndian =
-      (*reinterpret_cast< const char* >(&num) == num);
+  static const bool isLittleEndian = (*reinterpret_cast<const char*>(&num) == num);
 
   if (isLittleEndian)
-    return ((value & 0xFF) << 24) | (((value >> 8) & 0xFF) << 16)
-           | (((value >> 16) & 0xFF) << 8) | ((value >> 24) & 0xFF);
+    return ((value & 0xFF) << 24) | (((value >> 8) & 0xFF) << 16) |
+           (((value >> 16) & 0xFF) << 8) | ((value >> 24) & 0xFF);
 
   return value;
 }
 
-IGNITE_FRIEND_EXPORT Date MakeDateGmt(int year, int month, int day, int hour,
-                                      int min, int sec) {
+IGNITE_FRIEND_EXPORT Date MakeDateGmt(int year, int month, int day, int hour, int min,
+                                      int sec) {
   tm date;
 
   std::memset(&date, 0, sizeof(date));
@@ -84,8 +82,8 @@ IGNITE_FRIEND_EXPORT Date MakeDateGmt(int year, int month, int day, int hour,
   return CTmToDate(date);
 }
 
-IGNITE_FRIEND_EXPORT Date MakeDateLocal(int year, int month, int day, int hour,
-                                        int min, int sec) {
+IGNITE_FRIEND_EXPORT Date MakeDateLocal(int year, int month, int day, int hour, int min,
+                                        int sec) {
   tm date;
 
   std::memset(&date, 0, sizeof(date));
@@ -134,9 +132,8 @@ IGNITE_FRIEND_EXPORT Time MakeTimeLocal(int hour, int min, int sec, int ns) {
   return CTimeToTime(localTime, ns);
 }
 
-IGNITE_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year, int month, int day,
-                                                int hour, int min, int sec,
-                                                long ns) {
+IGNITE_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year, int month, int day, int hour,
+                                                int min, int sec, long ns) {
   tm date;
 
   std::memset(&date, 0, sizeof(date));
@@ -151,9 +148,8 @@ IGNITE_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year, int month, int day,
   return CTmToTimestamp(date, ns);
 }
 
-IGNITE_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year, int month, int day,
-                                                  int hour, int min, int sec,
-                                                  long ns) {
+IGNITE_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year, int month, int day, int hour,
+                                                  int min, int sec, long ns) {
   tm date;
 
   std::memset(&date, 0, sizeof(date));
@@ -181,8 +177,7 @@ IGNITE_IMPORT_EXPORT std::string GetDynamicLibraryName(const char* name) {
 IGNITE_IMPORT_EXPORT bool AllDigits(const std::string& val) {
   std::string::const_iterator i = val.begin();
 
-  while (i != val.end() && isdigit(*i))
-    ++i;
+  while (i != val.end() && isdigit(*i)) ++i;
 
   return i == val.end();
 }

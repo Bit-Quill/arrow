@@ -23,9 +23,9 @@
 #endif
 
 #include <sql.h>
+#include <sqlext.h>
 #include <sqltypes.h>
 #include "timestream/odbc/utility.h"
-#include <sqlext.h>
 
 #include <boost/test/unit_test.hpp>
 #include <cstdio>
@@ -35,24 +35,24 @@
 #include "odbc_test_suite.h"
 #include "test_utils.h"
 
-#include "timestream/odbc/log.h"
 #include "timestream/odbc/config/configuration.h"
+#include "timestream/odbc/log.h"
 
 using namespace timestream;
 using namespace timestream_test;
 
 using namespace boost::unit_test;
 
-#define CHECK_DESC_GET_FIELD_FAILURE(fieldId)                                  \
-  {                                                                            \
-    SQLSMALLINT tmp;                                                           \
-    ret = SQLGetDescField(ard, 1, fieldId, &tmp, 0, NULL);                     \
-    BOOST_CHECK_EQUAL(SQL_ERROR, ret);                                         \
-    OdbcClientError error = GetOdbcError(SQL_HANDLE_DESC, ard);                \
-    BOOST_CHECK_EQUAL(error.sqlstate, "HY000");                                \
-    BOOST_CHECK(error.message.find(                                            \
-                    "Current descriptor type ARD is not allowed to get field") \
-                != std::string::npos);                                         \
+#define CHECK_DESC_GET_FIELD_FAILURE(fieldId)                                            \
+  {                                                                                      \
+    SQLSMALLINT tmp;                                                                     \
+    ret = SQLGetDescField(ard, 1, fieldId, &tmp, 0, NULL);                               \
+    BOOST_CHECK_EQUAL(SQL_ERROR, ret);                                                   \
+    OdbcClientError error = GetOdbcError(SQL_HANDLE_DESC, ard);                          \
+    BOOST_CHECK_EQUAL(error.sqlstate, "HY000");                                          \
+    BOOST_CHECK(                                                                         \
+        error.message.find("Current descriptor type ARD is not allowed to get field") != \
+        std::string::npos);                                                              \
   }
 
 #define CHECK_DESC_SET_FIELD_FAILURE(fieldId, expectedErrMsg)             \
@@ -98,7 +98,7 @@ BOOST_FIXTURE_TEST_SUITE(DescriptorTestSuite, DescriptorTestSuiteFixture)
 BOOST_AUTO_TEST_CASE(TestDescriptorGetFromBindCol) {
   SQLRETURN ret;
 
-  std::vector< SQLWCHAR > request = MakeSqlBuffer(
+  std::vector<SQLWCHAR> request = MakeSqlBuffer(
       "select device_id, time, flag, rebuffering_ratio, video_startup_time, "
       "date(TIMESTAMP '2022-07-07 17:44:43.771000000'), current_time, interval "
       "'4' year + interval '2' month,"
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorGetFromBindCol) {
   SQLPOINTER dataPtr;
   ret = SQLGetDescField(ard, 1, SQL_DESC_DATA_PTR, &dataPtr, 0, NULL);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  BOOST_CHECK_EQUAL(dataPtr, static_cast< SQLPOINTER >(id));
+  BOOST_CHECK_EQUAL(dataPtr, static_cast<SQLPOINTER>(id));
 
   SQLULEN len;
   ret = SQLGetDescField(ard, 1, SQL_DESC_LENGTH, &len, 0, NULL);
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorGetFromBindCol) {
 BOOST_AUTO_TEST_CASE(TestDescriptorSetCharType) {
   SQLRETURN ret;
 
-  std::vector< SQLWCHAR > request = MakeSqlBuffer(
+  std::vector<SQLWCHAR> request = MakeSqlBuffer(
       "select device_id, time, flag, rebuffering_ratio, video_startup_time, "
       "date(TIMESTAMP '2022-07-07 17:44:43.771000000'), current_time, interval "
       "'4' year + interval '2' month,"
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetCharType) {
   SQLPOINTER dataPtr;
   ret = SQLGetDescField(ard, 1, SQL_DESC_DATA_PTR, &dataPtr, 0, NULL);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
-  BOOST_CHECK_EQUAL(dataPtr, static_cast< SQLPOINTER >(id2));
+  BOOST_CHECK_EQUAL(dataPtr, static_cast<SQLPOINTER>(id2));
 
   SQLULEN len;
   ret = SQLGetDescField(ard, 1, SQL_DESC_LENGTH, &len, 0, NULL);
@@ -227,8 +227,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetCharType) {
   BOOST_CHECK_EQUAL(lenPtr, &ind);
 
   // set SQL_DESC_OCTET_LENGTH_PTR
-  ret =
-      SQLSetDescField(ard, 1, SQL_DESC_OCTET_LENGTH_PTR, &ind, SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_OCTET_LENGTH_PTR, &ind, SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   ret = SQLGetDescField(ard, 1, SQL_DESC_OCTET_LENGTH_PTR, &lenPtr, 0, NULL);
@@ -236,8 +235,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetCharType) {
   BOOST_CHECK_EQUAL(lenPtr, &ind);
 
   // set SQL_DESC_OCTET_LENGTH
-  ret = SQLSetDescField(ard, 1, SQL_DESC_OCTET_LENGTH, (SQLPOINTER)ind,
-                        SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_OCTET_LENGTH, (SQLPOINTER)ind, SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   ret = SQLGetDescField(ard, 1, SQL_DESC_OCTET_LENGTH, &len, 0, NULL);
@@ -245,8 +243,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetCharType) {
   BOOST_CHECK_EQUAL(len, ind);
 
   // set SQL_DESC_LENGTH
-  ret =
-      SQLSetDescField(ard, 1, SQL_DESC_LENGTH, (SQLPOINTER)ind, SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_LENGTH, (SQLPOINTER)ind, SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   ret = SQLGetDescField(ard, 1, SQL_DESC_LENGTH, &len, 0, NULL);
@@ -268,7 +265,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetCharType) {
 BOOST_AUTO_TEST_CASE(TestDescriptorSetTimestampType) {
   SQLRETURN ret;
 
-  std::vector< SQLWCHAR > request = MakeSqlBuffer(
+  std::vector<SQLWCHAR> request = MakeSqlBuffer(
       "select device_id, time, flag, rebuffering_ratio, video_startup_time, "
       "date(TIMESTAMP '2022-07-07 17:44:43.771000000'), current_time, interval "
       "'4' year + interval '2' month,"
@@ -289,8 +286,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetTimestampType) {
   SQLSMALLINT siv;
   siv = SQL_TYPE_TIME;
   // set SQL_DESC_CONCISE_TYPE
-  ret = SQLSetDescField(ard, 1, SQL_DESC_CONCISE_TYPE, (SQLPOINTER)siv,
-                        SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_CONCISE_TYPE, (SQLPOINTER)siv, SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   SQLSMALLINT si;
@@ -317,8 +313,8 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetTimestampType) {
 
   siv = SQL_CODE_DATE;
   // set SQL_DESC_DATETIME_INTERVAL_CODE
-  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_CODE,
-                        (SQLPOINTER)siv, SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_CODE, (SQLPOINTER)siv,
+                        SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   ret = SQLGetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_CODE, &si, 0, NULL);
@@ -327,24 +323,23 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetTimestampType) {
 
   // set SQL_DESC_DATETIME_INTERVAL_PRECISION
   siv = 5;
-  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_PRECISION,
-                        (SQLPOINTER)siv, SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_PRECISION, (SQLPOINTER)siv,
+                        SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_ERROR, ret);
 
   OdbcClientError error = GetOdbcError(SQL_HANDLE_DESC, ard);
   BOOST_CHECK_EQUAL(error.sqlstate, "HY000");
 
-  BOOST_CHECK_EQUAL(
-      error.message,
-      "Interval precision could only be set when SQL_DESC_TYPE is "
-      "set to SQL_INTERVAL");
+  BOOST_CHECK_EQUAL(error.message,
+                    "Interval precision could only be set when SQL_DESC_TYPE is "
+                    "set to SQL_INTERVAL");
 }
 
 // Test SQLSetDescField using interval type
 BOOST_AUTO_TEST_CASE(TestDescriptorSetIntervalType) {
   SQLRETURN ret;
 
-  std::vector< SQLWCHAR > request = MakeSqlBuffer(
+  std::vector<SQLWCHAR> request = MakeSqlBuffer(
       "select device_id, time, flag, rebuffering_ratio, video_startup_time, "
       "date(TIMESTAMP '2022-07-07 17:44:43.771000000'), current_time, interval "
       "'4' year + interval '2' month,"
@@ -358,16 +353,15 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetIntervalType) {
 
   SQL_INTERVAL_STRUCT yearMonth;
   SQLLEN yearMonth_len = 0;
-  ret = SQLBindCol(stmt, 8, SQL_C_INTERVAL_YEAR_TO_MONTH, &yearMonth,
-                   sizeof(yearMonth), &yearMonth_len);
+  ret = SQLBindCol(stmt, 8, SQL_C_INTERVAL_YEAR_TO_MONTH, &yearMonth, sizeof(yearMonth),
+                   &yearMonth_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   SQLSMALLINT siv;
 
   // set SQL_DESC_CONCISE_TYPE
   siv = SQL_INTERVAL_DAY_TO_SECOND;
-  ret = SQLSetDescField(ard, 1, SQL_DESC_CONCISE_TYPE, (SQLPOINTER)siv,
-                        SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_CONCISE_TYPE, (SQLPOINTER)siv, SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   SQLSMALLINT si;
@@ -394,8 +388,8 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetIntervalType) {
 
   // set SQL_DESC_DATETIME_INTERVAL_CODE
   siv = SQL_CODE_YEAR_TO_MONTH;
-  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_CODE,
-                        (SQLPOINTER)siv, SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_CODE, (SQLPOINTER)siv,
+                        SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   ret = SQLGetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_CODE, &si, 0, NULL);
@@ -404,13 +398,12 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetIntervalType) {
 
   // set SQL_DESC_DATETIME_INTERVAL_PRECISION
   SQLINTEGER iv = 5;
-  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_PRECISION,
-                        (SQLPOINTER)iv, SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_PRECISION, (SQLPOINTER)iv,
+                        SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   SQLINTEGER iv2;
-  ret = SQLGetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_PRECISION, &iv2, 0,
-                        NULL);
+  ret = SQLGetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_PRECISION, &iv2, 0, NULL);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
   BOOST_CHECK_EQUAL(iv2, iv);
 }
@@ -419,7 +412,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetIntervalType) {
 BOOST_AUTO_TEST_CASE(TestDescriptorSetRainyCase) {
   SQLRETURN ret;
 
-  std::vector< SQLWCHAR > request = MakeSqlBuffer(
+  std::vector<SQLWCHAR> request = MakeSqlBuffer(
       "select device_id, time, flag, rebuffering_ratio, video_startup_time, "
       "date(TIMESTAMP '2022-07-07 17:44:43.771000000'), current_time, interval "
       "'4' year + interval '2' month,"
@@ -456,13 +449,12 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetRainyCase) {
 
   error = GetOdbcError(SQL_HANDLE_DESC, ard);
   BOOST_CHECK_EQUAL(error.sqlstate, "HY000");
-  BOOST_CHECK_EQUAL(error.message,
-                    "Invalid concise type SQL_INTERVAL_DAY_TO_HOUR");
+  BOOST_CHECK_EQUAL(error.message, "Invalid concise type SQL_INTERVAL_DAY_TO_HOUR");
 
   // set SQL_DESC_DATETIME_INTERVAL_CODE to invalid interval code
   siv = SQL_CODE_DATE;
-  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_CODE,
-                        (SQLPOINTER)siv, SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_CODE, (SQLPOINTER)siv,
+                        SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_ERROR, ret);
 
   error = GetOdbcError(SQL_HANDLE_DESC, ard);
@@ -472,8 +464,8 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetRainyCase) {
 
   // set SQL_DESC_DATETIME_INTERVAL_PRECISION for non internal type
   siv = 5;
-  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_PRECISION,
-                        (SQLPOINTER)siv, SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 1, SQL_DESC_DATETIME_INTERVAL_PRECISION, (SQLPOINTER)siv,
+                        SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_ERROR, ret);
 
   error = GetOdbcError(SQL_HANDLE_DESC, ard);
@@ -484,32 +476,27 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetRainyCase) {
 
   SQLBIGINT fieldLong;
   SQLLEN fieldLong_len = 0;
-  ret = SQLBindCol(stmt, 5, SQL_C_SBIGINT, &fieldLong, sizeof(fieldLong),
-                   &fieldLong_len);
+  ret = SQLBindCol(stmt, 5, SQL_C_SBIGINT, &fieldLong, sizeof(fieldLong), &fieldLong_len);
   BOOST_CHECK_EQUAL(SQL_SUCCESS, ret);
 
   siv = 5;
   // set SQL_DESC_OCTET_LENGTH for fixed length type
-  ret = SQLSetDescField(ard, 5, SQL_DESC_OCTET_LENGTH, (SQLPOINTER)siv,
-                        SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 5, SQL_DESC_OCTET_LENGTH, (SQLPOINTER)siv, SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_ERROR, ret);
 
   error = GetOdbcError(SQL_HANDLE_DESC, ard);
   BOOST_CHECK_EQUAL(error.sqlstate, "HY000");
-  BOOST_CHECK_EQUAL(
-      error.message,
-      "SQL_DESC_LENGTH could not be set for fixed length type -25");
+  BOOST_CHECK_EQUAL(error.message,
+                    "SQL_DESC_LENGTH could not be set for fixed length type -25");
 
   // set SQL_DESC_LENGTH for fixed length type
-  ret =
-      SQLSetDescField(ard, 5, SQL_DESC_LENGTH, (SQLPOINTER)siv, SQL_IS_POINTER);
+  ret = SQLSetDescField(ard, 5, SQL_DESC_LENGTH, (SQLPOINTER)siv, SQL_IS_POINTER);
   BOOST_CHECK_EQUAL(SQL_ERROR, ret);
 
   error = GetOdbcError(SQL_HANDLE_DESC, ard);
   BOOST_CHECK_EQUAL(error.sqlstate, "HY000");
-  BOOST_CHECK_EQUAL(
-      error.message,
-      "SQL_DESC_LENGTH could not be set for fixed length type -25");
+  BOOST_CHECK_EQUAL(error.message,
+                    "SQL_DESC_LENGTH could not be set for fixed length type -25");
 
   siv = SQL_TYPE_TIMESTAMP;
   // set SQL_DESC_TYPE to not supported type
@@ -525,7 +512,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetRainyCase) {
 BOOST_AUTO_TEST_CASE(TestDescriptorSetRainyCase2) {
   SQLRETURN ret;
 
-  std::vector< SQLWCHAR > request = MakeSqlBuffer(
+  std::vector<SQLWCHAR> request = MakeSqlBuffer(
       "select device_id, time, flag, rebuffering_ratio, video_startup_time, "
       "date(TIMESTAMP '2022-07-07 17:44:43.771000000'), current_time, interval "
       "'4' year + interval '2' month,"
@@ -546,20 +533,14 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetRainyCase2) {
 
 #ifdef _WIN32
   // error from Windows driver manager
-  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_ALLOC_TYPE,
-                               "Descriptor type out of range");
+  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_ALLOC_TYPE, "Descriptor type out of range");
 #else
-  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_ALLOC_TYPE,
-                               "Invalid descriptor field id");
+  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_ALLOC_TYPE, "Invalid descriptor field id");
 #endif
-  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_ARRAY_SIZE,
-                               "Invalid descriptor field id");
-  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_ARRAY_STATUS_PTR,
-                               "Invalid descriptor field id");
-  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_BIND_OFFSET_PTR,
-                               "Invalid descriptor field id");
-  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_BIND_TYPE,
-                               "Invalid descriptor field id");
+  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_ARRAY_SIZE, "Invalid descriptor field id");
+  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_ARRAY_STATUS_PTR, "Invalid descriptor field id");
+  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_BIND_OFFSET_PTR, "Invalid descriptor field id");
+  CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_BIND_TYPE, "Invalid descriptor field id");
   CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_COUNT, "Invalid descriptor field id");
   CHECK_DESC_SET_FIELD_FAILURE(SQL_DESC_ROWS_PROCESSED_PTR,
                                "Invalid descriptor field id");
@@ -569,7 +550,7 @@ BOOST_AUTO_TEST_CASE(TestDescriptorSetRainyCase2) {
 BOOST_AUTO_TEST_CASE(TestDescriptorGetRainyCase) {
   SQLRETURN ret;
 
-  std::vector< SQLWCHAR > request = MakeSqlBuffer(
+  std::vector<SQLWCHAR> request = MakeSqlBuffer(
       "select device_id, time, flag, rebuffering_ratio, video_startup_time, "
       "date(TIMESTAMP '2022-07-07 17:44:43.771000000'), current_time, interval "
       "'4' year + interval '2' month,"
@@ -665,8 +646,7 @@ BOOST_AUTO_TEST_CASE(TestCopyDescriptorRainyCase) {
 #elif defined(__APPLE__)
   OdbcClientError error = GetOdbcError(SQL_HANDLE_DESC, ard);
   BOOST_CHECK_EQUAL(error.sqlstate, "HY016");
-  BOOST_CHECK_EQUAL(error.message,
-                    "Cannot modify an implementation row descriptor");
+  BOOST_CHECK_EQUAL(error.message, "Cannot modify an implementation row descriptor");
 #endif
 }
 

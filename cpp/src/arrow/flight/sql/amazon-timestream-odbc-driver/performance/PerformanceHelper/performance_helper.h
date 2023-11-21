@@ -29,9 +29,9 @@
 #endif
 
 #ifdef __linux__
-#include "stdlib.h"
-#include "stdio.h"
 #include <cstring>
+#include "stdio.h"
+#include "stdlib.h"
 #endif
 
 #include <sql.h>
@@ -45,8 +45,7 @@
 #include <vector>
 
 #define HELPER_SIZEOF(x) (x == nullptr ? 0 : (sizeof(x) / sizeof(x[0])))
-#define TO_SQLTCHAR(str) \
-  const_cast< SQLTCHAR* >(reinterpret_cast< const SQLTCHAR* >(str))
+#define TO_SQLTCHAR(str) const_cast<SQLTCHAR*>(reinterpret_cast<const SQLTCHAR*>(str))
 
 #ifdef __linux__
 typedef std::u16string testString;

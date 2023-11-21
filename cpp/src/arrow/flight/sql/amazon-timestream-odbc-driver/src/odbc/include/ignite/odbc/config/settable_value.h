@@ -27,7 +27,7 @@ namespace config {
  *
  * @tparam T Type of the value.
  */
-template < typename T >
+template <typename T>
 class SettableValue {
  public:
   /** Type of the value. */
@@ -65,16 +65,12 @@ class SettableValue {
    *
    * @return Value or default value if not set.
    */
-  const ValueType& GetValue() const {
-    return val;
-  }
+  const ValueType& GetValue() const { return val; }
 
   /**
    * Check whether value is set to non-default.
    */
-  bool IsSet() const {
-    return set;
-  }
+  bool IsSet() const { return set; }
 
  private:
   /** Current value. */

@@ -15,22 +15,20 @@
  */
 
 #include "performance_helper.h"
-#include <cstdlib>
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
+#include <cstdlib>
 #include <regex>
 
 std::string sqltcharToStr(const SQLTCHAR* sqltchar) {
   if (sizeof(SQLTCHAR) == 2) {
     std::u16string temp((const char16_t*)sqltchar);
-    return std::wstring_convert< std::codecvt_utf8_utf16< char16_t >,
-                                 char16_t >{}
-        .to_bytes(temp);
+    return std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(
+        temp);
   } else if (sizeof(SQLTCHAR) == 4) {
     std::u32string temp((const char32_t*)sqltchar);
-    return std::wstring_convert< std::codecvt_utf8< char32_t >, char32_t >{}
-        .to_bytes(temp);
+    return std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t>{}.to_bytes(temp);
   } else {
     return std::string((const char*)sqltchar);
   }
@@ -77,10 +75,9 @@ int currentMemUsage() {
 #ifdef _WIN32
 int currentMemUsage() {
   PROCESS_MEMORY_COUNTERS_EX pmc;
-  GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc,
-                       sizeof(pmc));
+  GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
   // PrivateUsage is in bytes, return as KB
-  return static_cast< int >(pmc.PrivateUsage / 1000);
+  return static_cast<int>(pmc.PrivateUsage / 1000);
 }
 #endif  //_WIN32
 
@@ -89,13 +86,12 @@ int currentMemUsage() {
   struct task_basic_info t_info;
   mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
 
-  if (KERN_SUCCESS
-      != task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&t_info,
-                   &t_info_count)) {
+  if (KERN_SUCCESS !=
+      task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count)) {
     return -1;
   }
   // virtual_size is in bytes, return KB
-  return static_cast< int >(t_info.virtual_size / 1000);
+  return static_cast<int>(t_info.virtual_size / 1000);
 }
 #endif  //__APPLE__
 
@@ -125,12 +121,11 @@ void logDiagnostics(SQLSMALLINT handleType, SQLHANDLE handle, SQLRETURN ret,
   SQLSMALLINT recordNumber = 0;
   do {
     recordNumber++;
-    diagRet = SQLGetDiagRec(
-        handleType, handle, recordNumber, sqlState, &errorCode,
-        msgReturn == nullptr ? diagMessage : msgReturn,
-        msgReturn == nullptr ? HELPER_SIZEOF(diagMessage) : size, &messageLen);
-    std::string diagStr =
-        sqltcharToStr((msgReturn == nullptr) ? diagMessage : msgReturn);
+    diagRet = SQLGetDiagRec(handleType, handle, recordNumber, sqlState, &errorCode,
+                            msgReturn == nullptr ? diagMessage : msgReturn,
+                            msgReturn == nullptr ? HELPER_SIZEOF(diagMessage) : size,
+                            &messageLen);
+    std::string diagStr = sqltcharToStr((msgReturn == nullptr) ? diagMessage : msgReturn);
     std::string stateStr = sqltcharToStr(sqlState);
     if (diagRet == SQL_INVALID_HANDLE) {
       std::cout << "Invalid handle\n";

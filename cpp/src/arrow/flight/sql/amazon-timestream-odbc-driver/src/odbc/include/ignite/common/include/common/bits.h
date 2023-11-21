@@ -143,7 +143,7 @@ IGNITE_IMPORT_EXPORT uint64_t TenPowerU64(int32_t n);
  * @return The signum function of the specified value.
  */
 inline int32_t Signum64(int64_t i) {
-  return (static_cast< uint64_t >(-i) >> 63) | (i >> 63);
+  return (static_cast<uint64_t>(-i) >> 63) | (i >> 63);
 }
 
 /**
@@ -154,7 +154,7 @@ inline int32_t Signum64(int64_t i) {
  * @return New 64-bit integer.
  */
 inline uint64_t MakeU64(uint32_t higher, uint32_t lower) {
-  return (static_cast< uint64_t >(higher) << 32) | lower;
+  return (static_cast<uint64_t>(higher) << 32) | lower;
 }
 
 /**
@@ -165,7 +165,7 @@ inline uint64_t MakeU64(uint32_t higher, uint32_t lower) {
  * @return New 64-bit integer.
  */
 inline int64_t MakeI64(uint32_t higher, uint32_t lower) {
-  return static_cast< int64_t >(MakeU64(higher, lower));
+  return static_cast<int64_t>(MakeU64(higher, lower));
 }
 
 /**
@@ -201,7 +201,7 @@ inline uint32_t MakeU32(uint32_t x, uint32_t y, int32_t n) {
  * @return New 32-bit integer.
  */
 inline int32_t MakeI32(uint32_t x, uint32_t y, int32_t n) {
-  return static_cast< int32_t >(MakeU32(x, y, n));
+  return static_cast<int32_t>(MakeU32(x, y, n));
 }
 }  // namespace bits
 }  // namespace common

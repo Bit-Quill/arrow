@@ -22,13 +22,13 @@
 #include "timestream/odbc/system/ui/dsn_configuration_window.h"
 #endif
 
-#include <timestream/odbc/utils.h>
+#include <ignite/odbc/odbc_error.h>
+#include <timestream/odbc/authentication/auth_type.h>
 #include <timestream/odbc/config/configuration.h>
 #include <timestream/odbc/config/connection_string_parser.h>
-#include <timestream/odbc/authentication/auth_type.h>
 #include <timestream/odbc/log.h>
 #include <timestream/odbc/log_level.h>
-#include <ignite/odbc/odbc_error.h>
+#include <timestream/odbc/utils.h>
 
 #include <boost/test/unit_test.hpp>
 #include <iostream>
@@ -69,8 +69,7 @@ const std::string testAADTenant = "testAADTenant";
 }  // namespace
 
 const char* BoolToStr(bool val, bool lowerCase = true) {
-  if (lowerCase)
-    return val ? "true" : "false";
+  if (lowerCase) return val ? "true" : "false";
 
   return val ? "TRUE" : "FALSE";
 }
@@ -86,8 +85,7 @@ void ParseValidDsnString(const std::string& dsnStr, Configuration& cfg) {
     BOOST_FAIL(diag.GetStatusRecord(1).GetMessageText());
 }
 
-void ParseValidConnectString(const std::string& connectStr,
-                             Configuration& cfg) {
+void ParseValidConnectString(const std::string& connectStr, Configuration& cfg) {
   ConnectionStringParser parser(cfg);
 
   diagnostic::DiagnosticRecordStorage diag;
@@ -98,8 +96,7 @@ void ParseValidConnectString(const std::string& connectStr,
     BOOST_FAIL(diag.GetStatusRecord(1).GetMessageText());
 }
 
-void ParseConnectStringWithError(const std::string& connectStr,
-                                 Configuration& cfg) {
+void ParseConnectStringWithError(const std::string& connectStr, Configuration& cfg) {
   ConnectionStringParser parser(cfg);
 
   diagnostic::DiagnosticRecordStorage diag;
@@ -155,8 +152,7 @@ void CheckValidBoolValue(const std::string& connectStr, const std::string& key,
   BOOST_CHECK_EQUAL(map[key], expected);
 }
 
-void CheckInvalidBoolValue(const std::string& connectStr,
-                           const std::string& key) {
+void CheckInvalidBoolValue(const std::string& connectStr, const std::string& key) {
   Configuration cfg;
 
   ParseConnectStringWithError(connectStr, cfg);
@@ -199,28 +195,24 @@ void CheckConnectionConfig(const Configuration& cfg) {
   std::stringstream constructor;
   constructor << "aadapplicationid=" << testAADAppId << ';'
               << "aadclientsecret=" << testAADClientSecret << ';'
-              << "aadtenant=" << testAADTenant << ';'
-              << "accesskeyid=" << testAccessKeyId << ';'
-              << "auth=" << AuthType::ToString(testAuthType) << ';'
-              << "connectiontimeout=" << testConnectionTimeoutMS << ';'
-              << "driver={" << testDriverName << "};"
-              << "endpointoverride=" << testEndpoint << ';'
-              << "idparn=" << testIdPArn << ';' << "idphost=" << testIdPHost
-              << ';' << "idppassword=" << testIdPPassword << ';'
+              << "aadtenant=" << testAADTenant << ';' << "accesskeyid=" << testAccessKeyId
+              << ';' << "auth=" << AuthType::ToString(testAuthType) << ';'
+              << "connectiontimeout=" << testConnectionTimeoutMS << ';' << "driver={"
+              << testDriverName << "};"
+              << "endpointoverride=" << testEndpoint << ';' << "idparn=" << testIdPArn
+              << ';' << "idphost=" << testIdPHost << ';'
+              << "idppassword=" << testIdPPassword << ';'
               << "idpusername=" << testIdPUserName << ';' << "loglevel="
-              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel())
-              << ';'
-              << "logoutput=" << Logger::GetLoggerInstance()->GetLogPath()
-              << ';' << "maxconnections=" << testMaxConnections << ';'
+              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel()) << ';'
+              << "logoutput=" << Logger::GetLoggerInstance()->GetLogPath() << ';'
+              << "maxconnections=" << testMaxConnections << ';'
               << "maxretrycountclient=" << testMaxRetryCountClient << ';'
               << "oktaapplicationid=" << testOktaAppId << ';'
               << "profilename=" << testProfileName << ";"
               << "pwd=" << testPwd << ';' << "region=" << testRegion << ';'
-              << "requesttimeout=" << testReqTimeoutMS << ';'
-              << "rolearn=" << testRoleArn << ';'
-              << "secretkey=" << testSecretKey << ';'
-              << "sessiontoken=" << testSessionToken << ';' << "uid=" << testUid
-              << ';';
+              << "requesttimeout=" << testReqTimeoutMS << ';' << "rolearn=" << testRoleArn
+              << ';' << "secretkey=" << testSecretKey << ';'
+              << "sessiontoken=" << testSessionToken << ';' << "uid=" << testUid << ';';
   const std::string& expectedStr = constructor.str();
 
   BOOST_CHECK_EQUAL(timestream::odbc::common::ToLower(cfg.ToConnectString()),
@@ -237,29 +229,22 @@ void CheckDsnConfig(const Configuration& cfg) {
   BOOST_CHECK_EQUAL(cfg.GetDsn(), testDsn);
   BOOST_CHECK_EQUAL(cfg.GetUid(), Configuration::DefaultValue::uid);
   BOOST_CHECK_EQUAL(cfg.GetPwd(), Configuration::DefaultValue::pwd);
-  BOOST_CHECK_EQUAL(cfg.GetAccessKeyId(),
-                    Configuration::DefaultValue::accessKeyId);
+  BOOST_CHECK_EQUAL(cfg.GetAccessKeyId(), Configuration::DefaultValue::accessKeyId);
   BOOST_CHECK_EQUAL(cfg.GetSecretKey(), Configuration::DefaultValue::secretKey);
-  BOOST_CHECK_EQUAL(cfg.GetSessionToken(),
-                    Configuration::DefaultValue::sessionToken);
-  BOOST_CHECK_EQUAL(cfg.GetProfileName(),
-                    Configuration::DefaultValue::profileName);
-  BOOST_CHECK_EQUAL(cfg.GetReqTimeout(),
-                    Configuration::DefaultValue::reqTimeout);
+  BOOST_CHECK_EQUAL(cfg.GetSessionToken(), Configuration::DefaultValue::sessionToken);
+  BOOST_CHECK_EQUAL(cfg.GetProfileName(), Configuration::DefaultValue::profileName);
+  BOOST_CHECK_EQUAL(cfg.GetReqTimeout(), Configuration::DefaultValue::reqTimeout);
   BOOST_CHECK_EQUAL(cfg.GetConnectionTimeout(),
                     Configuration::DefaultValue::connectionTimeout);
   BOOST_CHECK_EQUAL(cfg.GetMaxRetryCountClient(),
                     Configuration::DefaultValue::maxRetryCountClient);
-  BOOST_CHECK_EQUAL(cfg.GetMaxConnections(),
-                    Configuration::DefaultValue::maxConnections);
+  BOOST_CHECK_EQUAL(cfg.GetMaxConnections(), Configuration::DefaultValue::maxConnections);
   BOOST_CHECK_EQUAL(cfg.GetEndpoint(), Configuration::DefaultValue::endpoint);
   BOOST_CHECK_EQUAL(cfg.GetRegion(), Configuration::DefaultValue::region);
   BOOST_CHECK(cfg.GetAuthType() == Configuration::DefaultValue::authType);
   BOOST_CHECK_EQUAL(cfg.GetIdPHost(), Configuration::DefaultValue::idPHost);
-  BOOST_CHECK_EQUAL(cfg.GetIdPUserName(),
-                    Configuration::DefaultValue::idPUserName);
-  BOOST_CHECK_EQUAL(cfg.GetIdPPassword(),
-                    Configuration::DefaultValue::idPPassword);
+  BOOST_CHECK_EQUAL(cfg.GetIdPUserName(), Configuration::DefaultValue::idPUserName);
+  BOOST_CHECK_EQUAL(cfg.GetIdPPassword(), Configuration::DefaultValue::idPPassword);
   BOOST_CHECK_EQUAL(cfg.GetIdPArn(), Configuration::DefaultValue::idPArn);
   BOOST_CHECK_EQUAL(cfg.GetOktaAppId(), Configuration::DefaultValue::oktaAppId);
   BOOST_CHECK_EQUAL(cfg.GetRoleArn(), Configuration::DefaultValue::roleArn);
@@ -281,12 +266,10 @@ BOOST_AUTO_TEST_CASE(CheckTestValuesNotEqualDefault) {
   BOOST_CHECK_NE(testSessionToken, Configuration::DefaultValue::sessionToken);
   BOOST_CHECK_NE(testProfileName, Configuration::DefaultValue::profileName);
   BOOST_CHECK_NE(testReqTimeoutMS, Configuration::DefaultValue::reqTimeout);
-  BOOST_CHECK_NE(testConnectionTimeoutMS,
-                 Configuration::DefaultValue::connectionTimeout);
+  BOOST_CHECK_NE(testConnectionTimeoutMS, Configuration::DefaultValue::connectionTimeout);
   BOOST_CHECK_NE(testMaxRetryCountClient,
                  Configuration::DefaultValue::maxRetryCountClient);
-  BOOST_CHECK_NE(testMaxConnections,
-                 Configuration::DefaultValue::maxConnections);
+  BOOST_CHECK_NE(testMaxConnections, Configuration::DefaultValue::maxConnections);
   BOOST_CHECK_NE(testEndpoint, Configuration::DefaultValue::endpoint);
   BOOST_CHECK_NE(testRegion, Configuration::DefaultValue::region);
   BOOST_CHECK(testAuthType != Configuration::DefaultValue::authType);
@@ -297,8 +280,7 @@ BOOST_AUTO_TEST_CASE(CheckTestValuesNotEqualDefault) {
   BOOST_CHECK_NE(testOktaAppId, Configuration::DefaultValue::oktaAppId);
   BOOST_CHECK_NE(testRoleArn, Configuration::DefaultValue::roleArn);
   BOOST_CHECK_NE(testAADAppId, Configuration::DefaultValue::aadAppId);
-  BOOST_CHECK_NE(testAADClientSecret,
-                 Configuration::DefaultValue::aadClientSecret);
+  BOOST_CHECK_NE(testAADClientSecret, Configuration::DefaultValue::aadClientSecret);
   BOOST_CHECK_NE(testAADTenant, Configuration::DefaultValue::aadTenant);
 }
 
@@ -308,29 +290,25 @@ BOOST_AUTO_TEST_CASE(TestConnectStringUppercase) {
   std::stringstream constructor;
 
   constructor << "UID=" << testUid << ';' << "PWD=" << testPwd << ';'
-              << "ACCESSKEYID=" << testAccessKeyId << ';'
-              << "SECRETKEY=" << testSecretKey << ';'
-              << "SESSIONTOKEN=" << testSessionToken << ';' << "LOGLEVEL="
-              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel())
-              << ';'
-              << "LOGOUTPUT=" << Logger::GetLoggerInstance()->GetLogPath()
-              << ';' << "AUTH=" << AuthType::ToString(testAuthType) << ';'
+              << "ACCESSKEYID=" << testAccessKeyId << ';' << "SECRETKEY=" << testSecretKey
+              << ';' << "SESSIONTOKEN=" << testSessionToken << ';' << "LOGLEVEL="
+              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel()) << ';'
+              << "LOGOUTPUT=" << Logger::GetLoggerInstance()->GetLogPath() << ';'
+              << "AUTH=" << AuthType::ToString(testAuthType) << ';'
               << "PROFILENAME=" << testProfileName << ';'
               << "REQUESTTIMEOUT=" << testReqTimeoutMS << ';'
               << "CONNECTIONTIMEOUT=" << testConnectionTimeoutMS << ';'
               << "MAXRETRYCOUNTCLIENT=" << testMaxRetryCountClient << ';'
               << "MAXCONNECTIONS=" << testMaxConnections << ';'
-              << "ENDPOINTOVERRIDE=" << testEndpoint << ';'
-              << "REGION=" << testRegion << ';' << "IDPHOST=" << testIdPHost
-              << ';' << "IDPUSERNAME=" << testIdPUserName << ';'
-              << "IDPPASSWORD=" << testIdPPassword << ';'
-              << "IDPARN=" << testIdPArn << ';'
-              << "OKTAAPPLICATIONID=" << testOktaAppId << ';'
-              << "ROLEARN=" << testRoleArn << ';'
-              << "AADAPPLICATIONID=" << testAADAppId << ';'
-              << "AADCLIENTSECRET=" << testAADClientSecret << ';'
-              << "AADTENANT=" << testAADTenant << ';' << "DRIVER={"
-              << testDriverName << "};";
+              << "ENDPOINTOVERRIDE=" << testEndpoint << ';' << "REGION=" << testRegion
+              << ';' << "IDPHOST=" << testIdPHost << ';'
+              << "IDPUSERNAME=" << testIdPUserName << ';'
+              << "IDPPASSWORD=" << testIdPPassword << ';' << "IDPARN=" << testIdPArn
+              << ';' << "OKTAAPPLICATIONID=" << testOktaAppId << ';'
+              << "ROLEARN=" << testRoleArn << ';' << "AADAPPLICATIONID=" << testAADAppId
+              << ';' << "AADCLIENTSECRET=" << testAADClientSecret << ';'
+              << "AADTENANT=" << testAADTenant << ';' << "DRIVER={" << testDriverName
+              << "};";
 
   const std::string& connectStr = constructor.str();
 
@@ -345,29 +323,25 @@ BOOST_AUTO_TEST_CASE(TestConnectStringLowercase) {
   std::stringstream constructor;
 
   constructor << "uid=" << testUid << ';' << "pwd=" << testPwd << ';'
-              << "accesskeyid=" << testAccessKeyId << ';'
-              << "secretkey=" << testSecretKey << ';'
-              << "sessiontoken=" << testSessionToken << ';' << "loglevel="
-              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel())
-              << ';'
-              << "logoutput=" << Logger::GetLoggerInstance()->GetLogPath()
-              << ';' << "auth=" << AuthType::ToString(testAuthType) << ';'
+              << "accesskeyid=" << testAccessKeyId << ';' << "secretkey=" << testSecretKey
+              << ';' << "sessiontoken=" << testSessionToken << ';' << "loglevel="
+              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel()) << ';'
+              << "logoutput=" << Logger::GetLoggerInstance()->GetLogPath() << ';'
+              << "auth=" << AuthType::ToString(testAuthType) << ';'
               << "profilename=" << testProfileName << ';'
               << "requesttimeout=" << testReqTimeoutMS << ';'
               << "connectiontimeout=" << testConnectionTimeoutMS << ';'
               << "maxretrycountclient=" << testMaxRetryCountClient << ';'
               << "maxconnections=" << testMaxConnections << ';'
-              << "endpointoverride=" << testEndpoint << ';'
-              << "region=" << testRegion << ';' << "idphost=" << testIdPHost
-              << ';' << "idpusername=" << testIdPUserName << ';'
-              << "idppassword=" << testIdPPassword << ';'
-              << "idparn=" << testIdPArn << ';'
-              << "oktaapplicationid=" << testOktaAppId << ';'
-              << "rolearn=" << testRoleArn << ';'
-              << "aadapplicationid=" << testAADAppId << ';'
-              << "aadclientsecret=" << testAADClientSecret << ';'
-              << "aadtenant=" << testAADTenant << ';' << "driver={"
-              << testDriverName << "};";
+              << "endpointoverride=" << testEndpoint << ';' << "region=" << testRegion
+              << ';' << "idphost=" << testIdPHost << ';'
+              << "idpusername=" << testIdPUserName << ';'
+              << "idppassword=" << testIdPPassword << ';' << "idparn=" << testIdPArn
+              << ';' << "oktaapplicationid=" << testOktaAppId << ';'
+              << "rolearn=" << testRoleArn << ';' << "aadapplicationid=" << testAADAppId
+              << ';' << "aadclientsecret=" << testAADClientSecret << ';'
+              << "aadtenant=" << testAADTenant << ';' << "driver={" << testDriverName
+              << "};";
 
   const std::string& connectStr = constructor.str();
 
@@ -382,29 +356,25 @@ BOOST_AUTO_TEST_CASE(TestConnectStringZeroTerminated) {
   std::stringstream constructor;
 
   constructor << "uid=" << testUid << ';' << "pwd=" << testPwd << ';'
-              << "accesskeyid=" << testAccessKeyId << ';'
-              << "secretkey=" << testSecretKey << ';'
-              << "sessiontoken=" << testSessionToken << ';' << "loglevel="
-              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel())
-              << ';'
-              << "logoutput=" << Logger::GetLoggerInstance()->GetLogPath()
-              << ';' << "auth=" << AuthType::ToString(testAuthType) << ';'
+              << "accesskeyid=" << testAccessKeyId << ';' << "secretkey=" << testSecretKey
+              << ';' << "sessiontoken=" << testSessionToken << ';' << "loglevel="
+              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel()) << ';'
+              << "logoutput=" << Logger::GetLoggerInstance()->GetLogPath() << ';'
+              << "auth=" << AuthType::ToString(testAuthType) << ';'
               << "profilename=" << testProfileName << ';'
               << "requesttimeout=" << testReqTimeoutMS << ';'
               << "connectiontimeout=" << testConnectionTimeoutMS << ';'
               << "maxretrycountclient=" << testMaxRetryCountClient << ';'
               << "maxconnections=" << testMaxConnections << ';'
-              << "endpointoverride=" << testEndpoint << ';'
-              << "region=" << testRegion << ';' << "idphost=" << testIdPHost
-              << ';' << "idpusername=" << testIdPUserName << ';'
-              << "idppassword=" << testIdPPassword << ';'
-              << "idparn=" << testIdPArn << ';'
-              << "oktaapplicationid=" << testOktaAppId << ';'
-              << "rolearn=" << testRoleArn << ';'
-              << "aadapplicationid=" << testAADAppId << ';'
-              << "aadclientsecret=" << testAADClientSecret << ';'
-              << "aadtenant=" << testAADTenant << ';' << "driver={"
-              << testDriverName << "};";
+              << "endpointoverride=" << testEndpoint << ';' << "region=" << testRegion
+              << ';' << "idphost=" << testIdPHost << ';'
+              << "idpusername=" << testIdPUserName << ';'
+              << "idppassword=" << testIdPPassword << ';' << "idparn=" << testIdPArn
+              << ';' << "oktaapplicationid=" << testOktaAppId << ';'
+              << "rolearn=" << testRoleArn << ';' << "aadapplicationid=" << testAADAppId
+              << ';' << "aadclientsecret=" << testAADClientSecret << ';'
+              << "aadtenant=" << testAADTenant << ';' << "driver={" << testDriverName
+              << "};";
 
   std::string connectStr = constructor.str();
 
@@ -421,29 +391,25 @@ BOOST_AUTO_TEST_CASE(TestConnectStringMixed) {
   std::stringstream constructor;
 
   constructor << "Uid=" << testUid << ';' << "Pwd=" << testPwd << ';'
-              << "AccessKeyId=" << testAccessKeyId << ';'
-              << "SecretKey=" << testSecretKey << ';'
-              << "SessionToken=" << testSessionToken << ';' << "LogLevel="
-              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel())
-              << ';'
-              << "LogOutput=" << Logger::GetLoggerInstance()->GetLogPath()
-              << ';' << "Auth=" << AuthType::ToString(testAuthType) << ';'
+              << "AccessKeyId=" << testAccessKeyId << ';' << "SecretKey=" << testSecretKey
+              << ';' << "SessionToken=" << testSessionToken << ';' << "LogLevel="
+              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel()) << ';'
+              << "LogOutput=" << Logger::GetLoggerInstance()->GetLogPath() << ';'
+              << "Auth=" << AuthType::ToString(testAuthType) << ';'
               << "ProfileName=" << testProfileName << ';'
               << "RequestTimeout=" << testReqTimeoutMS << ';'
               << "ConnectionTimeout=" << testConnectionTimeoutMS << ';'
               << "MaxRetryCountClient=" << testMaxRetryCountClient << ';'
               << "MaxConnections=" << testMaxConnections << ';'
-              << "EndpointOverride=" << testEndpoint << ';'
-              << "Region=" << testRegion << ';' << "IdPHost=" << testIdPHost
-              << ';' << "IdPUserName=" << testIdPUserName << ';'
-              << "IdPPassword=" << testIdPPassword << ';'
-              << "IdPArn=" << testIdPArn << ';'
-              << "OktaApplicationID=" << testOktaAppId << ';'
-              << "RoleArn=" << testRoleArn << ';'
-              << "AADApplicationID=" << testAADAppId << ';'
-              << "AADClientSecret=" << testAADClientSecret << ';'
-              << "AADTenant=" << testAADTenant << ';' << "Driver={"
-              << testDriverName << "};";
+              << "EndpointOverride=" << testEndpoint << ';' << "Region=" << testRegion
+              << ';' << "IdPHost=" << testIdPHost << ';'
+              << "IdPUserName=" << testIdPUserName << ';'
+              << "IdPPassword=" << testIdPPassword << ';' << "IdPArn=" << testIdPArn
+              << ';' << "OktaApplicationID=" << testOktaAppId << ';'
+              << "RoleArn=" << testRoleArn << ';' << "AADApplicationID=" << testAADAppId
+              << ';' << "AADClientSecret=" << testAADClientSecret << ';'
+              << "AADTenant=" << testAADTenant << ';' << "Driver={" << testDriverName
+              << "};";
 
   const std::string& connectStr = constructor.str();
 
@@ -462,10 +428,8 @@ BOOST_AUTO_TEST_CASE(TestConnectStringWhiteSpaces) {
               << "ACCESSKEYID =" << testAccessKeyId << ';'
               << "SECRETKEY=" << testSecretKey << ';'
               << "SESSIONTOKEN=" << testSessionToken << ';' << "  LOGLEVEL ="
-              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel())
-              << "  ; "
-              << "LOGOUTPUT=  " << Logger::GetLoggerInstance()->GetLogPath()
-              << " ;"
+              << LogLevel::ToString(Logger::GetLoggerInstance()->GetLogLevel()) << "  ; "
+              << "LOGOUTPUT=  " << Logger::GetLoggerInstance()->GetLogPath() << " ;"
               << " AUTH=" << AuthType::ToString(testAuthType) << ';'
               << "     PROFILENAME  = " << testProfileName << "    ; "
               << "  REQUESTTIMEOUT=" << testReqTimeoutMS << "  ;  "
@@ -525,8 +489,8 @@ BOOST_AUTO_TEST_CASE(TestDsnStringUppercase) {
 
   std::stringstream constructor;
 
-  constructor << "DRIVER=" << testDriverName << '\0' << "DSN={" << testDsn
-              << "}" << '\0' << '\0';
+  constructor << "DRIVER=" << testDriverName << '\0' << "DSN={" << testDsn << "}" << '\0'
+              << '\0';
 
   const std::string& configStr = constructor.str();
 
@@ -540,8 +504,8 @@ BOOST_AUTO_TEST_CASE(TestDsnStringLowercase) {
 
   std::stringstream constructor;
 
-  constructor << "driver=" << testDriverName << '\0' << "dsn={" << testDsn
-              << "}" << '\0' << '\0';
+  constructor << "driver=" << testDriverName << '\0' << "dsn={" << testDsn << "}" << '\0'
+              << '\0';
 
   const std::string& configStr = constructor.str();
 
@@ -555,8 +519,8 @@ BOOST_AUTO_TEST_CASE(TestDsnStringMixed) {
 
   std::stringstream constructor;
 
-  constructor << "Driver=" << testDriverName << '\0' << "Dsn={" << testDsn
-              << "}" << '\0' << '\0';
+  constructor << "Driver=" << testDriverName << '\0' << "Dsn={" << testDsn << "}" << '\0'
+              << '\0';
 
   const std::string& configStr = constructor.str();
 
@@ -585,42 +549,32 @@ BOOST_AUTO_TEST_CASE(TestDsnStringWhitespaces) {
 BOOST_AUTO_TEST_CASE(TestParseDriverVersion) {
   using timestream::odbc::system::ui::DsnConfigurationWindow;
 
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("02.00.0000"), L"V.2.0.0");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("02.01.0000"), L"V.2.1.0");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("02.10.0000"),
-      L"V.2.10.0");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("12.00.0000"),
-      L"V.12.0.0");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("02.01.1000"),
-      L"V.2.1.1000");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("02.01.0100"),
-      L"V.2.1.100");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("02.10.0010"),
-      L"V.2.10.10");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("02.01.0200"),
-      L"V.2.1.200");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("02.01.0201"),
-      L"V.2.1.201");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("02.10.1001"),
-      L"V.2.10.1001");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("12.10.0001"),
-      L"V.12.10.1");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("08.01.0001"), L"V.8.1.1");
-  BOOST_CHECK_EQUAL(
-      DsnConfigurationWindow::GetParsedDriverVersion("88.88.8888"),
-      L"V.88.88.8888");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("02.00.0000"),
+                    L"V.2.0.0");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("02.01.0000"),
+                    L"V.2.1.0");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("02.10.0000"),
+                    L"V.2.10.0");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("12.00.0000"),
+                    L"V.12.0.0");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("02.01.1000"),
+                    L"V.2.1.1000");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("02.01.0100"),
+                    L"V.2.1.100");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("02.10.0010"),
+                    L"V.2.10.10");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("02.01.0200"),
+                    L"V.2.1.200");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("02.01.0201"),
+                    L"V.2.1.201");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("02.10.1001"),
+                    L"V.2.10.1001");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("12.10.0001"),
+                    L"V.12.10.1");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("08.01.0001"),
+                    L"V.8.1.1");
+  BOOST_CHECK_EQUAL(DsnConfigurationWindow::GetParsedDriverVersion("88.88.8888"),
+                    L"V.88.88.8888");
 }
 #endif
 

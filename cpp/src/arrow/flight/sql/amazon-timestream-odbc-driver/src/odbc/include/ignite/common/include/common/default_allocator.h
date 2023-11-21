@@ -29,7 +29,7 @@ namespace common {
  * Allocator. Manages objects construction and destruction as well
  * as a memory allocation.
  */
-template < typename T >
+template <typename T>
 class IGNITE_IMPORT_EXPORT DefaultAllocator {
  public:
   typedef T ValueType;
@@ -40,9 +40,9 @@ class IGNITE_IMPORT_EXPORT DefaultAllocator {
   typedef int32_t SizeType;
   typedef int32_t DifferenceType;
 
-  template < class T2 >
+  template <class T2>
   struct Rebind {
-    typedef DefaultAllocator< T2 > other;
+    typedef DefaultAllocator<T2> other;
   };
 
   /**
@@ -60,20 +60,14 @@ class IGNITE_IMPORT_EXPORT DefaultAllocator {
   }
 
   PointerType Allocate(SizeType len, void* = 0) {
-    return static_cast< PointerType >(::operator new(len * sizeof(ValueType)));
+    return static_cast<PointerType>(::operator new(len * sizeof(ValueType)));
   }
 
-  void Deallocate(PointerType ptr, SizeType) {
-    ::operator delete(ptr);
-  }
+  void Deallocate(PointerType ptr, SizeType) { ::operator delete(ptr); }
 
-  void Construct(PointerType p, ConstReferenceType val) {
-    new (p) ValueType(val);
-  }
+  void Construct(PointerType p, ConstReferenceType val) { new (p) ValueType(val); }
 
-  void Destruct(PointerType p) {
-    p->~ValueType();
-  }
+  void Destruct(PointerType p) { p->~ValueType(); }
 };
 }  // namespace common
 }  // namespace odbc

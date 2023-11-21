@@ -35,12 +35,12 @@ namespace odbc {
 namespace query {
 using timestream::odbc::type_traits::OdbcNativeType;
 
-TableMetadataQuery::TableMetadataQuery(
-    diagnostic::DiagnosableAdapter& diag, Connection& connection,
-    const boost::optional< std::string >& catalog,
-    const boost::optional< std::string >& schema,
-    const boost::optional< std::string >& table,
-    const boost::optional< std::string >& tableType)
+TableMetadataQuery::TableMetadataQuery(diagnostic::DiagnosableAdapter& diag,
+                                       Connection& connection,
+                                       const boost::optional<std::string>& catalog,
+                                       const boost::optional<std::string>& schema,
+                                       const boost::optional<std::string>& table,
+                                       const boost::optional<std::string>& tableType)
     : Query(diag, timestream::odbc::query::QueryType::TABLE_METADATA),
       connection(connection),
       catalog(catalog),
@@ -64,18 +64,18 @@ TableMetadataQuery::TableMetadataQuery(
   const std::string tbl("");
 
   if (!connection.GetMetadataID()) {
-    all_catalogs = catalog && *catalog == SQL_ALL_CATALOGS && schema
-                   && schema->empty() && table && table->empty();
+    all_catalogs = catalog && *catalog == SQL_ALL_CATALOGS && schema && schema->empty() &&
+                   table && table->empty();
 
-    all_schemas = schema && *schema == SQL_ALL_SCHEMAS && catalog
-                  && catalog->empty() && table && table->empty();
+    all_schemas = schema && *schema == SQL_ALL_SCHEMAS && catalog && catalog->empty() &&
+                  table && table->empty();
   }
 
   // TableType is a value list argument, regardless of the setting of
   // SQL_ATTR_METADATA_ID.
-  all_table_types = tableType && *tableType == SQL_ALL_TABLE_TYPES && catalog
-                    && catalog->empty() && schema && schema->empty() && table
-                    && table->empty();
+  all_table_types = tableType && *tableType == SQL_ALL_TABLE_TYPES && catalog &&
+                    catalog->empty() && schema && schema->empty() && table &&
+                    table->empty();
 
   int32_t odbcVer = connection.GetEnvODBCVer();
 
@@ -88,10 +88,9 @@ TableMetadataQuery::TableMetadataQuery(
     catalog_meta_name = "TABLE_QUALIFIER";
     schema_meta_name = "TABLE_OWNER";
   }
-  LOG_DEBUG_MSG("all_catalogs is " << all_catalogs << ", all_schemas is "
-                                   << all_schemas << ", all_table_types is "
-                                   << all_table_types << ", odbcVer is "
-                                   << odbcVer);
+  LOG_DEBUG_MSG("all_catalogs is " << all_catalogs << ", all_schemas is " << all_schemas
+                                   << ", all_table_types is " << all_table_types
+                                   << ", odbcVer is " << odbcVer);
 
   if (all_catalogs) {
     /**
@@ -102,18 +101,17 @@ TableMetadataQuery::TableMetadataQuery(
      * since driver does not support catalogs, otherwise, a list of databases is
      * returned.
      */
-    columnsMeta.push_back(ColumnMeta(
-        sch, tbl, catalog_meta_name, ScalarType::VARCHAR,
-        DATABASE_AS_SCHEMA ? Nullability::NULLABLE : Nullability::NO_NULL));
-    columnsMeta.push_back(ColumnMeta(sch, tbl, schema_meta_name,
-                                     ScalarType::VARCHAR,
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, catalog_meta_name, ScalarType::VARCHAR,
+                   DATABASE_AS_SCHEMA ? Nullability::NULLABLE : Nullability::NO_NULL));
+    columnsMeta.push_back(ColumnMeta(sch, tbl, schema_meta_name, ScalarType::VARCHAR,
                                      Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(
-        sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(
-        sch, tbl, "TABLE_TYPE", ScalarType::VARCHAR, Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", ScalarType::VARCHAR,
-                                     Nullability::NULLABLE));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "TABLE_TYPE", ScalarType::VARCHAR, Nullability::NULLABLE));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "REMARKS", ScalarType::VARCHAR, Nullability::NULLABLE));
   } else if (all_schemas) {
     /**
      * If SchemaName equals SQL_ALL_SCHEMAS, and CatalogName and TableName are
@@ -124,18 +122,17 @@ TableMetadataQuery::TableMetadataQuery(
      * otherwise, an empty result set is returned since driver does not
      * support schemas.
      */
-    columnsMeta.push_back(ColumnMeta(sch, tbl, catalog_meta_name,
-                                     ScalarType::VARCHAR,
+    columnsMeta.push_back(ColumnMeta(sch, tbl, catalog_meta_name, ScalarType::VARCHAR,
                                      Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(
-        sch, tbl, schema_meta_name, ScalarType::VARCHAR,
-        DATABASE_AS_SCHEMA ? Nullability::NO_NULL : Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(
-        sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(
-        sch, tbl, "TABLE_TYPE", ScalarType::VARCHAR, Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", ScalarType::VARCHAR,
-                                     Nullability::NULLABLE));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, schema_meta_name, ScalarType::VARCHAR,
+                   DATABASE_AS_SCHEMA ? Nullability::NO_NULL : Nullability::NULLABLE));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "TABLE_TYPE", ScalarType::VARCHAR, Nullability::NULLABLE));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "REMARKS", ScalarType::VARCHAR, Nullability::NULLABLE));
   } else if (all_table_types) {
     /**
      * If TableType equals SQL_ALL_TABLE_TYPES and CatalogName, SchemaName, and
@@ -143,31 +140,27 @@ TableMetadataQuery::TableMetadataQuery(
      * table types for the data source. (All columns except the TABLE_TYPE
      * column contain NULLs.) "TABLE_TYPE" is set to "TABLE" for Timestream.
      */
-    columnsMeta.push_back(ColumnMeta(sch, tbl, catalog_meta_name,
-                                     ScalarType::VARCHAR,
+    columnsMeta.push_back(ColumnMeta(sch, tbl, catalog_meta_name, ScalarType::VARCHAR,
                                      Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(sch, tbl, schema_meta_name,
-                                     ScalarType::VARCHAR,
+    columnsMeta.push_back(ColumnMeta(sch, tbl, schema_meta_name, ScalarType::VARCHAR,
                                      Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(
-        sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(
-        sch, tbl, "TABLE_TYPE", ScalarType::VARCHAR, Nullability::NO_NULL));
-    columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", ScalarType::VARCHAR,
-                                     Nullability::NULLABLE));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "TABLE_TYPE", ScalarType::VARCHAR, Nullability::NO_NULL));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "REMARKS", ScalarType::VARCHAR, Nullability::NULLABLE));
   } else {
-    columnsMeta.push_back(ColumnMeta(sch, tbl, catalog_meta_name,
-                                     ScalarType::VARCHAR,
+    columnsMeta.push_back(ColumnMeta(sch, tbl, catalog_meta_name, ScalarType::VARCHAR,
                                      Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(sch, tbl, schema_meta_name,
-                                     ScalarType::VARCHAR,
+    columnsMeta.push_back(ColumnMeta(sch, tbl, schema_meta_name, ScalarType::VARCHAR,
                                      Nullability::NULLABLE));
-    columnsMeta.push_back(ColumnMeta(
-        sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
-    columnsMeta.push_back(ColumnMeta(
-        sch, tbl, "TABLE_TYPE", ScalarType::VARCHAR, Nullability::NO_NULL));
-    columnsMeta.push_back(ColumnMeta(sch, tbl, "REMARKS", ScalarType::VARCHAR,
-                                     Nullability::NULLABLE));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "TABLE_TYPE", ScalarType::VARCHAR, Nullability::NO_NULL));
+    columnsMeta.push_back(
+        ColumnMeta(sch, tbl, "REMARKS", ScalarType::VARCHAR, Nullability::NULLABLE));
   }
 }
 
@@ -177,18 +170,15 @@ TableMetadataQuery::~TableMetadataQuery() {
 
 SqlResult::Type TableMetadataQuery::Execute() {
   LOG_DEBUG_MSG("Execute is called");
-  if (executed)
-    Close();
+  if (executed) Close();
 
   SqlResult::Type result = MakeRequestGetTablesMeta();
 
-  if (result == SqlResult::AI_SUCCESS
-      || result == SqlResult::AI_SUCCESS_WITH_INFO) {
+  if (result == SqlResult::AI_SUCCESS || result == SqlResult::AI_SUCCESS_WITH_INFO) {
     executed = true;
     fetched = false;
 
-    if (!meta.empty())
-      cursor = meta.begin();
+    if (!meta.empty()) cursor = meta.begin();
   }
 
   LOG_DEBUG_MSG("result is " << result);
@@ -207,16 +197,12 @@ SqlResult::Type TableMetadataQuery::Cancel() {
   return SqlResult::AI_SUCCESS;
 }
 
-const meta::ColumnMetaVector* TableMetadataQuery::GetMeta() {
-  return &columnsMeta;
-}
+const meta::ColumnMetaVector* TableMetadataQuery::GetMeta() { return &columnsMeta; }
 
-SqlResult::Type TableMetadataQuery::FetchNextRow(
-    app::ColumnBindingMap& columnBindings) {
+SqlResult::Type TableMetadataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
   LOG_DEBUG_MSG("FetchNextRow is called");
   if (!executed) {
-    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                         "Query was not executed.");
+    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR, "Query was not executed.");
     return SqlResult::AI_ERROR;
   } else if (meta.empty()) {
     LOG_DEBUG_MSG("Exit due to meta vector is empty");
@@ -240,12 +226,11 @@ SqlResult::Type TableMetadataQuery::FetchNextRow(
   return SqlResult::AI_SUCCESS;
 }
 
-SqlResult::Type TableMetadataQuery::GetColumn(
-    uint16_t columnIdx, app::ApplicationDataBuffer& buffer) {
+SqlResult::Type TableMetadataQuery::GetColumn(uint16_t columnIdx,
+                                              app::ApplicationDataBuffer& buffer) {
   LOG_DEBUG_MSG("GetColumn is called");
   if (!executed) {
-    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR,
-                         "Query was not executed.");
+    diag.AddStatusRecord(SqlState::SHY010_SEQUENCE_ERROR, "Query was not executed.");
     return SqlResult::AI_ERROR;
   } else if (meta.empty()) {
     LOG_DEBUG_MSG("Exit due to meta vector is empty");
@@ -311,9 +296,7 @@ bool TableMetadataQuery::DataAvailable() const {
   return executed && !meta.empty() && cursor != meta.end();
 }
 
-int64_t TableMetadataQuery::AffectedRows() const {
-  return 0;
-}
+int64_t TableMetadataQuery::AffectedRows() const { return 0; }
 
 int64_t TableMetadataQuery::RowNumber() const {
   if (!executed || cursor == meta.end()) {
@@ -332,9 +315,7 @@ int64_t TableMetadataQuery::RowNumber() const {
   return rowNumber;
 }
 
-SqlResult::Type TableMetadataQuery::NextResultSet() {
-  return SqlResult::AI_NO_DATA;
-}
+SqlResult::Type TableMetadataQuery::NextResultSet() { return SqlResult::AI_NO_DATA; }
 
 SqlResult::Type TableMetadataQuery::MakeRequestGetTablesMeta() {
   LOG_DEBUG_MSG("MakeRequestGetTablesMeta is called");
@@ -371,9 +352,9 @@ SqlResult::Type TableMetadataQuery::MakeRequestGetTablesMeta() {
 
     if (!validTableType) {
       // table type(s) provided is not valid for Timestream.
-      std::string warnMsg =
-          "Empty result set is returned as tableType is set to \"" + *tableType
-          + "\" and Timestream only supports \"TABLE\" table type";
+      std::string warnMsg = "Empty result set is returned as tableType is set to \"" +
+                            *tableType +
+                            "\" and Timestream only supports \"TABLE\" table type";
       diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING, warnMsg,
                            timestream::odbc::LogLevel::Type::WARNING_LEVEL);
 
@@ -416,9 +397,8 @@ SqlResult::Type TableMetadataQuery::getTables() {
         // catalog has been provided with a non-empty value that isn't
         // SQL_ALL_CATALOGS. Return empty result set by default since
         // Timestream does not have catalogs.
-        std::string warnMsg =
-            "Empty result set is returned as catalog is set to \"" + *catalog
-            + "\" and Timestream does not have catalogs";
+        std::string warnMsg = "Empty result set is returned as catalog is set to \"" +
+                              *catalog + "\" and Timestream does not have catalogs";
 
         diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING, warnMsg,
                              timestream::odbc::LogLevel::Type::WARNING_LEVEL);
@@ -470,16 +450,14 @@ SqlResult::Type TableMetadataQuery::getTables() {
     } else {
       // Parameters are case-sensitive search patterns
       if (all_catalogs) {
-        LOG_DEBUG_MSG(
-            "Attempting to retrieve list of all catalogs (databases)");
+        LOG_DEBUG_MSG("Attempting to retrieve list of all catalogs (databases)");
         retval = getAllDatabases();
       } else if (schema && !schema->empty() && *schema != SQL_ALL_SCHEMAS) {
         // catalog has been provided with a non-empty value that isn't
         // SQL_ALL_SCHEMAS. Return empty result set by default since
         // Timestream does not have schemas.
-        std::string warnMsg =
-            "Empty result set is returned as schema is set to \"" + *schema
-            + "\" and Timestream does not have schemas";
+        std::string warnMsg = "Empty result set is returned as schema is set to \"" +
+                              *schema + "\" and Timestream does not have schemas";
 
         diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING, warnMsg,
                              timestream::odbc::LogLevel::Type::WARNING_LEVEL);
@@ -519,18 +497,16 @@ SqlResult::Type TableMetadataQuery::getTables() {
 }
 
 SqlResult::Type TableMetadataQuery::getMatchedDatabases(
-    const std::string& databasePattern,
-    std::vector< std::string >& databaseNames) {
+    const std::string& databasePattern, std::vector<std::string>& databaseNames) {
   LOG_DEBUG_MSG("getMatchedDatabases is called");
   std::string sql = "SHOW DATABASES LIKE \'" + databasePattern + "\'";
   LOG_DEBUG_MSG("sql is " << sql);
 
-  dataQuery_ = std::make_shared< DataQuery >(diag, connection, sql);
+  dataQuery_ = std::make_shared<DataQuery>(diag, connection, sql);
   SqlResult::Type result = dataQuery_->Execute();
 
   if (result == SqlResult::AI_NO_DATA) {
-    std::string warnMsg =
-        "No database is found with pattern \'" + databasePattern + "\'";
+    std::string warnMsg = "No database is found with pattern \'" + databasePattern + "\'";
     diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING, warnMsg,
                          timestream::odbc::LogLevel::Type::WARNING_LEVEL);
     return SqlResult::AI_SUCCESS_WITH_INFO;
@@ -545,8 +521,8 @@ SqlResult::Type TableMetadataQuery::getMatchedDatabases(
   // letters, digits, dashes, periods or underscores. It could
   // not be a unicode string.
   char databaseName[STRING_BUFFER_SIZE]{};
-  ApplicationDataBuffer buf(OdbcNativeType::Type::AI_CHAR, &databaseName,
-                            buflen, nullptr);
+  ApplicationDataBuffer buf(OdbcNativeType::Type::AI_CHAR, &databaseName, buflen,
+                            nullptr);
   columnBindings[1] = buf;
 
   while (dataQuery_->FetchNextRow(columnBindings) == SqlResult::AI_SUCCESS) {
@@ -559,18 +535,18 @@ SqlResult::Type TableMetadataQuery::getMatchedDatabases(
 
 SqlResult::Type TableMetadataQuery::getMatchedTables(
     const std::string& databaseName, const std::string& tablePattern,
-    std::vector< std::string >& tableNames) {
+    std::vector<std::string>& tableNames) {
   LOG_DEBUG_MSG("getMatchedTables is called");
   std::string sql =
       "SHOW TABLES FROM \"" + databaseName + "\" LIKE \'" + tablePattern + "\'";
   LOG_DEBUG_MSG("sql is " << sql);
 
-  dataQuery_ = std::make_shared< DataQuery >(diag, connection, sql);
+  dataQuery_ = std::make_shared<DataQuery>(diag, connection, sql);
   SqlResult::Type result = dataQuery_->Execute();
 
   if (result == SqlResult::AI_NO_DATA) {
-    std::string warnMsg = "No table is found with pattern \'" + tablePattern
-                          + "\' from database (" + databaseName + ")";
+    std::string warnMsg = "No table is found with pattern \'" + tablePattern +
+                          "\' from database (" + databaseName + ")";
     diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING, warnMsg,
                          timestream::odbc::LogLevel::Type::WARNING_LEVEL);
     return SqlResult::AI_SUCCESS_WITH_INFO;
@@ -586,8 +562,7 @@ SqlResult::Type TableMetadataQuery::getMatchedTables(
   // letters, digits, dashes, periods or underscores. It could
   // not be a unicode string.
   char tableName[STRING_BUFFER_SIZE]{};
-  ApplicationDataBuffer buf(OdbcNativeType::Type::AI_CHAR, &tableName, buflen,
-                            nullptr);
+  ApplicationDataBuffer buf(OdbcNativeType::Type::AI_CHAR, &tableName, buflen, nullptr);
   columnBindings[1] = buf;
 
   while (dataQuery_->FetchNextRow(columnBindings) == SqlResult::AI_SUCCESS) {
@@ -601,7 +576,7 @@ SqlResult::Type TableMetadataQuery::getMatchedTables(
 SqlResult::Type TableMetadataQuery::getAllDatabases() {
   LOG_DEBUG_MSG("getAllDatabases is called");
 
-  std::vector< std::string > databaseNames;
+  std::vector<std::string> databaseNames;
   SqlResult::Type result = getMatchedDatabases("%", databaseNames);
 
   if (result != SqlResult::AI_SUCCESS) {
@@ -610,8 +585,7 @@ SqlResult::Type TableMetadataQuery::getAllDatabases() {
   }
 
   int numDatabases = databaseNames.size();
-  LOG_DEBUG_MSG("database number: " << numDatabases
-                                    << ", DATABASE_AS_SCHEMA is "
+  LOG_DEBUG_MSG("database number: " << numDatabases << ", DATABASE_AS_SCHEMA is "
                                     << DATABASE_AS_SCHEMA);
 
   for (int i = 0; i < numDatabases; i++) {
@@ -621,11 +595,11 @@ SqlResult::Type TableMetadataQuery::getAllDatabases() {
     LOG_DEBUG_MSG("databaseNames[" << i << "] is " << databaseName);
 
     if (DATABASE_AS_SCHEMA) {
-      meta.emplace_back(TableMeta(std::string(""), databaseName,
-                                  std::string(""), std::string("TABLE")));
+      meta.emplace_back(TableMeta(std::string(""), databaseName, std::string(""),
+                                  std::string("TABLE")));
     } else {
-      meta.emplace_back(TableMeta(databaseName, std::string(""),
-                                  std::string(""), std::string("TABLE")));
+      meta.emplace_back(TableMeta(databaseName, std::string(""), std::string(""),
+                                  std::string("TABLE")));
     }
   }
 
@@ -637,26 +611,23 @@ SqlResult::Type TableMetadataQuery::getTablesWithIdentifier(
   LOG_DEBUG_MSG("getTablesWithIdentifier is called, databaseIdentifier is "
                 << databaseIdentifier);
 
-  std::vector< std::string > databaseNames;
+  std::vector<std::string> databaseNames;
   SqlResult::Type result = getMatchedDatabases("%", databaseNames);
 
   if (result != SqlResult::AI_SUCCESS) {
-    LOG_DEBUG_MSG(
-        "getTablesWithIdentifier early exiting with result: " << result);
+    LOG_DEBUG_MSG("getTablesWithIdentifier early exiting with result: " << result);
     return result;
   }
 
   // get all database names, then do filtering based on database name identifier
   int numDatabases = databaseNames.size();
   bool match = false;
-  Aws::String databaseUpper =
-      Aws::Utils::StringUtils::ToUpper(databaseIdentifier.data());
+  Aws::String databaseUpper = Aws::Utils::StringUtils::ToUpper(databaseIdentifier.data());
 
   std::string databaseName("");
   for (int i = 0; i < numDatabases; i++) {
     databaseName = databaseNames.at(i);
-    Aws::String dbNameUpper =
-        Aws::Utils::StringUtils::ToUpper(databaseName.data());
+    Aws::String dbNameUpper = Aws::Utils::StringUtils::ToUpper(databaseName.data());
     match = (databaseUpper == dbNameUpper);
 
     if (match) {
@@ -673,7 +644,7 @@ SqlResult::Type TableMetadataQuery::getTablesWithIdentifier(
   }
 
   // retrieve tables using database name
-  std::vector< std::string > tableNames;
+  std::vector<std::string> tableNames;
   SqlResult::Type res = getMatchedTables(databaseName, "%", tableNames);
 
   if (res != SqlResult::AI_SUCCESS && res != SqlResult::AI_SUCCESS_WITH_INFO) {
@@ -684,31 +655,25 @@ SqlResult::Type TableMetadataQuery::getTablesWithIdentifier(
   // get all database names, then do filtering based on database name
   // identifier
   int numTables = tableNames.size();
-  LOG_DEBUG_MSG("numTables is " << numTables << " for database "
-                                << databaseName);
+  LOG_DEBUG_MSG("numTables is " << numTables << " for database " << databaseName);
   for (int j = 0; j < numTables; j++) {
     using meta::TableMeta;
 
     // Check exact match for table name case-insensitive identifier
     std::string foundTableName = tableNames.at(j);
-    Aws::String tableUpper =
-        Aws::Utils::StringUtils::ToUpper(table.get().data());
-    Aws::String tbNameUpper =
-        Aws::Utils::StringUtils::ToUpper(foundTableName.data());
+    Aws::String tableUpper = Aws::Utils::StringUtils::ToUpper(table.get().data());
+    Aws::String tbNameUpper = Aws::Utils::StringUtils::ToUpper(foundTableName.data());
     match = (tableUpper == tbNameUpper);
 
     if (match) {
       if (DATABASE_AS_SCHEMA) {
         meta.emplace_back(TableMeta(std::string(""), databaseName,
-                                    std::string(foundTableName),
-                                    std::string("TABLE")));
+                                    std::string(foundTableName), std::string("TABLE")));
       } else {
         meta.emplace_back(TableMeta(databaseName, std::string(""),
-                                    std::string(foundTableName),
-                                    std::string("TABLE")));
+                                    std::string(foundTableName), std::string("TABLE")));
       }
-      LOG_DEBUG_MSG("Found matched table for " << databaseName << "."
-                                               << table.get());
+      LOG_DEBUG_MSG("Found matched table for " << databaseName << "." << table.get());
     }
   }
 
@@ -716,8 +681,8 @@ SqlResult::Type TableMetadataQuery::getTablesWithIdentifier(
 
   if (meta.empty()) {
     std::string warnMsg =
-        "Empty result set is returned as we could not find tables with "
-        + databaseName + "." + table.get();
+        "Empty result set is returned as we could not find tables with " + databaseName +
+        "." + table.get();
     diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING, warnMsg,
                          timestream::odbc::LogLevel::Type::WARNING_LEVEL);
     return SqlResult::AI_SUCCESS_WITH_INFO;
@@ -727,9 +692,9 @@ SqlResult::Type TableMetadataQuery::getTablesWithIdentifier(
 }
 
 SqlResult::Type TableMetadataQuery::getTablesWithSearchPattern(
-    const boost::optional< std::string >& databasePattern) {
+    const boost::optional<std::string>& databasePattern) {
   LOG_DEBUG_MSG("getTablesWithSearchPattern is called");
-  std::vector< std::string > databaseNames;
+  std::vector<std::string> databaseNames;
   SqlResult::Type result =
       getMatchedDatabases(databasePattern.get_value_or("%"), databaseNames);
 
@@ -737,8 +702,7 @@ SqlResult::Type TableMetadataQuery::getTablesWithSearchPattern(
                                       << ", databaseNames size is "
                                       << databaseNames.size());
   if (result != SqlResult::AI_SUCCESS) {
-    LOG_DEBUG_MSG(
-        "getTablesWithSearchPattern early exiting with result: " << result);
+    LOG_DEBUG_MSG("getTablesWithSearchPattern early exiting with result: " << result);
     return result;
   }
 
@@ -748,35 +712,30 @@ SqlResult::Type TableMetadataQuery::getTablesWithSearchPattern(
     std::string databaseName = databaseNames.at(i);
 
     // retrieve tables using database name
-    std::vector< std::string > tableNames;
+    std::vector<std::string> tableNames;
     SqlResult::Type res =
         getMatchedTables(databaseName, table.get_value_or("%"), tableNames);
 
-    if (res != SqlResult::AI_SUCCESS
-        && res != SqlResult::AI_SUCCESS_WITH_INFO) {
+    if (res != SqlResult::AI_SUCCESS && res != SqlResult::AI_SUCCESS_WITH_INFO) {
       LOG_DEBUG_MSG("getMatchedTables returns " << res << " for database "
                                                 << databaseName);
       return res;
     }
 
     int numTables = tableNames.size();
-    LOG_DEBUG_MSG("tableNames size is " << numTables << " for database "
-                                        << databaseName);
+    LOG_DEBUG_MSG("tableNames size is " << numTables << " for database " << databaseName);
     for (int j = 0; j < numTables; j++) {
       using meta::TableMeta;
 
       std::string foundTableName = tableNames.at(j);
       if (DATABASE_AS_SCHEMA) {
         meta.emplace_back(TableMeta(std::string(""), databaseName,
-                                    std::string(foundTableName),
-                                    std::string("TABLE")));
+                                    std::string(foundTableName), std::string("TABLE")));
       } else {
         meta.emplace_back(TableMeta(databaseName, std::string(""),
-                                    std::string(foundTableName),
-                                    std::string("TABLE")));
+                                    std::string(foundTableName), std::string("TABLE")));
       }
-      LOG_DEBUG_MSG("Found matched table for " << databaseName << "."
-                                               << foundTableName);
+      LOG_DEBUG_MSG("Found matched table for " << databaseName << "." << foundTableName);
     }
   }
 
@@ -785,8 +744,8 @@ SqlResult::Type TableMetadataQuery::getTablesWithSearchPattern(
   if (meta.empty()) {
     std::string warnMsg =
         "Empty result set is returned as we could not find tables for database "
-        "pattern "
-        + databasePattern.get_value_or("%");
+        "pattern " +
+        databasePattern.get_value_or("%");
     diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING, warnMsg,
                          timestream::odbc::LogLevel::Type::WARNING_LEVEL);
     return SqlResult::AI_SUCCESS_WITH_INFO;
@@ -796,9 +755,8 @@ SqlResult::Type TableMetadataQuery::getTablesWithSearchPattern(
 }
 
 std::string TableMetadataQuery::dequote(const std::string& s) {
-  if (s.size() >= 2
-      && ((s.front() == '\'' && s.back() == '\'')
-          || (s.front() == '"' && s.back() == '"'))) {
+  if (s.size() >= 2 && ((s.front() == '\'' && s.back() == '\'') ||
+                        (s.front() == '"' && s.back() == '"'))) {
     return s.substr(1, s.size() - 2);
   }
   return s;

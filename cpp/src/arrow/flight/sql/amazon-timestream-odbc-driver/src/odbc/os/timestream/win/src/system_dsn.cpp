@@ -18,11 +18,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "ignite/odbc/odbc_error.h"
 #include "timestream/odbc/config/connection_string_parser.h"
 #include "timestream/odbc/diagnostic/diagnosable_adapter.h"
 #include "timestream/odbc/dsn_config.h"
 #include "timestream/odbc/log.h"
-#include "ignite/odbc/odbc_error.h"
 #include "timestream/odbc/system/odbc_constants.h"
 #include "timestream/odbc/system/ui/dsn_configuration_window.h"
 #include "timestream/odbc/system/ui/window.h"
@@ -37,8 +37,7 @@ bool DisplayConnectionWindow(void* windowParent, Configuration& config) {
 
   HWND hwndParent = (HWND)windowParent;
 
-  if (!hwndParent)
-    return true;
+  if (!hwndParent) return true;
 
   try {
     Window parent(hwndParent);
@@ -81,8 +80,7 @@ bool InternalRegisterDsn(const Configuration& config, LPCSTR driver) {
 
   IgniteError error;
   try {
-    if (!RegisterDsn(config, driver, error))
-      throw error;
+    if (!RegisterDsn(config, driver, error)) throw error;
     return true;
   } catch (timestream::odbc::IgniteError& err) {
     std::wstring errText = FromUtf8(err.GetText());
@@ -103,8 +101,7 @@ bool InternalRegisterDsn(const Configuration& config, LPCSTR driver) {
 bool InternalUnregisterDsn(const std::string& dsn) {
   IgniteError error;
   try {
-    if (!UnregisterDsn(dsn, error))
-      throw error;
+    if (!UnregisterDsn(dsn, error)) throw error;
 
     return true;
   } catch (timestream::odbc::IgniteError& err) {
@@ -117,8 +114,7 @@ bool InternalUnregisterDsn(const std::string& dsn) {
   return false;
 }
 
-BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
-                       LPCSTR attributes) {
+BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver, LPCSTR attributes) {
   using namespace timestream::odbc;
 
   LOG_INFO_MSG("ConfigDSN called");
@@ -133,8 +129,7 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
 
   parser.ParseConfigAttributes(attributes, &diag);
 
-  if (!SQLValidDSN(utility::FromUtf8(config.GetDsn()).c_str()))
-    return FALSE;
+  if (!SQLValidDSN(utility::FromUtf8(config.GetDsn()).c_str())) return FALSE;
 
   LOG_INFO_MSG("Driver: " << driver);
   LOG_INFO_MSG("DSN: " << config.GetDsn());
@@ -144,12 +139,10 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
       LOG_INFO_MSG("ODBC_ADD_DSN");
 
 #ifdef _WIN32
-      if (!DisplayConnectionWindow(hwndParent, config))
-        return FALSE;
+      if (!DisplayConnectionWindow(hwndParent, config)) return FALSE;
 #endif  // _WIN32
 
-      if (!InternalRegisterDsn(config, driver))
-        return FALSE;
+      if (!InternalRegisterDsn(config, driver)) return FALSE;
 
       break;
     }
@@ -164,15 +157,12 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
       ReadDsnConfiguration(dsn.c_str(), loaded, &diag);
 
 #ifdef _WIN32
-      if (!DisplayConnectionWindow(hwndParent, loaded))
-        return FALSE;
+      if (!DisplayConnectionWindow(hwndParent, loaded)) return FALSE;
 #endif  // _WIN32
 
-      if (!InternalRegisterDsn(loaded, driver))
-        return FALSE;
+      if (!InternalRegisterDsn(loaded, driver)) return FALSE;
 
-      if (loaded.GetDsn() != dsn && !InternalUnregisterDsn(dsn.c_str()))
-        return FALSE;
+      if (loaded.GetDsn() != dsn && !InternalUnregisterDsn(dsn.c_str())) return FALSE;
 
       break;
     }
@@ -180,8 +170,7 @@ BOOL INSTAPI ConfigDSN(HWND hwndParent, WORD req, LPCSTR driver,
     case ODBC_REMOVE_DSN: {
       LOG_INFO_MSG("ODBC_REMOVE_DSN");
 
-      if (!InternalUnregisterDsn(config.GetDsn().c_str()))
-        return FALSE;
+      if (!InternalUnregisterDsn(config.GetDsn().c_str())) return FALSE;
 
       break;
     }

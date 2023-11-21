@@ -17,8 +17,8 @@
 #ifndef _IGNITE_ODBC_MOCK_CONNECTION
 #define _IGNITE_ODBC_MOCK_CONNECTION
 
-#include "timestream/odbc/connection.h"
 #include "mock/mock_statement.h"
+#include "timestream/odbc/connection.h"
 
 namespace timestream {
 namespace odbc {
@@ -57,7 +57,7 @@ class MockConnection : public Connection {
    * @param cfg connection configuration.
    * @return a shared_ptr to created MockTimestreamQueryClient object.
    */
-  virtual std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
+  virtual std::shared_ptr<Aws::TimestreamQuery::TimestreamQueryClient>
   CreateTSQueryClient(const Aws::Auth::AWSCredentials& credentials,
                       const Aws::Client::ClientConfiguration& clientCfg);
 
@@ -66,14 +66,14 @@ class MockConnection : public Connection {
    *
    * @return a shared_ptr to created MockHttpClient object.
    */
-  virtual std::shared_ptr< Aws::Http::HttpClient > GetHttpClient();
+  virtual std::shared_ptr<Aws::Http::HttpClient> GetHttpClient();
 
   /**
    * Create MockSTSClient object.
    *
    * @return a shared_ptr to created MockSTSClient object.
    */
-  virtual std::shared_ptr< Aws::STS::STSClient > GetStsClient();
+  virtual std::shared_ptr<Aws::STS::STSClient> GetStsClient();
 };
 }  // namespace odbc
 }  // namespace timestream

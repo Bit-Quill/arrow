@@ -63,17 +63,13 @@ void DiagnosticRecordStorage::Reset() {
   statusRecords.clear();
 }
 
-SqlResult::Type DiagnosticRecordStorage::GetOperaionResult() const {
-  return result;
-}
+SqlResult::Type DiagnosticRecordStorage::GetOperaionResult() const { return result; }
 
 int DiagnosticRecordStorage::GetReturnCode() const {
   return SqlResultToReturnCode(result);
 }
 
-int64_t DiagnosticRecordStorage::GetRowCount() const {
-  return rowCount;
-}
+int64_t DiagnosticRecordStorage::GetRowCount() const { return rowCount; }
 
 const std::string& DiagnosticRecordStorage::GetDynamicFunction() const {
   return dynamicFunction;
@@ -83,16 +79,13 @@ int32_t DiagnosticRecordStorage::GetDynamicFunctionCode() const {
   return dynamicFunctionCode;
 }
 
-int32_t DiagnosticRecordStorage::GetRowsAffected() const {
-  return rowsAffected;
-}
+int32_t DiagnosticRecordStorage::GetRowsAffected() const { return rowsAffected; }
 
 int32_t DiagnosticRecordStorage::GetStatusRecordsNumber() const {
-  return static_cast< int32_t >(statusRecords.size());
+  return static_cast<int32_t>(statusRecords.size());
 }
 
-const DiagnosticRecord& DiagnosticRecordStorage::GetStatusRecord(
-    int32_t idx) const {
+const DiagnosticRecord& DiagnosticRecordStorage::GetStatusRecord(int32_t idx) const {
   if (statusRecords.size() < idx) {
     LOG_ERROR_MSG("const: idx value " << idx << " is out of range");
   }
@@ -110,16 +103,14 @@ int32_t DiagnosticRecordStorage::GetLastNonRetrieved() const {
   for (size_t i = 0; i < statusRecords.size(); ++i) {
     const DiagnosticRecord& record = statusRecords[i];
 
-    if (!record.IsRetrieved())
-      return static_cast< int32_t >(i + 1);
+    if (!record.IsRetrieved()) return static_cast<int32_t>(i + 1);
   }
 
   return 0;
 }
 
 bool DiagnosticRecordStorage::IsSuccessful() const {
-  return result == SqlResult::AI_SUCCESS
-         || result == SqlResult::AI_SUCCESS_WITH_INFO;
+  return result == SqlResult::AI_SUCCESS || result == SqlResult::AI_SUCCESS_WITH_INFO;
 }
 
 SqlResult::Type DiagnosticRecordStorage::GetField(
@@ -167,7 +158,7 @@ SqlResult::Type DiagnosticRecordStorage::GetField(
       break;
   }
 
-  if (recNum < 1 || static_cast< size_t >(recNum) > statusRecords.size())
+  if (recNum < 1 || static_cast<size_t>(recNum) > statusRecords.size())
     return SqlResult::AI_NO_DATA;
 
   // Status record.

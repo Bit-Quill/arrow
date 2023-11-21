@@ -175,8 +175,7 @@ class IGNITE_IMPORT_EXPORT Atomics {
    * @param newVal New value.
    * @return Value which were observed during CAS attempt.
    */
-  static int32_t CompareAndSet32Val(int32_t* ptr, int32_t expVal,
-                                    int32_t newVal);
+  static int32_t CompareAndSet32Val(int32_t* ptr, int32_t expVal, int32_t newVal);
 
   /**
    * Increment 32-bit integer and return new value.
@@ -212,8 +211,7 @@ class IGNITE_IMPORT_EXPORT Atomics {
    * @param newVal New value.
    * @return Value which were observed during CAS attempt.
    */
-  static int64_t CompareAndSet64Val(int64_t* ptr, int64_t expVal,
-                                    int64_t newVal);
+  static int64_t CompareAndSet64Val(int64_t* ptr, int64_t expVal, int64_t newVal);
 
   /**
    * Increment 64-bit integer and return new value.
@@ -248,7 +246,7 @@ class IGNITE_IMPORT_EXPORT ThreadLocalEntry {
 /**
  * Typed thread-local entry.
  */
-template < typename T >
+template <typename T>
 class IGNITE_IMPORT_EXPORT ThreadLocalTypedEntry : public ThreadLocalEntry {
  public:
   /**
@@ -269,9 +267,7 @@ class IGNITE_IMPORT_EXPORT ThreadLocalTypedEntry : public ThreadLocalEntry {
    *
    * @return Value.
    */
-  T Get() {
-    return val;
-  }
+  T Get() { return val; }
 
  private:
   /** Value. */
@@ -296,19 +292,18 @@ class IGNITE_IMPORT_EXPORT ThreadLocal {
    * @param idx Index.
    * @return Value associated with the index or NULL.
    */
-  template < typename T >
+  template <typename T>
   static T Get(int32_t idx) {
     void* linuxVal = Get0();
 
     if (linuxVal) {
-      std::map< int32_t, ThreadLocalEntry* >* map =
-          static_cast< std::map< int32_t, ThreadLocalEntry* >* >(linuxVal);
+      std::map<int32_t, ThreadLocalEntry*>* map =
+          static_cast<std::map<int32_t, ThreadLocalEntry*>*>(linuxVal);
 
-      ThreadLocalTypedEntry< T >* entry =
-          static_cast< ThreadLocalTypedEntry< T >* >((*map)[idx]);
+      ThreadLocalTypedEntry<T>* entry =
+          static_cast<ThreadLocalTypedEntry<T>*>((*map)[idx]);
 
-      if (entry)
-        return entry->Get();
+      if (entry) return entry->Get();
     }
 
     return T();
@@ -320,27 +315,26 @@ class IGNITE_IMPORT_EXPORT ThreadLocal {
    * @param idx Index.
    * @param val Value to be associated with the index.
    */
-  template < typename T >
+  template <typename T>
   static void Set(int32_t idx, const T& val) {
     void* linuxVal = Get0();
 
     if (linuxVal) {
-      std::map< int32_t, ThreadLocalEntry* >* map =
-          static_cast< std::map< int32_t, ThreadLocalEntry* >* >(linuxVal);
+      std::map<int32_t, ThreadLocalEntry*>* map =
+          static_cast<std::map<int32_t, ThreadLocalEntry*>*>(linuxVal);
 
       ThreadLocalEntry* appVal = (*map)[idx];
 
-      if (appVal)
-        delete appVal;
+      if (appVal) delete appVal;
 
-      (*map)[idx] = new ThreadLocalTypedEntry< T >(val);
+      (*map)[idx] = new ThreadLocalTypedEntry<T>(val);
     } else {
-      std::map< int32_t, ThreadLocalEntry* >* map =
-          new std::map< int32_t, ThreadLocalEntry* >();
+      std::map<int32_t, ThreadLocalEntry*>* map =
+          new std::map<int32_t, ThreadLocalEntry*>();
 
       Set0(map);
 
-      (*map)[idx] = new ThreadLocalTypedEntry< T >(val);
+      (*map)[idx] = new ThreadLocalTypedEntry<T>(val);
     }
   }
 
@@ -377,7 +371,7 @@ class IGNITE_IMPORT_EXPORT ThreadLocal {
 /**
  * Thread-local instance. Simplifies API avoiding direct index allocations.
  */
-template < typename T >
+template <typename T>
 class IGNITE_IMPORT_EXPORT ThreadLocalInstance {
  public:
   /**
@@ -390,34 +384,26 @@ class IGNITE_IMPORT_EXPORT ThreadLocalInstance {
   /**
    * Destructor.
    */
-  ~ThreadLocalInstance() {
-    Remove();
-  }
+  ~ThreadLocalInstance() { Remove(); }
 
   /**
    * Get value.
    *
    * @return Value.
    */
-  T Get() {
-    return ThreadLocal::Get< T >(idx);
-  }
+  T Get() { return ThreadLocal::Get<T>(idx); }
 
   /**
    * Set instance.
    *
    * @param val Value.
    */
-  void Set(const T& val) {
-    ThreadLocal::Set< T >(idx, val);
-  }
+  void Set(const T& val) { ThreadLocal::Set<T>(idx, val); }
 
   /**
    * Remove instance.
    */
-  void Remove() {
-    ThreadLocal::Remove(idx);
-  }
+  void Remove() { ThreadLocal::Remove(idx); }
 
  private:
   /** Index. */
@@ -452,18 +438,14 @@ class ConditionVariable {
   /**
    * Destructor.
    */
-  ~ConditionVariable() {
-    pthread_cond_destroy(&cond);
-  }
+  ~ConditionVariable() { pthread_cond_destroy(&cond); }
 
   /**
    * Wait for Condition Variable to be notified.
    *
    * @param cs Critical section in which to wait.
    */
-  void Wait(CriticalSection& cs) {
-    pthread_cond_wait(&cond, &cs.mux);
-  }
+  void Wait(CriticalSection& cs) { pthread_cond_wait(&cond, &cs.mux); }
 
   /**
    * Wait for Condition Variable to be notified for specified time.
@@ -479,8 +461,8 @@ class ConditionVariable {
 
     IGNITE_UNUSED(err);
 
-    ts.tv_sec += msTimeout / 1000
-                 + (ts.tv_nsec + (msTimeout % 1000) * 1000000) / 1000000000;
+    ts.tv_sec +=
+        msTimeout / 1000 + (ts.tv_nsec + (msTimeout % 1000) * 1000000) / 1000000000;
     ts.tv_nsec = (ts.tv_nsec + (msTimeout % 1000) * 1000000) % 1000000000;
 
     int res = pthread_cond_timedwait(&cond, &cs.mux, &ts);
@@ -627,8 +609,8 @@ class ManualEvent {
       assert(!err);
       IGNITE_UNUSED(err);
 
-      ts.tv_sec += msTimeout / 1000
-                   + (ts.tv_nsec + (msTimeout % 1000) * 1000000) / 1000000000;
+      ts.tv_sec +=
+          msTimeout / 1000 + (ts.tv_nsec + (msTimeout % 1000) * 1000000) / 1000000000;
       ts.tv_nsec = (ts.tv_nsec + (msTimeout % 1000) * 1000000) % 1000000000;
 
       res = pthread_cond_timedwait(&cond, &mutex, &ts);

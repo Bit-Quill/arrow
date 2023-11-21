@@ -17,8 +17,8 @@
 #ifndef _IGNITE_ODBC_COMMON_DYNAMIC_SIZE_ARRAY
 #define _IGNITE_ODBC_COMMON_DYNAMIC_SIZE_ARRAY
 
-#include <ignite/common/include/common/bits.h>
 #include <ignite/common/common.h>
+#include <ignite/common/include/common/bits.h>
 #include <ignite/common/include/common/default_allocator.h>
 #include <stdint.h>
 
@@ -34,7 +34,7 @@ namespace common {
  * This is the analogue of the standard vector. It is needed to be used
  * in exported classes as we can't export standard library classes.
  */
-template < typename T, typename A = DefaultAllocator< T > >
+template <typename T, typename A = DefaultAllocator<T> >
 class IGNITE_IMPORT_EXPORT DynamicSizeArray {
  public:
   typedef T ValueType;
@@ -62,8 +62,7 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    * @param len Array length.
    * @param alloc Allocator.
    */
-  DynamicSizeArray(SizeType len,
-                   const AllocatorType& allocator = AllocatorType())
+  DynamicSizeArray(SizeType len, const AllocatorType& allocator = AllocatorType())
       : alloc(allocator),
         size(0),
         capasity(bits::GetCapasityForSize(len)),
@@ -88,7 +87,7 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    *
    * @param other Other instance.
    */
-  DynamicSizeArray(const DynamicSizeArray< T >& other)
+  DynamicSizeArray(const DynamicSizeArray<T>& other)
       : alloc(), size(0), capasity(0), data(0) {
     Assign(other);
   }
@@ -97,8 +96,7 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    * Destructor.
    */
   ~DynamicSizeArray() {
-    for (PointerType it = data; it != data + size; ++it)
-      alloc.Destruct(it);
+    for (PointerType it = data; it != data + size; ++it) alloc.Destruct(it);
 
     alloc.Deallocate(data, capasity);
   }
@@ -109,7 +107,7 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    * @param other Other instance.
    * @return Reference to this instance.
    */
-  DynamicSizeArray< T >& operator=(const DynamicSizeArray< T >& other) {
+  DynamicSizeArray<T>& operator=(const DynamicSizeArray<T>& other) {
     Assign(other);
 
     return *this;
@@ -120,7 +118,7 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    *
    * @param other Another array instance.
    */
-  void Assign(const DynamicSizeArray< T >& other) {
+  void Assign(const DynamicSizeArray<T>& other) {
     if (this != &other) {
       alloc = other.alloc;
 
@@ -135,8 +133,7 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    * @param len Array length in elements.
    */
   void Assign(ConstPointerType src, SizeType len) {
-    for (PointerType it = data; it != data + size; ++it)
-      alloc.Destruct(it);
+    for (PointerType it = data; it != data + size; ++it) alloc.Destruct(it);
 
     if (capasity < len) {
       alloc.Deallocate(data, capasity);
@@ -147,8 +144,7 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
 
     size = len;
 
-    for (SizeType i = 0; i < size; ++i)
-      alloc.Construct(data + i, src[i]);
+    for (SizeType i = 0; i < size; ++i) alloc.Construct(data + i, src[i]);
   }
 
   /**
@@ -160,8 +156,7 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
   void Append(ConstPointerType src, SizeType len) {
     Reserve(size + len);
 
-    for (SizeType i = 0; i < len; ++i)
-      alloc.Construct(data + size + i, src[i]);
+    for (SizeType i = 0; i < len; ++i) alloc.Construct(data + size + i, src[i]);
 
     size += len;
   }
@@ -171,7 +166,7 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    *
    * @param other Instance to swap with.
    */
-  void Swap(DynamicSizeArray< T >& other) {
+  void Swap(DynamicSizeArray<T>& other) {
     if (this != &other) {
       std::swap(alloc, other.alloc);
       std::swap(size, other.size);
@@ -185,36 +180,28 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    *
    * @return Data pointer.
    */
-  PointerType GetData() {
-    return data;
-  }
+  PointerType GetData() { return data; }
 
   /**
    * Get data pointer.
    *
    * @return Data pointer.
    */
-  ConstPointerType GetData() const {
-    return data;
-  }
+  ConstPointerType GetData() const { return data; }
 
   /**
    * Get array size.
    *
    * @return Array size.
    */
-  SizeType GetSize() const {
-    return size;
-  }
+  SizeType GetSize() const { return size; }
 
   /**
    * Get capasity.
    *
    * @return Array capasity.
    */
-  SizeType GetCapasity() const {
-    return capasity;
-  }
+  SizeType GetCapasity() const { return capasity; }
 
   /**
    * Element access operator.
@@ -245,16 +232,13 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    *
    * @return True if the array is empty.
    */
-  bool IsEmpty() const {
-    return size == 0;
-  }
+  bool IsEmpty() const { return size == 0; }
 
   /**
    * Clears the array.
    */
   void Clear() {
-    for (PointerType it = data; it != data + size; ++it)
-      alloc.Destruct(it);
+    for (PointerType it = data; it != data + size; ++it) alloc.Destruct(it);
 
     size = 0;
   }
@@ -267,7 +251,7 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    */
   void Reserve(SizeType newCapacity) {
     if (capasity < newCapacity) {
-      DynamicSizeArray< T > tmp(newCapacity);
+      DynamicSizeArray<T> tmp(newCapacity);
 
       tmp.Assign(*this);
 
@@ -283,15 +267,13 @@ class IGNITE_IMPORT_EXPORT DynamicSizeArray {
    * @param newSize Desired size.
    */
   void Resize(SizeType newSize) {
-    if (capasity < newSize)
-      Reserve(newSize);
+    if (capasity < newSize) Reserve(newSize);
 
     if (newSize > size) {
       for (PointerType it = data + size; it < data + newSize; ++it)
         alloc.Construct(it, ValueType());
     } else {
-      for (PointerType it = data + newSize; it < data + size; ++it)
-        alloc.Destruct(it);
+      for (PointerType it = data + newSize; it < data + size; ++it) alloc.Destruct(it);
     }
 
     size = newSize;

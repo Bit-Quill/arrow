@@ -48,8 +48,7 @@ class Window {
    * @param title Window title.
    * @param callback Event processing function.
    */
-  Window(Window* parent, const std::wstring& className,
-         const std::wstring& title);
+  Window(Window* parent, const std::wstring& className, const std::wstring& title);
 
   /**
    * Constructor for the existing window.
@@ -95,9 +94,7 @@ class Window {
    *
    * @return Window handle.
    */
-  HWND GetHandle() const {
-    return handle;
-  }
+  HWND GetHandle() const { return handle; }
 
   /**
    * Get window text.
@@ -196,9 +193,7 @@ class Window {
    *
    * @param value Window handle.
    */
-  void SetHandle(HWND value) {
-    handle = value;
-  }
+  void SetHandle(HWND value) { handle = value; }
 
   /** Window class name. */
   std::wstring className;

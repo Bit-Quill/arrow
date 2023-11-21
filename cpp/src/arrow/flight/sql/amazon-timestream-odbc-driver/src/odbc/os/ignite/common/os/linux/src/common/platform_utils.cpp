@@ -19,9 +19,9 @@
 #include <dlfcn.h>
 #include <ftw.h>
 #include <glob.h>
-#include <timestream/odbc/utils.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <timestream/odbc/utils.h>
 #include <unistd.h>
 
 #include <cstdio>
@@ -42,13 +42,9 @@ time_t IgniteTimeLocal(const tm& time) {
   return mktime(&tmc);
 }
 
-bool IgniteGmTime(time_t in, tm& out) {
-  return gmtime_r(&in, &out) != NULL;
-}
+bool IgniteGmTime(time_t in, tm& out) { return gmtime_r(&in, &out) != NULL; }
 
-bool IgniteLocalTime(time_t in, tm& out) {
-  return localtime_r(&in, &out) == 0;
-}
+bool IgniteLocalTime(time_t in, tm& out) { return localtime_r(&in, &out) == 0; }
 
 std::string GetEnv(const std::string& name) {
   static const std::string empty;
@@ -59,8 +55,7 @@ std::string GetEnv(const std::string& name) {
 std::string GetEnv(const std::string& name, const std::string& dflt) {
   char* val0 = std::getenv(name.c_str());
 
-  if (!val0)
-    return dflt;
+  if (!val0) return dflt;
 
   return std::string(val0);
 }
@@ -76,8 +71,7 @@ bool FileExists(const std::string& path) {
 }
 
 bool IsValidDirectory(const std::string& path) {
-  if (path.empty())
-    return false;
+  if (path.empty()) return false;
 
   struct stat pathStat;
 
@@ -115,9 +109,9 @@ IGNITE_IMPORT_EXPORT unsigned GetRandSeed() {
 
   clock_gettime(CLOCK_MONOTONIC, &ts);
 
-  unsigned res = static_cast< unsigned >(ts.tv_sec);
-  res ^= static_cast< unsigned >(ts.tv_nsec);
-  res ^= static_cast< unsigned >(getpid());
+  unsigned res = static_cast<unsigned>(ts.tv_sec);
+  res ^= static_cast<unsigned>(ts.tv_nsec);
+  res ^= static_cast<unsigned>(getpid());
 
   return res;
 }

@@ -39,34 +39,34 @@ ForeignKeysQuery::ForeignKeysQuery(diagnostic::DiagnosableAdapter& diag)
   const std::string sch("");
   const std::string tbl("");
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PKTABLE_CAT", ScalarType::VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PKTABLE_SCHEM",
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PKTABLE_NAME",
-                                   ScalarType::VARCHAR, Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PKCOLUMN_NAME",
-                                   ScalarType::VARCHAR, Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "FKTABLE_CAT", ScalarType::VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "FKTABLE_SCHEM",
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "FKTABLE_NAME",
-                                   ScalarType::VARCHAR, Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "FKCOLUMN_NAME",
-                                   ScalarType::VARCHAR, Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "KEY_SEQ", ScalarType::INTEGER,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "UPDATE_RULE", ScalarType::INTEGER,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DELETE_RULE", ScalarType::INTEGER,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "FK_NAME", ScalarType::VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PK_NAME", ScalarType::VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "DEFERRABILITY",
-                                   ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "PKTABLE_CAT", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "PKTABLE_SCHEM", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "PKTABLE_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "PKCOLUMN_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "FKTABLE_CAT", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "FKTABLE_SCHEM", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "FKTABLE_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "FKCOLUMN_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "KEY_SEQ", ScalarType::INTEGER, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "UPDATE_RULE", ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "DELETE_RULE", ScalarType::INTEGER, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "FK_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "PK_NAME", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "DEFERRABILITY", ScalarType::INTEGER, Nullability::NULLABLE));
 }
 
 ForeignKeysQuery::~ForeignKeysQuery() {
@@ -74,24 +74,18 @@ ForeignKeysQuery::~ForeignKeysQuery() {
 }
 
 SqlResult::Type ForeignKeysQuery::Execute() {
-  diag.AddStatusRecord(
-      SqlState::S01000_GENERAL_WARNING,
-      "SQLForeignKeys is not supported. Return empty result set.",
-      LogLevel::Type::WARNING_LEVEL);
+  diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
+                       "SQLForeignKeys is not supported. Return empty result set.",
+                       LogLevel::Type::WARNING_LEVEL);
 
   return SqlResult::AI_SUCCESS_WITH_INFO;
 }
 
-SqlResult::Type ForeignKeysQuery::Cancel() {
-  return SqlResult::AI_SUCCESS;
-}
+SqlResult::Type ForeignKeysQuery::Cancel() { return SqlResult::AI_SUCCESS; }
 
-const meta::ColumnMetaVector* ForeignKeysQuery::GetMeta() {
-  return &columnsMeta;
-}
+const meta::ColumnMetaVector* ForeignKeysQuery::GetMeta() { return &columnsMeta; }
 
-SqlResult::Type ForeignKeysQuery::FetchNextRow(
-    app::ColumnBindingMap& columnBindings) {
+SqlResult::Type ForeignKeysQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
   diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
                        "SQLForeignKeys is not supported. No data is returned.",
                        LogLevel::Type::WARNING_LEVEL);
@@ -99,8 +93,8 @@ SqlResult::Type ForeignKeysQuery::FetchNextRow(
   return SqlResult::AI_NO_DATA;
 }
 
-SqlResult::Type ForeignKeysQuery::GetColumn(
-    uint16_t columnIdx, app::ApplicationDataBuffer& buffer) {
+SqlResult::Type ForeignKeysQuery::GetColumn(uint16_t columnIdx,
+                                            app::ApplicationDataBuffer& buffer) {
   diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
                        "SQLForeignKeys is not supported. No data is returned.",
                        LogLevel::Type::WARNING_LEVEL);
@@ -108,20 +102,12 @@ SqlResult::Type ForeignKeysQuery::GetColumn(
   return SqlResult::AI_NO_DATA;
 }
 
-SqlResult::Type ForeignKeysQuery::Close() {
-  return SqlResult::AI_SUCCESS;
-}
+SqlResult::Type ForeignKeysQuery::Close() { return SqlResult::AI_SUCCESS; }
 
-bool ForeignKeysQuery::DataAvailable() const {
-  return false;
-}
-int64_t ForeignKeysQuery::AffectedRows() const {
-  return 0;
-}
+bool ForeignKeysQuery::DataAvailable() const { return false; }
+int64_t ForeignKeysQuery::AffectedRows() const { return 0; }
 
-SqlResult::Type ForeignKeysQuery::NextResultSet() {
-  return SqlResult::AI_NO_DATA;
-}
+SqlResult::Type ForeignKeysQuery::NextResultSet() { return SqlResult::AI_NO_DATA; }
 }  // namespace query
 }  // namespace odbc
 }  // namespace timestream

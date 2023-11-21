@@ -48,8 +48,7 @@ class IGNITE_IMPORT_EXPORT IntervalDaySecond {
    * @param sec Number of seconds
    * @param ns Number of nanoseconds
    */
-  IntervalDaySecond(int32_t day, int32_t hour, int32_t min, int32_t sec,
-                    int32_t ns);
+  IntervalDaySecond(int32_t day, int32_t hour, int32_t min, int32_t sec, int32_t ns);
 
   /**
    * Copy operator.
@@ -64,45 +63,35 @@ class IGNITE_IMPORT_EXPORT IntervalDaySecond {
    *
    * @return Number of days
    */
-  int32_t GetDay() const {
-    return day_;
-  }
+  int32_t GetDay() const { return day_; }
 
   /**
    * Returns number of hours
    *
    * @return Number of hours
    */
-  int32_t GetHour() const {
-    return hour_;
-  }
+  int32_t GetHour() const { return hour_; }
 
   /**
    * Returns number of minutes
    *
    * @return Number of minutes
    */
-  int32_t GetMinute() const {
-    return minute_;
-  }
+  int32_t GetMinute() const { return minute_; }
 
   /**
    * Returns number of seconds
    *
    * @return Number of seconds
    */
-  int32_t GetSecond() const {
-    return second_;
-  }
+  int32_t GetSecond() const { return second_; }
 
   /**
    * Returns number of nanoseconds
    *
    * @return Number of nanoseconds
    */
-  int32_t GetFraction() const {
-    return fractionNs_;
-  }
+  int32_t GetFraction() const { return fractionNs_; }
 
   /**
    * Convert the interval to number of seconds

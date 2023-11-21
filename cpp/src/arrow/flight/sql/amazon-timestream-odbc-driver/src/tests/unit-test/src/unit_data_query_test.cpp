@@ -16,11 +16,11 @@
 
 #include <string>
 
+#include <ignite/common/include/common/platform_utils.h>
 #include <odbc_unit_test_suite.h>
+#include <timestream/odbc/authentication/auth_type.h>
 #include "timestream/odbc/log.h"
 #include "timestream/odbc/log_level.h"
-#include <ignite/common/include/common/platform_utils.h>
-#include <timestream/odbc/authentication/auth_type.h>
 #include "timestream/odbc/statement.h"
 #include "timestream/odbc/utility.h"
 
@@ -36,9 +36,7 @@ using namespace boost::unit_test;
  * Test setup fixture.
  */
 struct DataQueryUnitTestSuiteFixture : OdbcUnitTestSuite {
-  DataQueryUnitTestSuiteFixture() : OdbcUnitTestSuite() {
-    stmt = dbc->CreateStatement();
-  }
+  DataQueryUnitTestSuiteFixture() : OdbcUnitTestSuite() { stmt = dbc->CreateStatement(); }
 
   /**
    * Destructor.

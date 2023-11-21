@@ -38,20 +38,20 @@ TablePrivilegesQuery::TablePrivilegesQuery(diagnostic::DiagnosableAdapter& diag)
   const std::string sch("");
   const std::string tbl("");
 
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_CAT", ScalarType::VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_SCHEM", ScalarType::VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "TABLE_NAME", ScalarType::VARCHAR,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "GRANTOR", ScalarType::VARCHAR,
-                                   Nullability::NULLABLE));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "GRANTEE", ScalarType::VARCHAR,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "PRIVILEGE", ScalarType::VARCHAR,
-                                   Nullability::NO_NULL));
-  columnsMeta.push_back(ColumnMeta(sch, tbl, "IS_GRANTABLE",
-                                   ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "TABLE_CAT", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "TABLE_SCHEM", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "TABLE_NAME", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "GRANTOR", ScalarType::VARCHAR, Nullability::NULLABLE));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "GRANTEE", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "PRIVILEGE", ScalarType::VARCHAR, Nullability::NO_NULL));
+  columnsMeta.push_back(
+      ColumnMeta(sch, tbl, "IS_GRANTABLE", ScalarType::VARCHAR, Nullability::NULLABLE));
 }
 
 TablePrivilegesQuery::~TablePrivilegesQuery() {
@@ -59,57 +59,42 @@ TablePrivilegesQuery::~TablePrivilegesQuery() {
 }
 
 SqlResult::Type TablePrivilegesQuery::Execute() {
-  diag.AddStatusRecord(
-      SqlState::S01000_GENERAL_WARNING,
-      "SQLTablePrivileges is not supported. Return empty result set.",
-      LogLevel::Type::WARNING_LEVEL);
+  diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
+                       "SQLTablePrivileges is not supported. Return empty result set.",
+                       LogLevel::Type::WARNING_LEVEL);
 
   return SqlResult::AI_SUCCESS_WITH_INFO;
 }
 
-SqlResult::Type TablePrivilegesQuery::Cancel() {
-  return SqlResult::AI_SUCCESS;
-}
+SqlResult::Type TablePrivilegesQuery::Cancel() { return SqlResult::AI_SUCCESS; }
 
-const meta::ColumnMetaVector* TablePrivilegesQuery::GetMeta() {
-  return &columnsMeta;
-}
+const meta::ColumnMetaVector* TablePrivilegesQuery::GetMeta() { return &columnsMeta; }
 
 SqlResult::Type TablePrivilegesQuery::FetchNextRow(
     app::ColumnBindingMap& columnBindings) {
-  diag.AddStatusRecord(
-      SqlState::S01000_GENERAL_WARNING,
-      "SQLTablePrivileges is not supported. No data is returned.",
-      LogLevel::Type::WARNING_LEVEL);
+  diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
+                       "SQLTablePrivileges is not supported. No data is returned.",
+                       LogLevel::Type::WARNING_LEVEL);
 
   return SqlResult::AI_NO_DATA;
 }
 
-SqlResult::Type TablePrivilegesQuery::GetColumn(
-    uint16_t columnIdx, app::ApplicationDataBuffer& buffer) {
-  diag.AddStatusRecord(
-      SqlState::S01000_GENERAL_WARNING,
-      "SQLTablePrivileges is not supported. No data is returned.",
-      LogLevel::Type::WARNING_LEVEL);
+SqlResult::Type TablePrivilegesQuery::GetColumn(uint16_t columnIdx,
+                                                app::ApplicationDataBuffer& buffer) {
+  diag.AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
+                       "SQLTablePrivileges is not supported. No data is returned.",
+                       LogLevel::Type::WARNING_LEVEL);
 
   return SqlResult::AI_NO_DATA;
 }
 
-SqlResult::Type TablePrivilegesQuery::Close() {
-  return SqlResult::AI_SUCCESS;
-}
+SqlResult::Type TablePrivilegesQuery::Close() { return SqlResult::AI_SUCCESS; }
 
-bool TablePrivilegesQuery::DataAvailable() const {
-  return false;
-}
+bool TablePrivilegesQuery::DataAvailable() const { return false; }
 
-int64_t TablePrivilegesQuery::AffectedRows() const {
-  return 0;
-}
+int64_t TablePrivilegesQuery::AffectedRows() const { return 0; }
 
-SqlResult::Type TablePrivilegesQuery::NextResultSet() {
-  return SqlResult::AI_NO_DATA;
-}
+SqlResult::Type TablePrivilegesQuery::NextResultSet() { return SqlResult::AI_NO_DATA; }
 }  // namespace query
 }  // namespace odbc
 }  // namespace timestream

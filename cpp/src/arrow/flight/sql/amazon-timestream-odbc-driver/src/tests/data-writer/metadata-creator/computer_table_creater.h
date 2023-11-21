@@ -17,8 +17,8 @@
 #ifndef _IGNITE_ODBC_COMPUTER_TABLE_CREATER
 #define _IGNITE_ODBC_COMPUTER_TABLE_CREATER
 
-#include "measure_metadata_creater.h"
 #include <aws/timestream-write/model/MeasureValueType.h>
+#include "measure_metadata_creater.h"
 
 using Aws::TimestreamWrite::Model::MeasureValueType;
 
@@ -31,7 +31,7 @@ class ComputerTableCreater : public MeasureMetadataCreater {
 
   virtual ~ComputerTableCreater() = default;
 
-  virtual void CreateDimensions(Aws::Vector< Dimension >& dimensions) {
+  virtual void CreateDimensions(Aws::Vector<Dimension>& dimensions) {
     Dimension region;
     region.WithName("region").WithValue("us-east-1");
 
@@ -46,8 +46,8 @@ class ComputerTableCreater : public MeasureMetadataCreater {
     dimensions.push_back(hostname);
   }
 
-  virtual void CreateRecords(Aws::Vector< Dimension >& dimensions,
-                             Aws::Vector< Record >& values) {
+  virtual void CreateRecords(Aws::Vector<Dimension>& dimensions,
+                             Aws::Vector<Record>& values) {
     Record index;
     index.WithDimensions(dimensions)
         .WithMeasureName("index")
@@ -68,40 +68,35 @@ class ComputerTableCreater : public MeasureMetadataCreater {
     values.push_back(memoryUtilization);
   }
 
-  virtual void CreateMeasureValues(Aws::Vector< MeasureValue >& values) {
+  virtual void CreateMeasureValues(Aws::Vector<MeasureValue>& values) {
     MeasureValue index;
     index.WithName("index").WithType(MeasureValueType::BIGINT);
 
     MeasureValue cpuUtilization;
-    cpuUtilization.WithName("cpu_utilization")
-        .WithType(MeasureValueType::DOUBLE);
+    cpuUtilization.WithName("cpu_utilization").WithType(MeasureValueType::DOUBLE);
 
     MeasureValue memoryUtilization;
-    memoryUtilization.WithName("memory_utilization")
-        .WithType(MeasureValueType::DOUBLE);
+    memoryUtilization.WithName("memory_utilization").WithType(MeasureValueType::DOUBLE);
 
     values.push_back(index);
     values.push_back(cpuUtilization);
     values.push_back(memoryUtilization);
   }
 
-  virtual const char* GetMetricName() {
-    return "computer_metrics";
-  }
+  virtual const char* GetMetricName() { return "computer_metrics"; }
 
   static double fRand(double fMin, double fMax) {
     double f = (double)rand() / RAND_MAX;
     return fMin + f * (fMax - fMin);
   }
 
-  static void AssignMeasureValues(Aws::Vector< MeasureValue >& values,
-                                  int index) {
+  static void AssignMeasureValues(Aws::Vector<MeasureValue>& values, int index) {
     values[0].WithValue(std::to_string(index));
     values[1].WithValue(std::to_string(fRand(0, 100)));
     values[2].WithValue(std::to_string(rand() % 1024));
   }
 
-  static void AssignRecordValues(Aws::Vector< Record >& values, int index) {
+  static void AssignRecordValues(Aws::Vector<Record>& values, int index) {
     values[0].WithMeasureValue(std::to_string(index));
     values[1].WithMeasureValue(std::to_string(fRand(0, 100)));
     values[2].WithMeasureValue(std::to_string(rand() % 1024));

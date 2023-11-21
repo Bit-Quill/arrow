@@ -121,8 +121,7 @@ class Query {
    * @return Operation result.
    */
   virtual SqlResult::Type GetColumn(
-      uint16_t columnIdx,
-      timestream::odbc::app::ApplicationDataBuffer& buffer) = 0;
+      uint16_t columnIdx, timestream::odbc::app::ApplicationDataBuffer& buffer) = 0;
 
   /**
    * Close query.
@@ -160,9 +159,7 @@ class Query {
    *
    * @return Row number of the row that the cursor points at.
    */
-  virtual int64_t RowNumber() const {
-    return 0;
-  }
+  virtual int64_t RowNumber() const { return 0; }
 
   /**
    * Move to the next result set.
@@ -176,16 +173,13 @@ class Query {
    *
    * @return Query type.
    */
-  QueryType::Type GetType() const {
-    return type;
-  }
+  QueryType::Type GetType() const { return type; }
 
  protected:
   /**
    * Constructor.
    */
-  Query(timestream::odbc::diagnostic::DiagnosableAdapter& diag,
-        QueryType::Type type)
+  Query(timestream::odbc::diagnostic::DiagnosableAdapter& diag, QueryType::Type type)
       : diag(diag), type(type) {
     // No-op.
   }

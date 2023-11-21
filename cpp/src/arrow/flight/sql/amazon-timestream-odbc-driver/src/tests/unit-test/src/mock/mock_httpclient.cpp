@@ -14,9 +14,9 @@
  *
  */
 
-#include <mock/mock_httpclient.h>
 #include <aws/core/http/standard/StandardHttpResponse.h>
 #include <aws/core/utils/json/JsonSerializer.h>
+#include <mock/mock_httpclient.h>
 
 #include <regex>
 
@@ -25,12 +25,12 @@ using namespace Aws::Http::Standard;
 namespace timestream {
 namespace odbc {
 
-std::shared_ptr< HttpResponse > MockHttpClient::MakeRequest(
-    const std::shared_ptr< HttpRequest >& request,
+std::shared_ptr<HttpResponse> MockHttpClient::MakeRequest(
+    const std::shared_ptr<HttpRequest>& request,
     Aws::Utils::RateLimits::RateLimiterInterface* readLimiter,
     Aws::Utils::RateLimits::RateLimiterInterface* writeLimiter) const {
-  std::shared_ptr< HttpResponse > response =
-      std::make_shared< StandardHttpResponse >(request);
+  std::shared_ptr<HttpResponse> response =
+      std::make_shared<StandardHttpResponse>(request);
 
   Aws::String path = request->GetUri().GetPath();
   std::smatch matches;
@@ -50,16 +50,14 @@ std::shared_ptr< HttpResponse > MockHttpClient::MakeRequest(
 }
 
 void MockHttpClient::HandleSessionTokenRequest(
-    const std::shared_ptr< HttpRequest >& request,
-    std::shared_ptr< HttpResponse >& response) const {
-  std::string body(
-      std::istreambuf_iterator< char >(*(request->GetContentBody())), {});
+    const std::shared_ptr<HttpRequest>& request,
+    std::shared_ptr<HttpResponse>& response) const {
+  std::string body(std::istreambuf_iterator<char>(*(request->GetContentBody())), {});
 
   std::smatch matches;
   std::string user("");
-  if (std::regex_search(
-          body, matches,
-          std::regex(std::string(R"#("username":\t"(.*?)",)#")))) {
+  if (std::regex_search(body, matches,
+                        std::regex(std::string(R"#("username":\t"(.*?)",)#")))) {
     user = matches.str(1);
   }
 
@@ -73,8 +71,7 @@ void MockHttpClient::HandleSessionTokenRequest(
     // fail to get session token
     response->SetResponseCode(Aws::Http::HttpResponseCode::UNAUTHORIZED);
 
-    response->SetClientErrorType(
-        Aws::Client::CoreErrors::INVALID_ACCESS_KEY_ID);
+    response->SetClientErrorType(Aws::Client::CoreErrors::INVALID_ACCESS_KEY_ID);
     response->SetClientErrorMessage("Invalid access key id");
   } else if (user == "okta_invalid_rsp_body") {
     // session token response body is broken
@@ -85,8 +82,7 @@ void MockHttpClient::HandleSessionTokenRequest(
     // no session token in the response body
     response->SetResponseCode(Aws::Http::HttpResponseCode::OK);
 
-    response->GetResponseBody()
-        << "{\"notSessionToken\" : \"1234567890abcdefg\"}";
+    response->GetResponseBody() << "{\"notSessionToken\" : \"1234567890abcdefg\"}";
   } else if (user == "okta_empty_session_token") {
     // empty session token in the response body
     response->SetResponseCode(Aws::Http::HttpResponseCode::OK);
@@ -99,15 +95,13 @@ void MockHttpClient::HandleSessionTokenRequest(
 }
 
 void MockHttpClient::HandleAADAccessTokenRequest(
-    const std::shared_ptr< HttpRequest >& request,
-    std::shared_ptr< HttpResponse >& response) const {
-  std::string body(
-      std::istreambuf_iterator< char >(*(request->GetContentBody())), {});
+    const std::shared_ptr<HttpRequest>& request,
+    std::shared_ptr<HttpResponse>& response) const {
+  std::string body(std::istreambuf_iterator<char>(*(request->GetContentBody())), {});
 
   std::smatch matches;
   std::string user("");
-  if (std::regex_search(body, matches,
-                        std::regex(std::string("username=\\s*(\\w*)")))) {
+  if (std::regex_search(body, matches, std::regex(std::string("username=\\s*(\\w*)")))) {
     user = matches.str(1);
   }
 
@@ -115,8 +109,7 @@ void MockHttpClient::HandleAADAccessTokenRequest(
   if (user == "aad_valid_user") {
     response->SetResponseCode(Aws::Http::HttpResponseCode::OK);
 
-    response->GetResponseBody()
-        << "{\"access_token\" : \"correctAccessToken\"}";
+    response->GetResponseBody() << "{\"access_token\" : \"correctAccessToken\"}";
   } else if (user == "aad_wrong_access_token") {
     response->SetResponseCode(Aws::Http::HttpResponseCode::OK);
 
@@ -136,8 +129,7 @@ void MockHttpClient::HandleAADAccessTokenRequest(
   } else if (user == "aad_no_access_token") {
     response->SetResponseCode(Aws::Http::HttpResponseCode::OK);
 
-    response->GetResponseBody()
-        << "{\"no_access_token\" : \"1234567890abcdefg\"}";
+    response->GetResponseBody() << "{\"no_access_token\" : \"1234567890abcdefg\"}";
   } else if (user == "aad_empty_access_token") {
     response->SetResponseCode(Aws::Http::HttpResponseCode::OK);
 
@@ -145,9 +137,9 @@ void MockHttpClient::HandleAADAccessTokenRequest(
   }
 }
 
-void MockHttpClient::HandleSAMLAssertion(
-    const Aws::String& path, const std::shared_ptr< HttpRequest >& request,
-    std::shared_ptr< HttpResponse >& response) const {
+void MockHttpClient::HandleSAMLAssertion(const Aws::String& path,
+                                         const std::shared_ptr<HttpRequest>& request,
+                                         std::shared_ptr<HttpResponse>& response) const {
   std::smatch matches;
 
   // The response is determined by application id in the path.
@@ -161,13 +153,11 @@ void MockHttpClient::HandleSAMLAssertion(
         "value=\"TUw6Mi4wOmF0dHJuYW1lLWZvcm1hdDpiYXNpYyI&#x2b;"
         "aGVtYS1pbnN0YW5jZSIgeHNpOnR5cGU9InhzOnN0cmluZyI&#x2b;\"/>";
     response->GetResponseBody() << samlResponse;
-  } else if (std::regex_search(path, matches,
-                               std::regex("okta_error_app_id"))) {
+  } else if (std::regex_search(path, matches, std::regex("okta_error_app_id"))) {
     // Respond with failure
     response->SetResponseCode(Aws::Http::HttpResponseCode::BAD_REQUEST);
 
-    response->SetClientErrorType(
-        Aws::Client::CoreErrors::INVALID_QUERY_PARAMETER);
+    response->SetClientErrorType(Aws::Client::CoreErrors::INVALID_QUERY_PARAMETER);
     response->SetClientErrorMessage("Invalid query parameter");
   } else if (std::regex_search(path, matches,
                                std::regex("okta_no_saml_response_app_id"))) {

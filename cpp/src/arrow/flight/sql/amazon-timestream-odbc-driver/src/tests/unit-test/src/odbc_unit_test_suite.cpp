@@ -13,11 +13,11 @@
  * permissions and limitations under the License.
  *
  */
-#include <fstream>
 #include <odbc_unit_test_suite.h>
+#include <fstream>
 
-#include <mock/mock_environment.h>
 #include <mock/mock_connection.h>
+#include <mock/mock_environment.h>
 
 using namespace boost::unit_test;
 
@@ -29,9 +29,7 @@ struct OdbcUnitTestConfig {
     unit_test_log.set_stream(test_log);
     unit_test_log.set_format(OF_JUNIT);
   }
-  ~OdbcUnitTestConfig() {
-    unit_test_log.set_stream(std::cout);
-  }
+  ~OdbcUnitTestConfig() { unit_test_log.set_stream(std::cout); }
 
   std::ofstream test_log;
 };
@@ -42,7 +40,7 @@ namespace timestream {
 namespace odbc {
 OdbcUnitTestSuite::OdbcUnitTestSuite()
     : env(new MockEnvironment()), dbc(nullptr), stmt(nullptr) {
-  dbc = static_cast< MockConnection* >(env->CreateConnection());
+  dbc = static_cast<MockConnection*>(env->CreateConnection());
 
   // MockTimestreamService is singleton
   MockTimestreamService::CreateMockTimestreamService();

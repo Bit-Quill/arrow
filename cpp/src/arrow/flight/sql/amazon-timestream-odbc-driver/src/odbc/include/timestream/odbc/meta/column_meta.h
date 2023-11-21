@@ -27,10 +27,10 @@
 #include <boost/optional/optional_io.hpp>
 #include <string>
 
+#include "timestream/odbc/app/application_data_buffer.h"
 #include "timestream/odbc/common_types.h"
 #include "timestream/odbc/log.h"
 #include "timestream/odbc/utility.h"
-#include "timestream/odbc/app/application_data_buffer.h"
 
 #include <aws/core/utils/memory/stl/AWSVector.h>
 #include <aws/timestream-query/model/ColumnInfo.h>
@@ -60,7 +60,7 @@ struct Nullability {
    * @param nullability Nullability.
    * @return SQL constant.
    */
-  static SqlLen ToSql(boost::optional< int32_t > nullability);
+  static SqlLen ToSql(boost::optional<int32_t> nullability);
 };
 
 using namespace timestream::odbc;
@@ -97,10 +97,10 @@ class IGNITE_IMPORT_EXPORT ColumnMeta {
    * @param tableName Table name.
    */
   ColumnMeta(const std::string& databaseName,
-             const boost::optional< std::string >& tableName)
+             const boost::optional<std::string>& tableName)
       : tableName(tableName),
         columnName(""),
-        dataType(static_cast< int16_t >(ScalarType::NOT_SET)),
+        dataType(static_cast<int16_t>(ScalarType::NOT_SET)),
         isAutoIncrement("NO"),
         precision(-1),
         decimalDigits(-1),
@@ -127,7 +127,7 @@ class IGNITE_IMPORT_EXPORT ColumnMeta {
              Nullability::Type nullability)
       : tableName(tableName),
         columnName(columnName),
-        dataType(static_cast< int16_t >(scalarType)),
+        dataType(static_cast<int16_t>(scalarType)),
         isAutoIncrement("NO"),
         precision(-1),
         decimalDigits(-1),
@@ -222,8 +222,7 @@ class IGNITE_IMPORT_EXPORT ColumnMeta {
    * @param columnBindings the map containing the data to be read.
    * @param position the ordinal position of the column.
    */
-  void Read(timestream::odbc::app::ColumnBindingMap& columnBindings,
-            int32_t position);
+  void Read(timestream::odbc::app::ColumnBindingMap& columnBindings, int32_t position);
 
   /**
    * Read using reader.
@@ -235,8 +234,7 @@ class IGNITE_IMPORT_EXPORT ColumnMeta {
    * Get Aws ColumnInfo.
    * @return Aws ColumnInfo.
    */
-  const boost::optional< Aws::TimestreamQuery::Model::ColumnInfo >&
-  GetColumnInfo() const {
+  const boost::optional<Aws::TimestreamQuery::Model::ColumnInfo>& GetColumnInfo() const {
     return columnInfo;
   }
 
@@ -244,65 +242,49 @@ class IGNITE_IMPORT_EXPORT ColumnMeta {
    * Get catalog name.
    * @return Catalog name.
    */
-  const boost::optional< std::string >& GetCatalogName() const {
-    return catalogName;
-  }
+  const boost::optional<std::string>& GetCatalogName() const { return catalogName; }
 
   /**
    * Get schema name.
    * @return Schema name.
    */
-  const boost::optional< std::string >& GetSchemaName() const {
-    return schemaName;
-  }
+  const boost::optional<std::string>& GetSchemaName() const { return schemaName; }
 
   /**
    * Get table name.
    * @return Table name.
    */
-  const boost::optional< std::string >& GetTableName() const {
-    return tableName;
-  }
+  const boost::optional<std::string>& GetTableName() const { return tableName; }
 
   /**
    * Get column name.
    * @return Column name.
    */
-  const boost::optional< std::string >& GetColumnName() const {
-    return columnName;
-  }
+  const boost::optional<std::string>& GetColumnName() const { return columnName; }
 
   /**
    * Get the remarks.
    * @return Remarks.
    */
-  const boost::optional< std::string >& GetRemarks() const {
-    return remarks;
-  }
+  const boost::optional<std::string>& GetRemarks() const { return remarks; }
 
   /**
    * Get the column default value.
    * @return Column default value.
    */
-  const boost::optional< std::string >& GetColumnDef() const {
-    return columnDef;
-  }
+  const boost::optional<std::string>& GetColumnDef() const { return columnDef; }
 
   /**
    * Get the column is auto increment.
    * @return Column is auto increment.
    */
-  const std::string GetIsAutoIncrement() const {
-    return isAutoIncrement;
-  }
+  const std::string GetIsAutoIncrement() const { return isAutoIncrement; }
 
   /**
    * Get data type.
    * @return Data type.
    */
-  boost::optional< int16_t > GetDataType() const {
-    return dataType;
-  }
+  boost::optional<int16_t> GetDataType() const { return dataType; }
 
   /**
    * Get data type.
@@ -314,48 +296,38 @@ class IGNITE_IMPORT_EXPORT ColumnMeta {
       return ScalarType::NOT_SET;
     }
 
-    return static_cast< ScalarType >(*dataType);
+    return static_cast<ScalarType>(*dataType);
   }
 
   /**
    * Get column precision.
    * @return Column precision.
    */
-  boost::optional< int32_t > GetPrecision() const {
-    return precision;
-  }
+  boost::optional<int32_t> GetPrecision() const { return precision; }
 
   /**
    * Get column decimal digits.
    * @return Column decimal digits.
    */
-  boost::optional< int32_t > GetDecimalDigits() const {
-    return decimalDigits;
-  }
+  boost::optional<int32_t> GetDecimalDigits() const { return decimalDigits; }
 
   /**
    * Get column scale.
    * @return Column scale.
    */
-  boost::optional< int32_t > GetScale() const {
-    return scale;
-  }
+  boost::optional<int32_t> GetScale() const { return scale; }
 
   /**
    * Get column nullability.
    * @return Column nullability.
    */
-  boost::optional< int32_t > GetNullability() const {
-    return nullability;
-  }
+  boost::optional<int32_t> GetNullability() const { return nullability; }
 
   /**
    * Get column ordinal position.
    * @return Column ordinal position.
    */
-  boost::optional< int32_t > GetOrdinalPosition() const {
-    return ordinalPosition;
-  }
+  boost::optional<int32_t> GetOrdinalPosition() const { return ordinalPosition; }
 
   /**
    * Try to get attribute of a string type.
@@ -385,51 +357,51 @@ class IGNITE_IMPORT_EXPORT ColumnMeta {
   ScalarType GetScalarDataType(const std::string& dataType);
 
   /** Aws columnInfo. */
-  boost::optional< Aws::TimestreamQuery::Model::ColumnInfo > columnInfo;
+  boost::optional<Aws::TimestreamQuery::Model::ColumnInfo> columnInfo;
 
   /** Catalog name. */
-  boost::optional< std::string > catalogName;
+  boost::optional<std::string> catalogName;
 
   /** Schema name. */
-  boost::optional< std::string > schemaName;
+  boost::optional<std::string> schemaName;
 
   /** Table name. */
-  boost::optional< std::string > tableName;
+  boost::optional<std::string> tableName;
 
   /** Column name. */
-  boost::optional< std::string > columnName;
+  boost::optional<std::string> columnName;
 
   /** Remarks */
-  boost::optional< std::string > remarks;
+  boost::optional<std::string> remarks;
 
   /** Column default value */
-  boost::optional< std::string > columnDef;
+  boost::optional<std::string> columnDef;
 
   /** Column is auto incremented */
   // Timestream columns are not auto increment
   std::string isAutoIncrement;
 
   /** Data type. */
-  boost::optional< int16_t > dataType;
+  boost::optional<int16_t> dataType;
 
   /** Column precision. */
-  boost::optional< int32_t > precision;
+  boost::optional<int32_t> precision;
 
   /** Column decimal digits. */
-  boost::optional< int32_t > decimalDigits;
+  boost::optional<int32_t> decimalDigits;
 
   /** Column scale. */
-  boost::optional< int32_t > scale;
+  boost::optional<int32_t> scale;
 
   /** Column nullability. */
-  boost::optional< int32_t > nullability;
+  boost::optional<int32_t> nullability;
 
   /** Column ordinal position. */
-  boost::optional< int32_t > ordinalPosition;
+  boost::optional<int32_t> ordinalPosition;
 };
 
 /** Column metadata vector alias. */
-typedef std::vector< ColumnMeta > ColumnMetaVector;
+typedef std::vector<ColumnMeta> ColumnMetaVector;
 }  // namespace meta
 }  // namespace odbc
 }  // namespace timestream

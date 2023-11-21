@@ -78,9 +78,7 @@ class IGNITE_IMPORT_EXPORT Module {
    * @param name Name of the symbol to load.
    * @return Pointer to symbol if found and NULL otherwise.
    */
-  void* FindSymbol(const std::string& name) {
-    return FindSymbol(name.c_str());
-  }
+  void* FindSymbol(const std::string& name) { return FindSymbol(name.c_str()); }
 
   /**
    * Check if the instance is loaded.

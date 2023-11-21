@@ -55,8 +55,7 @@ class OdbcError {
    *
    * @param other Other instance.
    */
-  OdbcError(const OdbcError& other)
-      : status(other.status), errMessage(other.errMessage) {
+  OdbcError(const OdbcError& other) : status(other.status), errMessage(other.errMessage) {
     // No-op.
   }
 
@@ -71,17 +70,13 @@ class OdbcError {
    * Get status.
    * @return Status.
    */
-  SqlState::Type GetStatus() const {
-    return status;
-  }
+  SqlState::Type GetStatus() const { return status; }
 
   /**
    * Get error message.
    * @return Error message.
    */
-  const std::string& GetErrorMessage() const {
-    return errMessage;
-  }
+  const std::string& GetErrorMessage() const { return errMessage; }
 
  private:
   /** Status. */
@@ -91,19 +86,19 @@ class OdbcError {
   std::string errMessage;
 };
 
-typedef odbc::common::Unexpected< OdbcError > OdbcUnexpected;
+typedef odbc::common::Unexpected<OdbcError> OdbcUnexpected;
 
 /**
  * Expected specialization for OdbcError.
  */
-template < typename R >
-struct OdbcExpected : odbc::common::Expected< R, OdbcError > {
-  OdbcExpected(const R& res) : common::Expected< R, OdbcError >(res) {
+template <typename R>
+struct OdbcExpected : odbc::common::Expected<R, OdbcError> {
+  OdbcExpected(const R& res) : common::Expected<R, OdbcError>(res) {
     // No-op.
   }
 
   OdbcExpected(const OdbcError& err)
-      : common::Expected< R, OdbcError >(OdbcUnexpected(err)) {
+      : common::Expected<R, OdbcError>(OdbcUnexpected(err)) {
     // No-op.
   }
 };

@@ -213,7 +213,7 @@ class IGNITE_IMPORT_EXPORT DiagnosticRecordStorage {
   int32_t rowsAffected;
 
   /** Status records. */
-  std::vector< DiagnosticRecord > statusRecords;
+  std::vector<DiagnosticRecord> statusRecords;
 };
 }  // namespace diagnostic
 }  // namespace odbc

@@ -25,14 +25,14 @@
 
 #include <vector>
 
-#include "timestream/odbc/config/configuration.h"
-#include "timestream/odbc/config/connection_info.h"
-#include "timestream/odbc/diagnostic/diagnosable_adapter.h"
-#include "timestream/odbc/log.h"
-#include "timestream/odbc/ignite_error.h"
 #include "ignite/odbc/odbc_error.h"
 #include "timestream/odbc/authentication/saml.h"
+#include "timestream/odbc/config/configuration.h"
+#include "timestream/odbc/config/connection_info.h"
 #include "timestream/odbc/descriptor.h"
+#include "timestream/odbc/diagnostic/diagnosable_adapter.h"
+#include "timestream/odbc/ignite_error.h"
+#include "timestream/odbc/log.h"
 
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentials.h>
@@ -107,10 +107,9 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    * @param outQueryLen Actual or required length of the output buffer for the
    * native SQL NOT including the null terminating character.
    */
-  template < typename CharT >
-  inline void NativeSql(const CharT* inQuery, int64_t inQueryLen,
-                        CharT* outQueryBuffer, int64_t outQueryBufferLen,
-                        int64_t* outQueryLen) {
+  template <typename CharT>
+  inline void NativeSql(const CharT* inQuery, int64_t inQueryLen, CharT* outQueryBuffer,
+                        int64_t outQueryBufferLen, int64_t* outQueryLen) {
     IGNITE_ODBC_API_CALL(InternalNativeSql(inQuery, inQueryLen, outQueryBuffer,
                                            outQueryBufferLen, outQueryLen));
   }
@@ -147,8 +146,7 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    *
    * @return Shared Pointer to Timestream query client.
    */
-  std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
-  GetQueryClient() const;
+  std::shared_ptr<Aws::TimestreamQuery::TimestreamQueryClient> GetQueryClient() const;
 
   /**
    * Create statement associated with the connection.
@@ -180,9 +178,10 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    * @param columnNum Associated column number.
    * @return DiagnosticRecord associated with the instance.
    */
-  static diagnostic::DiagnosticRecord CreateStatusRecord(
-      SqlState::Type sqlState, const std::string& message, int32_t rowNum = 0,
-      int32_t columnNum = 0);
+  static diagnostic::DiagnosticRecord CreateStatusRecord(SqlState::Type sqlState,
+                                                         const std::string& message,
+                                                         int32_t rowNum = 0,
+                                                         int32_t columnNum = 0);
 
   /**
    * Get connection attribute.
@@ -192,8 +191,7 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    * @param bufLen Buffer length.
    * @param valueLen Resulting value length.
    */
-  void GetAttribute(int attr, void* buf, SQLINTEGER bufLen,
-                    SQLINTEGER* valueLen);
+  void GetAttribute(int attr, void* buf, SQLINTEGER bufLen, SQLINTEGER* valueLen);
 
   /**
    * Set connection attribute.
@@ -224,17 +222,14 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    *
    * @return metadataID_ value.
    */
-  bool GetMetadataID() {
-    return metadataID_;
-  }
+  bool GetMetadataID() { return metadataID_; }
 
   /**
    * Get TimestreamSAMLCredentialsProvider.
    *
    * @return samlCredProvider_ value.
    */
-  std::shared_ptr< TimestreamSAMLCredentialsProvider >
-  GetSAMLCredentialsProvider() {
+  std::shared_ptr<TimestreamSAMLCredentialsProvider> GetSAMLCredentialsProvider() {
     return samlCredProvider_;
   }
 
@@ -252,8 +247,7 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    *
    * @return awsLogLevel AWS Log Level, default is Warn.
    */
-  static Aws::Utils::Logging::LogLevel GetAWSLogLevelFromString(
-      std::string awsLogLvl);
+  static Aws::Utils::Logging::LogLevel GetAWSLogLevelFromString(std::string awsLogLvl);
 
   /**
    * Get cursor name for a statement
@@ -327,7 +321,7 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    * @param clientCfg AWS client configuration.
    * @return a shared_ptr to created TimestreamQueryClient object.
    */
-  virtual std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
+  virtual std::shared_ptr<Aws::TimestreamQuery::TimestreamQueryClient>
   CreateTSQueryClient(const Aws::Auth::AWSCredentials& credentials,
                       const Aws::Client::ClientConfiguration& clientCfg);
 
@@ -336,14 +330,14 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    *
    * @return a shared_ptr to created HttpClient object.
    */
-  virtual std::shared_ptr< Aws::Http::HttpClient > GetHttpClient();
+  virtual std::shared_ptr<Aws::Http::HttpClient> GetHttpClient();
 
   /**
    * Create Aws STSClient object.
    *
    * @return a shared_ptr to created STSClient object.
    */
-  virtual std::shared_ptr< Aws::STS::STSClient > GetStsClient();
+  virtual std::shared_ptr<Aws::STS::STSClient> GetStsClient();
 
   /**
    * Create statement associated with the connection.
@@ -365,8 +359,7 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    * @param parentWindow Parent window.
    * @return Operation result.
    */
-  SqlResult::Type InternalEstablish(const std::string& connectStr,
-                                    void* parentWindow);
+  SqlResult::Type InternalEstablish(const std::string& connectStr, void* parentWindow);
 
   /**
    * Establish connection to ODBC server.
@@ -400,8 +393,8 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    * @param reslen Result value length pointer.
    * @return Operation result.
    */
-  SqlResult::Type InternalGetInfo(config::ConnectionInfo::InfoType type,
-                                  void* buf, short buflen, short* reslen);
+  SqlResult::Type InternalGetInfo(config::ConnectionInfo::InfoType type, void* buf,
+                                  short buflen, short* reslen);
 
   /**
    * Gets the native SQL statement.
@@ -415,9 +408,8 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    * native SQL NOT including the null terminating character.
    * @return Operation result.
    */
-  template < typename CharT >
-  inline SqlResult::Type InternalNativeSql(const CharT* inQuery,
-                                           int64_t inQueryLen,
+  template <typename CharT>
+  inline SqlResult::Type InternalNativeSql(const CharT* inQuery, int64_t inQueryLen,
                                            CharT* outQueryBuffer,
                                            int64_t outQueryBufferLen,
                                            int64_t* outQueryLen) {
@@ -453,10 +445,9 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
           outQueryBuffer[actualBufferLen] = inQuery[actualBufferLen];
         }
       } else {
-        AddStatusRecord(
-            SqlState::SHY090_INVALID_STRING_OR_BUFFER_LENGTH,
-            "The argument TextLength1 was less than 0, but not equal to "
-            "SQL_NTS");
+        AddStatusRecord(SqlState::SHY090_INVALID_STRING_OR_BUFFER_LENGTH,
+                        "The argument TextLength1 was less than 0, but not equal to "
+                        "SQL_NTS");
         return SqlResult::AI_ERROR;
       }
       outQueryBuffer[actualBufferLen] = 0;
@@ -470,13 +461,11 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
       }
     }
 
-    if (outQueryLen)
-      *outQueryLen = actualBufferLen;
+    if (outQueryLen) *outQueryLen = actualBufferLen;
 
     if (isTruncated) {
-      AddStatusRecord(
-          SqlState::S01004_DATA_TRUNCATED,
-          "Buffer is too small for the data. Truncated from the right.");
+      AddStatusRecord(SqlState::S01004_DATA_TRUNCATED,
+                      "Buffer is too small for the data. Truncated from the right.");
       return SqlResult::AI_SUCCESS_WITH_INFO;
     }
 
@@ -505,8 +494,7 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    * @param valueLen Value length.
    * @return Operation result.
    */
-  SqlResult::Type InternalSetAttribute(int attr, void* value,
-                                       SQLINTEGER valueLen);
+  SqlResult::Type InternalSetAttribute(int attr, void* value, SQLINTEGER valueLen);
 
   /**
    * Set a statement attribute
@@ -536,8 +524,7 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    * @param value  Option value to be returned
    * @return Operation result.
    */
-  SqlResult::Type InternalGetConnectOption(SQLUSMALLINT option,
-                                           SQLPOINTER value);
+  SqlResult::Type InternalGetConnectOption(SQLUSMALLINT option, SQLPOINTER value);
 
   /**
    * Create a descriptor.
@@ -557,8 +544,7 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
    * @param valueBuf Value array or value.
    * @return Operation result.
    */
-  SqlResult::Type InternalGetFunctions(SQLUSMALLINT funcId,
-                                       SQLUSMALLINT* valueBuf);
+  SqlResult::Type InternalGetFunctions(SQLUSMALLINT funcId, SQLUSMALLINT* valueBuf);
   /**
    * Set ODBC3 function support array for SQL_API_ODBC3_ALL_FUNCTIONS.
    *
@@ -609,10 +595,10 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
   config::ConnectionInfo info_;
 
   /** Timestream query client. */
-  std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient > queryClient_;
+  std::shared_ptr<Aws::TimestreamQuery::TimestreamQueryClient> queryClient_;
 
   /** SAML credentials provider */
-  std::shared_ptr< TimestreamSAMLCredentialsProvider > samlCredProvider_;
+  std::shared_ptr<TimestreamSAMLCredentialsProvider> samlCredProvider_;
 
   /** Aws SDK options. */
   Aws::SDKOptions options_;
@@ -624,16 +610,16 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
   static bool awsSDKReady_;
 
   /** This class object count */
-  static std::atomic< int > refCount_;
+  static std::atomic<int> refCount_;
 
   /** mutex for cursor names update */
   std::mutex cursorNameMutex_;
 
   /** cursor name set */
-  std::set< std::string > cursorNames_;
+  std::set<std::string> cursorNames_;
 
   /** map for statement and cursor name mapping */
-  std::map< const Statement*, std::string > cursorNameMap_;
+  std::map<const Statement*, std::string> cursorNameMap_;
 
   /** statement attributes struct */
   StatementAttributes stmtAttr_;

@@ -20,17 +20,17 @@
 
 #include "timestream/odbc/diagnostic/diagnosable_adapter.h"
 
+#include "ignite/odbc/odbc_error.h"
 #include "timestream/odbc/connection.h"
 #include "timestream/odbc/log.h"
-#include "ignite/odbc/odbc_error.h"
 
 namespace timestream {
 namespace odbc {
 namespace diagnostic {
-void DiagnosableAdapter::AddStatusRecord(
-    SqlState::Type sqlState, const std::string& message,
-    timestream::odbc::LogLevel::Type logLevel, int32_t rowNum,
-    int32_t columnNum) {
+void DiagnosableAdapter::AddStatusRecord(SqlState::Type sqlState,
+                                         const std::string& message,
+                                         timestream::odbc::LogLevel::Type logLevel,
+                                         int32_t rowNum, int32_t columnNum) {
   WRITE_LOG_MSG("Adding new record: " << message << ", rowNum: " << rowNum
                                       << ", columnNum: " << columnNum,
                 logLevel);
@@ -44,9 +44,9 @@ void DiagnosableAdapter::AddStatusRecord(
   }
 }
 
-void DiagnosableAdapter::AddStatusRecord(
-    SqlState::Type sqlState, const std::string& message,
-    timestream::odbc::LogLevel::Type logLevel) {
+void DiagnosableAdapter::AddStatusRecord(SqlState::Type sqlState,
+                                         const std::string& message,
+                                         timestream::odbc::LogLevel::Type logLevel) {
   AddStatusRecord(sqlState, message, logLevel, 0, 0);
 }
 

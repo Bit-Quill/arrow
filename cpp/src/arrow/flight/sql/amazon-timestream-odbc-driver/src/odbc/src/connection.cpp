@@ -27,7 +27,6 @@
 #include <cstring>
 #include <sstream>
 
-#include "timestream/odbc/utils.h"
 #include "timestream/odbc/config/configuration.h"
 #include "timestream/odbc/config/connection_string_parser.h"
 #include "timestream/odbc/dsn_config.h"
@@ -36,15 +35,16 @@
 #include "timestream/odbc/statement.h"
 #include "timestream/odbc/system/system_dsn.h"
 #include "timestream/odbc/utility.h"
+#include "timestream/odbc/utils.h"
 
 #include "timestream/odbc/authentication/aad.h"
 #include "timestream/odbc/authentication/okta.h"
 
-#include <aws/timestream-query/model/QueryRequest.h>
-#include <aws/timestream-query/model/QueryResult.h>
-#include <aws/core/utils/logging/LogLevel.h>
 #include <aws/core/auth/AWSCredentialsProvider.h>
 #include <aws/core/client/DefaultRetryStrategy.h>
+#include <aws/core/utils/logging/LogLevel.h>
+#include <aws/timestream-query/model/QueryRequest.h>
+#include <aws/timestream-query/model/QueryResult.h>
 
 using namespace timestream::odbc;
 using namespace ignite::odbc::common;
@@ -55,10 +55,9 @@ namespace odbc {
 
 std::mutex Connection::mutex_;
 bool Connection::awsSDKReady_ = false;
-std::atomic< int > Connection::refCount_(0);
+std::atomic<int> Connection::refCount_(0);
 
-Connection::Connection(Environment* env)
-    : env_(env), info_(config_), metadataID_(false) {
+Connection::Connection(Environment* env) : env_(env), info_(config_), metadataID_(false) {
   LOG_DEBUG_MSG("Connection is called");
   // The AWS SDK for C++ must be initialized by calling Aws::InitAPI.
   // It should only be initialized only once during the application running
@@ -67,10 +66,10 @@ Connection::Connection(Environment* env)
   if (!awsSDKReady_) {
     // Use awsSDKReady_ and mutex_ to guarantee InitAPI is executed before all
     // Connection objects start to run.
-    std::lock_guard< std::mutex > lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     if (!awsSDKReady_) {
-      Aws::Utils::Logging::LogLevel awsLogLvl = GetAWSLogLevelFromString(
-          ignite::odbc::common::GetEnv("TS_AWS_LOG_LEVEL"));
+      Aws::Utils::Logging::LogLevel awsLogLvl =
+          GetAWSLogLevelFromString(ignite::odbc::common::GetEnv("TS_AWS_LOG_LEVEL"));
       options_.loggingOptions.logLevel = awsLogLvl;
 
       LOG_INFO_MSG("AWS SDK log level is set to: "
@@ -100,24 +99,20 @@ Connection::~Connection() {
   }
 }
 
-const config::ConnectionInfo& Connection::GetInfo() const {
-  return info_;
-}
+const config::ConnectionInfo& Connection::GetInfo() const { return info_; }
 
-void Connection::GetInfo(config::ConnectionInfo::InfoType type, void* buf,
-                         short buflen, short* reslen) {
+void Connection::GetInfo(config::ConnectionInfo::InfoType type, void* buf, short buflen,
+                         short* reslen) {
   LOG_INFO_MSG("SQLGetInfo called: "
-               << type << " (" << config::ConnectionInfo::InfoTypeToString(type)
-               << "), " << std::hex << reinterpret_cast< size_t >(buf) << ", "
-               << buflen << ", " << std::hex
-               << reinterpret_cast< size_t >(reslen) << std::dec);
+               << type << " (" << config::ConnectionInfo::InfoTypeToString(type) << "), "
+               << std::hex << reinterpret_cast<size_t>(buf) << ", " << buflen << ", "
+               << std::hex << reinterpret_cast<size_t>(reslen) << std::dec);
 
   IGNITE_ODBC_API_CALL(InternalGetInfo(type, buf, buflen, reslen));
 }
 
-SqlResult::Type Connection::InternalGetInfo(
-    config::ConnectionInfo::InfoType type, void* buf, short buflen,
-    short* reslen) {
+SqlResult::Type Connection::InternalGetInfo(config::ConnectionInfo::InfoType type,
+                                            void* buf, short buflen, short* reslen) {
   const config::ConnectionInfo& info = GetInfo();
 
   SqlResult::Type res = info.GetInfo(type, buf, buflen, reslen);
@@ -170,8 +165,7 @@ void Connection::Establish(const config::Configuration& cfg) {
   IGNITE_ODBC_API_CALL(InternalEstablish(cfg));
 }
 
-SqlResult::Type Connection::InternalEstablish(
-    const config::Configuration& cfg) {
+SqlResult::Type Connection::InternalEstablish(const config::Configuration& cfg) {
   LOG_DEBUG_MSG("InternalEstablish is called");
   config_ = cfg;
 
@@ -207,16 +201,12 @@ SqlResult::Type Connection::InternalEstablish(
   return errors ? SqlResult::AI_SUCCESS_WITH_INFO : SqlResult::AI_SUCCESS;
 }
 
-void Connection::Release() {
-  IGNITE_ODBC_API_CALL(InternalRelease());
-}
+void Connection::Release() { IGNITE_ODBC_API_CALL(InternalRelease()); }
 
-void Connection::Deregister() {
-  env_->DeregisterConnection(this);
-}
+void Connection::Deregister() { env_->DeregisterConnection(this); }
 
-std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
-Connection::GetQueryClient() const {
+std::shared_ptr<Aws::TimestreamQuery::TimestreamQueryClient> Connection::GetQueryClient()
+    const {
   return queryClient_;
 }
 
@@ -272,27 +262,23 @@ SqlResult::Type Connection::InternalCreateStatement(Statement*& statement) {
   return SqlResult::AI_SUCCESS;
 }
 
-const config::Configuration& Connection::GetConfiguration() const {
-  return config_;
-}
+const config::Configuration& Connection::GetConfiguration() const { return config_; }
 
-bool Connection::IsAutoCommit() const {
-  return autoCommit_;
-}
+bool Connection::IsAutoCommit() const { return autoCommit_; }
 
-diagnostic::DiagnosticRecord Connection::CreateStatusRecord(
-    SqlState::Type sqlState, const std::string& message, int32_t rowNum,
-    int32_t columnNum) {
-  return diagnostic::DiagnosticRecord(sqlState, message, "", "", rowNum,
-                                      columnNum);
+diagnostic::DiagnosticRecord Connection::CreateStatusRecord(SqlState::Type sqlState,
+                                                            const std::string& message,
+                                                            int32_t rowNum,
+                                                            int32_t columnNum) {
+  return diagnostic::DiagnosticRecord(sqlState, message, "", "", rowNum, columnNum);
 }
 
 int32_t Connection::GetEnvODBCVer() {
   SQLINTEGER version;
   SqlLen outResLen;
 
-  app::ApplicationDataBuffer outBuffer(
-      type_traits::OdbcNativeType::AI_SIGNED_LONG, &version, 0, &outResLen);
+  app::ApplicationDataBuffer outBuffer(type_traits::OdbcNativeType::AI_SIGNED_LONG,
+                                       &version, 0, &outResLen);
   env_->GetAttribute(SQL_ATTR_ODBC_VERSION, outBuffer);
 
   return outBuffer.GetInt32();
@@ -303,93 +289,84 @@ void Connection::GetAttribute(int attr, void* buf, SQLINTEGER bufLen,
   IGNITE_ODBC_API_CALL(InternalGetAttribute(attr, buf, bufLen, valueLen));
 }
 
-SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
-                                                 SQLINTEGER,
+SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf, SQLINTEGER,
                                                  SQLINTEGER* valueLen) {
   LOG_DEBUG_MSG("InternalGetAttribute is called, attr is " << attr);
   if (!buf) {
-    AddStatusRecord(SqlState::SHY009_INVALID_USE_OF_NULL_POINTER,
-                    "Data buffer is null.");
+    AddStatusRecord(SqlState::SHY009_INVALID_USE_OF_NULL_POINTER, "Data buffer is null.");
 
     return SqlResult::AI_ERROR;
   }
 
   switch (attr) {
     case SQL_ATTR_CONNECTION_DEAD: {
-      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
+      SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
       *val = queryClient_ ? SQL_CD_FALSE : SQL_CD_TRUE;
 
-      if (valueLen)
-        *valueLen = SQL_IS_INTEGER;
+      if (valueLen) *valueLen = SQL_IS_INTEGER;
     }
 
     case SQL_ATTR_CONNECTION_TIMEOUT: {
-      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
+      SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
       // connection timeout is disabled. Same behavior as version 1.0
       *val = 0;
 
-      if (valueLen)
-        *valueLen = SQL_IS_INTEGER;
+      if (valueLen) *valueLen = SQL_IS_INTEGER;
 
       break;
     }
 
     case SQL_ATTR_AUTOCOMMIT: {
-      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
+      SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
       *val = autoCommit_ ? SQL_AUTOCOMMIT_ON : SQL_AUTOCOMMIT_OFF;
 
-      if (valueLen)
-        *valueLen = SQL_IS_INTEGER;
+      if (valueLen) *valueLen = SQL_IS_INTEGER;
 
       break;
     }
 
     case SQL_ATTR_METADATA_ID: {
-      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
+      SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
       *val = metadataID_ ? SQL_TRUE : SQL_FALSE;
 
-      if (valueLen)
-        *valueLen = SQL_IS_INTEGER;
+      if (valueLen) *valueLen = SQL_IS_INTEGER;
 
       break;
     }
 
     case SQL_ATTR_AUTO_IPD: {
-      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
+      SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
       // could only be false as we do not support SQLPrepare.
       *val = false;
 
-      if (valueLen)
-        *valueLen = SQL_IS_INTEGER;
+      if (valueLen) *valueLen = SQL_IS_INTEGER;
 
       break;
     }
 
     case SQL_ATTR_ASYNC_ENABLE: {
-      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
+      SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
       // Asynchronous execution is not supported
       *val = SQL_ASYNC_ENABLE_OFF;
 
-      if (valueLen)
-        *valueLen = SQL_IS_INTEGER;
+      if (valueLen) *valueLen = SQL_IS_INTEGER;
 
       break;
     }
 
     case SQL_ATTR_TSLOG_DEBUG: {
-      SQLUINTEGER* val = reinterpret_cast< SQLUINTEGER* >(buf);
+      SQLUINTEGER* val = reinterpret_cast<SQLUINTEGER*>(buf);
 
-      std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
-      *val = static_cast< SQLUINTEGER >(logger->GetLogLevel());
+      std::shared_ptr<Logger> logger = Logger::GetLoggerInstance();
+      *val = static_cast<SQLUINTEGER>(logger->GetLogLevel());
 
-      if (valueLen)
-        *valueLen = SQL_IS_INTEGER;
+      if (valueLen) *valueLen = SQL_IS_INTEGER;
 
       break;
     }
@@ -403,7 +380,7 @@ SqlResult::Type Connection::InternalGetAttribute(int attr, void* buf,
     }
   }
 
-  LOG_DEBUG_MSG("buf: " << *reinterpret_cast< SQLUINTEGER* >(buf));
+  LOG_DEBUG_MSG("buf: " << *reinterpret_cast<SQLUINTEGER*>(buf));
 
   return SqlResult::AI_SUCCESS;
 }
@@ -412,8 +389,7 @@ void Connection::SetAttribute(int attr, void* value, SQLINTEGER valueLen) {
   IGNITE_ODBC_API_CALL(InternalSetAttribute(attr, value, valueLen));
 }
 
-SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
-                                                 SQLINTEGER) {
+SqlResult::Type Connection::InternalSetAttribute(int attr, void* value, SQLINTEGER) {
   LOG_DEBUG_MSG("InternalSetAttribute is called, attr is " << attr);
   switch (attr) {
     case SQL_ATTR_CONNECTION_DEAD: {
@@ -424,8 +400,7 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_AUTOCOMMIT: {
-      SQLUINTEGER mode =
-          static_cast< SQLUINTEGER >(reinterpret_cast< ptrdiff_t >(value));
+      SQLUINTEGER mode = static_cast<SQLUINTEGER>(reinterpret_cast<ptrdiff_t>(value));
 
       if (mode != SQL_AUTOCOMMIT_ON && mode != SQL_AUTOCOMMIT_OFF) {
         AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
@@ -441,8 +416,7 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
     }
 
     case SQL_ATTR_METADATA_ID: {
-      SQLUINTEGER id =
-          static_cast< SQLUINTEGER >(reinterpret_cast< ptrdiff_t >(value));
+      SQLUINTEGER id = static_cast<SQLUINTEGER>(reinterpret_cast<ptrdiff_t>(value));
 
       if (id != SQL_TRUE && id != SQL_FALSE) {
         AddStatusRecord(SqlState::SHY024_INVALID_ATTRIBUTE_VALUE,
@@ -469,11 +443,11 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
 
     case SQL_ATTR_TSLOG_DEBUG: {
       LogLevel::Type type =
-          static_cast< LogLevel::Type >(reinterpret_cast< ptrdiff_t >(value));
+          static_cast<LogLevel::Type>(reinterpret_cast<ptrdiff_t>(value));
 
-      std::shared_ptr< Logger > logger = Logger::GetLoggerInstance();
+      std::shared_ptr<Logger> logger = Logger::GetLoggerInstance();
       logger->SetLogLevel(type);
-      LOG_INFO_MSG("log level is set to " << static_cast< int >(type));
+      LOG_INFO_MSG("log level is set to " << static_cast<int>(type));
       break;
     }
     default: {
@@ -501,35 +475,27 @@ void UpdateConnectionRuntimeInfo(const config::Configuration& config,
 #endif
 }
 
-std::shared_ptr< Aws::Http::HttpClient > Connection::GetHttpClient() {
+std::shared_ptr<Aws::Http::HttpClient> Connection::GetHttpClient() {
   return Aws::Http::CreateHttpClient(Aws::Client::ClientConfiguration());
 }
 
 Aws::Utils::Logging::LogLevel Connection::GetAWSLogLevelFromString(
     std::string awsLogLvl) {
-  std::transform(awsLogLvl.begin(), awsLogLvl.end(), awsLogLvl.begin(),
-                 ::toupper);
+  std::transform(awsLogLvl.begin(), awsLogLvl.end(), awsLogLvl.begin(), ::toupper);
 
-  if (awsLogLvl == "OFF")
-    return Aws::Utils::Logging::LogLevel::Off;
+  if (awsLogLvl == "OFF") return Aws::Utils::Logging::LogLevel::Off;
 
-  if (awsLogLvl == "FATAL")
-    return Aws::Utils::Logging::LogLevel::Fatal;
+  if (awsLogLvl == "FATAL") return Aws::Utils::Logging::LogLevel::Fatal;
 
-  if (awsLogLvl == "ERROR")
-    return Aws::Utils::Logging::LogLevel::Error;
+  if (awsLogLvl == "ERROR") return Aws::Utils::Logging::LogLevel::Error;
 
-  if (awsLogLvl == "WARN")
-    return Aws::Utils::Logging::LogLevel::Warn;
+  if (awsLogLvl == "WARN") return Aws::Utils::Logging::LogLevel::Warn;
 
-  if (awsLogLvl == "INFO")
-    return Aws::Utils::Logging::LogLevel::Info;
+  if (awsLogLvl == "INFO") return Aws::Utils::Logging::LogLevel::Info;
 
-  if (awsLogLvl == "DEBUG")
-    return Aws::Utils::Logging::LogLevel::Debug;
+  if (awsLogLvl == "DEBUG") return Aws::Utils::Logging::LogLevel::Debug;
 
-  if (awsLogLvl == "TRACE")
-    return Aws::Utils::Logging::LogLevel::Trace;
+  if (awsLogLvl == "TRACE") return Aws::Utils::Logging::LogLevel::Trace;
 
   // Return default
   return Aws::Utils::Logging::LogLevel::Warn;
@@ -583,16 +549,14 @@ void Connection::SetClientProxy(Aws::Client::ClientConfiguration& clientCfg) {
   }
 
   // proxy SSL certificate path
-  std::string proxySSLCertPath =
-      utility::Trim(GetEnv("TS_PROXY_SSL_CERT_PATH"));
+  std::string proxySSLCertPath = utility::Trim(GetEnv("TS_PROXY_SSL_CERT_PATH"));
   if (!proxySSLCertPath.empty()) {
     LOG_DEBUG_MSG("proxy SSL certificate path is " << proxySSLCertPath);
     clientCfg.proxySSLCertPath = proxySSLCertPath;
   }
 
   // proxy SSL certificate type
-  std::string proxySSLCertType =
-      utility::Trim(GetEnv("TS_PROXY_SSL_CERT_TYPE"));
+  std::string proxySSLCertType = utility::Trim(GetEnv("TS_PROXY_SSL_CERT_TYPE"));
   if (!proxySSLCertType.empty()) {
     LOG_DEBUG_MSG("proxy SSL certificate type is " << proxySSLCertType);
     clientCfg.proxySSLCertType = proxySSLCertType;
@@ -613,16 +577,15 @@ void Connection::SetClientProxy(Aws::Client::ClientConfiguration& clientCfg) {
   }
 
   // proxy SSL key password
-  std::string proxySSLKeyPassword =
-      utility::Trim(GetEnv("TS_PROXY_SSL_KEY_PASSWORD"));
+  std::string proxySSLKeyPassword = utility::Trim(GetEnv("TS_PROXY_SSL_KEY_PASSWORD"));
   if (!proxySSLKeyPassword.empty()) {
     LOG_DEBUG_MSG("proxy SSL key password is set");
     clientCfg.proxySSLKeyPassword = proxySSLKeyPassword;
   }
 }
 
-std::shared_ptr< Aws::STS::STSClient > Connection::GetStsClient() {
-  return std::make_shared< Aws::STS::STSClient >();
+std::shared_ptr<Aws::STS::STSClient> Connection::GetStsClient() {
+  return std::make_shared<Aws::STS::STSClient>();
 }
 
 bool Connection::TryRestoreConnection(const config::Configuration& cfg,
@@ -632,19 +595,19 @@ bool Connection::TryRestoreConnection(const config::Configuration& cfg,
   std::string errInfo("");
 
   AuthType::Type authType = cfg.GetAuthType();
-  LOG_DEBUG_MSG("auth type is " << static_cast< int >(authType));
+  LOG_DEBUG_MSG("auth type is " << static_cast<int>(authType));
   if (authType == AuthType::Type::OKTA) {
-    std::shared_ptr< Aws::Http::HttpClient > httpClient = GetHttpClient();
-    std::shared_ptr< Aws::STS::STSClient > stsClient = GetStsClient();
+    std::shared_ptr<Aws::Http::HttpClient> httpClient = GetHttpClient();
+    std::shared_ptr<Aws::STS::STSClient> stsClient = GetStsClient();
     samlCredProvider_ =
-        std::make_shared< timestream::odbc::TimestreamOktaCredentialsProvider >(
+        std::make_shared<timestream::odbc::TimestreamOktaCredentialsProvider>(
             cfg, httpClient, stsClient);
     samlCredProvider_->GetAWSCredentials(credentials, errInfo);
   } else if (authType == AuthType::Type::AAD) {
-    std::shared_ptr< Aws::Http::HttpClient > httpClient = GetHttpClient();
-    std::shared_ptr< Aws::STS::STSClient > stsClient = GetStsClient();
+    std::shared_ptr<Aws::Http::HttpClient> httpClient = GetHttpClient();
+    std::shared_ptr<Aws::STS::STSClient> stsClient = GetStsClient();
     samlCredProvider_ =
-        std::make_shared< timestream::odbc::TimestreamAADCredentialsProvider >(
+        std::make_shared<timestream::odbc::TimestreamAADCredentialsProvider>(
             cfg, httpClient, stsClient);
     samlCredProvider_->GetAWSCredentials(credentials, errInfo);
   } else if (authType == AuthType::Type::AWS_PROFILE) {
@@ -669,8 +632,7 @@ bool Connection::TryRestoreConnection(const config::Configuration& cfg,
   }
 
   if (credentials.IsExpiredOrEmpty()) {
-    if (errInfo.empty())
-      errInfo += "Empty or expired credentials";
+    if (errInfo.empty()) errInfo += "Empty or expired credentials";
 
     LOG_ERROR_MSG(errInfo);
     err = IgniteError(IgniteError::IGNITE_ERR_TS_CONNECT, errInfo.data());
@@ -694,20 +656,19 @@ bool Connection::TryRestoreConnection(const config::Configuration& cfg,
   std::string platform("Linux");
 #endif
   // pass driver info to Timestream as user agent
-  clientCfg.userAgent = "ts-odbc." + utility::GetFormatedDriverVersion() + " on " + platform;
-  LOG_DEBUG_MSG("region is "
-                << cfg.GetRegion() << ", connection timeout is "
-                << clientCfg.connectTimeoutMs << ", request timeout is "
-                << clientCfg.requestTimeoutMs << ", max connection is "
-                << clientCfg.maxConnections << ", user agent is "
-                << clientCfg.userAgent);
+  clientCfg.userAgent =
+      "ts-odbc." + utility::GetFormatedDriverVersion() + " on " + platform;
+  LOG_DEBUG_MSG("region is " << cfg.GetRegion() << ", connection timeout is "
+                             << clientCfg.connectTimeoutMs << ", request timeout is "
+                             << clientCfg.requestTimeoutMs << ", max connection is "
+                             << clientCfg.maxConnections << ", user agent is "
+                             << clientCfg.userAgent);
 
   SetClientProxy(clientCfg);
 
   if (cfg.GetMaxRetryCountClient() > 0) {
     clientCfg.retryStrategy =
-        std::make_shared< Aws::Client::DefaultRetryStrategy >(
-            cfg.GetMaxRetryCountClient());
+        std::make_shared<Aws::Client::DefaultRetryStrategy>(cfg.GetMaxRetryCountClient());
     LOG_DEBUG_MSG("max retry count is " << cfg.GetMaxRetryCountClient());
   }
 
@@ -723,12 +684,10 @@ bool Connection::TryRestoreConnection(const config::Configuration& cfg,
   Aws::TimestreamQuery::Model::QueryRequest queryRequest;
   queryRequest.SetQueryString("SELECT 1");
 
-  Aws::TimestreamQuery::Model::QueryOutcome outcome =
-      queryClient_->Query(queryRequest);
+  Aws::TimestreamQuery::Model::QueryOutcome outcome = queryClient_->Query(queryRequest);
   if (!outcome.IsSuccess()) {
     auto error = outcome.GetError();
-    LOG_DEBUG_MSG("ERROR: " << error.GetExceptionName() << ": "
-                            << error.GetMessage());
+    LOG_DEBUG_MSG("ERROR: " << error.GetExceptionName() << ": " << error.GetMessage());
 
     err = IgniteError(IgniteError::IGNITE_ERR_TS_CONNECT,
                       std::string(error.GetExceptionName())
@@ -745,12 +704,11 @@ bool Connection::TryRestoreConnection(const config::Configuration& cfg,
   return true;
 }
 
-std::shared_ptr< Aws::TimestreamQuery::TimestreamQueryClient >
-Connection::CreateTSQueryClient(
-    const Aws::Auth::AWSCredentials& credentials,
-    const Aws::Client::ClientConfiguration& clientCfg) {
-  return std::make_shared< Aws::TimestreamQuery::TimestreamQueryClient >(
-      credentials, clientCfg);
+std::shared_ptr<Aws::TimestreamQuery::TimestreamQueryClient>
+Connection::CreateTSQueryClient(const Aws::Auth::AWSCredentials& credentials,
+                                const Aws::Client::ClientConfiguration& clientCfg) {
+  return std::make_shared<Aws::TimestreamQuery::TimestreamQueryClient>(credentials,
+                                                                       clientCfg);
 }
 
 Descriptor* Connection::CreateDescriptor() {
@@ -782,8 +740,7 @@ SqlResult::Type Connection::InternalCreateDescriptor(Descriptor*& desc) {
 std::string Connection::GetCursorName(const Statement* stmt) {
   LOG_DEBUG_MSG("GetCursorName is called");
 
-  std::map< const Statement*, std::string >::iterator itr =
-      cursorNameMap_.find(stmt);
+  std::map<const Statement*, std::string>::iterator itr = cursorNameMap_.find(stmt);
   if (itr != cursorNameMap_.end()) {
     return itr->second;
   }
@@ -805,9 +762,8 @@ SqlResult::Type Connection::AddCursorName(const Statement* stmt,
   LOG_DEBUG_MSG("AddCursorName is called");
 
   // in case multiple statement in different threads
-  std::lock_guard< std::mutex > lock(cursorNameMutex_);
-  std::map< const Statement*, std::string >::iterator itr =
-      cursorNameMap_.find(stmt);
+  std::lock_guard<std::mutex> lock(cursorNameMutex_);
+  std::map<const Statement*, std::string>::iterator itr = cursorNameMap_.find(stmt);
   if (itr != cursorNameMap_.end()) {
     cursorNames_.erase(itr->second);
   }
@@ -821,9 +777,8 @@ void Connection::RemoveCursorName(const Statement* stmt) {
   LOG_DEBUG_MSG("RemoveCursorName is called");
 
   // locks to support having multiple statement in different threads
-  std::lock_guard< std::mutex > lock(cursorNameMutex_);
-  std::map< const Statement*, std::string >::iterator itr =
-      cursorNameMap_.find(stmt);
+  std::lock_guard<std::mutex> lock(cursorNameMutex_);
+  std::map<const Statement*, std::string>::iterator itr = cursorNameMap_.find(stmt);
   if (itr != cursorNameMap_.end()) {
     cursorNames_.erase(itr->second);
     cursorNameMap_.erase(itr);
@@ -1230,7 +1185,7 @@ SqlResult::Type Connection::InternalGetFunctions(SQLUSMALLINT funcId,
 }
 
 #define SQL_FUNC_SET(pfExists, uwAPI) \
-  (*(((UWORD*)(pfExists)) + ((uwAPI) >> 4)) |= (1 << ((uwAPI)&0x000F)))
+  (*(((UWORD*)(pfExists)) + ((uwAPI) >> 4)) |= (1 << ((uwAPI) & 0x000F)))
 
 void Connection::SetODBC3FunctionsValue(SQLUSMALLINT* valueBuf) {
   SQL_FUNC_SET(valueBuf, SQL_API_SQLALLOCHANDLE);
@@ -1353,14 +1308,13 @@ void Connection::SetODBC2FunctionsValue(SQLUSMALLINT* valueBuf) {
   valueBuf[SQL_API_SQLTABLES] = true;
   valueBuf[SQL_API_SQLTRANSACT] = true;
 }
-#endif //__APPLE__
+#endif  //__APPLE__
 
 void Connection::SetStmtAttribute(SQLUSMALLINT option, SQLULEN value) {
   IGNITE_ODBC_API_CALL(InternalSetStmtAttribute(option, value));
 }
 
-SqlResult::Type Connection::InternalSetStmtAttribute(SQLUSMALLINT option,
-                                                     SQLULEN value) {
+SqlResult::Type Connection::InternalSetStmtAttribute(SQLUSMALLINT option, SQLULEN value) {
   switch (option) {
     case SQL_BIND_TYPE: {
       if (value != SQL_BIND_BY_COLUMN) {
@@ -1395,9 +1349,8 @@ SqlResult::Type Connection::InternalSetStmtAttribute(SQLUSMALLINT option,
 
     case SQL_RETRIEVE_DATA: {
       if (value != SQL_RD_ON) {
-        AddStatusRecord(
-            SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
-            "SQLFetch can only retrieve data after it positions the cursor");
+        AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
+                        "SQLFetch can only retrieve data after it positions the cursor");
 
         return SqlResult::AI_ERROR;
       }
@@ -1406,9 +1359,8 @@ SqlResult::Type Connection::InternalSetStmtAttribute(SQLUSMALLINT option,
     }
     case SQL_ROWSET_SIZE: {
       if (value > 1000) {
-        AddStatusRecord(
-            SqlState::SIM001_FUNCTION_NOT_SUPPORTED,
-            "Array size value cannot be set to a value other than 1000");
+        AddStatusRecord(SqlState::SIM001_FUNCTION_NOT_SUPPORTED,
+                        "Array size value cannot be set to a value other than 1000");
 
         return SqlResult::AI_ERROR;
       }
@@ -1423,8 +1375,7 @@ SqlResult::Type Connection::InternalSetStmtAttribute(SQLUSMALLINT option,
     case SQL_MAX_LENGTH:
     case SQL_KEYSET_SIZE:
     case SQL_ASYNC_ENABLE: {
-      AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
-                      "Specified attribute is ignored.",
+      AddStatusRecord(SqlState::S01000_GENERAL_WARNING, "Specified attribute is ignored.",
                       timestream::odbc::LogLevel::Type::WARNING_LEVEL);
 
       return SqlResult::AI_SUCCESS_WITH_INFO;
@@ -1447,8 +1398,7 @@ void Connection::SetConnectOption(SQLUSMALLINT option, SQLULEN value) {
   IGNITE_ODBC_API_CALL(InternalSetConnectOption(option, value));
 }
 
-SqlResult::Type Connection::InternalSetConnectOption(SQLUSMALLINT option,
-                                                     SQLULEN value) {
+SqlResult::Type Connection::InternalSetConnectOption(SQLUSMALLINT option, SQLULEN value) {
   switch (option) {
     case SQL_ASYNC_ENABLE:
     case SQL_BIND_TYPE:
@@ -1474,16 +1424,14 @@ SqlResult::Type Connection::InternalSetConnectOption(SQLUSMALLINT option,
     case SQL_PACKET_SIZE:
     case SQL_QUIET_MODE:
     case SQL_LOGIN_TIMEOUT: {
-      AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
-                      "Specified attribute is ignored.",
+      AddStatusRecord(SqlState::S01000_GENERAL_WARNING, "Specified attribute is ignored.",
                       timestream::odbc::LogLevel::Type::WARNING_LEVEL);
       return SqlResult::AI_SUCCESS_WITH_INFO;
     }
 
     case SQL_AUTOCOMMIT:
     default:
-      return InternalSetAttribute(option, reinterpret_cast< SQLPOINTER >(value),
-                                  0);
+      return InternalSetAttribute(option, reinterpret_cast<SQLPOINTER>(value), 0);
   }
 }
 
@@ -1507,8 +1455,7 @@ SqlResult::Type Connection::InternalGetConnectOption(SQLUSMALLINT option,
     case SQL_PACKET_SIZE:
     case SQL_QUIET_MODE:
     case SQL_LOGIN_TIMEOUT: {
-      AddStatusRecord(SqlState::S01000_GENERAL_WARNING,
-                      "Specified attribute is ignored.",
+      AddStatusRecord(SqlState::S01000_GENERAL_WARNING, "Specified attribute is ignored.",
                       timestream::odbc::LogLevel::Type::WARNING_LEVEL);
 
       return SqlResult::AI_SUCCESS_WITH_INFO;

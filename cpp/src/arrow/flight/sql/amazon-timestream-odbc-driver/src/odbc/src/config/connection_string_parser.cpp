@@ -21,11 +21,11 @@
 #include "timestream/odbc/config/connection_string_parser.h"
 #include "timestream/odbc/log.h"
 
-#include <vector>
 #include <fstream>
+#include <vector>
 
-#include "timestream/odbc/utils.h"
 #include "timestream/odbc/utility.h"
+#include "timestream/odbc/utils.h"
 
 using namespace timestream::odbc;
 
@@ -41,12 +41,10 @@ const std::string ConnectionStringParser::Key::secretKey = "secretkey";
 const std::string ConnectionStringParser::Key::sessionToken = "sessiontoken";
 const std::string ConnectionStringParser::Key::profileName = "profilename";
 const std::string ConnectionStringParser::Key::reqTimeout = "requesttimeout";
-const std::string ConnectionStringParser::Key::connectionTimeout =
-    "connectiontimeout";
+const std::string ConnectionStringParser::Key::connectionTimeout = "connectiontimeout";
 const std::string ConnectionStringParser::Key::maxRetryCountClient =
     "maxretrycountclient";
-const std::string ConnectionStringParser::Key::maxConnections =
-    "maxconnections";
+const std::string ConnectionStringParser::Key::maxConnections = "maxconnections";
 const std::string ConnectionStringParser::Key::endpoint = "endpointoverride";
 const std::string ConnectionStringParser::Key::region = "region";
 const std::string ConnectionStringParser::Key::authType = "auth";
@@ -57,8 +55,7 @@ const std::string ConnectionStringParser::Key::idPArn = "idparn";
 const std::string ConnectionStringParser::Key::oktaAppId = "oktaapplicationid";
 const std::string ConnectionStringParser::Key::roleArn = "rolearn";
 const std::string ConnectionStringParser::Key::aadAppId = "aadapplicationid";
-const std::string ConnectionStringParser::Key::aadClientSecret =
-    "aadclientsecret";
+const std::string ConnectionStringParser::Key::aadClientSecret = "aadclientsecret";
 const std::string ConnectionStringParser::Key::aadTenant = "aadtenant";
 const std::string ConnectionStringParser::Key::logLevel = "loglevel";
 const std::string ConnectionStringParser::Key::logPath = "logoutput";
@@ -71,12 +68,11 @@ ConnectionStringParser::ConnectionStringParser(Configuration& cfg) : cfg(cfg) {
 void ConnectionStringParser::ParseConnectionString(
     const char* str, size_t len, char delimiter,
     diagnostic::DiagnosticRecordStorage* diag) {
-  LOG_DEBUG_MSG("ParseConnectionString is called with len is "
-                << len << ", delimiter is " << delimiter);
+  LOG_DEBUG_MSG("ParseConnectionString is called with len is " << len << ", delimiter is "
+                                                               << delimiter);
   std::string connect_str(str, len);
 
-  while (connect_str.rbegin() != connect_str.rend()
-         && *connect_str.rbegin() == 0)
+  while (connect_str.rbegin() != connect_str.rend() && *connect_str.rbegin() == 0)
     connect_str.erase(connect_str.size() - 1);
 
   while (!connect_str.empty()) {
@@ -89,8 +85,7 @@ void ConnectionStringParser::ParseConnectionString(
 
     size_t attr_eq_pos = connect_str.rfind('=');
 
-    if (attr_eq_pos == std::string::npos)
-      attr_eq_pos = 0;
+    if (attr_eq_pos == std::string::npos) attr_eq_pos = 0;
 
     if (attr_begin < attr_eq_pos) {
       const char* key_begin = connect_str.data() + attr_begin;
@@ -101,8 +96,8 @@ void ConnectionStringParser::ParseConnectionString(
 
       std::string key = timestream::odbc::utility::Trim(
           connect_str.substr(attr_begin, attr_eq_pos - attr_begin));
-      std::string value = timestream::odbc::utility::Trim(connect_str.substr(
-          attr_eq_pos + 1, connect_str.size() - attr_eq_pos));
+      std::string value = timestream::odbc::utility::Trim(
+          connect_str.substr(attr_eq_pos + 1, connect_str.size() - attr_eq_pos));
 
       if (value[0] == '{' && value[value.size() - 1] == '}')
         value = value.substr(1, value.size() - 2);
@@ -110,8 +105,7 @@ void ConnectionStringParser::ParseConnectionString(
       HandleAttributePair(key, value, diag);
     }
 
-    if (!attr_begin)
-      break;
+    if (!attr_begin) break;
 
     connect_str.erase(attr_begin - 1);
   }
@@ -127,8 +121,7 @@ void ConnectionStringParser::ParseConfigAttributes(
   size_t len = 0;
 
   // Getting list length. List is terminated by two '\0'.
-  while (str[len] || str[len + 1])
-    ++len;
+  while (str[len] || str[len + 1]) ++len;
 
   ++len;
 
@@ -141,9 +134,9 @@ void ConnectionStringParser::HandleAttributePair(
   LOG_DEBUG_MSG("HandleAttributePair is called");
   std::string lKey = timestream::odbc::common::ToLower(key);
 
-  if (lKey == Key::uid || lKey == Key::accessKeyId || lKey == Key::idPUserName
-      || lKey == Key::pwd || lKey == Key::secretKey || lKey == Key::sessionToken
-      || lKey == Key::idPPassword || lKey == Key::aadClientSecret) {
+  if (lKey == Key::uid || lKey == Key::accessKeyId || lKey == Key::idPUserName ||
+      lKey == Key::pwd || lKey == Key::secretKey || lKey == Key::sessionToken ||
+      lKey == Key::idPPassword || lKey == Key::aadClientSecret) {
     LOG_DEBUG_MSG(lKey << " is found");
   } else {
     LOG_DEBUG_MSG("key:value is " << lKey << ":" << value);
@@ -167,12 +160,11 @@ void ConnectionStringParser::HandleAttributePair(
 
     if (!timestream::odbc::common::AllDigits(value)) {
       if (diag) {
-        diag->AddStatusRecord(
-            SqlState::S01S02_OPTION_VALUE_CHANGED,
-            MakeErrorMessage("Request Timeout attribute value contains "
-                             "unexpected characters."
-                             " Using default value.",
-                             key, value));
+        diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                              MakeErrorMessage("Request Timeout attribute value contains "
+                                               "unexpected characters."
+                                               " Using default value.",
+                                               key, value));
       }
       return;
     }
@@ -205,16 +197,15 @@ void ConnectionStringParser::HandleAttributePair(
       return;
     }
 
-    cfg.SetReqTimeout(static_cast< uint32_t >(numValue));
+    cfg.SetReqTimeout(static_cast<uint32_t>(numValue));
   } else if (lKey == Key::connectionTimeout) {
     if (value.empty()) {
       if (diag) {
         diag->AddStatusRecord(
             SqlState::S01S02_OPTION_VALUE_CHANGED,
-            MakeErrorMessage(
-                "Connection Timeout attribute value is empty. Using "
-                "default value.",
-                key, value));
+            MakeErrorMessage("Connection Timeout attribute value is empty. Using "
+                             "default value.",
+                             key, value));
       }
       return;
     }
@@ -252,24 +243,22 @@ void ConnectionStringParser::HandleAttributePair(
       if (diag) {
         diag->AddStatusRecord(
             SqlState::S01S02_OPTION_VALUE_CHANGED,
-            MakeErrorMessage(
-                "Connection Timeout attribute value is out of range. "
-                "Using default value.",
-                key, value));
+            MakeErrorMessage("Connection Timeout attribute value is out of range. "
+                             "Using default value.",
+                             key, value));
       }
       return;
     }
 
-    cfg.SetConnectionTimeout(static_cast< uint32_t >(numValue));
+    cfg.SetConnectionTimeout(static_cast<uint32_t>(numValue));
   } else if (lKey == Key::maxRetryCountClient) {
     if (value.empty()) {
       if (diag) {
         diag->AddStatusRecord(
             SqlState::S01S02_OPTION_VALUE_CHANGED,
-            MakeErrorMessage(
-                "Max Retry Count Client attribute value is empty. Using "
-                "default value.",
-                key, value));
+            MakeErrorMessage("Max Retry Count Client attribute value is empty. Using "
+                             "default value.",
+                             key, value));
       }
       return;
     }
@@ -290,10 +279,9 @@ void ConnectionStringParser::HandleAttributePair(
       if (diag) {
         diag->AddStatusRecord(
             SqlState::S01S02_OPTION_VALUE_CHANGED,
-            MakeErrorMessage(
-                "Max Retry Count Client attribute value is too large. "
-                "Using default value.",
-                key, value));
+            MakeErrorMessage("Max Retry Count Client attribute value is too large. "
+                             "Using default value.",
+                             key, value));
       }
       return;
     }
@@ -308,15 +296,14 @@ void ConnectionStringParser::HandleAttributePair(
       if (diag) {
         diag->AddStatusRecord(
             SqlState::S01S02_OPTION_VALUE_CHANGED,
-            MakeErrorMessage(
-                "Max Retry Count Client attribute value is out of range. "
-                "Using default value.",
-                key, value));
+            MakeErrorMessage("Max Retry Count Client attribute value is out of range. "
+                             "Using default value.",
+                             key, value));
       }
       return;
     }
 
-    cfg.SetMaxRetryCountClient(static_cast< uint32_t >(numValue));
+    cfg.SetMaxRetryCountClient(static_cast<uint32_t>(numValue));
   } else if (lKey == Key::maxConnections) {
     if (value.empty()) {
       if (diag) {
@@ -331,12 +318,11 @@ void ConnectionStringParser::HandleAttributePair(
 
     if (!timestream::odbc::common::AllDigits(value)) {
       if (diag) {
-        diag->AddStatusRecord(
-            SqlState::S01S02_OPTION_VALUE_CHANGED,
-            MakeErrorMessage("Max Connections attribute value contains "
-                             "unexpected characters."
-                             " Using default value.",
-                             key, value));
+        diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                              MakeErrorMessage("Max Connections attribute value contains "
+                                               "unexpected characters."
+                                               " Using default value.",
+                                               key, value));
       }
       return;
     }
@@ -369,7 +355,7 @@ void ConnectionStringParser::HandleAttributePair(
       return;
     }
 
-    cfg.SetMaxConnections(static_cast< uint32_t >(numValue));
+    cfg.SetMaxConnections(static_cast<uint32_t>(numValue));
   } else if (lKey == Key::endpoint) {
     cfg.SetEndpoint(value);
   } else if (lKey == Key::region) {
@@ -457,9 +443,8 @@ void ConnectionStringParser::HandleAttributePair(
     cfg.SetDriver(value);
   } else if (lKey == Key::uid) {
     if (!cfg.GetUid().empty() && diag) {
-      diag->AddStatusRecord(
-          SqlState::S01S02_OPTION_VALUE_CHANGED,
-          "Re-writing UID (have you specified it several times?");
+      diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                            "Re-writing UID (have you specified it several times?");
     }
 
     if (!cfg.GetAccessKeyId().empty()) {
@@ -479,9 +464,8 @@ void ConnectionStringParser::HandleAttributePair(
     cfg.SetUid(value);
   } else if (lKey == Key::pwd) {
     if (!cfg.GetPwd().empty() && diag) {
-      diag->AddStatusRecord(
-          SqlState::S01S02_OPTION_VALUE_CHANGED,
-          "Re-writing PWD (have you specified it several times?");
+      diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                            "Re-writing PWD (have you specified it several times?");
     }
 
     if (!cfg.GetSecretKey().empty()) {
@@ -516,9 +500,8 @@ void ConnectionStringParser::HandleAttributePair(
     cfg.SetAccessKeyId(value);
   } else if (lKey == Key::secretKey) {
     if (!cfg.GetSecretKey().empty() && diag) {
-      diag->AddStatusRecord(
-          SqlState::S01S02_OPTION_VALUE_CHANGED,
-          "Re-writing SecretKey (have you specified it several times?");
+      diag->AddStatusRecord(SqlState::S01S02_OPTION_VALUE_CHANGED,
+                            "Re-writing SecretKey (have you specified it several times?");
     }
 
     if (!cfg.GetPwd().empty()) {
@@ -582,15 +565,14 @@ void ConnectionStringParser::HandleAttributePair(
       if (diag) {
         diag->AddStatusRecord(
             SqlState::S01S02_OPTION_VALUE_CHANGED,
-            MakeErrorMessage(
-                "Max Row Per Page attribute value is out of range. "
-                "Using default value.",
-                key, value));
+            MakeErrorMessage("Max Row Per Page attribute value is out of range. "
+                             "Using default value.",
+                             key, value));
       }
       return;
     }
 
-    cfg.SetMaxRowPerPage(static_cast< uint32_t >(numValue));
+    cfg.SetMaxRowPerPage(static_cast<uint32_t>(numValue));
   } else if (diag) {
     std::stringstream stream;
 
@@ -600,15 +582,13 @@ void ConnectionStringParser::HandleAttributePair(
   }
 }
 
-ConnectionStringParser::BoolParseResult::Type
-ConnectionStringParser::StringToBool(const std::string& value) {
+ConnectionStringParser::BoolParseResult::Type ConnectionStringParser::StringToBool(
+    const std::string& value) {
   std::string lower = timestream::odbc::common::ToLower(value);
 
-  if (lower == "true")
-    return BoolParseResult::Type::AI_TRUE;
+  if (lower == "true") return BoolParseResult::Type::AI_TRUE;
 
-  if (lower == "false")
-    return BoolParseResult::Type::AI_FALSE;
+  if (lower == "false") return BoolParseResult::Type::AI_FALSE;
 
   return BoolParseResult::Type::AI_UNRECOGNIZED;
 }

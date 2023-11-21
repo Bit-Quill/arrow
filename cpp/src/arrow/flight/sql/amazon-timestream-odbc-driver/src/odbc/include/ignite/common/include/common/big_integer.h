@@ -35,7 +35,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
 
  public:
   // Magnitude array type.
-  typedef DynamicSizeArray< uint32_t > MagArray;
+  typedef DynamicSizeArray<uint32_t> MagArray;
 
   /**
    * Default constructor. Constructs zero-value big integer.
@@ -62,9 +62,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
    *
    * @param val String to assign.
    */
-  explicit BigInteger(const std::string& val) : sign(1), mag() {
-    AssignString(val);
-  }
+  explicit BigInteger(const std::string& val) : sign(1), mag() { AssignString(val); }
 
   /**
    * Copy constructor.
@@ -82,8 +80,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
    * @param bigEndian If true then magnitude is in big-endian. Otherwise
    *     the byte order of the magnitude considered to be little-endian.
    */
-  BigInteger(const int8_t* val, int32_t len, int32_t sign,
-             bool bigEndian = true);
+  BigInteger(const int8_t* val, int32_t len, int32_t sign, bool bigEndian = true);
 
   /**
    * Constructs big integer with the specified magnitude.
@@ -122,7 +119,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
    * @param val String to assign.
    */
   void AssignString(const std::string& val) {
-    AssignString(val.data(), static_cast< int32_t >(val.size()));
+    AssignString(val.data(), static_cast<int32_t>(val.size()));
   }
 
   /**
@@ -183,7 +180,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
    *
    * @param buffer Buffer to fill.
    */
-  void MagnitudeToBytes(common::FixedSizeArray< int8_t >& buffer) const;
+  void MagnitudeToBytes(common::FixedSizeArray<int8_t>& buffer) const;
 
   /**
    * Mutates this BigInteger so its value becomes exp power of this.
@@ -215,8 +212,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
    * @param res Result placed there. Can be *this.
    * @param rem Remainder placed there. Can be *this.
    */
-  void Divide(const BigInteger& divisor, BigInteger& res,
-              BigInteger& rem) const;
+  void Divide(const BigInteger& divisor, BigInteger& res, BigInteger& rem) const;
 
   /**
    * Add unsigned integer number to this BigInteger.
@@ -247,34 +243,27 @@ class IGNITE_IMPORT_EXPORT BigInteger {
    *
    * @return True if this value is negative and false otherwise.
    */
-  bool IsNegative() const {
-    return sign < 0;
-  }
+  bool IsNegative() const { return sign < 0; }
 
   /**
    * Check whether this value is zero.
    *
    * @return True if this value is negative and false otherwise.
    */
-  bool IsZero() const {
-    return mag.GetSize() == 0;
-  }
+  bool IsZero() const { return mag.GetSize() == 0; }
 
   /**
    * Check whether this value is positive.
    *
    * @return True if this value is positive and false otherwise.
    */
-  bool IsPositive() const {
-    return sign > 0 && !IsZero();
-  }
+  bool IsPositive() const { return sign > 0 && !IsZero(); }
 
   /**
    * Rverses sign of this value.
    */
   void Negate() {
-    if (!IsZero())
-      sign = -sign;
+    if (!IsZero()) sign = -sign;
   }
 
   /**
@@ -285,11 +274,9 @@ class IGNITE_IMPORT_EXPORT BigInteger {
    * @return Reference to the first param.
    */
   friend std::ostream& operator<<(std::ostream& os, const BigInteger& val) {
-    if (val.IsZero())
-      return os << '0';
+    if (val.IsZero()) return os << '0';
 
-    if (val.sign < 0)
-      os << '-';
+    if (val.sign < 0) os << '-';
 
     const int32_t maxResultDigits = 19;
     BigInteger maxUintTenPower;
@@ -298,27 +285,25 @@ class IGNITE_IMPORT_EXPORT BigInteger {
 
     maxUintTenPower.AssignUint64(10000000000000000000U);
 
-    std::vector< uint64_t > vals;
+    std::vector<uint64_t> vals;
 
     val.Divide(maxUintTenPower, left, res);
 
-    if (res.sign < 0)
-      res.sign = -res.sign;
+    if (res.sign < 0) res.sign = -res.sign;
 
-    if (left.sign < 0)
-      left.sign = -left.sign;
+    if (left.sign < 0) left.sign = -left.sign;
 
-    vals.push_back(static_cast< uint64_t >(res.ToInt64()));
+    vals.push_back(static_cast<uint64_t>(res.ToInt64()));
 
     while (!left.IsZero()) {
       left.Divide(maxUintTenPower, left, res);
 
-      vals.push_back(static_cast< uint64_t >(res.ToInt64()));
+      vals.push_back(static_cast<uint64_t>(res.ToInt64()));
     }
 
     os << vals.back();
 
-    for (int32_t i = static_cast< int32_t >(vals.size()) - 2; i >= 0; --i) {
+    for (int32_t i = static_cast<int32_t>(vals.size()) - 2; i >= 0; --i) {
       os.fill('0');
       os.width(maxResultDigits);
 
@@ -341,8 +326,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
     // Return zero if input failed.
     val.AssignInt64(0);
 
-    if (!is)
-      return is;
+    if (!is) return is;
 
     // Current value parts.
     uint64_t part = 0;
@@ -355,13 +339,11 @@ class IGNITE_IMPORT_EXPORT BigInteger {
     // Current char.
     int c = is.peek();
 
-    if (!is)
-      return is;
+    if (!is) return is;
 
     // Checking sign.
     if (c == '-' || c == '+') {
-      if (c == '-')
-        sign = -1;
+      if (c == '-') sign = -1;
 
       is.ignore();
       c = is.peek();
@@ -369,7 +351,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
 
     // Reading number itself.
     while (is && isdigit(c)) {
-      part = part * 10 + (static_cast< unsigned long long >(c) - '0');
+      part = part * 10 + (static_cast<unsigned long long>(c) - '0');
       ++partDigits;
 
       if (part >= 1000000000000000000U) {
@@ -395,8 +377,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
       val.Add(part);
     }
 
-    if (sign < 0)
-      val.Negate();
+    if (sign < 0) val.Negate();
 
     return is;
   }
@@ -434,8 +415,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
    * @param rem Remainder placed there if requested. Can be *this.
    *     Can be null if the remainder is not needed.
    */
-  void Divide(const BigInteger& divisor, BigInteger& res,
-              BigInteger* rem) const;
+  void Divide(const BigInteger& divisor, BigInteger& res, BigInteger* rem) const;
 
   /**
    * Normalizes current value removing trailing zeroes from the magnitude.
@@ -456,8 +436,7 @@ class IGNITE_IMPORT_EXPORT BigInteger {
  * @param val2 Second value.
  * @return True if equal.
  */
-IGNITE_IMPORT_EXPORT bool operator==(const BigInteger& val1,
-                                     const BigInteger& val2);
+IGNITE_IMPORT_EXPORT bool operator==(const BigInteger& val1, const BigInteger& val2);
 
 /**
  * Comparison operator.
@@ -466,8 +445,7 @@ IGNITE_IMPORT_EXPORT bool operator==(const BigInteger& val1,
  * @param val2 Second value.
  * @return True if not equal.
  */
-IGNITE_IMPORT_EXPORT bool operator!=(const BigInteger& val1,
-                                     const BigInteger& val2);
+IGNITE_IMPORT_EXPORT bool operator!=(const BigInteger& val1, const BigInteger& val2);
 
 /**
  * Comparison operator.
@@ -476,8 +454,7 @@ IGNITE_IMPORT_EXPORT bool operator!=(const BigInteger& val1,
  * @param val2 Second value.
  * @return True if less.
  */
-IGNITE_IMPORT_EXPORT bool operator<(const BigInteger& val1,
-                                    const BigInteger& val2);
+IGNITE_IMPORT_EXPORT bool operator<(const BigInteger& val1, const BigInteger& val2);
 
 /**
  * Comparison operator.
@@ -486,8 +463,7 @@ IGNITE_IMPORT_EXPORT bool operator<(const BigInteger& val1,
  * @param val2 Second value.
  * @return True if less or equal.
  */
-IGNITE_IMPORT_EXPORT bool operator<=(const BigInteger& val1,
-                                     const BigInteger& val2);
+IGNITE_IMPORT_EXPORT bool operator<=(const BigInteger& val1, const BigInteger& val2);
 
 /**
  * Comparison operator.
@@ -496,8 +472,7 @@ IGNITE_IMPORT_EXPORT bool operator<=(const BigInteger& val1,
  * @param val2 Second value.
  * @return True if gretter.
  */
-IGNITE_IMPORT_EXPORT bool operator>(const BigInteger& val1,
-                                    const BigInteger& val2);
+IGNITE_IMPORT_EXPORT bool operator>(const BigInteger& val1, const BigInteger& val2);
 
 /**
  * Comparison operator.
@@ -506,8 +481,7 @@ IGNITE_IMPORT_EXPORT bool operator>(const BigInteger& val1,
  * @param val2 Second value.
  * @return True if gretter or equal.
  */
-IGNITE_IMPORT_EXPORT bool operator>=(const BigInteger& val1,
-                                     const BigInteger& val2);
+IGNITE_IMPORT_EXPORT bool operator>=(const BigInteger& val1, const BigInteger& val2);
 }  // namespace common
 }  // namespace odbc
 }  // namespace ignite

@@ -21,11 +21,11 @@
 #ifndef _TIMESTREAM_ODBC_COMMON_UTILS
 #define _TIMESTREAM_ODBC_COMMON_UTILS
 
-#include <ignite/common/include/date.h>
 #include <ignite/common/common.h>
 #include <ignite/common/include/common/platform_utils.h>
-#include <timestream/odbc/timestamp.h>
+#include <ignite/common/include/date.h>
 #include <stdint.h>
+#include <timestream/odbc/timestamp.h>
 
 #include <algorithm>
 #include <cstring>
@@ -78,8 +78,8 @@ inline std::string EncodeURIComponent(std::string unencoded) {
   std::ostringstream oss;
 
   for (char& c : unencoded) {
-    if (std::isalnum(c) || c == '-' || c == '_' || c == '~' || c == '.'
-        || c == '*' || c == '!' || c == '(' || c == ')') {
+    if (std::isalnum(c) || c == '-' || c == '_' || c == '~' || c == '.' || c == '*' ||
+        c == '!' || c == '(' || c == ')') {
       oss << c;
     } else {
       oss << "%" << std::uppercase << std::hex << (0xff & c);
@@ -104,12 +104,11 @@ inline void SpaceToUnderscore(std::string& str) {
  * @param end Iterator to the end of the character sequence.
  * @return Iterator to first non-blanc character.
  */
-template < typename Iterator >
+template <typename Iterator>
 Iterator SkipLeadingSpaces(Iterator begin, Iterator end) {
   Iterator res = begin;
 
-  while (isspace(*res) && res != end)
-    ++res;
+  while (isspace(*res) && res != end) ++res;
 
   return res;
 }
@@ -121,12 +120,11 @@ Iterator SkipLeadingSpaces(Iterator begin, Iterator end) {
  * @param end Iterator to the end of the character sequence.
  * @return Iterator to last non-blanc character.
  */
-template < typename Iterator >
+template <typename Iterator>
 Iterator SkipTrailingSpaces(Iterator begin, Iterator end) {
   Iterator res = end - 1;
 
-  while (isspace(*res) && res != begin - 1)
-    --res;
+  while (isspace(*res) && res != begin - 1) --res;
 
   return res + 1;
 }
@@ -149,9 +147,7 @@ inline std::string LongToString(long val) {
  * @param str String to be parsed.
  * @return String contataining decimal representation of the value.
  */
-inline int ParseInt(const std::string& str) {
-  return atoi(str.c_str());
-}
+inline int ParseInt(const std::string& str) { return atoi(str.c_str()); }
 
 /**
  * Copy characters.
@@ -174,7 +170,7 @@ IGNITE_IMPORT_EXPORT void ReleaseChars(char* val);
  * @param val Input value.
  * @param res Resulted value.
  */
-template < typename T1, typename T2 >
+template <typename T1, typename T2>
 void LexicalCast(const T2& val, T1& res) {
   std::stringstream converter;
 
@@ -188,11 +184,11 @@ void LexicalCast(const T2& val, T1& res) {
  * @param val Input value.
  * @return Resulted value.
  */
-template < typename T1, typename T2 >
+template <typename T1, typename T2>
 T1 LexicalCast(const T2& val) {
   T1 res;
 
-  LexicalCast< T1, T2 >(val, res);
+  LexicalCast<T1, T2>(val, res);
 
   return res;
 }
@@ -219,7 +215,7 @@ IGNITE_IMPORT_EXPORT uint32_t ToBigEndian(uint32_t value);
  * @return Corresponding value of time_t.
  */
 inline time_t DateToCTime(const Date& date) {
-  return static_cast< time_t >(date.GetSeconds());
+  return static_cast<time_t>(date.GetSeconds());
 }
 
 /**
@@ -229,7 +225,7 @@ inline time_t DateToCTime(const Date& date) {
  * @return Corresponding value of time_t.
  */
 inline time_t TimestampToCTime(const Timestamp& ts) {
-  return static_cast< time_t >(ts.GetSeconds());
+  return static_cast<time_t>(ts.GetSeconds());
 }
 
 /**
@@ -239,7 +235,7 @@ inline time_t TimestampToCTime(const Timestamp& ts) {
  * @return Corresponding value of time_t.
  */
 inline time_t TimeToCTime(const Time& time) {
-  return static_cast< time_t >(time.GetSeconds());
+  return static_cast<time_t>(time.GetSeconds());
 }
 
 /**
@@ -299,9 +295,7 @@ inline Date CTimeToDate(time_t ctime) {
  * @param ns Nanosecond.
  * @return Corresponding value of Time.
  */
-inline Time CTimeToTime(time_t ctime, int32_t ns) {
-  return Time(ctime, ns);
-}
+inline Time CTimeToTime(time_t ctime, int32_t ns) { return Time(ctime, ns); }
 
 /**
  * Convert standard C type time_t to Timestamp type.
@@ -365,9 +359,8 @@ inline Timestamp CTmToTimestamp(const tm& ctime, int32_t ns) {
  * @param sec Sec.
  * @return Date.
  */
-IGNITE_FRIEND_EXPORT Date MakeDateGmt(int year = 1900, int month = 1,
-                                      int day = 1, int hour = 0, int min = 0,
-                                      int sec = 0);
+IGNITE_FRIEND_EXPORT Date MakeDateGmt(int year = 1900, int month = 1, int day = 1,
+                                      int hour = 0, int min = 0, int sec = 0);
 
 /**
  * Make Date in human understandable way.
@@ -382,9 +375,8 @@ IGNITE_FRIEND_EXPORT Date MakeDateGmt(int year = 1900, int month = 1,
  * @param sec Sec.
  * @return Date.
  */
-IGNITE_FRIEND_EXPORT Date MakeDateLocal(int year = 1900, int month = 1,
-                                        int day = 1, int hour = 0, int min = 0,
-                                        int sec = 0);
+IGNITE_FRIEND_EXPORT Date MakeDateLocal(int year = 1900, int month = 1, int day = 1,
+                                        int hour = 0, int min = 0, int sec = 0);
 
 /**
  * Make Time in human understandable way.
@@ -397,8 +389,7 @@ IGNITE_FRIEND_EXPORT Date MakeDateLocal(int year = 1900, int month = 1,
  * @param ns Nanosecond.
  * @return Time.
  */
-IGNITE_FRIEND_EXPORT Time MakeTimeGmt(int hour = 0, int min = 0, int sec = 0,
-                                      int ns = 0);
+IGNITE_FRIEND_EXPORT Time MakeTimeGmt(int hour = 0, int min = 0, int sec = 0, int ns = 0);
 
 /**
  * Make Time in human understandable way.
@@ -429,9 +420,8 @@ IGNITE_FRIEND_EXPORT Time MakeTimeLocal(int hour = 0, int min = 0, int sec = 0,
  * @return Timestamp.
  */
 IGNITE_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year = 1900, int month = 1,
-                                                int day = 1, int hour = 0,
-                                                int min = 0, int sec = 0,
-                                                long ns = 0);
+                                                int day = 1, int hour = 0, int min = 0,
+                                                int sec = 0, long ns = 0);
 
 /**
  * Make Date in human understandable way.
@@ -447,9 +437,8 @@ IGNITE_FRIEND_EXPORT Timestamp MakeTimestampGmt(int year = 1900, int month = 1,
  * @param ns Nanosecond.
  * @return Timestamp.
  */
-IGNITE_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year = 1900,
-                                                  int month = 1, int day = 1,
-                                                  int hour = 0, int min = 0,
+IGNITE_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year = 1900, int month = 1,
+                                                  int day = 1, int hour = 0, int min = 0,
                                                   int sec = 0, long ns = 0);
 
 /**
@@ -457,7 +446,7 @@ IGNITE_FRIEND_EXPORT Timestamp MakeTimestampLocal(int year = 1900,
  * Defines T1 as ::type if the condition is true, otherwise
  * defines T2 as ::type.
  */
-template < bool, typename T1, typename T2 >
+template <bool, typename T1, typename T2>
 struct Conditional {
   typedef T1 type;
 };
@@ -465,23 +454,23 @@ struct Conditional {
 /**
  * Specialization for the false case.
  */
-template < typename T1, typename T2 >
-struct Conditional< false, T1, T2 > {
+template <typename T1, typename T2>
+struct Conditional<false, T1, T2> {
   typedef T2 type;
 };
 
 /**
  * Returns the bigger type.
  */
-template < typename T1, typename T2 >
+template <typename T1, typename T2>
 struct Bigger {
-  typedef typename Conditional< (sizeof(T1) > sizeof(T2)), T1, T2 >::type type;
+  typedef typename Conditional<(sizeof(T1) > sizeof(T2)), T1, T2>::type type;
 };
 
 /**
  * Utility class to bind class instance with member function.
  */
-template < typename R, typename T >
+template <typename R, typename T>
 class BoundInstance {
  public:
   typedef R FunctionReturnType;
@@ -505,9 +494,7 @@ class BoundInstance {
    * @return Result of the invokation of the member function on the bound
    * instance.
    */
-  FunctionReturnType operator()() {
-    return (instance->*mfunc)();
-  }
+  FunctionReturnType operator()() { return (instance->*mfunc)(); }
 
  private:
   /** Instance reference. */
@@ -520,9 +507,9 @@ class BoundInstance {
 /**
  * Utility function for binding.
  */
-template < typename R, typename T >
-BoundInstance< R, T > Bind(T* instance, R (T::*mfunc)()) {
-  return BoundInstance< R, T >(instance, mfunc);
+template <typename R, typename T>
+BoundInstance<R, T> Bind(T* instance, R (T::*mfunc)()) {
+  return BoundInstance<R, T>(instance, mfunc);
 }
 
 /**
@@ -532,7 +519,7 @@ BoundInstance< R, T > Bind(T* instance, R (T::*mfunc)()) {
  *
  * @tparam T Value type.
  */
-template < typename T >
+template <typename T>
 class MethodGuard {
  public:
   /** Value type. */
@@ -555,8 +542,7 @@ class MethodGuard {
    * Destructor.
    */
   ~MethodGuard() {
-    if (val && method)
-      (val->*method)();
+    if (val && method) (val->*method)();
   }
 
   /**
@@ -582,7 +568,7 @@ class MethodGuard {
  *
  * @tparam T Value type.
  */
-template < typename T >
+template <typename T>
 class DeinitGuard {
  public:
   /** Value type. */
@@ -605,8 +591,7 @@ class DeinitGuard {
    * Destructor.
    */
   ~DeinitGuard() {
-    if (val && func)
-      (func)(val);
+    if (val && func) (func)(val);
   }
 
   /**

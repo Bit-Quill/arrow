@@ -28,9 +28,9 @@
 #include <boost/test/unit_test.hpp>
 #include <string>
 
+#include "timestream/ignition.h"
 #include "timestream/odbc/common/decimal.h"
 #include "timestream/timestream.h"
-#include "timestream/ignition.h"
 
 namespace timestream {
 /**
@@ -65,7 +65,7 @@ struct SqlTestSuiteFixture {
    * @param request SQL request.
    * @param expected Expected result.
    */
-  template < typename T >
+  template <typename T>
   void CheckSingleResult(const char*, const T&) {
     BOOST_FAIL("Function is not defined for the type.");
   }
@@ -75,7 +75,7 @@ struct SqlTestSuiteFixture {
    *
    * @param request SQL request.
    */
-  template < typename T >
+  template <typename T>
   void CheckSingleResult(const char*) {
     BOOST_FAIL("Function is not defined for the type.");
   }
@@ -87,9 +87,8 @@ struct SqlTestSuiteFixture {
    * @param expected Expected result.
    * @param type Result type.
    */
-  template < typename T >
-  void CheckSingleResultNum0(const char* request, const T& expected,
-                             SQLSMALLINT type) {
+  template <typename T>
+  void CheckSingleResultNum0(const char* request, const T& expected, SQLSMALLINT type) {
     T res = 0;
 
     CheckSingleResult0(request, type, &res, 0, 0);
@@ -103,7 +102,7 @@ struct SqlTestSuiteFixture {
    * @param request SQL request.
    * @param type Result type.
    */
-  template < typename T >
+  template <typename T>
   void CheckSingleResultNum0(const char* request, SQLSMALLINT type) {
     T res = 0;
 
@@ -114,7 +113,7 @@ struct SqlTestSuiteFixture {
   Ignite grid;
 
   /** Test cache instance. */
-  cache::Cache< int64_t, TestType > testCache;
+  cache::Cache<int64_t, TestType> testCache;
 
   /** ODBC Environment. */
   SQLHENV env;
@@ -127,90 +126,90 @@ struct SqlTestSuiteFixture {
 };
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< std::string >(
-    const char* request, const std::string& expected);
+void SqlTestSuiteFixture::CheckSingleResult<std::string>(const char* request,
+                                                         const std::string& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< SQLBIGINT >(
-    const char* request, const SQLBIGINT& expected);
+void SqlTestSuiteFixture::CheckSingleResult<SQLBIGINT>(const char* request,
+                                                       const SQLBIGINT& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< SQLINTEGER >(
-    const char* request, const SQLINTEGER& expected);
+void SqlTestSuiteFixture::CheckSingleResult<SQLINTEGER>(const char* request,
+                                                        const SQLINTEGER& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< SQLSMALLINT >(
-    const char* request, const SQLSMALLINT& expected);
+void SqlTestSuiteFixture::CheckSingleResult<SQLSMALLINT>(const char* request,
+                                                         const SQLSMALLINT& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< int8_t >(const char* request,
-                                                      const int8_t& expected);
+void SqlTestSuiteFixture::CheckSingleResult<int8_t>(const char* request,
+                                                    const int8_t& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< float >(const char* request,
-                                                     const float& expected);
+void SqlTestSuiteFixture::CheckSingleResult<float>(const char* request,
+                                                   const float& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< double >(const char* request,
-                                                      const double& expected);
+void SqlTestSuiteFixture::CheckSingleResult<double>(const char* request,
+                                                    const double& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< bool >(const char* request,
-                                                    const bool& expected);
+void SqlTestSuiteFixture::CheckSingleResult<bool>(const char* request,
+                                                  const bool& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< timestream::Guid >(
+void SqlTestSuiteFixture::CheckSingleResult<timestream::Guid>(
     const char* request, const timestream::Guid& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< std::string >(const char* request);
+void SqlTestSuiteFixture::CheckSingleResult<std::string>(const char* request);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< SQLBIGINT >(const char* request);
+void SqlTestSuiteFixture::CheckSingleResult<SQLBIGINT>(const char* request);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< SQLINTEGER >(const char* request);
+void SqlTestSuiteFixture::CheckSingleResult<SQLINTEGER>(const char* request);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< SQLSMALLINT >(const char* request);
+void SqlTestSuiteFixture::CheckSingleResult<SQLSMALLINT>(const char* request);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< int8_t >(const char* request);
+void SqlTestSuiteFixture::CheckSingleResult<int8_t>(const char* request);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< float >(const char* request);
+void SqlTestSuiteFixture::CheckSingleResult<float>(const char* request);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< double >(const char* request);
+void SqlTestSuiteFixture::CheckSingleResult<double>(const char* request);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< Date >(const char* request);
+void SqlTestSuiteFixture::CheckSingleResult<Date>(const char* request);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< Timestamp >(const char* request);
+void SqlTestSuiteFixture::CheckSingleResult<Timestamp>(const char* request);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< Time >(const char* request);
+void SqlTestSuiteFixture::CheckSingleResult<Time>(const char* request);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< std::vector< int8_t > >(
-    const char* request, const std::vector< int8_t >& expected);
+void SqlTestSuiteFixture::CheckSingleResult<std::vector<int8_t> >(
+    const char* request, const std::vector<int8_t>& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< timestream::common::Decimal >(
+void SqlTestSuiteFixture::CheckSingleResult<timestream::common::Decimal>(
     const char* request, const timestream::common::Decimal& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< Date >(const char* request,
-                                                    const Date& expected);
+void SqlTestSuiteFixture::CheckSingleResult<Date>(const char* request,
+                                                  const Date& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< Timestamp >(
-    const char* request, const Timestamp& expected);
+void SqlTestSuiteFixture::CheckSingleResult<Timestamp>(const char* request,
+                                                       const Timestamp& expected);
 
 template <>
-void SqlTestSuiteFixture::CheckSingleResult< Time >(const char* request,
-                                                    const Time& expected);
+void SqlTestSuiteFixture::CheckSingleResult<Time>(const char* request,
+                                                  const Time& expected);
 }  // namespace timestream
 
 #endif  //_IGNITE_ODBC_TEST_SQL_TEST_SUIT_FIXTURE

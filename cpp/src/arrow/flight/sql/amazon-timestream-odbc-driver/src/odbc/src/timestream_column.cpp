@@ -18,13 +18,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <chrono>
-#include <ctime>
-#include <time.h>
 #include "timestream/odbc/timestream_column.h"
-#include "timestream/odbc/utility.h"
 #include <aws/timestream-query/model/ColumnInfo.h>
 #include <aws/timestream-query/model/TimeSeriesDataPoint.h>
+#include <time.h>
+#include <chrono>
+#include <ctime>
+#include "timestream/odbc/utility.h"
 
 using Aws::TimestreamQuery::Model::ScalarType;
 using Aws::TimestreamQuery::Model::TimeSeriesDataPoint;
@@ -34,17 +34,13 @@ namespace timestream {
 namespace odbc {
 #define BUFFER_SIZE 1024
 
-TimestreamColumn::TimestreamColumn(
-                                   uint32_t columnIdx,
-                                   const meta::ColumnMeta& columnMeta)
-    :
-      columnIdx_(columnIdx), 
-      columnMeta_(columnMeta) {
-}
+TimestreamColumn::TimestreamColumn(uint32_t columnIdx, const meta::ColumnMeta& columnMeta)
+    : columnIdx_(columnIdx), columnMeta_(columnMeta) {}
 
-ConversionResult::Type TimestreamColumn::ReadToBuffer(const Datum& datum, ApplicationDataBuffer& dataBuf) const {
+ConversionResult::Type TimestreamColumn::ReadToBuffer(
+    const Datum& datum, ApplicationDataBuffer& dataBuf) const {
   LOG_DEBUG_MSG("ReadToBuffer is called");
-  const boost::optional< Aws::TimestreamQuery::Model::ColumnInfo >& columnInfo =
+  const boost::optional<Aws::TimestreamQuery::Model::ColumnInfo>& columnInfo =
       columnMeta_.GetColumnInfo();
 
   if (!columnInfo || !columnInfo->TypeHasBeenSet()) {
@@ -87,7 +83,7 @@ ConversionResult::Type TimestreamColumn::ParseScalarType(
 
   Aws::String value = datum.GetScalarValue();
   LOG_DEBUG_MSG("value is " << value << ", scalar type is "
-                            << static_cast< int >(columnMeta_.GetScalarType()));
+                            << static_cast<int>(columnMeta_.GetScalarType()));
 
   ConversionResult::Type convRes = ConversionResult::Type::AI_SUCCESS;
 
@@ -121,8 +117,8 @@ ConversionResult::Type TimestreamColumn::ParseScalarType(
       memset(&tmTime, 0, sizeof(tm));
       int32_t fractionNs;
       std::sscanf(value.c_str(), "%4d-%2d-%2d %2d:%2d:%2d.%9d", &tmTime.tm_year,
-                  &tmTime.tm_mon, &tmTime.tm_mday, &tmTime.tm_hour,
-                  &tmTime.tm_min, &tmTime.tm_sec, &fractionNs);
+                  &tmTime.tm_mon, &tmTime.tm_mday, &tmTime.tm_hour, &tmTime.tm_min,
+                  &tmTime.tm_sec, &fractionNs);
       tmTime.tm_year -= 1900;
       tmTime.tm_mon--;
 #ifdef _WIN32
@@ -130,10 +126,9 @@ ConversionResult::Type TimestreamColumn::ParseScalarType(
 #else
       int64_t seconds = timegm(&tmTime);
 #endif
-      LOG_DEBUG_MSG("timestamp is " << tmTime.tm_year << " " << tmTime.tm_mon
-                                    << " " << tmTime.tm_mday << " "
-                                    << tmTime.tm_hour << ":" << tmTime.tm_min
-                                    << ":" << tmTime.tm_sec << "."
+      LOG_DEBUG_MSG("timestamp is " << tmTime.tm_year << " " << tmTime.tm_mon << " "
+                                    << tmTime.tm_mday << " " << tmTime.tm_hour << ":"
+                                    << tmTime.tm_min << ":" << tmTime.tm_sec << "."
                                     << fractionNs);
 
       LOG_DEBUG_MSG("seconds is " << seconds);
@@ -162,8 +157,7 @@ ConversionResult::Type TimestreamColumn::ParseScalarType(
       uint32_t minute;
       uint32_t second;
       int32_t fractionNs;
-      std::sscanf(value.c_str(), "%2d:%2d:%2d.%9d", &hour, &minute, &second,
-                  &fractionNs);
+      std::sscanf(value.c_str(), "%2d:%2d:%2d.%9d", &hour, &minute, &second, &fractionNs);
       int32_t secondValue = (hour * 60 + minute) * 60 + second;
       convRes = dataBuf.PutTime(Time(secondValue, fractionNs));
       break;
@@ -176,17 +170,17 @@ ConversionResult::Type TimestreamColumn::ParseScalarType(
     }
     case ScalarType::INTERVAL_DAY_TO_SECOND: {
       int32_t day, hour, minute, second, fraction;
-      std::sscanf(value.c_str(), "%d %2d:%2d:%2d.%9d", &day, &hour, &minute,
-                  &second, &fraction);
-      convRes = dataBuf.PutInterval(
-          IntervalDaySecond(day, hour, minute, second, fraction));
+      std::sscanf(value.c_str(), "%d %2d:%2d:%2d.%9d", &day, &hour, &minute, &second,
+                  &fraction);
+      convRes =
+          dataBuf.PutInterval(IntervalDaySecond(day, hour, minute, second, fraction));
       break;
     }
     default:
       return ConversionResult::Type::AI_UNSUPPORTED_CONVERSION;
   }
 
-  LOG_DEBUG_MSG("convRes is " << static_cast< int >(convRes));
+  LOG_DEBUG_MSG("convRes is " << static_cast<int>(convRes));
   return convRes;
 }
 
@@ -194,8 +188,7 @@ ConversionResult::Type TimestreamColumn::ParseTimeSeriesType(
     const Datum& datum, ApplicationDataBuffer& dataBuf) const {
   LOG_DEBUG_MSG("ParseTimeSeriesType is called");
 
-  const Aws::Vector< TimeSeriesDataPoint >& valueVec =
-      datum.GetTimeSeriesValue();
+  const Aws::Vector<TimeSeriesDataPoint>& valueVec = datum.GetTimeSeriesValue();
 
   std::string result = "[";
   for (const auto& itr : valueVec) {
@@ -208,9 +201,8 @@ ConversionResult::Type TimestreamColumn::ParseTimeSeriesType(
     if (itr.ValueHasBeenSet()) {
       char buf[BUFFER_SIZE]{};
       SqlLen resLen;
-      ApplicationDataBuffer tmpBuf(OdbcNativeType::Type::AI_CHAR,
-                                   static_cast< void* >(buf), BUFFER_SIZE,
-                                   &resLen);
+      ApplicationDataBuffer tmpBuf(OdbcNativeType::Type::AI_CHAR, static_cast<void*>(buf),
+                                   BUFFER_SIZE, &resLen);
       ParseDatum(itr.GetValue(), tmpBuf);
       result += buf;
     }
@@ -224,7 +216,7 @@ ConversionResult::Type TimestreamColumn::ParseTimeSeriesType(
 
   ConversionResult::Type convRes = dataBuf.PutString(result);
 
-  LOG_DEBUG_MSG("convRes is " << static_cast< int >(convRes));
+  LOG_DEBUG_MSG("convRes is " << static_cast<int>(convRes));
   return convRes;
 }
 
@@ -232,7 +224,7 @@ ConversionResult::Type TimestreamColumn::ParseArrayType(
     const Datum& datum, ApplicationDataBuffer& dataBuf) const {
   LOG_DEBUG_MSG("ParseArrayType is called");
 
-  const Aws::Vector< Datum >& valueVec = datum.GetArrayValue();
+  const Aws::Vector<Datum>& valueVec = datum.GetArrayValue();
 
   std::string result("");
   if (valueVec.empty()) {
@@ -242,9 +234,8 @@ ConversionResult::Type TimestreamColumn::ParseArrayType(
     for (const auto& itr : valueVec) {
       char buf[BUFFER_SIZE]{};
       SqlLen resLen;
-      ApplicationDataBuffer tmpBuf(OdbcNativeType::Type::AI_CHAR,
-                                   static_cast< void* >(buf), BUFFER_SIZE,
-                                   &resLen);
+      ApplicationDataBuffer tmpBuf(OdbcNativeType::Type::AI_CHAR, static_cast<void*>(buf),
+                                   BUFFER_SIZE, &resLen);
       ParseDatum(itr, tmpBuf);
       result += buf;
 
@@ -256,7 +247,7 @@ ConversionResult::Type TimestreamColumn::ParseArrayType(
 
   ConversionResult::Type convRes = dataBuf.PutString(result);
 
-  LOG_DEBUG_MSG("convRes is " << static_cast< int >(convRes));
+  LOG_DEBUG_MSG("convRes is " << static_cast<int>(convRes));
   return convRes;
 }
 
@@ -271,14 +262,13 @@ ConversionResult::Type TimestreamColumn::ParseRowType(
     return ConversionResult::Type::AI_NO_DATA;
   }
 
-  const Aws::Vector< Datum >& valueVec = row.GetData();
+  const Aws::Vector<Datum>& valueVec = row.GetData();
   std::string result = "(";
   for (const auto& itr : valueVec) {
     char buf[BUFFER_SIZE]{};
     SqlLen resLen;
-    ApplicationDataBuffer tmpBuf(OdbcNativeType::Type::AI_CHAR,
-                                 static_cast< void* >(buf), BUFFER_SIZE,
-                                 &resLen);
+    ApplicationDataBuffer tmpBuf(OdbcNativeType::Type::AI_CHAR, static_cast<void*>(buf),
+                                 BUFFER_SIZE, &resLen);
     ParseDatum(itr, tmpBuf);
     result += buf;
 
@@ -291,7 +281,7 @@ ConversionResult::Type TimestreamColumn::ParseRowType(
 
   ConversionResult::Type convRes = dataBuf.PutString(result);
 
-  LOG_DEBUG_MSG("convRes is " << static_cast< int >(convRes));
+  LOG_DEBUG_MSG("convRes is " << static_cast<int>(convRes));
   return convRes;
 }
 }  // namespace odbc

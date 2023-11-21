@@ -37,13 +37,9 @@ Date& Date::operator=(const Date& another) {
   return *this;
 }
 
-int64_t Date::GetMilliseconds() const {
-  return milliseconds;
-}
+int64_t Date::GetMilliseconds() const { return milliseconds; }
 
-int64_t Date::GetSeconds() const {
-  return milliseconds / 1000;
-}
+int64_t Date::GetSeconds() const { return milliseconds / 1000; }
 
 bool operator==(const Date& val1, const Date& val2) {
   return val1.milliseconds == val2.milliseconds;

@@ -67,8 +67,7 @@ class Diagnosable {
    * @param rowNum Associated row number.
    * @param columnNum Associated column number.
    */
-  virtual void AddStatusRecord(SqlState::Type sqlState,
-                               const std::string& message,
+  virtual void AddStatusRecord(SqlState::Type sqlState, const std::string& message,
                                LogLevel::Type logLevel, int32_t rowNum,
                                int32_t columnNum) = 0;
 
@@ -78,9 +77,8 @@ class Diagnosable {
    * @param sqlState SQL state.
    * @param message Message.
    */
-  virtual void AddStatusRecord(
-      SqlState::Type sqlState, const std::string& message,
-      LogLevel::Type logLevel = LogLevel::Type::ERROR_LEVEL) = 0;
+  virtual void AddStatusRecord(SqlState::Type sqlState, const std::string& message,
+                               LogLevel::Type logLevel = LogLevel::Type::ERROR_LEVEL) = 0;
 
   /**
    * Add new status record.

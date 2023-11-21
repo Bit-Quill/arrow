@@ -21,8 +21,8 @@
 #include "timestream/odbc/system/ui/window.h"
 #include "timestream/odbc/ignite_error.h"
 
-#include <windowsx.h>
 #include <CommCtrl.h>
+#include <windowsx.h>
 
 namespace timestream {
 namespace odbc {
@@ -35,8 +35,7 @@ HINSTANCE GetHInstance() {
   if (hInstance == NULL) {
     std::stringstream buf;
 
-    buf << "Can not get hInstance for the module, error code: "
-        << GetLastError();
+    buf << "Can not get hInstance for the module, error code: " << GetLastError();
 
     throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
   }
@@ -44,13 +43,8 @@ HINSTANCE GetHInstance() {
   return hInstance;
 }
 
-Window::Window(Window* parent, const std::wstring& className,
-               const std::wstring& title)
-    : className(className),
-      title(title),
-      handle(NULL),
-      created(false),
-      parent(parent) {
+Window::Window(Window* parent, const std::wstring& className, const std::wstring& title)
+    : className(className), title(title), handle(NULL), created(false), parent(parent) {
   // No-op.
 }
 
@@ -60,12 +54,10 @@ Window::Window(HWND handle)
 }
 
 Window::~Window() {
-  if (created)
-    Destroy();
+  if (created) Destroy();
 }
 
-void Window::Create(DWORD style, int posX, int posY, int width, int height,
-                    int id) {
+void Window::Create(DWORD style, int posX, int posY, int width, int height, int id) {
   if (handle) {
     std::stringstream buf;
 
@@ -74,9 +66,9 @@ void Window::Create(DWORD style, int posX, int posY, int width, int height,
     throw IgniteError(IgniteError::IGNITE_ERR_GENERIC, buf.str().c_str());
   }
 
-  handle = CreateWindow(className.c_str(), title.c_str(), style, posX, posY,
-                        width, height, parent ? parent->GetHandle() : nullptr,
-                        reinterpret_cast< HMENU >(static_cast< ptrdiff_t >(id)),
+  handle = CreateWindow(className.c_str(), title.c_str(), style, posX, posY, width,
+                        height, parent ? parent->GetHandle() : nullptr,
+                        reinterpret_cast<HMENU>(static_cast<ptrdiff_t>(id)),
                         GetHInstance(), this);
 
   if (!handle) {
@@ -94,17 +86,12 @@ void Window::Create(DWORD style, int posX, int posY, int width, int height,
   SendMessage(GetHandle(), WM_SETFONT, (WPARAM)hfDefault, MAKELPARAM(FALSE, 0));
 }
 
-void Window::Show() {
-  ShowWindow(handle, SW_SHOW);
-}
+void Window::Show() { ShowWindow(handle, SW_SHOW); }
 
-void Window::Update() {
-  UpdateWindow(handle);
-}
+void Window::Update() { UpdateWindow(handle); }
 
 void Window::Destroy() {
-  if (handle)
-    DestroyWindow(handle);
+  if (handle) DestroyWindow(handle);
 
   handle = nullptr;
 }
@@ -126,19 +113,16 @@ void Window::GetText(std::wstring& text) const {
 
   text.resize(len + 1);
 
-  if (!GetWindowText(handle, &text[0], len + 1))
-    text.clear();
+  if (!GetWindowText(handle, &text[0], len + 1)) text.clear();
 
   text.resize(len);
 }
 
 void Window::SetText(const std::wstring& text) const {
-  SNDMSG(handle, WM_SETTEXT, 0, reinterpret_cast< LPARAM >(text.c_str()));
+  SNDMSG(handle, WM_SETTEXT, 0, reinterpret_cast<LPARAM>(text.c_str()));
 }
 
-bool Window::HasText() const {
-  return IsEnabled() && GetWindowTextLength(handle) > 0;
-}
+bool Window::HasText() const { return IsEnabled() && GetWindowTextLength(handle) > 0; }
 
 bool Window::IsChecked() const {
   return IsEnabled() && Button_GetCheck(handle) == BST_CHECKED;
@@ -149,32 +133,28 @@ void Window::SetChecked(bool state) {
 }
 
 void Window::AddString(const std::wstring& str) {
-  SNDMSG(handle, CB_ADDSTRING, 0, reinterpret_cast< LPARAM >(str.c_str()));
+  SNDMSG(handle, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(str.c_str()));
 }
 
 void Window::SetCBSelection(int idx) {
-  SNDMSG(handle, CB_SETCURSEL, static_cast< WPARAM >(idx), 0);
+  SNDMSG(handle, CB_SETCURSEL, static_cast<WPARAM>(idx), 0);
 }
 
 int Window::GetCBSelection() const {
-  return static_cast< int >(SNDMSG(handle, CB_GETCURSEL, 0, 0));
+  return static_cast<int>(SNDMSG(handle, CB_GETCURSEL, 0, 0));
 }
 
 void Window::SetTabSelection(int idx) {
-  SNDMSG(handle, TCM_SETCURSEL, static_cast< WPARAM >(idx), 0);
+  SNDMSG(handle, TCM_SETCURSEL, static_cast<WPARAM>(idx), 0);
 }
 
 int Window::GetTabSelection() const {
-  return static_cast< int >(SNDMSG(handle, TCM_GETCURSEL, 0, 0));
+  return static_cast<int>(SNDMSG(handle, TCM_GETCURSEL, 0, 0));
 }
 
-void Window::SetEnabled(bool enabled) {
-  EnableWindow(GetHandle(), enabled);
-}
+void Window::SetEnabled(bool enabled) { EnableWindow(GetHandle(), enabled); }
 
-bool Window::IsEnabled() const {
-  return IsWindowEnabled(GetHandle()) != 0;
-}
+bool Window::IsEnabled() const { return IsWindowEnabled(GetHandle()) != 0; }
 
 void Window::AddTab(int idx, wchar_t* tabTitle) {
   TCITEM tabItem;
@@ -182,9 +162,8 @@ void Window::AddTab(int idx, wchar_t* tabTitle) {
   tabItem.iImage = -1;
   tabItem.pszText = tabTitle;
 
-  if (SNDMSG(handle, TCM_INSERTITEM, static_cast< WPARAM >(idx),
-             reinterpret_cast< LPARAM >(&tabItem))
-      == -1) {
+  if (SNDMSG(handle, TCM_INSERTITEM, static_cast<WPARAM>(idx),
+             reinterpret_cast<LPARAM>(&tabItem)) == -1) {
     DestroyWindow(handle);
 
     std::stringstream buf;
