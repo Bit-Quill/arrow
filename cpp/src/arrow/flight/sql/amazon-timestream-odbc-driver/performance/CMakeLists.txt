@@ -25,19 +25,15 @@ add_subdirectory(${PERFORMANCE_HELPER})
 add_subdirectory(${RESULTS_PTESTS})
 add_subdirectory(${EXECUTION_PTESTS})
 
-if (NOT "$ENV{BOOST_ROOT}" STREQUAL "")
-    set(BOOST_ROOT "$ENV{BOOST_ROOT}")
+if(NOT "$ENV{BOOST_ROOT}" STREQUAL "")
+  set(BOOST_ROOT "$ENV{BOOST_ROOT}")
 endif()
 
 # gtest
 include(gtest/googletest.cmake)
 if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -fPIC")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -fPIC -Wno-error=maybe-uninitialized")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -fPIC -Wno-error=maybe-uninitialized")
 endif()
-fetch_googletest(
-  ${PROJECT_SOURCE_DIR}/gtest
-  ${PROJECT_BINARY_DIR}/googletest
-)
-
+fetch_googletest(${PROJECT_SOURCE_DIR}/gtest ${PROJECT_BINARY_DIR}/googletest)
