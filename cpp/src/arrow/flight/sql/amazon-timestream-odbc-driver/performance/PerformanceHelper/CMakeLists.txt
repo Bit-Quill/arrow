@@ -17,14 +17,13 @@ find_package(ODBC REQUIRED)
 
 # Source, headers, and include dirs
 set(SOURCE_FILES performance_helper.cpp)
-set(HEADER_FILES performance_helper.h)	
+set(HEADER_FILES performance_helper.h)
 
 # Generate dll (SHARED)
-add_library(performance_helper  ${SOURCE_FILES} ${HEADER_FILES})
+add_library(performance_helper ${SOURCE_FILES} ${HEADER_FILES})
 include_directories(${ODBC_INCLUDE_DIRS})
 
 # Library dependencies
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} -fPIC")
 target_link_libraries(performance_helper gtest_main ${ODBC_LIBRARIES})
-target_compile_definitions(performance_helper PUBLIC _UNICODE UNICODE)	
-
+target_compile_definitions(performance_helper PUBLIC _UNICODE UNICODE)
