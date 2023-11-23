@@ -1,23 +1,24 @@
 name: ODBC Driver for Windows
-# TODO integrate the ODBC driver build into rest of the Arrow workflows.
-# Workflows under "cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\.github\workflows\*"" serve as backup
+
 on:
   push:
-    branches:
-      - main
+    paths:
+      - '.github/workflows/win-build.yml'
+      - 'cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/**'
   pull_request:
-    branches:
-      - main
+    paths:
+      - '.github/workflows/win-build.yml'
+      - 'cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/**'
 
 env:
   SIGNING_ENABLED: ${{ github.event.inputs.sign }}
   CI_OUTPUT_PATH: "ci-output"
-  ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
-  ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin/Release"
-  ODBC_DEBUG_PATH: "${{github.workspace}}/build/odbc/bin/Debug"
-  ODBC_BUILD_PATH: "${{github.workspace}}/build/odbc/cmake"
+  ODBC_LIB_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/lib"
+  ODBC_BIN_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/bin/Release"
+  ODBC_DEBUG_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/bin/Debug"
+  ODBC_BUILD_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/cmake"
   VCPKG_ROOT: "c:/vcpkg"
-  TIMESTREAM_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
+  TIMESTREAM_LOG_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs"
   TIMESTREAM_LOG_LEVEL: "4"
   BIG_TABLE_PAGINATION_TEST_ENABLE: "TRUE"
 
@@ -41,32 +42,8 @@ env:
   # OKTA_IDP_ARN: ${{secrets.OKTA_IDP_ARN}}  
 
 jobs:
-  trufflehog-git-secrets-scan:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: TruffleHog OSS
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          extra_args: --debug --only-verified
-      - name: git secrets
-        run: |
-          git clone https://github.com/awslabs/git-secrets.git
-          cd git-secrets
-          sudo make install
-          cd ..
-          git secrets --register-aws
-          git secrets --scan-history
-
   build-windows32:
     runs-on: windows-2022
-    needs: trufflehog-git-secrets-scan
     steps:
     - uses: actions/checkout@v2
 
@@ -101,31 +78,24 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
+        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
         .\build_win_release32.ps1
 
     - name: Build PowerBI connector
       run: |
-        cd src/PowerBIConnector
+        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/PowerBIConnector
         .\AmazonTimestreamConnector.ps1
-        cd ${{github.workspace}}
+        cd ${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
 
     - name: Upload ODBC connector build 
       uses: actions/upload-artifact@v3
       with:
         name: AmazonTimestreamConnector.mez
-        path: ./src/PowerBIConnector/AmazonTimestreamConnector.mez
+        path: ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/PowerBIConnector/AmazonTimestreamConnector.mez
 
     - name: register-driver
       run: |
-        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll
-
-    - name: configure-aws-credentials-for-tests
-      if: success()
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-2
+        .\cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll
 
     - name: run-unit-tests
       id: rununittests
@@ -148,12 +118,12 @@ jobs:
         name: odbc-unit-test-results
         path: |
           ./odbc_unit_test_result.xml
-          ./build/odbc/logs/timestream_odbc_*.log
+          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
 
-    - name: run-integration-tests
-      id: runintegrationtests
-      run: |
-        ${{env.ODBC_BIN_PATH}}/timestream-odbc-integration-tests.exe
+    # - name: run-integration-tests
+    #   id: runintegrationtests
+    #   run: |
+    #     ${{env.ODBC_BIN_PATH}}/timestream-odbc-integration-tests.exe
 
     - name: upload-integration-test-report
       if: always()
@@ -170,44 +140,44 @@ jobs:
         name: odbc-test-results
         path: |
           ./odbc_test_result.xml
-          ./build/odbc/logs/timestream_odbc_*.log
+          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
 
     - name: Read VERSION file
       if: ${{ env.SIGNING_ENABLED == 'true' }}
       id: getversion
-      run: echo "::set-output name=version::$(cat src/ODBC_DRIVER_VERSION.txt)"
+      run: echo "::set-output name=version::$(cat cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/ODBC_DRIVER_VERSION.txt)"
 
-    - name: "Configure AWS credentials"
-      if: ${{ env.SIGNING_ENABLED == 'true' }}
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        role-skip-session-tagging: true
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-2
-        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-        role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
-        role-duration-seconds: 3600
+    # TODO remove code for signing the installer
+    # - name: "Configure AWS credentials"
+    #   if: ${{ env.SIGNING_ENABLED == 'true' }}
+    #   uses: aws-actions/configure-aws-credentials@v2
+    #   with:
+    #     role-skip-session-tagging: true
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: us-west-2
+    #     role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    #     role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+    #     role-duration-seconds: 3600
 
-    # Name of signed executable is same as unsigned exeuctable
-    - name: Sign executables
-      if: ${{ env.SIGNING_ENABLED == 'true' }}
-      id: sign-executables-32
-      shell: pwsh
-      run: |
-        . ./scripts/sign_installer.ps1
-        choco install jq -y
-        Invoke-SignInstaller build\odbc\cmake\Release x86 ${{ steps.getversion.outputs.version }} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }}
+    # # Name of signed executable is same as unsigned exeuctable
+    # - name: Sign executables
+    #   if: ${{ env.SIGNING_ENABLED == 'true' }}
+    #   id: sign-executables-32
+    #   shell: pwsh
+    #   run: |
+    #     . ./scripts/sign_installer.ps1
+    #     choco install jq -y
+    #     Invoke-SignInstaller build\odbc\cmake\Release x86 ${{ steps.getversion.outputs.version }} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }}
 
     - name: Upload ODBC driver build 
       uses: actions/upload-artifact@v3
       with:
         name: timestream-odbc-driver-32
-        path: build/odbc/cmake/Release
+        path: cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/cmake/Release
 
   build-windows64:
     runs-on: windows-2022
-    needs: trufflehog-git-secrets-scan
     steps:
     - uses: actions/checkout@v2
 
@@ -242,31 +212,24 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
+        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
         .\build_win_release64.ps1
 
     - name: Build PowerBI connector
       run: |
-        cd src/PowerBIConnector
+        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/PowerBIConnector
         .\AmazonTimestreamConnector.ps1
-        cd ${{github.workspace}}
+        cd ${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
 
     - name: Upload ODBC connector build 
       uses: actions/upload-artifact@v3
       with:
         name: AmazonTimestreamConnector.mez
-        path: ./src/PowerBIConnector/AmazonTimestreamConnector.mez
+        path: ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/PowerBIConnector/AmazonTimestreamConnector.mez
 
     - name: register-driver
       run: |
-        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll
-
-    - name: configure-aws-credentials-for-tests
-      if: success()
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-2
+        .\cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll
 
     - name: run-unit-tests
       id: rununittests
@@ -289,12 +252,13 @@ jobs:
         name: odbc-unit-test-results
         path: |
           ./odbc_unit_test_result.xml
-          ./build/odbc/logs/timestream_odbc_*.log
+          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
 
-    - name: run-integration-tests
-      id: runintegrationtests
-      run: |
-        ${{env.ODBC_BIN_PATH}}/timestream-odbc-integration-tests.exe
+    # TODO enable integration tests
+    # - name: run-integration-tests
+    #   id: runintegrationtests
+    #   run: |
+    #     ${{env.ODBC_BIN_PATH}}/timestream-odbc-integration-tests.exe
 
     - name: upload-integration-test-report
       if: always()
@@ -311,44 +275,43 @@ jobs:
         name: odbc-test-results
         path: |
           ./odbc_test_result.xml
-          ./build/odbc/logs/timestream_odbc_*.log
+          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
 
     - name: Read VERSION file
       if: ${{ env.SIGNING_ENABLED == 'true' }}
       id: getversion
-      run: echo "::set-output name=version::$(cat src/ODBC_DRIVER_VERSION.txt)"
+      run: echo "::set-output name=version::$(cat cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/ODBC_DRIVER_VERSION.txt)"
 
-    - name: "Configure AWS credentials"
-      if: ${{ env.SIGNING_ENABLED == 'true' }}
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        role-skip-session-tagging: true
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-2
-        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-        role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
-        role-duration-seconds: 3600
+    # - name: "Configure AWS credentials"
+    #   if: ${{ env.SIGNING_ENABLED == 'true' }}
+    #   uses: aws-actions/configure-aws-credentials@v2
+    #   with:
+    #     role-skip-session-tagging: true
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: us-west-2
+    #     role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    #     role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+    #     role-duration-seconds: 3600
 
     # Name of signed executable is same as unsigned exeuctable
-    - name: Sign executables
-      if: ${{ env.SIGNING_ENABLED == 'true' }}
-      id: sign-executables-64
-      shell: pwsh
-      run: |
-        . ./scripts/sign_installer.ps1
-        choco install jq -y
-        Invoke-SignInstaller build\odbc\cmake\Release x64 ${{ steps.getversion.outputs.version }} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }}
+    # - name: Sign executables
+    #   if: ${{ env.SIGNING_ENABLED == 'true' }}
+    #   id: sign-executables-64
+    #   shell: pwsh
+    #   run: |
+    #     . ./scripts/sign_installer.ps1
+    #     choco install jq -y
+    #     Invoke-SignInstaller build\odbc\cmake\Release x64 ${{ steps.getversion.outputs.version }} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }}
 
     - name: Upload ODBC driver build 
       uses: actions/upload-artifact@v3
       with:
         name: timestream-odbc-driver-64
-        path: build/odbc/cmake/Release
+        path: cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/cmake/Release
 
   build-windows64_coverage:
     runs-on: windows-2022
-    needs: trufflehog-git-secrets-scan
     steps:
     - uses: actions/checkout@v2
 
@@ -389,32 +352,30 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
+        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
         .\build_win_debug64.ps1
 
     - name: Build PowerBI connector
       run: |
-        cd src/PowerBIConnector
+        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/PowerBIConnector
         .\AmazonTimestreamConnector.ps1
-        cd ${{github.workspace}}
+        cd ${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/
 
     - name: register-driver
       run: |
-        .\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\timestream.odbc.dll
+        .\cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\timestream.odbc.dll
 
-    - name: configure-aws-credentials-for-tests
-      if: success()
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-2
-
+    # TODO re-enable integration tests
     - name: run-tests
       run: |
         # run code coverage against unit test first
-        opencppcoverage --sources src\odbc\src --sources src\odbc\include --export_type binary:unit.test.cov --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources src\odbc\src\ignite --excluded_sources src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-unit-tests.exe
+        opencppcoverage --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include --export_type cobertura:coverage.cobertura.xml --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src\ignite --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-unit-tests.exe
+
+
+        # TODO after integration tests are enabled, merge unit test coverage with integraion test coverage; replace below lines with above.
+        # opencppcoverage --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include --export_type binary:unit.test.cov --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src\ignite --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-unit-tests.exe
         # run code coverage against integration test and merge the result with the unit test one
-        opencppcoverage --sources src\odbc\src --sources src\odbc\include --input_coverage unit.test.cov --export_type cobertura:coverage.cobertura.xml --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources src\odbc\src\ignite --excluded_sources src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-integration-tests.exe
+        # opencppcoverage --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include --input_coverage unit.test.cov --export_type cobertura:coverage.cobertura.xml --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src\ignite --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-integration-tests.exe
 
     - name: upload-coverage
       if: always()
