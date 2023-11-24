@@ -134,12 +134,12 @@ class DsnConfigurationWindow : public CustomWindow {
   void Create();
 
   /**
-   * @copedoc timestream::odbc::system::ui::CustomWindow::OnCreate
+   * timestream::odbc::system::ui::CustomWindow::OnCreate
    */
   virtual void OnCreate();
 
   /**
-   * @copedoc timestream::odbc::system::ui::CustomWindow::OnMessage
+   * timestream::odbc::system::ui::CustomWindow::OnMessage
    */
   virtual bool OnMessage(UINT msg, WPARAM wParam, LPARAM lParam);
 

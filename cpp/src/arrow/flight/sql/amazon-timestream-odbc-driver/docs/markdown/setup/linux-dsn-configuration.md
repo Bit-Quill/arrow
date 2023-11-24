@@ -47,7 +47,7 @@ Use a text editor from the Unix shell to edit the odbc.ini file such as vi. See 
 
 `vi ~/.odbc.ini`
 
-#### <a name="odbc_data_source"></a>Sample odbc.ini file
+#### Sample odbc.ini file
 ```
 [ODBC Data Sources]
 timestream-iam             = Amazon Timestream ODBC Driver
