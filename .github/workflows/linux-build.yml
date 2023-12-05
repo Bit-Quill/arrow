@@ -4,18 +4,18 @@ on:
   push:
     paths:
       - '.github/workflows/win-build.yml'
-      - 'cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/**'
+      - 'cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/**'
   pull_request:
     paths:
       - '.github/workflows/win-build.yml'
-      - 'cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/**'
+      - 'cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/**'
 
 env:
   CI_OUTPUT_PATH: "ci-output"
-  ODBC_LIB_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/lib"
-  ODBC_BIN_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/bin"
-  ODBC_BUILD_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/build"
-  TIMESTREAM_LOG_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs"
+  ODBC_LIB_PATH: "${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/lib"
+  ODBC_BIN_PATH: "${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/bin"
+  ODBC_BUILD_PATH: "${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/build"
+  TIMESTREAM_LOG_PATH: "${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/logs"
   TIMESTREAM_LOG_LEVEL: "4"
   BIG_TABLE_PAGINATION_TEST_ENABLE: "TRUE"
 
@@ -50,7 +50,7 @@ jobs:
     - name: run-cppcheck
       run: |
         sudo apt install cppcheck
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         sh run_cppcheck.sh
   
     - name: upload-cppcheck-results
@@ -68,14 +68,14 @@ jobs:
    
     - name: configure-and-build-driver
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         chmod +x build_linux_release64_deb.sh
         chmod +x scripts/build_linux.sh
         ./build_linux_release64_deb.sh
 
     - name: update-environment-with-ODBC_DRIVER_VERSION
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         read -r ODBC_DRIVER_VERSION < ./src/ODBC_DRIVER_VERSION.txt
         echo "ODBC_DRIVER_VERSION=$ODBC_DRIVER_VERSION" >> $GITHUB_ENV
 
@@ -83,11 +83,11 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: AmazonTimestreamODBC_${{env.ODBC_DRIVER_VERSION}}_RELEASE_amd64
-        path: cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/cmake-build64/AmazonTimestreamODBC_${{env.ODBC_DRIVER_VERSION}}_RELEASE_amd64.deb
+        path: cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/cmake-build64/AmazonTimestreamODBC_${{env.ODBC_DRIVER_VERSION}}_RELEASE_amd64.deb
 
     - name: register-odbc-driver
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         chmod +r -R ${{env.ODBC_LIB_PATH}}
         chmod +x scripts/register_driver_unix.sh
         sudo bash scripts/register_driver_unix.sh
@@ -96,7 +96,7 @@ jobs:
       id: rununittests
       run: |
         mkdir -p "${{env.TIMESTREAM_LOG_PATH}}"
-        ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false
+        ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false
 
     - name: upload-unit-test-report
       if: always()
@@ -113,7 +113,7 @@ jobs:
         name: odbc-unit-test-results
         path: |
           ./odbc_unit_test_result.xml
-          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log 
+          ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log 
           ./aws_sdk_*.log
 
     # TODO re-enable integration tests
@@ -121,7 +121,7 @@ jobs:
     # - name: run-odbc-tests
     #   id: runodbctests
     #   run: |
-    #     ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false
+    #     ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false
 
     - name: upload-odbc-test-report
       if: always()
@@ -156,7 +156,7 @@ jobs:
     - name: run-cppcheck
       run: |
         sudo apt install cppcheck
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         sh run_cppcheck.sh
   
     - name: upload-cppcheck-results
@@ -174,14 +174,14 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         chmod +x build_linux_debug64_deb.sh
         chmod +x scripts/build_linux.sh
         ./build_linux_debug64_deb.sh
 
     - name: update-environment-with-ODBC_DRIVER_VERSION
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         read -r ODBC_DRIVER_VERSION < ./src/ODBC_DRIVER_VERSION.txt
         echo "ODBC_DRIVER_VERSION=$ODBC_DRIVER_VERSION" >> $GITHUB_ENV
 
@@ -189,11 +189,11 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: AmazonTimestreamODBC_${{env.ODBC_DRIVER_VERSION}}_DEBUG_amd64
-        path: cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/cmake-build64/AmazonTimestreamODBC_${{env.ODBC_DRIVER_VERSION}}_DEBUG_amd64.deb
+        path: cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/cmake-build64/AmazonTimestreamODBC_${{env.ODBC_DRIVER_VERSION}}_DEBUG_amd64.deb
 
     - name: register-odbc-driver
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         chmod +r -R ${{env.ODBC_LIB_PATH}}
         chmod +x scripts/register_driver_unix.sh
         sudo bash scripts/register_driver_unix.sh
@@ -203,8 +203,8 @@ jobs:
       id: rununittests
       run: |
         mkdir -p "${{env.TIMESTREAM_LOG_PATH}}"
-        ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false
-        gcovr --exclude-directories=cmake-build64/tests/integration-test/CMakeFiles/timestream-odbc-integration-tests.dir$ --exclude-directories=cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/cmake-build64/tests/unit-test/CMakeFiles/timestream-odbc-unit-tests.dir$ --cobertura --output coverage.cobertura.xml
+        ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false
+        gcovr --exclude-directories=cmake-build64/tests/integration-test/CMakeFiles/timestream-odbc-integration-tests.dir$ --exclude-directories=cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/cmake-build64/tests/unit-test/CMakeFiles/timestream-odbc-unit-tests.dir$ --cobertura --output coverage.cobertura.xml
         
     - name: upload-test-report
       if: always()
@@ -221,7 +221,7 @@ jobs:
         name: odbc-unit-test-results-linux-debug
         path: |
           ./odbc_unit_test_result.xml
-          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log 
+          ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log 
           ./aws_sdk_*.log
 
     # TODO re-enable integration tests and code coverage from integration tests
@@ -229,8 +229,8 @@ jobs:
     # - name: run-odbc-tests
     #   id: runodbctests
     #   run: |
-    #     ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false
-    #     gcovr --exclude-directories=cmake-build64/tests/integration-test/CMakeFiles/timestream-odbc-integration-tests.dir$ --exclude-directories=cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/cmake-build64/tests/unit-test/CMakeFiles/timestream-odbc-unit-tests.dir$ --cobertura --output coverage.cobertura.xml
+    #     ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false
+    #     gcovr --exclude-directories=cmake-build64/tests/integration-test/CMakeFiles/timestream-odbc-integration-tests.dir$ --exclude-directories=cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/cmake-build64/tests/unit-test/CMakeFiles/timestream-odbc-unit-tests.dir$ --cobertura --output coverage.cobertura.xml
 
     - name: Code Coverage Summary Report
       uses: irongut/CodeCoverageSummary@v1.2.0
@@ -269,7 +269,7 @@ jobs:
         name: odbc-test-results-linux-debug
         path: |
           ./odbc_test_result.xml
-          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log 
+          ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log 
           ./aws_sdk_*.log   
 
     - name: upload-coverage

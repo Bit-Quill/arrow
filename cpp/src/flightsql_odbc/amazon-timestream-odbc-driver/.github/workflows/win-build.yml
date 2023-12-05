@@ -1,6 +1,6 @@
 name: ODBC Driver for Windows
 # TODO integrate the ODBC driver build into rest of the Arrow workflows.
-# Workflows under "cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\.github\workflows\*"" serve as backup
+# Workflows under "cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\.github\workflows\*"" serve as backup
 on:
   push:
     branches:
