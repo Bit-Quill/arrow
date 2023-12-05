@@ -4,21 +4,21 @@ on:
   push:
     paths:
       - '.github/workflows/win-build.yml'
-      - 'cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/**'
+      - 'cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/**'
   pull_request:
     paths:
       - '.github/workflows/win-build.yml'
-      - 'cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/**'
+      - 'cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/**'
 
 env:
   SIGNING_ENABLED: ${{ github.event.inputs.sign }}
   CI_OUTPUT_PATH: "ci-output"
-  ODBC_LIB_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/lib"
-  ODBC_BIN_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/bin/Release"
-  ODBC_DEBUG_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/bin/Debug"
-  ODBC_BUILD_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/cmake"
+  ODBC_LIB_PATH: "${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/lib"
+  ODBC_BIN_PATH: "${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/bin/Release"
+  ODBC_DEBUG_PATH: "${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/bin/Debug"
+  ODBC_BUILD_PATH: "${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/cmake"
   VCPKG_ROOT: "c:/vcpkg"
-  TIMESTREAM_LOG_PATH: "${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs"
+  TIMESTREAM_LOG_PATH: "${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/logs"
   TIMESTREAM_LOG_LEVEL: "4"
   BIG_TABLE_PAGINATION_TEST_ENABLE: "TRUE"
 
@@ -78,24 +78,24 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         .\build_win_release32.ps1
 
     - name: Build PowerBI connector
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/PowerBIConnector
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/src/PowerBIConnector
         .\AmazonTimestreamConnector.ps1
-        cd ${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd ${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
 
     - name: Upload ODBC connector build 
       uses: actions/upload-artifact@v3
       with:
         name: AmazonTimestreamConnector.mez
-        path: ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/PowerBIConnector/AmazonTimestreamConnector.mez
+        path: ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/src/PowerBIConnector/AmazonTimestreamConnector.mez
 
     - name: register-driver
       run: |
-        .\cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll
+        .\cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll
 
     - name: run-unit-tests
       id: rununittests
@@ -118,7 +118,7 @@ jobs:
         name: odbc-unit-test-results
         path: |
           ./odbc_unit_test_result.xml
-          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
+          ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
 
     # - name: run-integration-tests
     #   id: runintegrationtests
@@ -140,12 +140,12 @@ jobs:
         name: odbc-test-results
         path: |
           ./odbc_test_result.xml
-          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
+          ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
 
     - name: Read VERSION file
       if: ${{ env.SIGNING_ENABLED == 'true' }}
       id: getversion
-      run: echo "::set-output name=version::$(cat cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/ODBC_DRIVER_VERSION.txt)"
+      run: echo "::set-output name=version::$(cat cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/src/ODBC_DRIVER_VERSION.txt)"
 
     # TODO remove code for signing the installer
     # - name: "Configure AWS credentials"
@@ -174,7 +174,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: timestream-odbc-driver-32
-        path: cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/cmake/Release
+        path: cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/cmake/Release
 
   build-windows64:
     runs-on: windows-2022
@@ -212,24 +212,24 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         .\build_win_release64.ps1
 
     - name: Build PowerBI connector
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/PowerBIConnector
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/src/PowerBIConnector
         .\AmazonTimestreamConnector.ps1
-        cd ${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd ${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
 
     - name: Upload ODBC connector build 
       uses: actions/upload-artifact@v3
       with:
         name: AmazonTimestreamConnector.mez
-        path: ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/PowerBIConnector/AmazonTimestreamConnector.mez
+        path: ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/src/PowerBIConnector/AmazonTimestreamConnector.mez
 
     - name: register-driver
       run: |
-        .\cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll
+        .\cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\install\install_amd64.cmd ${{env.ODBC_BIN_PATH}}\timestream.odbc.dll
 
     - name: run-unit-tests
       id: rununittests
@@ -252,7 +252,7 @@ jobs:
         name: odbc-unit-test-results
         path: |
           ./odbc_unit_test_result.xml
-          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
+          ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
 
     # TODO enable integration tests
     # - name: run-integration-tests
@@ -275,12 +275,12 @@ jobs:
         name: odbc-test-results
         path: |
           ./odbc_test_result.xml
-          ./cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
+          ./cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/logs/timestream_odbc_*.log
 
     - name: Read VERSION file
       if: ${{ env.SIGNING_ENABLED == 'true' }}
       id: getversion
-      run: echo "::set-output name=version::$(cat cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/ODBC_DRIVER_VERSION.txt)"
+      run: echo "::set-output name=version::$(cat cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/src/ODBC_DRIVER_VERSION.txt)"
 
     # - name: "Configure AWS credentials"
     #   if: ${{ env.SIGNING_ENABLED == 'true' }}
@@ -308,7 +308,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: timestream-odbc-driver-64
-        path: cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/build/odbc/cmake/Release
+        path: cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/build/odbc/cmake/Release
 
   build-windows64_coverage:
     runs-on: windows-2022
@@ -352,30 +352,30 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver
         .\build_win_debug64.ps1
 
     - name: Build PowerBI connector
       run: |
-        cd cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/src/PowerBIConnector
+        cd cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/src/PowerBIConnector
         .\AmazonTimestreamConnector.ps1
-        cd ${{github.workspace}}/cpp/src/arrow/flight/sql/amazon-timestream-odbc-driver/
+        cd ${{github.workspace}}/cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/
 
     - name: register-driver
       run: |
-        .\cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\timestream.odbc.dll
+        .\cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\install\install_amd64.cmd ${{env.ODBC_DEBUG_PATH}}\timestream.odbc.dll
 
     # TODO re-enable integration tests
     - name: run-tests
       run: |
         # run code coverage against unit test first
-        opencppcoverage --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include --export_type cobertura:coverage.cobertura.xml --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src\ignite --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-unit-tests.exe
+        opencppcoverage --sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\src --sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\include --export_type cobertura:coverage.cobertura.xml --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\src\ignite --excluded_sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-unit-tests.exe
 
 
         # TODO after integration tests are enabled, merge unit test coverage with integraion test coverage; replace below lines with above.
-        # opencppcoverage --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include --export_type binary:unit.test.cov --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src\ignite --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-unit-tests.exe
+        # opencppcoverage --sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\src --sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\include --export_type binary:unit.test.cov --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\src\ignite --excluded_sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-unit-tests.exe
         # run code coverage against integration test and merge the result with the unit test one
-        # opencppcoverage --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src --sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include --input_coverage unit.test.cov --export_type cobertura:coverage.cobertura.xml --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\src\ignite --excluded_sources \cpp\src\arrow\flight\sql\amazon-timestream-odbc-driver\src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-integration-tests.exe
+        # opencppcoverage --sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\src --sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\include --input_coverage unit.test.cov --export_type cobertura:coverage.cobertura.xml --excluded_modules boost_unit_test_framework --excluded_modules timestream-odbc-integration-tests --excluded_modules zlib --excluded_modules aws --excluded_modules boost --excluded_sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\src\ignite --excluded_sources \cpp\src\flightsql_odbc\amazon-timestream-odbc-driver\src\odbc\include\ignite -- ${{env.ODBC_DEBUG_PATH}}/timestream-odbc-integration-tests.exe
 
     - name: upload-coverage
       if: always()
