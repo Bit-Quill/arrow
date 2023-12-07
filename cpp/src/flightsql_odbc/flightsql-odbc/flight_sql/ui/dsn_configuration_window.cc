@@ -30,8 +30,8 @@ namespace {
 
         // This should have been checked before enabling the Test button.
         assert(missingProperties.empty());
-        std::string serverName = boost::get<std::string>(flightSqlConn->GetInfo(SQL_SERVER_NAME));
-        std::string serverVersion = boost::get<std::string>(flightSqlConn->GetInfo(SQL_DBMS_VER));
+        std::string serverName = std::get<std::string>(flightSqlConn->GetInfo(SQL_SERVER_NAME));
+        std::string serverVersion = std::get<std::string>(flightSqlConn->GetInfo(SQL_DBMS_VER));
         return "Server Name: " + serverName + "\n" +
             "Server Version: " + serverVersion;
     }

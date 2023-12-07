@@ -4,7 +4,7 @@
 #
 
 cmake_minimum_required(VERSION 3.11)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -115,7 +115,7 @@ endif()
 
 # If build fails, need to remove build folder to re-build.
 set(ARROW_GIT_REPOSITORY "https://github.com/apache/arrow.git" CACHE STRING "Arrow repository path or URL")
-set(ARROW_GIT_TAG "b050bd0d31db6412256cec3362c0d57c9732e1f2" CACHE STRING "Tag for the Arrow repository")
+set(ARROW_GIT_TAG "apache-arrow-14.0.1" CACHE STRING "Tag for the Arrow repository")
 
 message("Using Arrow from ${ARROW_GIT_REPOSITORY} on tag ${ARROW_GIT_TAG}")
 ExternalProject_Add(
@@ -134,7 +134,7 @@ link_directories(${CMAKE_CURRENT_BINARY_DIR}/ApacheArrow-prefix/src/ApacheArrow-
 
 if (MSVC)
   # the following definitions stop arrow from using __declspec when staticly linking and will break on windows without them
-  add_compile_definitions(ARROW_STATIC ARROW_FLIGHT_STATIC)
+  add_compile_definitions(ARROW_STATIC ARROW_FLIGHT_STATIC ARROW_FLIGHT_SQL_STATIC)
 endif()
 
 enable_testing()

@@ -6,8 +6,9 @@
 
 #pragma once
 
+#include <optional>
+
 #include <arrow/flight/types.h>
-#include <arrow/util/optional.h>
 #include <boost/xpressive/xpressive.hpp>
 #include <codecvt>
 #include <odbcabstraction/exceptions.h>
@@ -20,7 +21,7 @@ typedef std::function<
   std::shared_ptr<arrow::Array>(const std::shared_ptr<arrow::Array> &)>
   ArrayConvertTask;
 
-using arrow::util::optional;
+using std::optional;
 
 inline void ThrowIfNotOK(const arrow::Status &status) {
   if (!status.ok()) {
@@ -30,7 +31,7 @@ inline void ThrowIfNotOK(const arrow::Status &status) {
 
 template <typename T, typename AttributeTypeT>
 inline bool CheckIfSetToOnlyValidValue(const AttributeTypeT &value, T allowed_value) {
-  return boost::get<T>(value) == allowed_value;
+  return std::get<T>(value) == allowed_value;
 }
 
 template <typename BUILDER, typename T>

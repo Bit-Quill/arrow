@@ -28,7 +28,7 @@ TEST(AttributeTests, SetAndGetAttribute) {
 
   EXPECT_TRUE(firstValue);
 
-  EXPECT_EQ(boost::get<uint32_t>(*firstValue), static_cast<uint32_t>(200));
+  EXPECT_EQ(std::get<uint32_t>(*firstValue), static_cast<uint32_t>(200));
 
   connection.SetAttribute(Connection::CONNECTION_TIMEOUT, static_cast<uint32_t>(300));
 
@@ -36,7 +36,7 @@ TEST(AttributeTests, SetAndGetAttribute) {
       connection.GetAttribute(Connection::CONNECTION_TIMEOUT);
 
   EXPECT_TRUE(changeValue);
-  EXPECT_EQ(boost::get<uint32_t>(*changeValue), static_cast<uint32_t>(300));
+  EXPECT_EQ(std::get<uint32_t>(*changeValue), static_cast<uint32_t>(300));
 
   connection.Close();
 }
@@ -48,7 +48,7 @@ TEST(AttributeTests, GetAttributeWithoutSetting) {
       connection.GetAttribute(Connection::CONNECTION_TIMEOUT);
   connection.SetClosed(false);
 
-  EXPECT_EQ(0, boost::get<uint32_t>(*optional));
+  EXPECT_EQ(0, std::get<uint32_t>(*optional));
 
   connection.Close();
 }
@@ -113,7 +113,7 @@ TEST(BuildLocationTests, ForTcp) {
 
   Location expected_location;
   ASSERT_TRUE(
-    Location::ForGrpcTcp("localhost", 32010, &expected_location).ok());
+    Location::ForGrpcTcp("localhost", 32010).Value(&expected_location).ok());
   ASSERT_EQ(expected_location, actual_location1);
   ASSERT_NE(expected_location, actual_location2);
 }
@@ -146,7 +146,7 @@ TEST(BuildLocationTests, ForTls) {
 
   Location expected_location;
   ASSERT_TRUE(
-      Location::ForGrpcTls("localhost", 32010, &expected_location).ok());
+      Location::ForGrpcTls("localhost", 32010).Value(&expected_location).ok());
   ASSERT_EQ(expected_location, actual_location1);
   ASSERT_NE(expected_location, actual_location2);
 }

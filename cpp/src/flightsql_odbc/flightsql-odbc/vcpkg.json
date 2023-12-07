@@ -1,6 +1,5 @@
 {
   "name": "flightsql-odbc",
-  "version-string": "1.0.0",
   "dependencies": [
     "abseil",
     "benchmark",
@@ -19,13 +18,13 @@
     "gflags",
     "openssl",
     "protobuf",
-    { "name": "zlib", "version>=": "1.3" },
     "re2",
     "spdlog",
     "grpc",
     "utf8proc",
+    "xsimd",
+    "zlib",
     "zstd",
     "rapidjson"
-  ],
-  "builtin-baseline": "4e485c34f5e056327ef00c14e2e3620bc50de098"
+  ]
 }

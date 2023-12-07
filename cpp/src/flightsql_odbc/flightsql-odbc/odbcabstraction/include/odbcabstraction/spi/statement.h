@@ -7,8 +7,8 @@
 #pragma once
 
 #include <boost/optional.hpp>
-#include <boost/variant.hpp>
 #include <map>
+#include <variant>
 #include <vector>
 
 namespace driver {
@@ -37,7 +37,7 @@ public:
     QUERY_TIMEOUT,  // size_t - The time to wait in seconds for queries to execute. 0 to have no timeout.
   };
 
-  typedef boost::variant<size_t> Attribute;
+  typedef std::variant<size_t> Attribute;
 
   /// \brief Set a statement attribute (may be called at any time)
   ///

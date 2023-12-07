@@ -76,7 +76,7 @@ GetTablesForSQLAllCatalogs(const ColumnNames &names,
 
   ThrowIfNotOK(result.status());
   flight_info = result.ValueOrDie();
-  ThrowIfNotOK(flight_info->GetSchema(nullptr, &schema));
+  ThrowIfNotOK(flight_info->GetSchema(nullptr).Value(&schema));
 
   auto transformer = RecordBatchTransformerWithTasksBuilder(schema)
                          .RenameField("catalog_name", names.catalog_column)
@@ -102,7 +102,7 @@ std::shared_ptr<ResultSet> GetTablesForSQLAllDbSchemas(
 
   ThrowIfNotOK(result.status());
   flight_info = result.ValueOrDie();
-  ThrowIfNotOK(flight_info->GetSchema(nullptr, &schema));
+  ThrowIfNotOK(flight_info->GetSchema(nullptr).Value(&schema));
 
   auto transformer = RecordBatchTransformerWithTasksBuilder(schema)
                          .AddFieldOfNulls(names.catalog_column, utf8())
@@ -130,7 +130,7 @@ GetTablesForSQLAllTableTypes(const ColumnNames &names,
 
   ThrowIfNotOK(result.status());
   flight_info = result.ValueOrDie();
-  ThrowIfNotOK(flight_info->GetSchema(nullptr, &schema));
+  ThrowIfNotOK(flight_info->GetSchema(nullptr).Value(&schema));
 
   auto transformer = RecordBatchTransformerWithTasksBuilder(schema)
                          .AddFieldOfNulls(names.catalog_column, utf8())
@@ -158,7 +158,7 @@ std::shared_ptr<ResultSet> GetTablesForGenericUse(
 
   ThrowIfNotOK(result.status());
   flight_info = result.ValueOrDie();
-  ThrowIfNotOK(flight_info->GetSchema(nullptr, &schema));
+  ThrowIfNotOK(flight_info->GetSchema(nullptr).Value(&schema));
 
   auto transformer = RecordBatchTransformerWithTasksBuilder(schema)
                          .RenameField("catalog_name", names.catalog_column)

@@ -168,15 +168,15 @@ uint32_t GetCvtBitForArrowConvertEntry(int32_t convert_entry) {
 }
 
 inline int32_t ScalarToInt32(arrow::UnionScalar *scalar) {
-  return reinterpret_cast<arrow::Int32Scalar *>(scalar->value.get())->value;
+  return reinterpret_cast<arrow::Int32Scalar *>(scalar->child_value().get())->value;
 }
 
 inline int64_t ScalarToInt64(arrow::UnionScalar *scalar) {
-  return reinterpret_cast<arrow::Int64Scalar *>(scalar->value.get())->value;
+  return reinterpret_cast<arrow::Int64Scalar *>(scalar->child_value().get())->value;
 }
 
 inline std::string ScalarToBoolString(arrow::UnionScalar *scalar) {
-  return reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value ? "Y" : "N";
+  return reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value ? "Y" : "N";
 }
 
 inline void SetDefaultIfMissing(std::unordered_map<uint16_t, driver::odbcabstraction::Connection::Info>& cache,
@@ -310,7 +310,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           switch (info_type) {
           // String properties
           case SqlInfoOptions::FLIGHT_SQL_SERVER_NAME: {
-            std::string server_name(reinterpret_cast<arrow::StringScalar*>(scalar->value.get())->view());
+            std::string server_name(reinterpret_cast<arrow::StringScalar*>(scalar->child_value().get())->view());
 
             // TODO: Consider creating different properties in GetSqlInfo.
             // TODO: Investigate if SQL_SERVER_NAME should just be the host
@@ -325,7 +325,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           }
           case SqlInfoOptions::FLIGHT_SQL_SERVER_VERSION: {
             info_[SQL_DBMS_VER] = ConvertToDBMSVer(
-                std::string(reinterpret_cast<arrow::StringScalar*>(scalar->value.get())->view()));
+                std::string(reinterpret_cast<arrow::StringScalar*>(scalar->child_value().get())->view()));
             break;
           }
           case SqlInfoOptions::FLIGHT_SQL_SERVER_ARROW_VERSION: {
@@ -333,27 +333,27 @@ bool GetInfoCache::LoadInfoFromServer() {
             break;
           }
           case SqlInfoOptions::SQL_SEARCH_STRING_ESCAPE: {
-            info_[SQL_SEARCH_PATTERN_ESCAPE] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->value.get())->view());
+            info_[SQL_SEARCH_PATTERN_ESCAPE] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->child_value().get())->view());
             break;
           }
           case ARROW_SQL_IDENTIFIER_QUOTE_CHAR: {
-            info_[SQL_IDENTIFIER_QUOTE_CHAR] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->value.get())->view());
+            info_[SQL_IDENTIFIER_QUOTE_CHAR] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->child_value().get())->view());
             break;
           }
           case SqlInfoOptions::SQL_EXTRA_NAME_CHARACTERS: {
-            info_[SQL_SPECIAL_CHARACTERS] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->value.get())->view());
+            info_[SQL_SPECIAL_CHARACTERS] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->child_value().get())->view());
             break;
           }
           case ARROW_SQL_SCHEMA_TERM: {
-            info_[SQL_SCHEMA_TERM] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->value.get())->view());
+            info_[SQL_SCHEMA_TERM] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->child_value().get())->view());
             break;
           }
           case ARROW_SQL_PROCEDURE_TERM: {
-            info_[SQL_PROCEDURE_TERM] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->value.get())->view());
+            info_[SQL_PROCEDURE_TERM] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->child_value().get())->view());
             break;
           }
           case ARROW_SQL_CATALOG_TERM: {
-            std::string catalog_term(std::string(reinterpret_cast<arrow::StringScalar*>(scalar->value.get())->view()));
+            std::string catalog_term(std::string(reinterpret_cast<arrow::StringScalar*>(scalar->child_value().get())->view()));
             if (catalog_term.empty()) {
               info_[SQL_CATALOG_NAME] = "N";
               info_[SQL_CATALOG_NAME_SEPARATOR] = "";
@@ -363,7 +363,7 @@ bool GetInfoCache::LoadInfoFromServer() {
               info_[SQL_CATALOG_NAME_SEPARATOR] = ".";
               info_[SQL_CATALOG_LOCATION] = static_cast<uint16_t>(SQL_CL_START);
             }
-            info_[SQL_CATALOG_TERM] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->value.get())->view());
+            info_[SQL_CATALOG_TERM] = std::string(reinterpret_cast<arrow::StringScalar*>(scalar->child_value().get())->view());
 
             break;
           }
@@ -384,7 +384,7 @@ bool GetInfoCache::LoadInfoFromServer() {
             break;
           case SqlInfoOptions::SQL_DDL_SCHEMA: {
             bool supports_schema_ddl =
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value;
             // Note: this is a bitmask and we can't describe cascade or restrict
             // flags.
             info_[SQL_DROP_SCHEMA] = static_cast<uint32_t>(SQL_DS_DROP_SCHEMA);
@@ -397,7 +397,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           }
           case SqlInfoOptions::SQL_DDL_TABLE: {
             bool supports_table_ddl =
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value;
             // This is a bitmask and we cannot describe all clauses.
             info_[SQL_CREATE_TABLE] =
                 static_cast<uint32_t>(SQL_CT_CREATE_TABLE);
@@ -414,7 +414,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           }
           case SqlInfoOptions::SQL_NULL_PLUS_NULL_IS_NULL: {
             info_[SQL_CONCAT_NULL_BEHAVIOR] = static_cast<uint16_t>(
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value
                     ? SQL_CB_NULL
                     : SQL_CB_NON_NULL);
             break;
@@ -424,7 +424,7 @@ bool GetInfoCache::LoadInfoFromServer() {
             // SQL_SUPPORTS_DIFFERENT_TABLE_CORRELATION_NAMES since we need both
             // properties to determine the value for SQL_CORRELATION_NAME.
             supports_correlation_name =
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value;
             break;
           }
           case SqlInfoOptions::SQL_SUPPORTS_DIFFERENT_TABLE_CORRELATION_NAMES: {
@@ -432,7 +432,7 @@ bool GetInfoCache::LoadInfoFromServer() {
             // SQL_SUPPORTS_DIFFERENT_TABLE_CORRELATION_NAMES since we need both
             // properties to determine the value for SQL_CORRELATION_NAME.
             requires_different_correlation_name =
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value;
             break;
           }
           case SqlInfoOptions::SQL_SUPPORTS_EXPRESSIONS_IN_ORDER_BY: {
@@ -442,7 +442,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           case SqlInfoOptions::SQL_SUPPORTS_ORDER_BY_UNRELATED: {
             // Note: this is the negation of the Flight SQL property.
             info_[SQL_ORDER_BY_COLUMNS_IN_SELECT] =
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value ? "N"
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value ? "N"
                                                                         : "Y";
             break;
           }
@@ -452,7 +452,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           }
           case SqlInfoOptions::SQL_SUPPORTS_NON_NULLABLE_COLUMNS: {
             info_[SQL_NON_NULLABLE_COLUMNS] = static_cast<uint16_t>(
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value
                     ? SQL_NNC_NON_NULL
                     : SQL_NNC_NULL);
             break;
@@ -463,7 +463,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           }
           case SqlInfoOptions::SQL_CATALOG_AT_START: {
             info_[SQL_CATALOG_LOCATION] = static_cast<uint16_t>(
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value
                     ? SQL_CL_START
                     : SQL_CL_END);
             break;
@@ -481,22 +481,22 @@ bool GetInfoCache::LoadInfoFromServer() {
           }
           case SqlInfoOptions::SQL_TRANSACTIONS_SUPPORTED: {
             transactions_supported =
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value;
             break;
           }
           case SqlInfoOptions::SQL_DATA_DEFINITION_CAUSES_TRANSACTION_COMMIT: {
             transaction_ddl_commit =
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value;
             break;
           }
           case SqlInfoOptions::SQL_DATA_DEFINITIONS_IN_TRANSACTIONS_IGNORED: {
             transaction_ddl_ignore =
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value;
             break;
           }
           case SqlInfoOptions::SQL_BATCH_UPDATES_SUPPORTED: {
             info_[SQL_BATCH_SUPPORT] = static_cast<uint32_t>(
-                reinterpret_cast<arrow::BooleanScalar *>(scalar->value.get())->value
+                reinterpret_cast<arrow::BooleanScalar *>(scalar->child_value().get())->value
                     ? SQL_BS_ROW_COUNT_EXPLICIT
                     : 0);
             break;
@@ -936,7 +936,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           // List<string> properties
           case ARROW_SQL_NUMERIC_FUNCTIONS: {
             std::shared_ptr<arrow::Array> list_value =
-                reinterpret_cast<arrow::BaseListScalar*>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BaseListScalar*>(scalar->child_value().get())->value;
             uint32_t result_val = 0;
             for (int64_t list_index = 0; list_index < list_value->length();
                  ++list_index) {
@@ -953,7 +953,7 @@ bool GetInfoCache::LoadInfoFromServer() {
 
           case ARROW_SQL_STRING_FUNCTIONS: {
             std::shared_ptr<arrow::Array> list_value =
-                reinterpret_cast<arrow::BaseListScalar*>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BaseListScalar*>(scalar->child_value().get())->value;
             uint32_t result_val = 0;
             for (int64_t list_index = 0; list_index < list_value->length();
                  ++list_index) {
@@ -969,7 +969,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           }
           case ARROW_SQL_SYSTEM_FUNCTIONS: {
             std::shared_ptr<arrow::Array> list_value =
-                reinterpret_cast<arrow::BaseListScalar*>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BaseListScalar*>(scalar->child_value().get())->value;
             uint32_t sys_result = 0;
             uint32_t convert_result = 0;
             for (int64_t list_index = 0; list_index < list_value->length();
@@ -987,7 +987,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           }
           case SqlInfoOptions::SQL_DATETIME_FUNCTIONS: {
             std::shared_ptr<arrow::Array> list_value =
-                reinterpret_cast<arrow::BaseListScalar*>(scalar->value.get())->value;
+                reinterpret_cast<arrow::BaseListScalar*>(scalar->child_value().get())->value;
             uint32_t result_val = 0;
             for (int64_t list_index = 0; list_index < list_value->length();
                  ++list_index) {
@@ -1004,7 +1004,7 @@ bool GetInfoCache::LoadInfoFromServer() {
 
           case ARROW_SQL_KEYWORDS: {
             std::shared_ptr<arrow::Array> list_value =
-              reinterpret_cast<arrow::BaseListScalar*>(scalar->value.get())->value;
+              reinterpret_cast<arrow::BaseListScalar*>(scalar->child_value().get())->value;
             std::string result_str;
             for (int64_t list_index = 0; list_index < list_value->length();
               ++list_index) {
@@ -1024,7 +1024,7 @@ bool GetInfoCache::LoadInfoFromServer() {
           // Map<int32, list<int32> properties
           case SqlInfoOptions::SQL_SUPPORTS_CONVERT: {
             arrow::MapScalar *map_scalar =
-                reinterpret_cast<arrow::MapScalar *>(scalar->value.get());
+                reinterpret_cast<arrow::MapScalar *>(scalar->child_value().get());
             auto data_array = map_scalar->value;
             arrow::StructArray *map_contents =
                 reinterpret_cast<arrow::StructArray *>(data_array.get());
