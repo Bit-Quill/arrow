@@ -36,7 +36,9 @@ mkdir build
 
 cd build
 
-if NOT DEFINED ARROW_GIT_REPOSITORY SET ARROW_GIT_REPOSITORY = "https://github.com/apache/arrow"
+if NOT DEFINED ARROW_GIT_REPOSITORY (
+    SET ARROW_GIT_REPOSITORY="https://github.com/apache/arrow"
+    )
 
 cmake ..^
     -DARROW_GIT_REPOSITORY=%ARROW_GIT_REPOSITORY%^
