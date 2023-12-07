@@ -274,7 +274,7 @@ void ODBCConnection::GetInfo(SQLUSMALLINT infoType, SQLPOINTER value, SQLSMALLIN
     case SQL_XOPEN_CLI_YEAR:
     {
       const auto& info = m_spiConnection->GetInfo(infoType);
-      const std::string& infoValue = boost::get<std::string>(info);
+      const std::string& infoValue = std::get<std::string>(info);
       GetStringAttribute(isUnicode, infoValue, true, value, bufferLength, outputLength, GetDiagnostics());
       break;
     }
@@ -365,7 +365,7 @@ void ODBCConnection::GetInfo(SQLUSMALLINT infoType, SQLPOINTER value, SQLSMALLIN
     case SQL_STANDARD_CLI_CONFORMANCE:
     {
       const auto& info = m_spiConnection->GetInfo(infoType);
-      uint32_t infoValue = boost::get<uint32_t>(info);
+      uint32_t infoValue = std::get<uint32_t>(info);
       GetAttribute(infoValue, value, bufferLength, outputLength);
       break;
     }
@@ -401,7 +401,7 @@ void ODBCConnection::GetInfo(SQLUSMALLINT infoType, SQLPOINTER value, SQLSMALLIN
     case SQL_ODBC_SAG_CLI_CONFORMANCE:
     {
       const auto& info = m_spiConnection->GetInfo(infoType);
-      uint16_t infoValue = boost::get<uint16_t>(info);
+      uint16_t infoValue = std::get<uint16_t>(info);
       GetAttribute(infoValue, value, bufferLength, outputLength);
       break;
     }
@@ -414,7 +414,7 @@ void ODBCConnection::GetInfo(SQLUSMALLINT infoType, SQLPOINTER value, SQLSMALLIN
       if (!attr) {
         throw DriverException("Optional feature not supported.", "HYC00");
       }
-      const std::string &infoValue = boost::get<std::string>(*attr);
+      const std::string &infoValue = std::get<std::string>(*attr);
       GetStringAttribute(isUnicode, infoValue, true, value, bufferLength,outputLength, GetDiagnostics());
       break;
     }
@@ -599,7 +599,7 @@ void ODBCConnection::GetConnectAttr(SQLINTEGER attribute, SQLPOINTER value,
     if (!catalog) {
       throw DriverException("Optional feature not supported.", "HYC00");
     }
-    const std::string &infoValue = boost::get<std::string>(*catalog);
+    const std::string &infoValue = std::get<std::string>(*catalog);
     GetStringAttribute(isUnicode, infoValue, true, value, bufferLength,outputLength, GetDiagnostics());
     return;
   }
@@ -628,7 +628,7 @@ void ODBCConnection::GetConnectAttr(SQLINTEGER attribute, SQLPOINTER value,
     throw DriverException("Invalid attribute", "HY092");
   }
 
-  GetAttribute(static_cast<SQLUINTEGER>(boost::get<uint32_t>(*spiAttribute)), value, bufferLength, outputLength);
+  GetAttribute(static_cast<SQLUINTEGER>(std::get<uint32_t>(*spiAttribute)), value, bufferLength, outputLength);
 }
 
 void ODBCConnection::disconnect() {

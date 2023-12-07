@@ -18,7 +18,7 @@ namespace driver {
 namespace flight_sql {
 
 using arrow::internal::checked_pointer_cast;
-using arrow::util::nullopt;
+using std::nullopt;
 
 GetTablesReader::GetTablesReader(std::shared_ptr<RecordBatch> record_batch)
     : record_batch_(std::move(record_batch)), current_row_(-1) {}

@@ -5,13 +5,12 @@
  */
 
 #include "record_batch_transformer.h"
-#include <arrow/util/optional.h>
 
 namespace driver {
 namespace flight_sql {
 
 using namespace arrow;
-using arrow::util::optional;
+using std::optional;
 
 class GetTablesReader {
 private:

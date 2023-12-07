@@ -53,8 +53,8 @@ odbcabstraction::CDataType GetDefaultCCharType(bool useWideChar) {
 }
 
 using namespace odbcabstraction;
-using arrow::util::make_optional;
-using arrow::util::nullopt;
+using std::make_optional;
+using std::nullopt;
 
 /// \brief Returns the mapping from Arrow type to SqlDataType
 /// \param field the field to return the SqlDataType for
@@ -274,7 +274,7 @@ GetRadixFromSqlDataType(odbcabstraction::SqlDataType data_type) {
   case SqlDataType_DOUBLE:
     return 2;
   default:
-    return arrow::util::nullopt;
+    return std::nullopt;
   }
 }
 
@@ -338,7 +338,7 @@ optional<int16_t> GetSqlDateTimeSubCode(SqlDataType data_type) {
   case SqlDataType_INTERVAL_MINUTE_TO_SECOND:
     return SqlDateTimeSubCode_MINUTE_TO_SECOND;
   default:
-    return arrow::util::nullopt;
+    return std::nullopt;
   }
 }
 
@@ -354,7 +354,7 @@ optional<int32_t> GetCharOctetLength(SqlDataType data_type,
       if (column_size.ok()) {
         return column_size.ValueOrDie();
       } else {
-        return arrow::util::nullopt;
+        return std::nullopt;
       }
     case SqlDataType_WCHAR:
     case SqlDataType_WVARCHAR:
@@ -362,7 +362,7 @@ optional<int32_t> GetCharOctetLength(SqlDataType data_type,
       if (column_size.ok()) {
         return column_size.ValueOrDie() * GetSqlWCharSize();
       } else {
-        return arrow::util::nullopt;
+        return std::nullopt;
       }
     case SqlDataType_TINYINT:
     case SqlDataType_BIT:
@@ -400,7 +400,7 @@ optional<int32_t> GetCharOctetLength(SqlDataType data_type,
     case SqlDataType_GUID:
       return 16;
     default:
-      return arrow::util::nullopt;
+      return std::nullopt;
   }
 }
 optional<int32_t> GetTypeScale(SqlDataType data_type,
@@ -419,7 +419,7 @@ optional<int32_t> GetTypeScale(SqlDataType data_type,
     case SqlDataType_BIGINT:
       return 0;
     default:
-      return arrow::util::nullopt;
+      return std::nullopt;
   }
 }
 optional<int32_t> GetColumnSize(SqlDataType data_type,
@@ -432,8 +432,8 @@ optional<int32_t> GetColumnSize(SqlDataType data_type,
     case SqlDataType_WCHAR:
     case SqlDataType_WVARCHAR:
     case SqlDataType_WLONGVARCHAR:
-      return column_size.has_value() ? arrow::util::make_optional(column_size.value() * GetSqlWCharSize())
-                                     : arrow::util::nullopt;
+      return column_size.has_value() ? std::make_optional(column_size.value() * GetSqlWCharSize())
+                                     : std::nullopt;
     case SqlDataType_BINARY:
     case SqlDataType_VARBINARY:
     case SqlDataType_LONGVARBINARY:
@@ -479,7 +479,7 @@ optional<int32_t> GetColumnSize(SqlDataType data_type,
     case SqlDataType_GUID:
       return 16;
     default:
-      return arrow::util::nullopt;
+      return std::nullopt;
   }
 }
 
@@ -493,8 +493,8 @@ optional<int32_t> GetBufferLength(SqlDataType data_type,
   case SqlDataType_WCHAR:
   case SqlDataType_WVARCHAR:
   case SqlDataType_WLONGVARCHAR:
-    return column_size.has_value() ? arrow::util::make_optional(column_size.value() * GetSqlWCharSize())
-                                   : arrow::util::nullopt;
+    return column_size.has_value() ? std::make_optional(column_size.value() * GetSqlWCharSize())
+                                   : std::nullopt;
   case SqlDataType_BINARY:
   case SqlDataType_VARBINARY:
   case SqlDataType_LONGVARBINARY:
@@ -539,7 +539,7 @@ optional<int32_t> GetBufferLength(SqlDataType data_type,
   case SqlDataType_GUID:
     return 16;
   default:
-    return arrow::util::nullopt;
+    return std::nullopt;
   }
 }
 
@@ -595,7 +595,7 @@ optional<int32_t> GetLength(SqlDataType data_type, const optional<int32_t>& colu
     case SqlDataType_GUID:
       return 16;
     default:
-      return arrow::util::nullopt;
+      return std::nullopt;
   }
 }
 

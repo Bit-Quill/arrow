@@ -4,18 +4,19 @@
  * See "LICENSE" for license information.
  */
 
+#include <optional>
+
 #include "record_batch_transformer.h"
 #include <arrow/array/builder_binary.h>
 #include <arrow/array/builder_primitive.h>
 #include <arrow/status.h>
-#include <arrow/util/optional.h>
 #include <odbcabstraction/types.h>
 
 namespace driver {
 namespace flight_sql {
 
 using odbcabstraction::MetadataSettings;
-using arrow::util::optional;
+using std::optional;
 
 class GetColumns_RecordBatchBuilder {
 private:
