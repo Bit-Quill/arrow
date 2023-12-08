@@ -25,18 +25,22 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "timestream/odbc/log.h"
+
+#ifdef REFACTOR_TIMESTREAM_CODE
 #include "timestream/odbc/config/configuration.h"
 #include "timestream/odbc/config/connection_string_parser.h"
 #include "timestream/odbc/connection.h"
 #include "timestream/odbc/dsn_config.h"
 #include "timestream/odbc/environment.h"
-#include "timestream/odbc/log.h"
 #include "timestream/odbc/statement.h"
 #include "timestream/odbc/system/odbc_constants.h"
 #include "timestream/odbc/system/system_dsn.h"
 #include "timestream/odbc/type_traits.h"
 #include "timestream/odbc/utility.h"
+#endif // REFACTOR_TIMESTREAM_CODE
 
+#ifdef REFACTOR_TIMESTREAM_CODE
 using ignite::odbc::diagnostic::Diagnosable;
 /**
  * Handle window handle.
@@ -60,10 +64,14 @@ bool HandleParentWindow(SQLHWND windowHandle,
 
 using namespace timestream::odbc::utility;
 using timestream::odbc::Statement;
+#endif  // REFACTOR_TIMESTREAM_CODE
 
 namespace timestream {
 SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValue,
                      SQLSMALLINT infoValueMax, SQLSMALLINT* length) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETINFO
   using odbc::Connection;
   using odbc::config::ConnectionInfo;
 
@@ -82,10 +90,14 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValue,
   connection->GetInfo(infoType, infoValue, infoValueMax, length);
 
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETINFO
 }
 
 SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent,
                          SQLHANDLE* result) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLALLOCHANDLE
   LOG_DEBUG_MSG("SQLAllocHandle called with type " << type);
   switch (type) {
     case SQL_HANDLE_ENV:
@@ -107,9 +119,13 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent,
   *result = 0;
 
   return SQL_ERROR;
+  #endif // ENABLE_SQLALLOCHANDLE
 }
 
 SQLRETURN SQLAllocEnv(SQLHENV* env) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLALLOCENV
   using odbc::Environment;
 
   LOG_DEBUG_MSG("SQLAllocEnv called");
@@ -117,9 +133,13 @@ SQLRETURN SQLAllocEnv(SQLHENV* env) {
   *env = reinterpret_cast< SQLHENV >(new Environment());
 
   return SQL_SUCCESS;
+  #endif // ENABLE_SQLALLOCENV
 }
 
 SQLRETURN SQLAllocConnect(SQLHENV env, SQLHDBC* conn) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLALLOCCONNECT
   using odbc::Connection;
   using odbc::Environment;
 
@@ -144,9 +164,13 @@ SQLRETURN SQLAllocConnect(SQLHENV env, SQLHDBC* conn) {
   *conn = reinterpret_cast< SQLHDBC >(connection);
 
   return SQL_SUCCESS;
+  #endif // ENABLE_SQLALLOCCONNECT
 }
 
 SQLRETURN SQLAllocStmt(SQLHDBC conn, SQLHSTMT* stmt) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLALLOCSTMT
   using odbc::Connection;
 
   LOG_DEBUG_MSG("SQLAllocStmt called");
@@ -165,9 +189,13 @@ SQLRETURN SQLAllocStmt(SQLHDBC conn, SQLHSTMT* stmt) {
   *stmt = reinterpret_cast< SQLHSTMT >(statement);
 
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLALLOCSTMT
 }
 
 SQLRETURN SQLAllocDesc(SQLHDBC conn, SQLHDESC* desc) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLALLOCDESC
   using odbc::Connection;
 
   Connection* connection = reinterpret_cast< Connection* >(conn);
@@ -182,9 +210,13 @@ SQLRETURN SQLAllocDesc(SQLHDBC conn, SQLHDESC* desc) {
   *desc = reinterpret_cast< SQLHDESC >(descriptor);
 
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLALLOCDESC
 }
 
 SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLFREEHANDLE
   LOG_DEBUG_MSG("SQLFreeHandle called with type " << type);
 
   switch (type) {
@@ -205,9 +237,13 @@ SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
   }
 
   return SQL_ERROR;
+  #endif // ENABLE_SQLFREEHANDLE
 }
 
 SQLRETURN SQLFreeEnv(SQLHENV env) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLFREEENV
   using odbc::Environment;
 
   LOG_DEBUG_MSG("SQLFreeEnv called: " << env);
@@ -222,9 +258,13 @@ SQLRETURN SQLFreeEnv(SQLHENV env) {
   delete environment;
 
   return SQL_SUCCESS;
+  #endif // ENABLE_SQLFREEENV
 }
 
 SQLRETURN SQLFreeConnect(SQLHDBC conn) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLFREECONNECT
   using odbc::Connection;
 
   LOG_DEBUG_MSG("SQLFreeConnect called");
@@ -241,9 +281,13 @@ SQLRETURN SQLFreeConnect(SQLHDBC conn) {
   delete connection;
 
   return SQL_SUCCESS;
+  #endif // ENABLE_SQLFREECONNECT
 }
 
 SQLRETURN SQLFreeStmt(SQLHSTMT stmt, SQLUSMALLINT option) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLFREESTMT
   LOG_DEBUG_MSG("SQLFreeStmt called [option=" << option << ']');
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -264,9 +308,13 @@ SQLRETURN SQLFreeStmt(SQLHSTMT stmt, SQLUSMALLINT option) {
   statement->FreeResources(option);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLFREESTMT
 }
 
 SQLRETURN SQLFreeDescriptor(SQLHDESC desc) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLFREEDESCRIPTOR
   using odbc::Statement;
 
   LOG_DEBUG_MSG("SQLFreeDescriptor called");
@@ -284,9 +332,13 @@ SQLRETURN SQLFreeDescriptor(SQLHDESC desc) {
   delete descriptor;
 
   return SQL_SUCCESS;
+  #endif // ENABLE_SQLFREEDESCRIPTOR
 }
 
 SQLRETURN SQLCloseCursor(SQLHSTMT stmt) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLCLOSECURSOR
   LOG_DEBUG_MSG("SQLCloseCursor called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -294,6 +346,7 @@ SQLRETURN SQLCloseCursor(SQLHSTMT stmt) {
   statement->Close();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLCLOSECURSOR
 }
 
 SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
@@ -303,6 +356,9 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
                            SQLSMALLINT outConnectionStringBufferLen,
                            SQLSMALLINT* outConnectionStringLen,
                            SQLUSMALLINT driverCompletion) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLDRIVERCONNECT
   IGNITE_UNUSED(driverCompletion);
 
   using odbc::Connection;
@@ -339,12 +395,16 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     *outConnectionStringLen = static_cast< SQLSMALLINT >(reslen);
 
   return diag.GetReturnCode();
+  #endif // ENABLE_SQLDRIVERCONNECT
 }
 
 SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
                      SQLSMALLINT serverNameLen, SQLWCHAR* userName,
                      SQLSMALLINT userNameLen, SQLWCHAR* auth,
                      SQLSMALLINT authLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLCONNECT
   using odbc::Connection;
   using odbc::config::Configuration;
 
@@ -377,9 +437,13 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* serverName,
   connection->Establish(config);
 
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLCONNECT
 }
 
 SQLRETURN SQLDisconnect(SQLHDBC conn) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLDISCONNECT
   using odbc::Connection;
 
   LOG_DEBUG_MSG("SQLDisconnect called");
@@ -394,9 +458,13 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
   connection->Release();
 
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLDISCONNECT
 }
 
 SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLPREPARE
   LOG_DEBUG_MSG("SQLPrepare called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -413,9 +481,13 @@ SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
   statement->PrepareSqlQuery(sql);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLPREPARE
 }
 
 SQLRETURN SQLExecute(SQLHSTMT stmt) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLEXECUTE
   LOG_DEBUG_MSG("SQLExecute called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -428,9 +500,13 @@ SQLRETURN SQLExecute(SQLHSTMT stmt) {
   statement->ExecuteSqlQuery();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLEXECUTE
 }
 
 SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLEXECDIRECT
   LOG_DEBUG_MSG("SQLExecDirect called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -447,9 +523,13 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* query, SQLINTEGER queryLen) {
   statement->ExecuteSqlQuery(sql);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLEXECDIRECT
 }
 
 SQLRETURN SQLCancel(SQLHSTMT stmt) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLCANCEL
   LOG_DEBUG_MSG("SQLCancel called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -462,11 +542,15 @@ SQLRETURN SQLCancel(SQLHSTMT stmt) {
   statement->CancelSqlQuery();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLCANCEL
 }
 
 SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
                      SQLPOINTER targetValue, SQLLEN bufferLength,
                      SQLLEN* strLengthOrIndicator) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLBINDCOL
   using namespace odbc::type_traits;
   using odbc::app::ApplicationDataBuffer;
 
@@ -487,9 +571,13 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
                         strLengthOrIndicator);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLBINDCOL
 }
 
 SQLRETURN SQLFetch(SQLHSTMT stmt) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLFETCH
   LOG_DEBUG_MSG("SQLFetch called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -502,10 +590,14 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
   statement->FetchRow();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLFETCH
 }
 
 SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT orientation,
                          SQLLEN offset) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLFETCHSCROLL
   LOG_DEBUG_MSG("SQLFetchScroll called with Orientation "
                 << orientation << " Offset " << offset);
 
@@ -519,11 +611,15 @@ SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT orientation,
   statement->FetchScroll(orientation, offset);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLFETCHSCROLL
 }
 
 SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation,
                            SQLLEN offset, SQLULEN* rowCount,
                            SQLUSMALLINT* rowStatusArray) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLEXTENDEDFETCH
   LOG_DEBUG_MSG("SQLExtendedFetch called");
 
   SQLRETURN res = SQLFetchScroll(stmt, orientation, offset);
@@ -548,9 +644,13 @@ SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT orientation,
     LOG_DEBUG_MSG("*rowCount is " << *rowCount);
 
   return res;
+  #endif // ENABLE_SQLEXTENDEDFETCH
 }
 
 SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLNUMRESULTCOLS
   using odbc::meta::ColumnMetaVector;
 
   LOG_DEBUG_MSG("SQLNumResultCols called");
@@ -570,6 +670,7 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnNum) {
   }
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLNUMRESULTCOLS
 }
 
 SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
@@ -577,6 +678,9 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
                      SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                      SQLSMALLINT tableNameLen, SQLWCHAR* columnName,
                      SQLSMALLINT columnNameLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLCOLUMNS
   LOG_DEBUG_MSG("SQLColumns called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -608,6 +712,7 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
   statement->ExecuteGetColumnsMetaQuery(catalog, schema, table, column);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLCOLUMNS
 }
 
 SQLRETURN SQLColumnPrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
@@ -615,6 +720,9 @@ SQLRETURN SQLColumnPrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
                               SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                               SQLSMALLINT tableNameLen, SQLWCHAR* columnName,
                               SQLSMALLINT columnNameLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLCOLUMNPRIVILEGES
   LOG_DEBUG_MSG("SQLColumnPrivileges called");
 
   IGNITE_UNUSED(catalogName);
@@ -638,6 +746,7 @@ SQLRETURN SQLColumnPrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
   statement->ExecuteColumnPrivilegesQuery();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLCOLUMNPRIVILEGES
 }
 
 SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
@@ -645,6 +754,9 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
                     SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                     SQLSMALLINT tableNameLen, SQLWCHAR* tableType,
                     SQLSMALLINT tableTypeLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLTABLES
   LOG_DEBUG_MSG("SQLTables called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -669,12 +781,16 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
   statement->ExecuteGetTablesMetaQuery(catalog, schema, table, tableTypeStr);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLTABLES
 }
 
 SQLRETURN SQLTablePrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
                              SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
                              SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                              SQLSMALLINT tableNameLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLTABLEPRIVILEGES
   LOG_DEBUG_MSG("SQLTablePrivileges called");
 
   IGNITE_UNUSED(catalogName);
@@ -696,9 +812,13 @@ SQLRETURN SQLTablePrivileges(SQLHSTMT stmt, SQLWCHAR* catalogName,
   statement->ExecuteTablePrivilegesQuery();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLTABLEPRIVILEGES
 }
 
 SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLMORERESULTS
   LOG_DEBUG_MSG("SQLMoreResults called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -711,11 +831,15 @@ SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
   statement->MoreResults();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLMORERESULTS
 }
 
 SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
                        SQLWCHAR* outQueryBuffer, SQLINTEGER outQueryBufferLen,
                        SQLINTEGER* outQueryLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLNATIVESQL
   using namespace odbc;
 
   LOG_DEBUG_MSG("SQLNativeSql called");
@@ -736,12 +860,16 @@ SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* inQuery, SQLINTEGER inQueryLen,
   }
 
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLNATIVESQL
 }
 
 SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
                           SQLUSMALLINT fieldId, SQLPOINTER strAttr,
                           SQLSMALLINT bufferLen, SQLSMALLINT* strAttrLen,
                           SQLLEN* numericAttr) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLCOLATTRIBUTE
   using odbc::meta::ColumnMeta;
   using odbc::meta::ColumnMetaVector;
 
@@ -773,6 +901,7 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNum,
                                 bufferLen, strAttrLen, numericAttr);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLCOLATTRIBUTE
 }
 
 SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
@@ -780,6 +909,9 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
                          SQLSMALLINT* columnNameLen, SQLSMALLINT* dataType,
                          SQLULEN* columnSize, SQLSMALLINT* decimalDigits,
                          SQLSMALLINT* nullable) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLDESCRIBECOL
   using odbc::SqlLen;
 
   LOG_DEBUG_MSG("SQLDescribeCol called with columnNum "
@@ -871,9 +1003,13 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNum,
   }
 
   return SQL_SUCCESS;
+  #endif // ENABLE_SQLDESCRIBECOL
 }
 
 SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLROWCOUNT
   LOG_DEBUG_MSG("SQLRowCount called");
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -891,6 +1027,7 @@ SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCnt) {
     *rowCnt = static_cast< SQLLEN >((res > 0 ? res : -1));
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLROWCOUNT
 }
 
 SQLRETURN SQLForeignKeys(
@@ -901,6 +1038,9 @@ SQLRETURN SQLForeignKeys(
     SQLSMALLINT foreignCatalogNameLen, SQLWCHAR* foreignSchemaName,
     SQLSMALLINT foreignSchemaNameLen, SQLWCHAR* foreignTableName,
     SQLSMALLINT foreignTableNameLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLFOREIGNKEYS
   LOG_DEBUG_MSG("SQLForeignKeys called");
 
   IGNITE_UNUSED(primaryCatalogName);
@@ -928,10 +1068,14 @@ SQLRETURN SQLForeignKeys(
   statement->ExecuteGetForeignKeysQuery();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLFOREIGNKEYS
 }
 
 SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER valueBuf,
                          SQLINTEGER valueBufLen, SQLINTEGER* valueResLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETSTMTATTR
   LOG_DEBUG_MSG("SQLGetStmtAttr called");
 
 #ifdef _DEBUG
@@ -951,10 +1095,14 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER valueBuf,
   statement->GetAttribute(attr, valueBuf, valueBufLen, valueResLen);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETSTMTATTR
 }
 
 SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER value,
                          SQLINTEGER valueLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSETSTMTATTR
   LOG_DEBUG_MSG("SQLSetStmtAttr called: " << attr);
 
 #ifdef _DEBUG
@@ -972,12 +1120,16 @@ SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attr, SQLPOINTER value,
   statement->SetAttribute(attr, value, valueLen);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLSETSTMTATTR
 }
 
 SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
                          SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
                          SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                          SQLSMALLINT tableNameLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLPRIMARYKEYS
   LOG_DEBUG_MSG("SQLPrimaryKeys called");
 
   IGNITE_UNUSED(catalogName);
@@ -999,12 +1151,16 @@ SQLRETURN SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
   statement->ExecuteGetPrimaryKeysQuery();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLPRIMARYKEYS
 }
 
 SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
                           SQLSMALLINT recNum, SQLSMALLINT diagId,
                           SQLPOINTER buffer, SQLSMALLINT bufferLen,
                           SQLSMALLINT* resLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETDIAGFIELDS
   using namespace odbc;
   using namespace odbc::diagnostic;
   using namespace odbc::type_traits;
@@ -1044,12 +1200,16 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
     *resLen = static_cast< SQLSMALLINT >(outResLen);
 
   return SqlResultToReturnCode(result);
+  #endif // ENABLE_SQLGETDIAGFIELDS
 }
 
 SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
                         SQLSMALLINT recNum, SQLWCHAR* sqlState,
                         SQLINTEGER* nativeError, SQLWCHAR* msgBuffer,
                         SQLSMALLINT msgBufferLen, SQLSMALLINT* msgLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETDIAGREC
   using namespace odbc::utility;
   using namespace odbc;
   using namespace odbc::diagnostic;
@@ -1143,9 +1303,13 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle,
     *msgLen = msgLen0;
 
   return SQL_SUCCESS;
+  #endif // ENABLE_SQLGETDIAGREC
 }
 
 SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT type) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETTYPEINFO
   LOG_DEBUG_MSG("SQLGetTypeInfo called: [type=" << type << ']');
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -1158,11 +1322,15 @@ SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT type) {
   statement->ExecuteGetTypeInfoQuery(static_cast< int16_t >(type));
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETTYPEINFO
 }
 
 SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
                      SQLPOINTER targetValue, SQLLEN bufferLength,
                      SQLLEN* strLengthOrIndicator) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETDATA
   using namespace odbc::type_traits;
 
   using odbc::app::ApplicationDataBuffer;
@@ -1185,10 +1353,14 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT colNum, SQLSMALLINT targetType,
   statement->GetColumnData(colNum, dataBuffer);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETDATA
 }
 
 SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value,
                         SQLINTEGER valueLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSETENVATTR
   using odbc::Environment;
 
   LOG_DEBUG_MSG("SQLSetEnvAttr called with Attribute " << attr << ", Value "
@@ -1204,10 +1376,14 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value,
   environment->SetAttribute(attr, value, valueLen);
 
   return environment->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLSETENVATTR
 }
 
 SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valueBuf,
                         SQLINTEGER valueBufLen, SQLINTEGER* valueResLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETENVATTR
   using namespace odbc;
   using namespace type_traits;
 
@@ -1231,6 +1407,7 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valueBuf,
     *valueResLen = static_cast< SQLSMALLINT >(outResLen);
 
   return environment->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETENVATTR
 }
 
 SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
@@ -1238,6 +1415,9 @@ SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
                             SQLWCHAR* schemaName, SQLSMALLINT schemaNameLen,
                             SQLWCHAR* tableName, SQLSMALLINT tableNameLen,
                             SQLSMALLINT scope, SQLSMALLINT nullable) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSPECIALCOLUMNS
   LOG_DEBUG_MSG("SQLSpecialColumns called");
 
   IGNITE_UNUSED(idType);
@@ -1262,6 +1442,7 @@ SQLRETURN SQLSpecialColumns(SQLHSTMT stmt, SQLSMALLINT idType,
   statement->ExecuteSpecialColumnsQuery();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLSPECIALCOLUMNS
 }
 
 SQLRETURN SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName,
@@ -1269,6 +1450,9 @@ SQLRETURN SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName,
                         SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                         SQLSMALLINT tableNameLen, SQLUSMALLINT unique,
                         SQLUSMALLINT reserved) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSTATISTICS
   LOG_DEBUG_MSG("SQLStatistics called");
 
   IGNITE_UNUSED(catalogName);
@@ -1292,6 +1476,7 @@ SQLRETURN SQLStatistics(SQLHSTMT stmt, SQLWCHAR* catalogName,
   statement->ExecuteStatisticsQuery();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLSTATISTICS
 }
 
 SQLRETURN SQLProcedureColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
@@ -1299,6 +1484,9 @@ SQLRETURN SQLProcedureColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
                               SQLSMALLINT schemaNameLen, SQLWCHAR* procName,
                               SQLSMALLINT procNameLen, SQLWCHAR* columnName,
                               SQLSMALLINT columnNameLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLPROCEDURECOLUMNS
   LOG_DEBUG_MSG("SQLProcedureColumns called");
 
   IGNITE_UNUSED(catalogName);
@@ -1322,12 +1510,16 @@ SQLRETURN SQLProcedureColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
   statement->ExecuteProcedureColumnsQuery();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLPROCEDURECOLUMNS
 }
 
 SQLRETURN SQLProcedures(SQLHSTMT stmt, SQLWCHAR* catalogName,
                         SQLSMALLINT catalogNameLen, SQLWCHAR* schemaName,
                         SQLSMALLINT schemaNameLen, SQLWCHAR* tableName,
                         SQLSMALLINT tableNameLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLPROCEDURES
   LOG_DEBUG_MSG("SQLProcedures called");
 
   IGNITE_UNUSED(catalogName);
@@ -1349,11 +1541,15 @@ SQLRETURN SQLProcedures(SQLHSTMT stmt, SQLWCHAR* catalogName,
   statement->ExecuteProceduresQuery();
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLPROCEDURES
 }
 
 SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
                    SQLINTEGER* error, SQLWCHAR* msgBuf, SQLSMALLINT msgBufLen,
                    SQLSMALLINT* msgResLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLERROR
   using namespace timestream::odbc::utility;
   using namespace timestream::odbc;
   using namespace timestream::odbc::diagnostic;
@@ -1411,10 +1607,14 @@ SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* state,
     *msgResLen = static_cast< SQLSMALLINT >(outResLen);
 
   return SQL_SUCCESS;
+  #endif // ENABLE_SQLERROR
 }
 
 SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER valueBuf,
                             SQLINTEGER valueBufLen, SQLINTEGER* valueResLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETCONNECTATTR
   using namespace odbc;
   using namespace type_traits;
 
@@ -1432,10 +1632,14 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER valueBuf,
   connection->GetAttribute(attr, valueBuf, valueBufLen, valueResLen);
 
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETCONNECTATTR
 }
 
 SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value,
                             SQLINTEGER valueLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSETCONNECTATTR
   using odbc::Connection;
 
   LOG_DEBUG_MSG("SQLSetConnectAttr called(" << attr << ", " << value << ")");
@@ -1450,10 +1654,14 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value,
   connection->SetAttribute(attr, value, valueLen);
 
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLSETCONNECTATTR
 }
 
 SQLRETURN SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf,
                            SQLSMALLINT nameBufLen, SQLSMALLINT* nameResLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETCURSORNAME
   LOG_DEBUG_MSG("SQLGetCursorName called with nameBufLen " << nameBufLen);
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -1465,9 +1673,13 @@ SQLRETURN SQLGetCursorName(SQLHSTMT stmt, SQLWCHAR* nameBuf,
   statement->GetCursorName(nameBuf, nameBufLen, nameResLen);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETCURSORNAME
 }
 
 SQLRETURN SQLSetCursorName(SQLHSTMT stmt, SQLWCHAR* name, SQLSMALLINT nameLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSETCURSORNAME
   LOG_DEBUG_MSG("SQLSetCursorName called with name " << name << ", nameLen "
                                                      << nameLen);
 
@@ -1481,10 +1693,14 @@ SQLRETURN SQLSetCursorName(SQLHSTMT stmt, SQLWCHAR* name, SQLSMALLINT nameLen) {
   statement->SetCursorName(name, nameLen);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLSETCURSORNAME
 }
 SQLRETURN SQLSetDescField(SQLHDESC descr, SQLSMALLINT recNum,
                           SQLSMALLINT fieldId, SQLPOINTER buffer,
                           SQLINTEGER bufferLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSETDESCFIELD
   LOG_DEBUG_MSG("SQLSetDescField called with recNum " << recNum << ", fieldId "
                                                       << fieldId);
 
@@ -1498,11 +1714,15 @@ SQLRETURN SQLSetDescField(SQLHDESC descr, SQLSMALLINT recNum,
   descriptor->SetField(recNum, fieldId, buffer, bufferLen);
 
   return descriptor->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLSETDESCFIELD
 }
 
 SQLRETURN SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
                           SQLSMALLINT fieldId, SQLPOINTER buffer,
                           SQLINTEGER bufferLen, SQLINTEGER* resLen) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETDESCFIELD
   LOG_DEBUG_MSG("SQLGetDescField called with recNum " << recNum << ", fieldId "
                                                       << fieldId);
   Descriptor* descriptor = reinterpret_cast< Descriptor* >(descr);
@@ -1515,9 +1735,13 @@ SQLRETURN SQLGetDescField(SQLHDESC descr, SQLSMALLINT recNum,
   descriptor->GetField(recNum, fieldId, buffer, bufferLen, resLen);
 
   return descriptor->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETDESCFIELD
 }
 
 SQLRETURN SQLCopyDesc(SQLHDESC src, SQLHDESC dst) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLCOPYDESC
   LOG_DEBUG_MSG("SQLCopyDesc called");
 
   Descriptor* srcDesc = reinterpret_cast< Descriptor* >(src);
@@ -1537,11 +1761,15 @@ SQLRETURN SQLCopyDesc(SQLHDESC src, SQLHDESC dst) {
   srcDesc->CopyDesc(dstDesc);
 
   return srcDesc->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLCOPYDESC
 }
 
 #if defined(__APPLE__)
 SQLRETURN SQL_API SQLGetFunctions(SQLHDBC conn, SQLUSMALLINT funcId,
                                   SQLUSMALLINT* valueBuf) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETFUNCTIONS
   using odbc::Connection;
 
   LOG_DEBUG_MSG("SQLGetFunctions called with funcId " << funcId);
@@ -1556,11 +1784,15 @@ SQLRETURN SQL_API SQLGetFunctions(SQLHDBC conn, SQLUSMALLINT funcId,
   connection->GetFunctions(funcId, valueBuf);
 
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETFUNCTIONS
 }
 #endif
 
 SQLRETURN SQLSetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
                               SQLULEN value) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSETCONNECTOPTION
   using odbc::Connection;
 
   LOG_DEBUG_MSG("SQLSetConnectOption called(" << option << ", " << value
@@ -1575,10 +1807,14 @@ SQLRETURN SQLSetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
 
   connection->SetConnectOption(option, value);
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLSETCONNECTOPTION
 }
 
 SQLRETURN SQLGetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
                               SQLPOINTER value) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETCONNECTOPTION
   using odbc::Connection;
 
   LOG_DEBUG_MSG("SQLGetConnectOption called(" << option << ")");
@@ -1592,10 +1828,14 @@ SQLRETURN SQLGetConnectOption(SQLHDBC conn, SQLUSMALLINT option,
 
   connection->GetConnectOption(option, value);
   return connection->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETCONNECTOPTION
 }
 
 SQLRETURN SQLGetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
                            SQLPOINTER value) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETSTMTOPTION
   LOG_DEBUG_MSG("SQLGetStmtOption called with option " << option);
 
   Statement* statement = reinterpret_cast< Statement* >(stmt);
@@ -1608,12 +1848,16 @@ SQLRETURN SQLGetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
   statement->GetStmtOption(option, value);
 
   return statement->GetDiagnosticRecords().GetReturnCode();
+  #endif // ENABLE_SQLGETSTMTOPTION
 }
 
 SQLRETURN SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
                            SQLUSMALLINT fieldId, SQLPOINTER strAttrBuf,
                            SQLSMALLINT strAttrBufLen,
                            SQLSMALLINT* strAttrResLen, SQLLEN* numAttrBuf) {
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLCOLATTRIBUTES
   LOG_DEBUG_MSG("SQLColAttributes called: "
                 << fieldId << " ("
                 << odbc::meta::ColumnMeta::AttrIdToString(fieldId) << ")");
@@ -1648,5 +1892,6 @@ SQLRETURN SQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT colNum,
     }
   }
   return ret;
+  #endif // ENABLE_SQLCOLATTRIBUTES
 }
 }  // namespace timestream
