@@ -36,6 +36,10 @@
  * there are no collisions.
  */
 
+#define UNSUPPORTED_FUNC                                           \
+  LOG_ERROR_MSG(__FUNCTION__ << " called; it is not implemented"); \
+  return SQL_INVALID_HANDLE;
+
 namespace timestream {
 SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValue,
                      SQLSMALLINT infoValueMax, SQLSMALLINT* length);

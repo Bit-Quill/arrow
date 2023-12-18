@@ -21,10 +21,12 @@
 #include <ignite/common/common.h>
 
 #include "timestream/odbc.h"
-#include "timestream/odbc/environment.h"
-#include "timestream/odbc/connection.h"
 #include "timestream/odbc/log.h"
 #include "timestream/odbc/utility.h"
+
+#ifdef REFACTOR_TIMESTREAM_CODE
+#include "timestream/odbc/environment.h"
+#include "timestream/odbc/connection.h"
 #include "timestream/odbc/statement.h"
 
 #define ENV_UNSUPPORTED_FUNC(env, diagStr)                          \
@@ -50,6 +52,14 @@
   Descriptor* descriptor = reinterpret_cast< Descriptor* >(desc); \
   descriptor->AddStatusRecord(                                    \
       SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED, diagStr);
+#endif // REFACTOR_TIMESTREAM_CODE
+
+/**
+ * IMPORTANT: None of the ODBC APIs have been enabled. 
+ * To see the logs that indicate which ODBC APIs have been called,
+ * please visit amazon-timestream-odbc-driver\docs\markdown\support\troubleshooting-guide.md#logs
+ * to find the default log path on your machine.
+ */
 
 SQLRETURN SQL_API SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType,
                              SQLPOINTER infoValue, SQLSMALLINT infoValueMax,
@@ -457,10 +467,16 @@ SQLRETURN SQL_API SQLSetStmtOption(SQLHSTMT stmt, SQLUSMALLINT option,
   IGNITE_UNUSED(option);
   IGNITE_UNUSED(value);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSETSTMTOPTION
+
   LOG_DEBUG_MSG("unsupported function SQLSetStmtOption called");
 
   STMT_UNSUPPORTED_FUNC(stmt, "SQLSetStmtOption is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLSETSTMTOPTION
 }
 
 SQLRETURN SQL_API SQLBrowseConnect(SQLHDBC conn, SQLWCHAR* inConnectionStr,
@@ -475,10 +491,16 @@ SQLRETURN SQL_API SQLBrowseConnect(SQLHDBC conn, SQLWCHAR* inConnectionStr,
   IGNITE_UNUSED(outConnectionStrBufLen);
   IGNITE_UNUSED(outConnectionStrResLen);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLBROWSECONNECT
+
   LOG_DEBUG_MSG("unsupported function SQLBrowseConnect called");
 
   CONN_UNSUPPORTED_FUNC(conn, "SQLBrowseConnect is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLBROWSECONNECT
 }
 
 SQLRETURN SQL_API SQLSetPos(SQLHSTMT stmt, SQLSETPOSIROW rowNum,
@@ -487,10 +509,16 @@ SQLRETURN SQL_API SQLSetPos(SQLHSTMT stmt, SQLSETPOSIROW rowNum,
   IGNITE_UNUSED(operation);
   IGNITE_UNUSED(lockType);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSETPOS
+
   LOG_DEBUG_MSG("unsupported function SQLSetPos called");
 
   STMT_UNSUPPORTED_FUNC(stmt, "SQLSetPos is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLSETPOS
 }
 
 SQLRETURN SQL_API SQLSetScrollOptions(SQLHSTMT stmt, SQLUSMALLINT concurrency,
@@ -501,24 +529,40 @@ SQLRETURN SQL_API SQLSetScrollOptions(SQLHSTMT stmt, SQLUSMALLINT concurrency,
   IGNITE_UNUSED(crowKeyset);
   IGNITE_UNUSED(crowRowset);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSETSCROLLOPTIONS
+
   LOG_DEBUG_MSG("unsupported function SQLSetScrollOptions called");
 
   STMT_UNSUPPORTED_FUNC(stmt, "SQLSetScrollOptions is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLSETSCROLLOPTIONS
 }
 
 SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT stmt, SQLUSMALLINT operation) {
   IGNITE_UNUSED(operation);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLBULKOPERATIONS
+
   LOG_DEBUG_MSG("Unsupported function SQLBulkOperations called");
 
   STMT_UNSUPPORTED_FUNC(stmt, "SQLBulkOperations is not supported.");
   return SQL_ERROR;
+  
+  #endif // ENABLE_SQLBULKOPERATIONS
 }
 
 SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handleType, SQLHANDLE handle,
                              SQLSMALLINT completionType) {
   IGNITE_UNUSED(completionType);
+
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLENDTRAN
 
   LOG_DEBUG_MSG("Unsupported function SQLEndTran called");
 
@@ -529,6 +573,8 @@ SQLRETURN SQL_API SQLEndTran(SQLSMALLINT handleType, SQLHANDLE handle,
   }
 
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLENDTRAN
 }
 
 SQLRETURN SQL_API SQLGetDescRec(SQLHDESC desc, SQLSMALLINT RecNumber,
@@ -548,10 +594,16 @@ SQLRETURN SQL_API SQLGetDescRec(SQLHDESC desc, SQLSMALLINT RecNumber,
   IGNITE_UNUSED(scale);
   IGNITE_UNUSED(nullable);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLGETDESCREC
+
   LOG_DEBUG_MSG("unsupported function SQLGetDescRec called");
 
   DESC_UNSUPPORTED_FUNC(desc, "SQLGetDescRec is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLGETDESCREC
 }
 
 SQLRETURN SQL_API SQLSetDescRec(SQLHDESC desc, SQLSMALLINT recNum,
@@ -569,10 +621,16 @@ SQLRETURN SQL_API SQLSetDescRec(SQLHDESC desc, SQLSMALLINT recNum,
   IGNITE_UNUSED(resLen);
   IGNITE_UNUSED(id);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLSETDESCREC
+
   LOG_DEBUG_MSG("unsupported function SQLSetDescRec called");
 
   DESC_UNSUPPORTED_FUNC(desc, "SQLSetDescRec is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLSETDESCREC
 }
 
 SQLRETURN SQL_API SQLBindParameter(SQLHSTMT stmt, SQLUSMALLINT paramIdx,
@@ -590,10 +648,16 @@ SQLRETURN SQL_API SQLBindParameter(SQLHSTMT stmt, SQLUSMALLINT paramIdx,
   IGNITE_UNUSED(bufferLen);
   IGNITE_UNUSED(resLen);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLBINDPARAMETER
+
   LOG_DEBUG_MSG("unsupported function SQLBindParameter called");
 
   STMT_UNSUPPORTED_FUNC(stmt, "SQLBindParameter is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLBINDPARAMETER
 }
 
 SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
@@ -606,19 +670,31 @@ SQLRETURN SQL_API SQLDescribeParam(SQLHSTMT stmt, SQLUSMALLINT paramNum,
   IGNITE_UNUSED(decimalDigits);
   IGNITE_UNUSED(nullable);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLDESCRIBEPARAM
+
   LOG_DEBUG_MSG("unsupported function SQLDescribeParam called");
 
   STMT_UNSUPPORTED_FUNC(stmt, "SQLDescribeParam is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLDESCRIBEPARAM
 }
 
 SQLRETURN SQL_API SQLParamData(SQLHSTMT stmt, SQLPOINTER* value) {
   IGNITE_UNUSED(value);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLPARAMDATA
+
   LOG_DEBUG_MSG("unsupported function SQLParamData called");
 
   STMT_UNSUPPORTED_FUNC(stmt, "SQLParamData is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLPARAMDATA
 }
 
 SQLRETURN SQL_API SQLParamOptions(SQLHSTMT stmt, SQLULEN paramSetSize,
@@ -627,19 +703,31 @@ SQLRETURN SQL_API SQLParamOptions(SQLHSTMT stmt, SQLULEN paramSetSize,
   IGNITE_UNUSED(paramSetSize);
   IGNITE_UNUSED(paramsProcessed);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLPARAMOPTIONS
+
   LOG_DEBUG_MSG("unsupported function SQLParamOptions called");
 
   STMT_UNSUPPORTED_FUNC(stmt, "SQLParamOptions is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLPARAMOPTIONS
 }
 
 SQLRETURN SQL_API SQLNumParams(SQLHSTMT stmt, SQLSMALLINT* paramCnt) {
   IGNITE_UNUSED(paramCnt);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLNUMPARAMS
+
   LOG_DEBUG_MSG("unsupported function SQLNumParams called");
 
   STMT_UNSUPPORTED_FUNC(stmt, "SQLNumParams is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLNUMPARAMS
 }
 
 SQLRETURN SQL_API SQLPutData(SQLHSTMT stmt, SQLPOINTER data,
@@ -647,8 +735,14 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT stmt, SQLPOINTER data,
   IGNITE_UNUSED(data);
   IGNITE_UNUSED(strLengthOrIndicator);
 
+  UNSUPPORTED_FUNC;
+
+  #ifdef ENABLE_SQLPUTDATA
+
   LOG_DEBUG_MSG("unsupported function SQLPutData called");
 
   STMT_UNSUPPORTED_FUNC(stmt, "SQLPutData is not supported.");
   return SQL_ERROR;
+
+  #endif // ENABLE_SQLPUTDATA
 }
