@@ -20,7 +20,6 @@
 #include <odbcabstraction/types.h>
 #include <boost/optional.hpp>
 #include <utility>
-#include <boost/variant.hpp>
 
 using namespace ODBC;
 using namespace driver::odbcabstraction;
@@ -451,7 +450,7 @@ void ODBCStatement::GetStmtAttr(SQLINTEGER statementAttribute,
   }
 
   if (spiAttribute) {
-    GetAttribute(static_cast<SQLULEN>(boost::get<size_t>(*spiAttribute)),
+    GetAttribute(static_cast<SQLULEN>(std::get<size_t>(spiAttribute.get())),
                  output, bufferSize, strLenPtr);
     return;
   }

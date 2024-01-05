@@ -174,7 +174,7 @@ void FlightSqlConnection::Connect(const ConnPropertyMap &properties,
 
     std::unique_ptr<FlightClient> flight_client;
     ThrowIfNotOK(
-      FlightClient::Connect(location, client_options, &flight_client));
+      FlightClient::Connect(location, client_options).Value(&flight_client));
 
     std::unique_ptr<FlightSqlAuthMethod> auth_method =
       FlightSqlAuthMethod::FromProperties(flight_client, properties);
@@ -251,9 +251,9 @@ FlightSqlConnection::PopulateCallOptions(const ConnPropertyMap &props) {
   // is the first request.
   const boost::optional<Connection::Attribute> &connection_timeout = closed_ ?
       GetAttribute(LOGIN_TIMEOUT) : GetAttribute(CONNECTION_TIMEOUT);
-  if (connection_timeout && boost::get<uint32_t>(*connection_timeout) > 0) {
+  if (connection_timeout && std::get<uint32_t>(*connection_timeout) > 0) {
     call_options_.timeout =
-        TimeoutDuration{static_cast<double>(boost::get<uint32_t>(*connection_timeout))};
+        TimeoutDuration{static_cast<double>(std::get<uint32_t>(*connection_timeout))};
   }
 
   for (auto prop : props) {
@@ -342,7 +342,7 @@ FlightSqlConnection::BuildLocation(const ConnPropertyMap &properties,
         operation_result = address_info.GetAddressInfo(host, host_name_info,
                                                            NI_MAXHOST);
         if (operation_result) {
-          ThrowIfNotOK(Location::ForGrpcTls(host_name_info, port, &location));
+          ThrowIfNotOK(Location::ForGrpcTls(host_name_info, port).Value(&location));
           return location;
         }
         // TODO: We should log that we could not convert an IP to hostname here.
@@ -353,11 +353,11 @@ FlightSqlConnection::BuildLocation(const ConnPropertyMap &properties,
       // if it is not an IP.
     }
 
-    ThrowIfNotOK(Location::ForGrpcTls(host, port, &location));
+    ThrowIfNotOK(Location::ForGrpcTls(host, port).Value(&location));
     return location;
   }
 
-  ThrowIfNotOK(Location::ForGrpcTcp(host, port, &location));
+  ThrowIfNotOK(Location::ForGrpcTcp(host, port).Value(&location));
   return location;
 }
 
@@ -415,7 +415,7 @@ Connection::Info FlightSqlConnection::GetInfo(uint16_t info_type) {
   if (info_type == SQL_DBMS_NAME || info_type == SQL_SERVER_NAME) {
     // Update the database component reported in error messages.
     // We do this lazily for performance reasons.
-    diagnostics_.SetDataSourceComponent(boost::get<std::string>(result));
+    diagnostics_.SetDataSourceComponent(std::get<std::string>(result));
   }
   return result;
 }

@@ -1,0 +1,29 @@
+name: Flight SQL ODBC Driver Client for Windows
+
+on:
+  push:
+    paths:
+      - '.github/workflows/flightsqlodbc_build.yml'
+      - 'cpp/src/flightsql_odbc/flightsql-odbc/**'
+  pull_request:
+    paths:
+      - '.github/workflows/flightsqlodbc_build.yml'
+      - 'cpp/src/flightsql_odbc/flightsql-odbc/**'
+
+env:
+  VCPKG_ROOT: "c:/vcpkg"
+
+jobs:
+  build-windows64:
+    runs-on: windows-2022
+    steps:
+    - uses: actions/checkout@v2
+    # Use cmake 3.25 to stably build flightsql-odbc
+    - uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: "~3.25.0"  # <--= optional, use most recent 3.25.x version
+
+    - name: configure-and-build-driver
+      run: |
+        cd cpp/src/flightsql_odbc/flightsql-odbc
+        .\build_win64.bat

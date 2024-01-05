@@ -51,7 +51,7 @@ FlightSqlResultSet::FlightSqlResultSet(
   if (transformer_) {
     schema_ = transformer_->GetTransformedSchema();
   } else {
-    ThrowIfNotOK(flight_info->GetSchema(nullptr, &schema_));
+    ThrowIfNotOK(flight_info->GetSchema(nullptr).Value(&schema_));
   }
 
   for (size_t i = 0; i < columns_.size(); ++i) {
