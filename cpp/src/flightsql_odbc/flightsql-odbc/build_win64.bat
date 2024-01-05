@@ -49,4 +49,8 @@ cmake ..^
 
 cmake --build . --parallel 8 --config Release
 
+set CMAKE_RESULT=%ERRORLEVEL%
+
 cd ..
+
+exit /b %CMAKE_RESULT%
