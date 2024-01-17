@@ -3,11 +3,11 @@ name: ODBC Driver for Mac
 on:
   push:
     paths:
-      - '.github/workflows/win-build.yml'
+      - '.github/workflows/mac-build.yml'
       - 'cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/**'
   pull_request:
     paths:
-      - '.github/workflows/win-build.yml'
+      - '.github/workflows/mac-build.yml'
       - 'cpp/src/flightsql_odbc/amazon-timestream-odbc-driver/**'
 
 env:
