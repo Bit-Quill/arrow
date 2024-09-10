@@ -165,7 +165,7 @@ public class ArrowVectorIterator implements Iterator<VectorSchemaRoot>, AutoClos
 
   @Override
   public boolean hasNext() {
-    return !readComplete;
+    return readComplete;
   }
 
   /**
