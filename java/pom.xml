@@ -96,7 +96,7 @@ under the License.
     <dep.junit.jupiter.version>5.11.0</dep.junit.jupiter.version>
     <dep.slf4j.version>2.0.16</dep.slf4j.version>
     <dep.guava-bom.version>33.2.1-jre</dep.guava-bom.version>
-    <dep.netty-bom.version>4.1.112.Final</dep.netty-bom.version>
+    <dep.netty-bom.version>4.1.113.Final</dep.netty-bom.version>
     <dep.grpc-bom.version>1.65.0</dep.grpc-bom.version>
     <dep.protobuf-bom.version>3.25.4</dep.protobuf-bom.version>
     <dep.jackson-bom.version>2.17.2</dep.jackson-bom.version>
@@ -111,7 +111,7 @@ under the License.
     <mockito.core.version>5.11.0</mockito.core.version>
     <mockito.inline.version>5.2.0</mockito.inline.version>
     <checker.framework.version>3.46.0</checker.framework.version>
-    <logback.version>1.5.7</logback.version>
+    <logback.version>1.5.8</logback.version>
     <doclint>none</doclint>
     <additionalparam>-Xdoclint:none</additionalparam>
     <!-- List of add-opens arg line arguments for tests -->
