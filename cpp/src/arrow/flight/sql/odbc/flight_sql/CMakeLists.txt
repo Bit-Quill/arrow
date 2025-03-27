@@ -123,7 +123,7 @@ add_library(arrow_odbc_spi_impl
             utils.cc)
 target_include_directories(arrow_odbc_spi_impl PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 if(WIN32)
-  target_sources(arrow_odbc_spi_impl
+  target_sources(arrow_odbc_spi_impl PRIVATE
                  include/flight_sql/config/configuration.h
                  include/flight_sql/config/connection_string_parser.h
                  include/flight_sql/ui/add_property_window.h
@@ -142,7 +142,9 @@ endif()
 find_package(ArrowFlightSql)
 
 target_link_libraries(arrow_odbc_spi_impl PUBLIC odbcabstraction
-                                                 ArrowFlightSql::arrow_flight_sql_static)
+                                                 # -AL- TODO go back to visit this: arrow_flight_sql_static cannot be found
+                                                 # ArrowFlightSql::arrow_flight_sql_static
+                                                 )
 
 if(MSVC)
   set(CMAKE_CXX_FLAGS_RELEASE "/MD")
