@@ -159,3 +159,8 @@ if(ARROW_BUILD_TESTS OR ARROW_BUILD_EXAMPLES)
     endforeach()
   endif()
 endif()
+
+# -AL- TODO test: I think this code allows ODBC to be built?
+if(ARROW_FLIGHT_SQL_ODBC)
+  add_subdirectory(odbc)
+endif()
