@@ -1,0 +1,5 @@
+
+LIBRARY   arrow_flight_sql_odbc.dll
+EXPORTS
+	SQLAllocHandle
+	SQLDriverConnect
