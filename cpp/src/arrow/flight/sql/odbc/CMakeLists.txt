@@ -28,15 +28,12 @@ endif()
 find_package(Boost REQUIRED)
 find_package(ODBC REQUIRED)
 
-# -AL- temperary disable to build and test odbc.dll
-# add_subdirectory(flight_sql)
-# add_subdirectory(odbcabstraction)
+add_subdirectory(flight_sql)
+add_subdirectory(odbcabstraction)
 add_subdirectory(tests)
 
 arrow_install_all_headers("arrow/flight/sql/odbc")
 
-# -AL- ARROW_FLIGHT_SQL_ODBC_SRCS  should contain all files. 
-# TODO: migrate all files to  ARROW_FLIGHT_SQL_ODBC_SRCS after build failures are fixed.                     
 set(ARROW_FLIGHT_SQL_ODBC_SRCS
     entry_points.cc
     odbc_api.cc
