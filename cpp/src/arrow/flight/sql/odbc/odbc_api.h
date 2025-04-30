@@ -32,7 +32,7 @@
 namespace arrow
 {
   SQLRETURN SQLAllocEnv(SQLHENV* env);
-  SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result);
+  SQLRETURN SQLAllocConnect(SQLHENV env, SQLHDBC* conn);
   SQLRETURN SQLFreeEnv(SQLHENV env);
-  SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle);
-  } //arrow
+  SQLRETURN SQLFreeConnect(SQLHDBC conn);
+} // namespace arrow

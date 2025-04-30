@@ -17,6 +17,7 @@
 
 
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h>
+#include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h>
 #include <arrow/flight/sql/odbc/flight_sql/include/flight_sql/flight_sql_driver.h>
 
 // odbc_api includes windows.h, which needs to be put behind winsock2.h.
@@ -25,71 +26,70 @@
 
 namespace arrow
 {
-  SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
-    // TODO: implement SQLAllocHandle by linking to `odbc_impl`
-    *result = 0;
+  SQLRETURN SQLAllocEnv(SQLHENV* env) {
+    using driver::flight_sql::FlightSqlDriver;
+    using ODBC::ODBCEnvironment;
 
-    switch (type)
-    {
-      case SQL_HANDLE_ENV: {
-        using ODBC::ODBCEnvironment;
-        using driver::flight_sql::FlightSqlDriver;
+    *env = SQL_NULL_HENV;
 
-        std::shared_ptr<FlightSqlDriver> odbc_driver = std::make_shared<FlightSqlDriver>();
-        *result = reinterpret_cast<SQLHENV>(new ODBCEnvironment(odbc_driver));
+    std::shared_ptr<FlightSqlDriver> odbc_driver = std::make_shared<FlightSqlDriver>();
+    *env = reinterpret_cast<SQLHENV>(new ODBCEnvironment(odbc_driver));
 
-        return SQL_SUCCESS;
-      }
-
-      case SQL_HANDLE_DBC: {
-        return SQL_INVALID_HANDLE;
-      }
-
-      case SQL_HANDLE_STMT: {
-        return SQL_INVALID_HANDLE;
-      }
-
-      default:
-        break;
-    }
-
-    return SQL_ERROR;
+    return SQL_SUCCESS;
   }
 
-  SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle)
-  {
-    switch (type) {
-      case SQL_HANDLE_ENV: {
-        using ODBC::ODBCEnvironment;
+  SQLRETURN SQLAllocConnect(SQLHENV env, SQLHDBC* conn) {
+    using ODBC::ODBCConnection;
+    using ODBC::ODBCEnvironment;
 
-        ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(handle);
+    *conn = SQL_NULL_HDBC;
 
-        if (!environment) {
-          return SQL_INVALID_HANDLE;
-        }
+    ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
 
-        delete environment;
-
-        return SQL_SUCCESS;
-      }
-
-      case SQL_HANDLE_DBC:
-        return SQL_INVALID_HANDLE;
-
-      case SQL_HANDLE_STMT:
-        return SQL_INVALID_HANDLE;
-
-      case SQL_HANDLE_DESC:
-        return SQL_INVALID_HANDLE;
-
-      default:
-        break;
+    if (!environment) {
+      return SQL_INVALID_HANDLE;
     }
 
-    return SQL_ERROR;
+    std::shared_ptr<ODBCConnection> connection = environment->CreateConnection();
+
+    if (!connection) {
+      return environment->GetDiagnostics().GetNativeError(0);
+    }
+
+    *connection = reinterpret_cast<SQLHANDLE>(&connection);
+
+    return SQL_SUCCESS;
   }
 
+  SQLRETURN SQLFreeEnv(SQLHENV env) {
+    using ODBC::ODBCEnvironment;
 
+    ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
 
+    if (!environment) {
+      return SQL_INVALID_HANDLE;
+    }
+
+    delete environment;
+
+    return SQL_SUCCESS;
+  }
+
+  SQLRETURN SQLFreeConnect(SQLHDBC conn) {
+    using ODBC::ODBCConnection;
+
+    ODBCConnection* odbc_conn = reinterpret_cast<ODBCConnection*>(conn);
+
+    if (!odbc_conn) {
+      return SQL_INVALID_HANDLE;
+    }
+
+    // TODO: Fix Pointer or Reference to an incomplete type
+    // odbc_connection->releaseConnection();
+
+    delete odbc_conn;
+
+    return SQL_SUCCESS;
+  }
 
   }  // namespace arrow

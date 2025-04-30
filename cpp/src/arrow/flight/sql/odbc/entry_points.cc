@@ -27,21 +27,66 @@
 #include "arrow/flight/sql/odbc/odbc_api.h"
 #include "arrow/flight/sql/odbc/visibility.h"
 
-SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent,
-  SQLHANDLE* result) {
-  return arrow::SQLAllocHandle(type, parent, result);
+SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
+
+  switch (type) {
+    case SQL_HANDLE_ENV: {
+      return arrow::SQLAllocEnv(result);
+    }
+
+    case SQL_HANDLE_DBC: {
+      return arrow::SQLAllocConnect(parent, result);
+    }
+
+    case SQL_HANDLE_STMT: {
+      return SQL_INVALID_HANDLE;
+    }
+
+    default: {
+      return SQL_ERROR;
+    }
+  }
 }
 
 SQLRETURN SQL_API SQLAllocEnv(SQLHENV* env) {
-  return arrow::SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, env);
+  return arrow::SQLAllocEnv(env);
+}
+
+SQLRETURN SQL_API SQLAllocConnect(SQLHENV env, SQLHDBC* conn) {
+  return arrow::SQLAllocConnect(env, conn);
+}
+
+SQLRETURN SQL_API SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
+
+  switch (type) {
+    case SQL_HANDLE_ENV: {
+      return arrow::SQLFreeEnv(handle);
+    }
+
+    case SQL_HANDLE_DBC: {
+      return arrow::SQLFreeConnect(handle);
+    }
+
+    case SQL_HANDLE_STMT: {
+      return SQL_INVALID_HANDLE;
+    }
+
+    case SQL_HANDLE_DESC: {
+      return SQL_INVALID_HANDLE;
+    }
+
+    default: {
+      return SQL_ERROR;
+    }
+  }
 }
 
 SQLRETURN SQL_API SQLFreeEnv(SQLHENV env) {
-  return arrow::SQLFreeHandle(SQL_HANDLE_ENV, env);
+  return arrow::SQLFreeEnv(env);
 }
 
-SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
-  return arrow::SQLFreeHandle(type, handle);
+SQLRETURN SQL_API SQLFreeConnect(SQLHDBC conn) {
+  return arrow::SQLFreeConnect(conn);
 }
 
 SQLRETURN SQL_API SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
