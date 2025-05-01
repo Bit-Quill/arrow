@@ -17,6 +17,7 @@
 
 
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h>
+#include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h>
 #include <arrow/flight/sql/odbc/flight_sql/include/flight_sql/flight_sql_driver.h>
 
 // odbc_api includes windows.h, which needs to be put behind winsock2.h.
@@ -42,7 +43,26 @@ namespace arrow
       }
 
       case SQL_HANDLE_DBC: {
-        return SQL_INVALID_HANDLE;
+        using ODBC::ODBCConnection;
+        using ODBC::ODBCEnvironment;
+
+        *result = SQL_NULL_HDBC;
+
+        ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(parent);
+
+        if (!environment) {
+          return SQL_INVALID_HANDLE;
+        }
+
+        std::shared_ptr<ODBCConnection> conn = environment->CreateConnection();
+
+        if (!conn) {
+          return environment->GetDiagnostics().GetNativeError(0);
+        }
+
+        *result = reinterpret_cast<SQLHANDLE>(&conn);
+
+        return SQL_SUCCESS;
       }
 
       case SQL_HANDLE_STMT: {
@@ -73,8 +93,19 @@ namespace arrow
         return SQL_SUCCESS;
       }
 
-      case SQL_HANDLE_DBC:
-        return SQL_INVALID_HANDLE;
+      case SQL_HANDLE_DBC: {
+        using ODBC::ODBCConnection;
+
+        ODBCConnection* conn = reinterpret_cast<ODBCConnection*>(handle);
+
+        if (!conn) {
+          return SQL_INVALID_HANDLE;
+        }
+
+        delete conn;
+
+        return SQL_SUCCESS;
+      }
 
       case SQL_HANDLE_STMT:
         return SQL_INVALID_HANDLE;
@@ -88,8 +119,5 @@ namespace arrow
 
     return SQL_ERROR;
   }
-
-
-
 
   }  // namespace arrow
