@@ -17,6 +17,7 @@
 
 
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h>
+#include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h>
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h>
 #include <arrow/flight/sql/odbc/flight_sql/include/flight_sql/flight_sql_driver.h>
 
@@ -102,6 +103,7 @@ namespace arrow
           return SQL_INVALID_HANDLE;
         }
 
+        conn->releaseConnection();
         delete conn;
 
         return SQL_SUCCESS;
