@@ -60,7 +60,7 @@ namespace arrow
           return SQL_INVALID_HANDLE;
         }
 
-        *result = reinterpret_cast<SQLHANDLE>(&conn);
+        *result = reinterpret_cast<SQLHDBC>(conn.get());
 
         return SQL_SUCCESS;
       }
