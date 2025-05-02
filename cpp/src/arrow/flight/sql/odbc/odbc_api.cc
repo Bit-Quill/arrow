@@ -57,7 +57,7 @@ namespace arrow
         std::shared_ptr<ODBCConnection> conn = environment->CreateConnection();
 
         if (!conn) {
-          return environment->GetDiagnostics().GetNativeError(0);
+          return SQL_INVALID_HANDLE;
         }
 
         *result = reinterpret_cast<SQLHANDLE>(&conn);
