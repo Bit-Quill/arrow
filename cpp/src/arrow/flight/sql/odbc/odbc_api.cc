@@ -104,7 +104,6 @@ namespace arrow
         }
 
         conn->releaseConnection();
-        delete conn;
 
         return SQL_SUCCESS;
       }
