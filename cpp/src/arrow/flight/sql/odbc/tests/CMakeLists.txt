@@ -26,5 +26,7 @@ add_definitions(-DUNICODE=1)
 add_arrow_test(connection_test
                SOURCES
                connection_test.cc
+               odbc_test_suite.cc
+               odbc_test_suite.h
                EXTRA_LINK_LIBS
                ${ODBC_LIBRARIES})
