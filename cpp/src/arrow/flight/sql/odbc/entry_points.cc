@@ -59,6 +59,8 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   SQLSMALLINT outConnectionStringBufferLen,
   SQLSMALLINT* outConnectionStringLen,
   SQLUSMALLINT driverCompletion) {
-  // TODO: implement SQLDriverConnect by linking to `odbc_impl` //-AL- TODO: create GitHub issue for SQLDriverConnect implementation
-  return SQL_INVALID_HANDLE;
+  return arrow::SQLDriverConnect(
+    conn, windowHandle, inConnectionString, inConnectionStringLen,
+    outConnectionString, outConnectionStringBufferLen, outConnectionStringLen,
+    driverCompletion);
 }

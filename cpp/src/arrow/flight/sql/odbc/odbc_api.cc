@@ -121,4 +121,15 @@ namespace arrow
     return SQL_ERROR;
   }
 
-  }  // namespace arrow
+  SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
+    SQLWCHAR* inConnectionString,
+    SQLSMALLINT inConnectionStringLen,
+    SQLWCHAR* outConnectionString,
+    SQLSMALLINT outConnectionStringBufferLen,
+    SQLSMALLINT* outConnectionStringLen,
+    SQLUSMALLINT driverCompletion) {
+    // -AL- TODO implement
+    return SQL_INVALID_HANDLE;
+  }
+
+}  // namespace arrow

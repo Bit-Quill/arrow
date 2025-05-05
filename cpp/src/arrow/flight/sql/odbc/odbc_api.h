@@ -33,4 +33,11 @@ namespace arrow
 {
   SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result);
   SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle);
+  SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
+    SQLWCHAR* inConnectionString,
+    SQLSMALLINT inConnectionStringLen,
+    SQLWCHAR* outConnectionString,
+    SQLSMALLINT outConnectionStringBufferLen,
+    SQLSMALLINT* outConnectionStringLen,
+    SQLUSMALLINT driverCompletion);
 } // namespace arrow
