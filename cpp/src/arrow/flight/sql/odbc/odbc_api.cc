@@ -38,7 +38,7 @@ namespace arrow
         using driver::flight_sql::FlightSqlDriver;
         
         static FlightSqlDriver* odbc_driver = new FlightSqlDriver();
-        std::shared_ptr<FlightSqlDriver> driver_ptr =
+        static std::shared_ptr<FlightSqlDriver> driver_ptr =
             std::make_shared<FlightSqlDriver>(odbc_driver);
         *result = reinterpret_cast<SQLHENV>(new ODBCEnvironment(driver_ptr));
 
