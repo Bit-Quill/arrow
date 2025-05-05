@@ -29,4 +29,6 @@ add_arrow_test(connection_test
                odbc_test_suite.cc
                odbc_test_suite.h
                EXTRA_LINK_LIBS
-               ${ODBC_LIBRARIES})
+               ${ODBC_LIBRARIES}
+            #    arrow_flight_sql_odbc_shared #-AL- add after resolving build issue, so I can put mutal code in 1 place.
+               )
