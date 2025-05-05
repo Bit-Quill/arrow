@@ -32,6 +32,8 @@ add_subdirectory(flight_sql)
 add_subdirectory(odbcabstraction)
 add_subdirectory(tests)
 
+add_definitions(-DUNICODE=1)
+
 arrow_install_all_headers("arrow/flight/sql/odbc")
 
 set(ARROW_FLIGHT_SQL_ODBC_SRCS

@@ -21,6 +21,8 @@ find_package(ODBC REQUIRED)
 
 include_directories(${ODBC_INCLUDE_DIRS})
 
+add_definitions(-DUNICODE=1)
+
 add_arrow_test(connection_test
                SOURCES
                connection_test.cc

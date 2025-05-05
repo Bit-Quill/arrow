@@ -22,12 +22,64 @@
 #include <sql.h>
 #include <sqltypes.h>
 #include <sqlucode.h>
+
+// For wchar conversion
+#include <codecvt>
+
 #include "gtest/gtest.h"
 
 namespace arrow {
 namespace flight {
 namespace odbc {
 namespace integration_tests {
+/** ODBC read buffer size. */
+enum { ODBC_BUFFER_SIZE = 1024 };
+
+std::string SqlWcharToString(SQLWCHAR* wchar_msg) {
+  if (wchar_msg == nullptr) {
+    return std::string();
+  }
+
+  // Size of SQLWCHAR depends on the platform
+  size_t wchar_size = sizeof(SQLWCHAR);
+
+  // Assert that size of SQLWCHAR and wchar_t are the same
+  assert(wchar_size == sizeof(wchar_t));
+
+  // Copy SQLWCHAR into a temp wstring
+  std::wstring wstring_msg;
+
+  for (int i = 0; wchar_msg[i] != 0; i++) {
+    wstring_msg.push_back(wchar_msg[i]);
+  }
+
+  // Converter for SQLWCHAR to wstring
+  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+  return conv.to_bytes(wstring_msg);
+}
+
+std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle) {
+  SQLWCHAR sql_state[7] = {};
+  SQLINTEGER native_code;
+
+  SQLWCHAR message[ODBC_BUFFER_SIZE] = {};
+  SQLSMALLINT reallen = 0;
+
+  // On Windows, reallen is in bytes. On Linux, reallen is in chars.
+  // So, not using reallen
+  SQLGetDiagRec(handle_type, handle, 1, sql_state, &native_code, message,
+  ODBC_BUFFER_SIZE, &reallen);
+
+  std::string res = SqlWcharToString(sql_state);
+
+  if (res.empty() || !message[0]) {
+  res = "Cannot find ODBC error message";
+  } else {
+  res.append(": ").append(SqlWcharToString(message));
+  }
+
+  return res;
+}
 
 TEST(SQLAllocHandle, TestSQLAllocHandleEnv) {
 
@@ -83,6 +135,41 @@ TEST(SQLAllocConnect, TestSQLAllocHandleConnect) {
   SQLRETURN return_alloc_connect = SQLAllocConnect(env, &conn);
 
   EXPECT_TRUE(return_alloc_connect == SQL_SUCCESS);
+}
+
+TEST(SQLDriverConnect, TestSQLDriverConnect) {
+  // ODBC Environment
+  SQLHENV env;
+  SQLHDBC conn;
+
+  // Allocate an environment handle
+  SQLRETURN return_value = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(return_value == SQL_SUCCESS);
+
+  // Allocate a connection using alloc handle
+  SQLRETURN return_alloc_connect = SQLAllocConnect(env, &conn);
+
+  EXPECT_TRUE(return_alloc_connect == SQL_SUCCESS);
+
+  // Connect string
+  std::string connect_str("driver={Apache Arrow Flight SQL ODBC Driver};");
+  std::vector< SQLWCHAR > connect_str0(connect_str.begin(), connect_str.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLSMALLINT outstrlen;
+
+  // Connecting to ODBC server.
+  SQLRETURN return_driver_connect =
+    SQLDriverConnect(conn, NULL, &connect_str0[0],
+                      static_cast< SQLSMALLINT >(connect_str0.size()), outstr,
+                      ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_COMPLETE);
+
+  if (!SQL_SUCCEEDED(return_driver_connect)) {
+   std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
+  }
+
+  EXPECT_TRUE(return_driver_connect == SQL_SUCCESS);
 }
 
 TEST(SQLFreeHandle, TestSQLFreeHandleEnv) {
