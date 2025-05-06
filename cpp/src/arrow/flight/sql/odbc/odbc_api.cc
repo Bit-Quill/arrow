@@ -36,7 +36,7 @@ namespace arrow
       case SQL_HANDLE_ENV: {
         using ODBC::ODBCEnvironment;
         using driver::flight_sql::FlightSqlDriver;
-        
+
         static std::shared_ptr<FlightSqlDriver> odbc_driver = std::make_shared<FlightSqlDriver>();
         *result = reinterpret_cast<SQLHENV>(new ODBCEnvironment(odbc_driver));
 
@@ -77,8 +77,7 @@ namespace arrow
     return SQL_ERROR;
   }
 
-  SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle)
-  {
+  SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
     switch (type) {
       case SQL_HANDLE_ENV: {
         using ODBC::ODBCEnvironment;
@@ -119,6 +118,63 @@ namespace arrow
     }
 
     return SQL_ERROR;
+  }
+
+  SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
+                          SQLINTEGER bufferLen, SQLINTEGER* strLenPtr) {
+    using ODBC::ODBCEnvironment;
+
+    ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
+
+    if (!environment) return SQL_INVALID_HANDLE;
+
+    switch (attr) {
+      case SQL_ATTR_ODBC_VERSION: {
+        SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
+        *value = static_cast<SQLSMALLINT>(environment->getODBCVersion());
+        return SQL_SUCCESS;
+      }
+
+      case SQL_ATTR_OUTPUT_NTS: {
+        // output nts always returns SQL_TRUE
+        SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
+        *value = SQL_TRUE;
+        return SQL_SUCCESS;
+      }
+
+      default: {
+        return SQL_ERROR;
+      }
+    }
+  }
+
+  SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
+                          SQLINTEGER strLen) {
+    switch (attr) {
+      case SQL_ATTR_ODBC_VERSION: {
+        // odbc version can not be set
+        SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
+        if (*value == SQL_OV_ODBC2) {
+          return SQL_SUCCESS;
+        } else {
+          return SQL_ERROR;
+        }
+      }
+
+      case SQL_ATTR_OUTPUT_NTS: {
+        // output nts can not be set to SQL_FALSE, is always SQL_TRUE
+        SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
+        if (*value == SQL_TRUE) {
+          return SQL_SUCCESS;
+        } else {
+          return SQL_ERROR;
+        }
+      }
+
+      default: {
+        return SQL_ERROR;
+      }
+    }
   }
 
   }  // namespace arrow

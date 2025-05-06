@@ -157,6 +157,106 @@ TEST(SQLFreeConnect, TestSQLFreeConnect) {
   EXPECT_TRUE(return_free_connect == SQL_SUCCESS);
 }
 
+TEST(SQLGetEnvAttr, TestSQLGetEnvAttrODBCVersion) {
+  // ODBC Environment
+  SQLHENV env;
+
+  SQLINTEGER version;
+
+  // Allocate an environment handle
+  SQLRETURN return_env = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(return_env == SQL_SUCCESS);
+
+  SQLRETURN return_get = SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, &version, 0, 0);
+
+  EXPECT_TRUE(return_get == SQL_SUCCESS);
+
+  EXPECT_EQ(version, SQL_OV_ODBC2);
+}
+
+TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionValid) {
+  // ODBC Environment
+  SQLHENV env;
+
+  // Allocate an environment handle
+  SQLRETURN return_env = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(return_env == SQL_SUCCESS);
+
+  // Attempt to set to unsupported version
+  SQLRETURN return_set =
+      SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(SQL_OV_ODBC2), 0);
+
+  EXPECT_TRUE(return_set == SQL_SUCCESS);
+}
+
+TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInalid) {
+  // ODBC Environment
+  SQLHENV env;
+
+  // Allocate an environment handle
+  SQLRETURN return_env = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(return_env == SQL_SUCCESS);
+
+  // Attempt to set to unsupported version
+  SQLRETURN return_set =
+    SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(SQL_OV_ODBC3), 0);
+
+  EXPECT_TRUE(return_set == SQL_ERROR);
+}
+
+TEST(SQLGetEnvAttr, TestSQLGetEnvOutputNTS) {
+  // ODBC Environment
+  SQLHENV env;
+
+  SQLINTEGER output_nts;
+
+  // Allocate an environment handle
+  SQLRETURN return_env = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(return_env == SQL_SUCCESS);
+
+  SQLRETURN return_get = SQLGetEnvAttr(env, SQL_ATTR_OUTPUT_NTS, &output_nts, 0, 0);
+
+  EXPECT_TRUE(return_get == SQL_SUCCESS);
+
+  EXPECT_EQ(output_nts, SQL_TRUE);
+}
+
+TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSValid) {
+  // ODBC Environment
+  SQLHENV env;
+
+  // Allocate an environment handle
+  SQLRETURN return_env = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(return_env == SQL_SUCCESS);
+
+  // Attempt to set to output nts to supported version
+  SQLRETURN return_set =
+      SQLSetEnvAttr(env, SQL_ATTR_OUTPUT_NTS, reinterpret_cast<void*>(SQL_TRUE), 0);
+
+  EXPECT_TRUE(return_set == SQL_SUCCESS);
+}
+
+TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSInalid) {
+  // ODBC Environment
+  SQLHENV env;
+
+  // Allocate an environment handle
+  SQLRETURN return_env = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(return_env == SQL_SUCCESS);
+
+  // Attempt to set to output nts to unsupported false
+  SQLRETURN return_set =
+      SQLSetEnvAttr(env, SQL_ATTR_OUTPUT_NTS, reinterpret_cast<void*>(SQL_FALSE), 0);
+
+  EXPECT_TRUE(return_set == SQL_ERROR);
+}
+
 }  // namespace integration_tests
 }  // namespace odbc
 }  // namespace flight
