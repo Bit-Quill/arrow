@@ -37,4 +37,4 @@ namespace arrow
                           SQLINTEGER bufferLen, SQLINTEGER* strLenPtr);
   SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                           SQLINTEGER strLen);
-  } // namespace arrow
+} // namespace arrow
