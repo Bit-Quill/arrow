@@ -126,7 +126,13 @@ namespace arrow
 
     ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
 
-    if (!environment) return SQL_INVALID_HANDLE;
+    if (!environment) {
+      return SQL_INVALID_HANDLE;
+    }
+
+    if (!valuePtr) {
+      return SQL_INVALID_HANDLE;
+    }
 
     switch (attr) {
       case SQL_ATTR_ODBC_VERSION: {
@@ -150,12 +156,23 @@ namespace arrow
 
   SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                           SQLINTEGER strLen) {
+    using ODBC::ODBCEnvironment;
+
+    ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
+
+    if (!environment) {
+      return SQL_INVALID_HANDLE;
+    }
+
+    if (!valuePtr) {
+      return SQL_INVALID_HANDLE;
+    }
+
     switch (attr) {
       case SQL_ATTR_ODBC_VERSION: {
-        // odbc version can not be set
-        SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
-        if (*value == SQL_OV_ODBC2) {
-          return SQL_SUCCESS;
+        SQLINTEGER* version = reinterpret_cast<SQLINTEGER*>(valuePtr);
+        if (*version == SQL_OV_ODBC2 || *version == SQL_OV_ODBC3) {
+          environment->setODBCVersion(*version);
         } else {
           return SQL_ERROR;
         }
