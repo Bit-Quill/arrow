@@ -21,8 +21,9 @@
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h>
 #include <atomic>
 #include <memory>
-#include <mutex>
 #include <unordered_map>
+
+#include "arrow/util/mutex.h"
 
 namespace driver {
 namespace flight_sql {
@@ -32,7 +33,7 @@ class GetInfoCache {
   std::unordered_map<uint16_t, driver::odbcabstraction::Connection::Info> info_;
   arrow::flight::FlightCallOptions& call_options_;
   std::unique_ptr<arrow::flight::sql::FlightSqlClient>& sql_client_;
-  std::mutex mutex_;
+  arrow::util::Mutex mutex_;
   std::atomic<bool> has_server_info_;
 
  public:

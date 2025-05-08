@@ -26,8 +26,8 @@
 #  include <bcrypt.h>
 #  include <cryptuiapi.h>
 
+#  include <string>
 #  include <tchar.h>
-#  include <iostream>
 #  include <vector>
 
 namespace driver {

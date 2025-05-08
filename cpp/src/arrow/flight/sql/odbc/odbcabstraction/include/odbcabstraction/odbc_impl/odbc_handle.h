@@ -22,7 +22,8 @@
 #include <sql.h>
 #include <sqltypes.h>
 #include <functional>
-#include <mutex>
+
+#include "arrow/util/mutex.h"
 
 /**
  * @brief An abstraction over a generic ODBC handle.
@@ -68,7 +69,7 @@ class ODBCHandle {
 
   template <typename Function>
   inline SQLRETURN executeWithLock(SQLRETURN rc, Function function) {
-    const std::lock_guard<std::mutex> lock(mtx_);
+    auto lock = mutex_.Lock();
     return execute(rc, function);
   }
 
@@ -88,6 +89,6 @@ class ODBCHandle {
   static Derived* of(SQLHANDLE handle) { return reinterpret_cast<Derived*>(handle); }
 
  private:
-  std::mutex mtx_;
+  arrow::util::Mutex mtx_;
 };
 }  // namespace ODBC

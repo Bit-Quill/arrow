@@ -20,7 +20,8 @@
 #if defined(__APPLE__)
 #  include <dlfcn.h>
 #  include <boost/algorithm/string/predicate.hpp>
-#  include <mutex>
+
+#  include "arrow/util/mutex.h"
 #endif
 
 namespace driver {
@@ -30,7 +31,7 @@ namespace odbcabstraction {
 std::atomic<size_t> SqlWCharSize{0};
 
 namespace {
-std::mutex SqlWCharSizeMutex;
+arrow::util::Mutex SqlWCharSizeMutex;
 
 bool IsUsingIODBC() {
   // Detects iODBC by looking up by symbol iodbc_version
