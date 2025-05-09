@@ -21,8 +21,14 @@ find_package(ODBC REQUIRED)
 
 include_directories(${ODBC_INCLUDE_DIRS})
 
+add_definitions(-DUNICODE=1)
+
 add_arrow_test(connection_test
                SOURCES
                connection_test.cc
+               odbc_test_suite.cc
+               odbc_test_suite.h
                EXTRA_LINK_LIBS
-               ${ODBC_LIBRARIES})
+               ${ODBC_LIBRARIES}
+            #    arrow_flight_sql_odbc_shared #-AL- add after resolving build issue, so I can put mutal code in 1 place.
+               )

@@ -121,4 +121,34 @@ namespace arrow
     return SQL_ERROR;
   }
 
-  }  // namespace arrow
+  SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
+    SQLWCHAR* inConnectionString,
+    SQLSMALLINT inConnectionStringLen,
+    SQLWCHAR* outConnectionString,
+    SQLSMALLINT outConnectionStringBufferLen,
+    SQLSMALLINT* outConnectionStringLen,
+    SQLUSMALLINT driverCompletion) {
+    // -AL- TODO implement
+    using ODBC::ODBCConnection;
+
+    ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
+
+    if (!connection) {
+      // Invalid connection pointer
+      return SQL_INVALID_HANDLE;
+    }
+    
+    // -AL- todo implement. Need to move SqlWcharToString from tests into a shared space. 
+    /*
+    std::string connection_string = SqlWcharToString(inConnectionString, inConnectionStringLen);
+    Connection::ConnPropertyMap properties;
+    std::string dsn = ODBCConnection::getPropertiesFromConnString(connection_string, properties);
+
+    std::vector<std::string> missing_properties;
+    connection->connect(dsn, properties, missing_properties);
+    */
+
+    return SQL_INVALID_HANDLE;
+  }
+
+}  // namespace arrow
