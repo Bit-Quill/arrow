@@ -55,6 +55,12 @@ class ARROW_EXPORT Mutex {
   Guard TryLock();
   Guard Lock();
 
+  /// For implementing BasicLockable
+  /// https://en.cppreference.com/w/cpp/named_req/BasicLockable
+  void try_lock();
+  void lock();
+  void unlock();
+
  private:
   struct Impl;
   std::unique_ptr<Impl, void (*)(Impl*)> impl_;

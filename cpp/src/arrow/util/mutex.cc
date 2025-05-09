@@ -57,6 +57,18 @@ Mutex::Guard Mutex::Lock() {
   return Guard{this};
 }
 
+void Mutex::try_lock() {
+  TryLock();
+}
+void Mutex::lock() {
+  Lock();
+}
+
+void Mutex::unlock() {
+  auto guard = Guard{this};
+  guard.Unlock();
+}
+
 Mutex::Mutex() : impl_(new Impl, [](Impl* impl) { delete impl; }) {}
 
 #ifndef _WIN32
