@@ -202,12 +202,12 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
 
   // Attempt to set to unsupported version
   SQLRETURN return_set =
-    SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(1), 0);
+      SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(1), 0);
 
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
 
-TEST(SQLGetEnvAttr, TestSQLGetEnvOutputNTS) {
+TEST(SQLGetEnvAttr, TestSQLGetEnvAttrOutputNTS) {
   // ODBC Environment
   SQLHENV env;
 
@@ -223,6 +223,38 @@ TEST(SQLGetEnvAttr, TestSQLGetEnvOutputNTS) {
   EXPECT_TRUE(return_get == SQL_SUCCESS);
 
   EXPECT_EQ(output_nts, SQL_TRUE);
+}
+
+TEST(SQLGetEnvAttr, TestSQLGetEnvAttrGetLength) {
+  // ODBC Environment
+  SQLHENV env;
+
+  SQLINTEGER length;
+
+  // Allocate an environment handle
+  SQLRETURN return_env = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(return_env == SQL_SUCCESS);
+
+  SQLRETURN return_get = SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0, &length);
+
+  EXPECT_TRUE(return_get == SQL_SUCCESS);
+
+  EXPECT_EQ(length, sizeof(SQLINTEGER));
+}
+
+TEST(SQLGetEnvAttr, TestSQLGetEnvAttrNullValuePointer) {
+  // ODBC Environment
+  SQLHENV env;
+
+  // Allocate an environment handle
+  SQLRETURN return_env = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(return_env == SQL_SUCCESS);
+
+  SQLRETURN return_get = SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0, nullptr);
+
+  EXPECT_TRUE(return_get == SQL_ERROR);
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSValid) {
@@ -265,10 +297,18 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrBadEnv) {
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
 
-TEST(SQLSetEnvAttr, TestSQLSetEnvAttrBadData) {
+TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
+  // ODBC Environment
+  SQLHENV env;
+
+  // Allocate an environment handle
+  SQLRETURN return_env = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(return_env == SQL_SUCCESS);
+
   // Attempt to set using bad data pointer
   SQLRETURN return_set =
-      SQLSetEnvAttr(0, SQL_ATTR_ODBC_VERSION, nullptr, 0);
+      SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0);
 
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
