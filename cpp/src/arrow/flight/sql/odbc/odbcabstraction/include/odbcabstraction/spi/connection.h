@@ -67,8 +67,8 @@ class Connection {
   typedef PropertyMap ConnPropertyMap;
 
   /// \brief Establish the connection.
-  /// \param properties[in] properties used to establish the connection.
-  /// \param missing_properties[out] vector of missing properties (if any).
+  /// \param properties [in] properties used to establish the connection.
+  /// \param missing_properties [out] vector of missing properties (if any).
   virtual void Connect(const ConnPropertyMap& properties,
                        std::vector<std::string>& missing_properties) = 0;
 
@@ -79,14 +79,14 @@ class Connection {
   virtual std::shared_ptr<Statement> CreateStatement() = 0;
 
   /// \brief Set a connection attribute (may be called at any time).
-  /// \param attribute[in] Which attribute to set.
+  /// \param attribute [in] Which attribute to set.
   /// \param value The value to be set.
   /// \return true if the value was set successfully or false if it was substituted with
   /// a similar value.
   virtual bool SetAttribute(AttributeId attribute, const Attribute& value) = 0;
 
   /// \brief Retrieve a connection attribute
-  /// \param attribute[in] Attribute to be retrieved.
+  /// \param attribute [in] Attribute to be retrieved.
   virtual boost::optional<Connection::Attribute> GetAttribute(
       Connection::AttributeId attribute) = 0;
 

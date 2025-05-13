@@ -46,8 +46,8 @@ boost::optional<bool> AsBool(const Connection::ConnPropertyMap& connPropertyMap,
 /// value is returned. \param connPropertyMap              the map with the connection
 /// properties. \param property_name                the name of the property that will be
 /// looked up. \return                             the parsed valued. \exception
-/// std::invalid_argument    exception from \link std::stoi \endlink \exception
-/// std::out_of_range        exception from \link std::stoi \endlink
+/// std::invalid_argument    exception from std::stoi \exception
+/// std::out_of_range        exception from std::stoi
 boost::optional<int32_t> AsInt32(int32_t min_value,
                                  const Connection::ConnPropertyMap& connPropertyMap,
                                  const std::string& property_name);
