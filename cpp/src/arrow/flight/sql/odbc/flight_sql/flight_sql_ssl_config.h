@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <arrow/flight/types.h>
-#include <arrow/status.h>
 #include <string>
+#include "arrow/flight/types.h"
+#include "arrow/status.h"
 
 namespace driver {
 namespace flight_sql {
@@ -50,7 +50,6 @@ class FlightSqlSslConfig {
   /// \brief Loads the certificate file and extract the certificate file from it
   ///        and create the object CertKeyPair with it on.
   /// \param out A CertKeyPair with the cert on it.
-  /// \return    The cert key pair object
   void populateOptionsWithCerts(arrow::flight::CertKeyPair* out);
 
  private:
