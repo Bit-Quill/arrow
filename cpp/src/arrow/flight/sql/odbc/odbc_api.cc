@@ -263,7 +263,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   // https://github.com/apache/arrow/issues/46449
 
   std::cout << "-AL- SQLDriverConnect called\n";
-  // -AL- TODO implement
+
   using driver::odbcabstraction::Connection;
   using ODBC::ODBCConnection;
 
@@ -274,52 +274,50 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     return SQL_INVALID_HANDLE;
   }
 
-  // -AL- draft code for execute with diagnostics
-  // return connection->ExecuteWithDiagnostics(conn, SQL_ERROR, []() {
+  return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    std::string connection_string =
+        ODBC::SqlStringToString(inConnectionString, inConnectionStringLen);
+    Connection::ConnPropertyMap properties;
+    std::string dsn =
+        ODBCConnection::getPropertiesFromConnString(connection_string, properties);
 
-  std::string connection_string =
-      ODBC::SqlStringToString(inConnectionString, inConnectionStringLen);
-  Connection::ConnPropertyMap properties;
-  std::string dsn =
-      ODBCConnection::getPropertiesFromConnString(connection_string, properties);
+    std::vector<std::string> missing_properties;
+    connection->connect(dsn, properties, missing_properties);
 
-  std::vector<std::string> missing_properties;
-  connection->connect(dsn, properties, missing_properties);
+    // TODO: Implement SQL_DRIVER_COMPLETE_REQUIRED in SQLDriverConnect according to the
+    // spec https://github.com/apache/arrow/issues/46448
+    if (driverCompletion == SQL_DRIVER_PROMPT ||
+        ((driverCompletion == SQL_DRIVER_COMPLETE ||
+          driverCompletion == SQL_DRIVER_COMPLETE_REQUIRED) &&
+         !missing_properties.empty())) {
+      // TODO: Display connection window. Draft code is provided
+      // Configuration config;
+      // if (DisplayConnectionWindow(windowHandle, config)) {
+      //  properties = config.GetProperties();
+      //
+      // // Copy connection string to outConnectionString before connection attempt
+      // connectStr = config.ToConnectString();
+      // size_t reslen = ODBC::CopyStringToBuffer(
+      //    connectStr, reinterpret_cast<char*>(outConnectionString),
+      //    static_cast<size_t>(outConnectionStringBufferLen));
+      // if (outConnectionStringLen)
+      //  *outConnectionStringLen = static_cast<SQLSMALLINT>(reslen);
+      //
+      //  connection->connect(dsn, properties, missing_properties);
+      //} else {
+      //  throw DriverException("Connection canceled by user", "HY008");
+      //}
+    } else {
+      // Copy connection string to outConnectionString after connection attempt
+      size_t reslen = ODBC::CopyStringToBuffer(
+          connection_string, reinterpret_cast<char*>(outConnectionString),
+          static_cast<size_t>(outConnectionStringBufferLen));
+      if (outConnectionStringLen)
+        *outConnectionStringLen = static_cast<SQLSMALLINT>(reslen);
+    }
 
-  // TODO: Implement SQL_DRIVER_COMPLETE_REQUIRED in SQLDriverConnect according to the
-  // spec https://github.com/apache/arrow/issues/46448
-  if (driverCompletion == SQL_DRIVER_PROMPT ||
-      ((driverCompletion == SQL_DRIVER_COMPLETE ||
-        driverCompletion == SQL_DRIVER_COMPLETE_REQUIRED) &&
-       !missing_properties.empty())) {
-    // TODO: Display connection window. Draft code is provided
-    // Configuration config;
-    // if (DisplayConnectionWindow(windowHandle, config)) {
-    //  properties = config.GetProperties();
-    // 
-    // // Copy connection string to outConnectionString before connection attempt
-    // connectStr = config.ToConnectString();
-    //size_t reslen = ODBC::CopyStringToBuffer(
-    //    connectStr, reinterpret_cast<char*>(outConnectionString),
-    //    static_cast<size_t>(outConnectionStringBufferLen));
-    //if (outConnectionStringLen)
-    //  *outConnectionStringLen = static_cast<SQLSMALLINT>(reslen);
-    // 
-    //  connection->connect(dsn, properties, missing_properties);
-    //} else {
-    //  throw DriverException("Connection canceled by user", "HY008");
-    //}
-  } else {
-    // Copy connection string to outConnectionString after connection attempt
-    size_t reslen = ODBC::CopyStringToBuffer(
-        connection_string, reinterpret_cast<char*>(outConnectionString),
-        static_cast<size_t>(outConnectionStringBufferLen));
-    if (outConnectionStringLen)
-      *outConnectionStringLen = static_cast<SQLSMALLINT>(reslen);
-  }
-
-  return SQL_SUCCESS;
-  //});
+    return SQL_SUCCESS;
+  });
 }
 
 SQLRETURN SQLDisconnect(SQLHDBC conn) {
@@ -332,9 +330,11 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
     return SQL_INVALID_HANDLE;
   }
 
-  connection->disconnect();
+  return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    connection->disconnect();
 
-  return SQL_SUCCESS;
+    return SQL_SUCCESS;
+  });
 }
 
 SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePtr,
@@ -345,8 +345,8 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
   // Partially stubbed implementation of SQLGetInfo
   if (infoType == SQL_DRIVER_ODBC_VER) {
     std::string ver("03.80");
-    size_t reslen =
-        ODBC::CopyStringToBuffer(ver, reinterpret_cast<char*>(infoValuePtr), static_cast<size_t>(bufLen));
+    size_t reslen = ODBC::CopyStringToBuffer(ver, reinterpret_cast<char*>(infoValuePtr),
+                                             static_cast<size_t>(bufLen));
     if (length) *length = static_cast<SQLSMALLINT>(reslen);
 
     return SQL_SUCCESS;
