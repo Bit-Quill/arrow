@@ -34,6 +34,7 @@ namespace ODBC {
 using driver::odbcabstraction::DriverException;
 using driver::odbcabstraction::GetSqlWCharSize;
 using driver::odbcabstraction::Utf8ToWcs;
+using driver::odbcabstraction::WcsToUtf8;
 
 // Return the number of bytes required for the conversion.
 template <typename CHAR_TYPE>
@@ -86,29 +87,15 @@ inline std::string SqlWcharToString(SQLWCHAR* wchar_msg, SQLSMALLINT msg_len = S
     return std::string();
   }
 
-  // Size of SQLWCHAR depends on the platform
-  size_t wchar_size = sizeof(SQLWCHAR);
+  thread_local std::vector<uint8_t> utf8_str;
 
-  // Assert that size of SQLWCHAR and wchar_t are the same
-  // This assert is unsafe if the driver is built using unixODBC headers
-  static_assert(sizeof(SQLWCHAR) == sizeof(wchar_t));
-
-  // Copy SQLWCHAR into a temp wstring
-  std::wstring wstring_msg;
-
-  if (msg_len != SQL_NTS) {
-    for (int i = 0; wchar_msg[i] != 0 && i < msg_len; i++) {
-      wstring_msg.push_back(wchar_msg[i]);
-    }
+  if (msg_len == SQL_NTS) {
+    WcsToUtf8((void*)wchar_msg, &utf8_str);
   } else {
-    for (int i = 0; wchar_msg[i] != 0; i++) {
-      wstring_msg.push_back(wchar_msg[i]);
-    }
+    WcsToUtf8((void*)wchar_msg, msg_len / GetSqlWCharSize(), &utf8_str);
   }
 
-  // Converter for SQLWCHAR to wstring
-  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-  return conv.to_bytes(wstring_msg);
+  return std::string(utf8_str.begin(), utf8_str.end());
 }
 
 inline std::string SqlStringToString(const unsigned char* sqlStr,
