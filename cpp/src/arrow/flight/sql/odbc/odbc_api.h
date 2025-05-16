@@ -28,7 +28,6 @@
 //  @file odbc_api.h
 //
 //  Define internal ODBC API function headers.
-
 namespace arrow {
 SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result);
 SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle);
@@ -36,4 +35,17 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                         SQLINTEGER bufferLen, SQLINTEGER* strLenPtr);
 SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                         SQLINTEGER strLen);
+SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
+                           SQLCHAR* inConnectionString, SQLSMALLINT inConnectionStringLen,
+                           SQLCHAR* outConnectionString,
+                           SQLSMALLINT outConnectionStringBufferLen,
+                           SQLSMALLINT* outConnectionStringLen,
+                           SQLUSMALLINT driverCompletion);
+SQLRETURN SQLConnect(SQLHDBC conn, SQLCHAR* dsnName,
+                             SQLSMALLINT dsnNameLen, SQLCHAR* userName,
+                             SQLSMALLINT userNameLen, SQLCHAR* password,
+                             SQLSMALLINT passwordLen);
+SQLRETURN SQLDisconnect(SQLHDBC conn);
+SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePtr,
+                     SQLSMALLINT bufLen, SQLSMALLINT* length);
 }  // namespace arrow

@@ -34,6 +34,7 @@ namespace ODBC {
 using driver::odbcabstraction::DriverException;
 using driver::odbcabstraction::GetSqlWCharSize;
 using driver::odbcabstraction::Utf8ToWcs;
+using driver::odbcabstraction::WcsToUtf8;
 
 // Return the number of bytes required for the conversion.
 template <typename CHAR_TYPE>
@@ -75,6 +76,53 @@ inline size_t ConvertToSqlWChar(const std::string& str, SQLWCHAR* buffer,
       throw DriverException("Encoding is unsupported, SQLWCHAR size: " +
                             std::to_string(GetSqlWCharSize()));
   }
+}
+
+/// @brief Convert buffer of SqlWchar to standard string
+/// @param wchar_msg[in] SqlWchar to convert
+/// @param msg_len[in] Number of characters in wchar_msg
+/// @return wchar_msg in std::string format
+inline std::string SqlWcharToString(SQLWCHAR* wchar_msg, SQLSMALLINT msg_len = SQL_NTS) {
+  if (wchar_msg == nullptr) {
+    return std::string();
+  }
+
+  thread_local std::vector<uint8_t> utf8_str;
+
+  if (msg_len == SQL_NTS) {
+    WcsToUtf8((void*)wchar_msg, &utf8_str);
+  } else {
+    WcsToUtf8((void*)wchar_msg, msg_len / GetSqlWCharSize(), &utf8_str);
+  }
+
+  return std::string(utf8_str.begin(), utf8_str.end());
+}
+
+inline std::string SqlStringToString(const unsigned char* sqlStr,
+                                     int32_t sqlStrLen = SQL_NTS) {
+  std::string res;
+
+  const char* sqlStrC = reinterpret_cast<const char*>(sqlStr);
+
+  if (!sqlStr) return res;
+
+  if (sqlStrLen == SQL_NTS)
+    res.assign(sqlStrC);
+  else if (sqlStrLen > 0)
+    res.assign(sqlStrC, sqlStrLen);
+
+  return res;
+}
+
+inline size_t CopyStringToBuffer(const std::string& str, char* buf, size_t buflen) {
+  if (!buf || !buflen) return 0;
+
+  size_t bytesToCopy = std::min(str.size(), static_cast<size_t>(buflen - 1));
+
+  memcpy(buf, str.data(), bytesToCopy);
+  buf[bytesToCopy] = 0;
+
+  return bytesToCopy;
 }
 
 }  // namespace ODBC
