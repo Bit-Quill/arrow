@@ -86,4 +86,11 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
       outConnectionStringBufferLen, outConnectionStringLen, driverCompletion);
 }
 
+SQLRETURN SQL_API SQLConnect(SQLHDBC conn, SQLCHAR* dsnName, SQLSMALLINT dsnNameLen,
+                     SQLCHAR* userName, SQLSMALLINT userNameLen, SQLCHAR* password,
+                     SQLSMALLINT passwordLen) {
+  return arrow::SQLConnect(conn, dsnName, dsnNameLen, userName, userNameLen, password,
+                           passwordLen);
+}
+
 SQLRETURN SQL_API SQLDisconnect(SQLHDBC conn) { return arrow::SQLDisconnect(conn); }

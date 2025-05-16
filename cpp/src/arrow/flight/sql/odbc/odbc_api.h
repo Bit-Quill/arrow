@@ -41,6 +41,10 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
                            SQLSMALLINT outConnectionStringBufferLen,
                            SQLSMALLINT* outConnectionStringLen,
                            SQLUSMALLINT driverCompletion);
+SQLRETURN SQLConnect(SQLHDBC conn, SQLCHAR* dsnName,
+                             SQLSMALLINT dsnNameLen, SQLCHAR* userName,
+                             SQLSMALLINT userNameLen, SQLCHAR* password,
+                             SQLSMALLINT passwordLen);
 SQLRETURN SQLDisconnect(SQLHDBC conn);
 SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePtr,
                      SQLSMALLINT bufLen, SQLSMALLINT* length);

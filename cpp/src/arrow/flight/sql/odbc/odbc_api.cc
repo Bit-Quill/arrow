@@ -15,11 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// flight_sql_connection.h needs to be included first due to conflicts with windows.h
+#include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
+
 #include <arrow/flight/sql/odbc/flight_sql/include/flight_sql/flight_sql_driver.h>
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h>
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h>
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h>
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h>
+
+#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/configuration.h"
 
 // odbc_api includes windows.h, which needs to be put behind winsock2.h.
 // odbc_environment.h includes winsock2.h
@@ -269,11 +274,6 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
 
   ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
 
-  if (!connection) {
-    // Invalid connection pointer
-    return SQL_INVALID_HANDLE;
-  }
-
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     std::string connection_string =
         ODBC::SqlStringToString(inConnectionString, inConnectionStringLen);
@@ -320,7 +320,44 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   });
 }
 
+SQLRETURN SQLConnect(SQLHDBC conn, SQLCHAR* dsnName, SQLSMALLINT dsnNameLen,
+                     SQLCHAR* userName, SQLSMALLINT userNameLen, SQLCHAR* password,
+                     SQLSMALLINT passwordLen) {
+  std::cout << "-AL- SQLConnect called\n";
+  using ODBC::ODBCConnection;
+  using driver::flight_sql::config::Configuration;
+  using driver::flight_sql::FlightSqlConnection;
+
+  using ODBC::SqlStringToString;
+
+  ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
+
+  return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    std::string dsn = SqlStringToString(dsnName, dsnNameLen);
+
+    Configuration config;
+    config.LoadDsn(dsn);
+
+    if (userName) {
+      std::string uid = SqlStringToString(userName, userNameLen);
+      config.Set(FlightSqlConnection::UID, uid);
+    }
+
+    if (password) {
+      std::string pwd = SqlStringToString(password, passwordLen);
+      config.Set(FlightSqlConnection::PWD, pwd);
+    }
+
+    std::vector<std::string> missing_properties;
+
+    connection->connect(dsn, config.GetProperties(), missing_properties);
+
+    return SQL_SUCCESS;
+  });
+}
+
 SQLRETURN SQLDisconnect(SQLHDBC conn) {
+  std::cout << "-AL- SQLDisconnect called\n";
   using ODBC::ODBCConnection;
 
   ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
