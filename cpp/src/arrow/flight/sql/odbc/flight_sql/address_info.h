@@ -20,6 +20,7 @@
 #include <string>
 
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h>
+
 #include <sys/types.h>
 #if !_WIN32
 #  include <netdb.h>
