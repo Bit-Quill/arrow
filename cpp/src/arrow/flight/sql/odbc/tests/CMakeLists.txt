@@ -28,4 +28,6 @@ add_arrow_test(connection_test
                odbc_test_suite.h
                EXTRA_LINK_LIBS
                ${ODBC_LIBRARIES}
-)
+               ${ODBCINST}
+               arrow_odbc_spi_impl
+               odbcabstraction)

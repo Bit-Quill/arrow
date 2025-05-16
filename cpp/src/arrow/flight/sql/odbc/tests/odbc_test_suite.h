@@ -23,9 +23,6 @@
 #include <sqltypes.h>
 #include <sqlucode.h>
 
-// For wchar conversion
-#include <codecvt>
-
 namespace arrow {
 namespace flight {
 namespace odbc {

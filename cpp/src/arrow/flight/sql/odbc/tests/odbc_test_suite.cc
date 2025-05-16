@@ -15,11 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <cassert>
+// For DSN registration. flight_sql_connection.h needs to included first due to conflicts
+// with windows.h
+#include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
 
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h>
 
 #include <arrow/flight/sql/odbc/tests/odbc_test_suite.h>
+
+// For DSN registration
+#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/configuration.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
 
 namespace arrow {
 namespace flight {
@@ -50,6 +56,21 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle) {
   }
 
   return res;
+}
+
+void writeDSN(std::string connection_str) {
+  // -AL- todo implement and add header to odbc_test_suite.h!!
+  using driver::flight_sql::FlightSqlConnection;
+  using driver::flight_sql::config::Configuration;
+  using driver::odbcabstraction::Connection;
+  using ODBC::ODBCConnection;
+
+  Connection::ConnPropertyMap properties;
+
+  ODBC::ODBCConnection::getPropertiesFromConnString(connection_str, properties);
+
+  Configuration config;
+  config.Set(FlightSqlConnection::DSN, std::string("Apache Arrow Flight SQL Test DSN"));
 }
 
 // -AL- todo potentially add `connectToFlightSql` here.

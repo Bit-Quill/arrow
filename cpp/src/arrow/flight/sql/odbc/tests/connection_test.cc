@@ -124,6 +124,69 @@ TEST(SQLDriverConnect, TestSQLDriverConnect) {
 
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
+  // -AL- todo write checks for checking that outstr is same content as connect_str0
+
+  // Disconnect from ODBC
+  ret = SQLDisconnect(conn);
+
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
+  }
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // Free connection handle
+  ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // Free environment handle
+  ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+}
+
+TEST(SQLConnect, TestSQLConnect) {
+  // ODBC Environment
+  SQLHENV env;
+  SQLHDBC conn;
+
+  // Allocate an environment handle
+  SQLRETURN ret = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // Allocate a connection using alloc handle
+  ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // Connect string
+  ASSERT_OK_AND_ASSIGN(std::string connect_str,
+                       arrow::internal::GetEnvVar("ARROW_FLIGHT_SQL_ODBC_CONN"));
+  std::vector<SQLCHAR> connect_str0(connect_str.begin(), connect_str.end());
+
+  // Write connection string content into a DSN
+  // -AL- todo move this into a helper function
+  // Configuration config;
+  // ODBCConnection::getPropertiesFromConnString(connection_string, properties);
+
+  // Connecting to ODBC server.
+  // SQLRETURN ret = SQLConnect(
+  //    dbc, wDsn.data(), static_cast< SQLSMALLINT >(wDsn.size()),
+  //    wUsername.data(), static_cast< SQLSMALLINT >(wUsername.size()),
+  //    wPassword.data(), static_cast< SQLSMALLINT >(wPassword.size());
+
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
+  }
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
   // Disconnect from ODBC
   ret = SQLDisconnect(conn);
 
@@ -346,8 +409,8 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSInvalid) {
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrBadEnv) {
   // Attempt to set using bad environment pointer
-  SQLRETURN return_set =
-      SQLSetEnvAttr(nullptr, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(SQL_OV_ODBC2), 0);
+  SQLRETURN return_set = SQLSetEnvAttr(nullptr, SQL_ATTR_ODBC_VERSION,
+                                       reinterpret_cast<void*>(SQL_OV_ODBC2), 0);
 
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
@@ -362,8 +425,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
   EXPECT_TRUE(return_env == SQL_SUCCESS);
 
   // Attempt to set using bad data pointer
-  SQLRETURN return_set =
-      SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0);
+  SQLRETURN return_set = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0);
 
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
