@@ -60,18 +60,16 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
         return SQL_INVALID_HANDLE;
       }
 
-      std::shared_ptr<ODBCConnection> conn;
-      SQLRETURN sql_return = ODBCEnvironment::ExecuteWithDiagnostics(
-          environment, SQL_ERROR, [environment, &conn]() {
-            conn = environment->CreateConnection();
+      return ODBCEnvironment::ExecuteWithDiagnostics(
+          environment, SQL_ERROR, [environment, result]() {
+            std::shared_ptr<ODBCConnection> conn = environment->CreateConnection();
+
+            if (conn) {
+              *result = reinterpret_cast<SQLHDBC>(conn.get());
+            }
+
             return SQL_SUCCESS;
           });
-
-      if (conn) {
-        *result = reinterpret_cast<SQLHDBC>(conn.get());
-      }
-
-      return sql_return;
     }
 
     case SQL_HANDLE_STMT: {
@@ -145,9 +143,11 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
             if (valuePtr) {
               SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
               *value = static_cast<SQLSMALLINT>(environment->getODBCVersion());
+
               return SQL_SUCCESS;
             } else if (strLenPtr) {
               *strLenPtr = sizeof(SQLINTEGER);
+
               return SQL_SUCCESS;
             } else {
               throw driver::odbcabstraction::DriverException(
@@ -163,9 +163,11 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
               // output nts always returns SQL_TRUE
               SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
               *value = SQL_TRUE;
+
               return SQL_SUCCESS;
             } else if (strLenPtr) {
               *strLenPtr = sizeof(SQLINTEGER);
+
               return SQL_SUCCESS;
             } else {
               throw driver::odbcabstraction::DriverException(
@@ -178,12 +180,14 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
     case SQL_ATTR_APP_ROW_DESC: {
       environment->GetDiagnostics().AddError(driver::odbcabstraction::DriverException(
           "Optional feature not supported.", "HYC00"));
+
       return SQL_ERROR;
     }
 
     default: {
       environment->GetDiagnostics().AddError(
           driver::odbcabstraction::DriverException("Invalid attribute", "HYC00"));
+
       return SQL_ERROR;
     }
   }
@@ -216,6 +220,7 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                 static_cast<SQLINTEGER>(reinterpret_cast<intptr_t>(valuePtr));
             if (version == SQL_OV_ODBC2 || version == SQL_OV_ODBC3) {
               environment->setODBCVersion(version);
+
               return SQL_SUCCESS;
             } else {
               throw driver::odbcabstraction::DriverException(
@@ -243,12 +248,14 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
     case SQL_ATTR_APP_ROW_DESC: {
       environment->GetDiagnostics().AddError(driver::odbcabstraction::DriverException(
           "Optional feature not supported.", "HYC00"));
+
       return SQL_ERROR;
     }
 
     default: {
       environment->GetDiagnostics().AddError(
           driver::odbcabstraction::DriverException("Invalid attribute", "HY092"));
+
       return SQL_ERROR;
     }
   }
