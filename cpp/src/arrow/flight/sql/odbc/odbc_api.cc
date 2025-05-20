@@ -140,39 +140,43 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
     case SQL_ATTR_ODBC_VERSION: {
       return ODBCEnvironment::ExecuteWithDiagnostics(
           environment, SQL_ERROR, [environment, valuePtr, strLenPtr]() {
-            if (valuePtr) {
-              SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
-              *value = static_cast<SQLSMALLINT>(environment->getODBCVersion());
-
-              return SQL_SUCCESS;
-            } else if (strLenPtr) {
-              *strLenPtr = sizeof(SQLINTEGER);
-
-              return SQL_SUCCESS;
-            } else {
+            if (!valuePtr && !strLenPtr) {
               throw driver::odbcabstraction::DriverException(
                   "Invalid null pointer for attribute.", "HY000");
             }
+
+            if (valuePtr) {
+              SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
+              *value = static_cast<SQLSMALLINT>(environment->getODBCVersion());
+            }
+
+            if (strLenPtr) {
+              *strLenPtr = sizeof(SQLINTEGER);
+            }
+
+            return SQL_SUCCESS;
           });
     }
 
     case SQL_ATTR_OUTPUT_NTS: {
       return ODBCEnvironment::ExecuteWithDiagnostics(
           environment, SQL_ERROR, [environment, valuePtr, strLenPtr]() {
+            if (!valuePtr && !strLenPtr) {
+              throw driver::odbcabstraction::DriverException(
+                  "Invalid null pointer for attribute.", "HY000");
+            }
+
             if (valuePtr) {
               // output nts always returns SQL_TRUE
               SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
               *value = SQL_TRUE;
-
-              return SQL_SUCCESS;
-            } else if (strLenPtr) {
-              *strLenPtr = sizeof(SQLINTEGER);
-
-              return SQL_SUCCESS;
-            } else {
-              throw driver::odbcabstraction::DriverException(
-                  "Invalid null pointer for attribute.", "HY000");
             }
+
+            if (strLenPtr) {
+              *strLenPtr = sizeof(SQLINTEGER);
+            }
+
+            return SQL_SUCCESS;
           });
     }
 
