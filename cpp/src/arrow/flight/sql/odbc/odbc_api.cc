@@ -27,7 +27,7 @@
 namespace arrow {
 SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
   // TODO: implement SQLAllocHandle by linking to `odbc_impl`
-  *result = 0;
+  *result = nullptr;
 
   switch (type) {
     case SQL_HANDLE_ENV: {
@@ -56,20 +56,17 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
 
       ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(parent);
 
-      if (!environment) {
-        return SQL_INVALID_HANDLE;
-      }
+      return ODBCEnvironment::ExecuteWithDiagnostics(environment, SQL_ERROR, [=]() {
+        std::shared_ptr<ODBCConnection> conn = environment->CreateConnection();
 
-      return ODBCEnvironment::ExecuteWithDiagnostics(
-          environment, SQL_ERROR, [environment, result]() {
-            std::shared_ptr<ODBCConnection> conn = environment->CreateConnection();
+        if (conn) {
+          *result = reinterpret_cast<SQLHDBC>(conn.get());
 
-            if (conn) {
-              *result = reinterpret_cast<SQLHDBC>(conn.get());
-            }
+          return SQL_SUCCESS;
+        }
 
-            return SQL_SUCCESS;
-          });
+        return SQL_ERROR;
+      });
     }
 
     case SQL_HANDLE_STMT: {
@@ -104,13 +101,11 @@ SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
 
       ODBCConnection* conn = reinterpret_cast<ODBCConnection*>(handle);
 
-      if (!conn) {
-        return SQL_INVALID_HANDLE;
-      }
+      return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+        conn->releaseConnection();
 
-      conn->releaseConnection();
-
-      return SQL_SUCCESS;
+        return SQL_SUCCESS;
+      });
     }
 
     case SQL_HANDLE_STMT:
@@ -132,71 +127,56 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
 
   ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
 
-  if (!environment) {
-    return SQL_INVALID_HANDLE;
-  }
+  return ODBCEnvironment::ExecuteWithDiagnostics(environment, SQL_ERROR, [=]() {
+    switch (attr) {
+      case SQL_ATTR_ODBC_VERSION: {
+        if (!valuePtr && !strLenPtr) {
+          throw driver::odbcabstraction::DriverException(
+              "Invalid null pointer for attribute.", "HY000");
+        }
 
-  switch (attr) {
-    case SQL_ATTR_ODBC_VERSION: {
-      return ODBCEnvironment::ExecuteWithDiagnostics(
-          environment, SQL_ERROR, [environment, valuePtr, strLenPtr]() {
-            if (!valuePtr && !strLenPtr) {
-              throw driver::odbcabstraction::DriverException(
-                  "Invalid null pointer for attribute.", "HY000");
-            }
+        if (valuePtr) {
+          SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
+          *value = static_cast<SQLSMALLINT>(environment->getODBCVersion());
+        }
 
-            if (valuePtr) {
-              SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
-              *value = static_cast<SQLSMALLINT>(environment->getODBCVersion());
-            }
+        if (strLenPtr) {
+          *strLenPtr = sizeof(SQLINTEGER);
+        }
 
-            if (strLenPtr) {
-              *strLenPtr = sizeof(SQLINTEGER);
-            }
+        return SQL_SUCCESS;
+      }
 
-            return SQL_SUCCESS;
-          });
+      case SQL_ATTR_OUTPUT_NTS: {
+        if (!valuePtr && !strLenPtr) {
+          throw driver::odbcabstraction::DriverException(
+              "Invalid null pointer for attribute.", "HY000");
+        }
+
+        if (valuePtr) {
+          // output nts always returns SQL_TRUE
+          SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
+          *value = SQL_TRUE;
+        }
+
+        if (strLenPtr) {
+          *strLenPtr = sizeof(SQLINTEGER);
+        }
+
+        return SQL_SUCCESS;
+      }
+
+      case SQL_ATTR_CONNECTION_POOLING:
+      case SQL_ATTR_APP_ROW_DESC: {
+        throw driver::odbcabstraction::DriverException("Optional feature not supported.",
+                                                       "HYC00");
+      }
+
+      default: {
+        throw driver::odbcabstraction::DriverException("Invalid attribute", "HYC00");
+      }
     }
-
-    case SQL_ATTR_OUTPUT_NTS: {
-      return ODBCEnvironment::ExecuteWithDiagnostics(
-          environment, SQL_ERROR, [environment, valuePtr, strLenPtr]() {
-            if (!valuePtr && !strLenPtr) {
-              throw driver::odbcabstraction::DriverException(
-                  "Invalid null pointer for attribute.", "HY000");
-            }
-
-            if (valuePtr) {
-              // output nts always returns SQL_TRUE
-              SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(valuePtr);
-              *value = SQL_TRUE;
-            }
-
-            if (strLenPtr) {
-              *strLenPtr = sizeof(SQLINTEGER);
-            }
-
-            return SQL_SUCCESS;
-          });
-    }
-
-    case SQL_ATTR_CONNECTION_POOLING:
-    case SQL_ATTR_APP_ROW_DESC: {
-      environment->GetDiagnostics().AddError(driver::odbcabstraction::DriverException(
-          "Optional feature not supported.", "HYC00"));
-
-      return SQL_ERROR;
-    }
-
-    default: {
-      environment->GetDiagnostics().AddError(
-          driver::odbcabstraction::DriverException("Invalid attribute", "HYC00"));
-
-      return SQL_ERROR;
-    }
-  }
-
-  return SQL_ERROR;
+  });
 }
 
 SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
@@ -205,65 +185,47 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
 
   ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
 
-  if (!environment) {
-    return SQL_INVALID_HANDLE;
-  }
-
-  if (!valuePtr) {
-    environment->GetDiagnostics().AddError(driver::odbcabstraction::DriverException(
-        "Invalid null pointer for attribute.", "HY024"));
-
-    return SQL_ERROR;
-  }
-
-  switch (attr) {
-    case SQL_ATTR_ODBC_VERSION: {
-      return ODBCEnvironment::ExecuteWithDiagnostics(
-          environment, SQL_ERROR, [environment, valuePtr]() {
-            SQLINTEGER version =
-                static_cast<SQLINTEGER>(reinterpret_cast<intptr_t>(valuePtr));
-            if (version == SQL_OV_ODBC2 || version == SQL_OV_ODBC3) {
-              environment->setODBCVersion(version);
-
-              return SQL_SUCCESS;
-            } else {
-              throw driver::odbcabstraction::DriverException(
-                  "Invalid value for attribute", "HY024");
-            }
-          });
+  return ODBCEnvironment::ExecuteWithDiagnostics(environment, SQL_ERROR, [=]() {
+    if (!valuePtr) {
+      throw driver::odbcabstraction::DriverException(
+          "Invalid null pointer for attribute.", "HY024");
     }
 
-    case SQL_ATTR_OUTPUT_NTS: {
-      return ODBCEnvironment::ExecuteWithDiagnostics(
-          environment, SQL_ERROR, [valuePtr]() {
-            // output nts can not be set to SQL_FALSE, is always SQL_TRUE
-            SQLINTEGER value =
-                static_cast<SQLINTEGER>(reinterpret_cast<intptr_t>(valuePtr));
-            if (value == SQL_TRUE) {
-              return SQL_SUCCESS;
-            } else {
-              throw driver::odbcabstraction::DriverException(
-                  "Invalid value for attribute", "HY024");
-            }
-          });
+    switch (attr) {
+      case SQL_ATTR_ODBC_VERSION: {
+        SQLINTEGER version =
+            static_cast<SQLINTEGER>(reinterpret_cast<intptr_t>(valuePtr));
+        if (version == SQL_OV_ODBC2 || version == SQL_OV_ODBC3) {
+          environment->setODBCVersion(version);
+
+          return SQL_SUCCESS;
+        } else {
+          throw driver::odbcabstraction::DriverException("Invalid value for attribute",
+                                                         "HY024");
+        }
+      }
+
+      case SQL_ATTR_OUTPUT_NTS: {
+        // output nts can not be set to SQL_FALSE, is always SQL_TRUE
+        SQLINTEGER value = static_cast<SQLINTEGER>(reinterpret_cast<intptr_t>(valuePtr));
+        if (value == SQL_TRUE) {
+          return SQL_SUCCESS;
+        } else {
+          throw driver::odbcabstraction::DriverException("Invalid value for attribute",
+                                                         "HY024");
+        }
+      }
+
+      case SQL_ATTR_CONNECTION_POOLING:
+      case SQL_ATTR_APP_ROW_DESC: {
+        throw driver::odbcabstraction::DriverException("Optional feature not supported.",
+                                                       "HYC00");
+      }
+
+      default: {
+        throw driver::odbcabstraction::DriverException("Invalid attribute", "HY092");
+      }
     }
-
-    case SQL_ATTR_CONNECTION_POOLING:
-    case SQL_ATTR_APP_ROW_DESC: {
-      environment->GetDiagnostics().AddError(driver::odbcabstraction::DriverException(
-          "Optional feature not supported.", "HYC00"));
-
-      return SQL_ERROR;
-    }
-
-    default: {
-      environment->GetDiagnostics().AddError(
-          driver::odbcabstraction::DriverException("Invalid attribute", "HY092"));
-
-      return SQL_ERROR;
-    }
-  }
-
-  return SQL_ERROR;
+  });
 }
 }  // namespace arrow
