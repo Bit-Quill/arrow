@@ -16,6 +16,8 @@
 // under the License.
 
 #include <arrow/flight/sql/odbc/flight_sql/include/flight_sql/flight_sql_driver.h>
+#include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/diagnostics.h>
+#include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/attribute_utils.h>
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h>
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h>
 #include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h>
@@ -116,6 +118,107 @@ SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
 
     default:
       break;
+  }
+
+  return SQL_ERROR;
+}
+
+SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT recNumber,
+                          SQLSMALLINT diagIdentifier, SQLPOINTER diagInfoPtr,
+                          SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr) {
+  using driver::odbcabstraction::Diagnostics;
+  using ODBC::GetStringAttribute;
+  using ODBC::ODBCConnection;
+  using ODBC::ODBCEnvironment;
+
+  if (!handle) {
+    return SQL_INVALID_HANDLE;
+  }
+
+  if (!diagInfoPtr) {
+    return SQL_ERROR;
+  }
+
+  // Set character type to be Unicode by defualt (not Ansi)
+  bool isUnicode = true;
+  Diagnostics* diagnostics = nullptr;
+
+  switch (handleType) {
+    case SQL_HANDLE_ENV: {
+      ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(handle);
+      diagnostics = &environment->GetDiagnostics();
+      break;
+    }
+
+    case SQL_HANDLE_DBC: {
+      ODBCConnection* environment = reinterpret_cast<ODBCConnection*>(handle);
+      diagnostics = &environment->GetDiagnostics();
+      break;
+    }
+
+    default:
+      return SQL_ERROR;
+  }
+
+  if (!diagnostics) {
+    return SQL_INVALID_HANDLE;
+  }
+
+  // Retrieve header level diagnostics if Record 0 specified
+  if (recNumber == 0) {
+    switch (diagIdentifier) {
+      case SQL_DIAG_NUMBER: {
+        SQLINTEGER count = static_cast<SQLINTEGER>(diagnostics->GetRecordCount());
+        *static_cast<SQLINTEGER*>(diagInfoPtr) = count;
+        if (stringLengthPtr) {
+          *stringLengthPtr = sizeof(SQLINTEGER);
+        }
+
+        return SQL_SUCCESS;
+      }
+
+      case SQL_DIAG_SERVER_NAME: {
+        const std::string source = diagnostics->GetDataSourceComponent();
+        return GetStringAttribute(isUnicode, source, false, diagInfoPtr, bufferLength,
+                                  stringLengthPtr, *diagnostics);
+      }
+
+      default:
+        return SQL_ERROR;
+    }
+  }
+
+  // Retrieve record level diagnostics from specified 1 based record
+  uint32_t recordIndex = static_cast<uint32_t>(recNumber - 1);
+  if (!diagnostics->HasRecord(recordIndex)) {
+    return SQL_NO_DATA;
+  }
+
+  // Retrieve record field data
+  switch (diagIdentifier) {
+    case SQL_DIAG_MESSAGE_TEXT: {
+      const std::string message = diagnostics->GetMessageText(recordIndex);
+      return GetStringAttribute(isUnicode, message, false, diagInfoPtr, bufferLength,
+                                stringLengthPtr, *diagnostics);
+    }
+
+    case SQL_DIAG_NATIVE: {
+      *static_cast<SQLINTEGER*>(diagInfoPtr) = diagnostics->GetNativeError(recordIndex);
+      if (stringLengthPtr) {
+        *stringLengthPtr = sizeof(SQLINTEGER);
+      }
+
+      return SQL_SUCCESS;
+    }
+
+    case SQL_DIAG_SQLSTATE: {
+      const std::string state = diagnostics->GetSQLState(recordIndex);
+      return GetStringAttribute(isUnicode, state, false, diagInfoPtr, bufferLength,
+                                stringLengthPtr, *diagnostics);
+    }
+
+    default:
+      return SQL_ERROR;
   }
 
   return SQL_ERROR;
