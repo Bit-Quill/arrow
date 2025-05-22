@@ -51,10 +51,10 @@ SQLRETURN SQL_API SQLFreeConnect(SQLHDBC conn) {
   return arrow::SQLFreeHandle(SQL_HANDLE_DBC, conn);
 }
 
-SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
-                                  SQLSMALLINT recNumber, SQLSMALLINT diagIdentifier,
-                                  SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLength,
-                                  SQLSMALLINT* stringLengthPtr) {
+SQLRETURN SQL_API SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
+                                   SQLSMALLINT recNumber, SQLSMALLINT diagIdentifier,
+                                   SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLength,
+                                   SQLSMALLINT* stringLengthPtr) {
   return arrow::SQLGetDiagFieldW(handleType, handle, recNumber, diagIdentifier,
                                  diagInfoPtr, bufferLength, stringLengthPtr);
 }
