@@ -152,8 +152,8 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     }
 
     case SQL_HANDLE_DBC: {
-      ODBCConnection* environment = reinterpret_cast<ODBCConnection*>(handle);
-      diagnostics = &environment->GetDiagnostics();
+      ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(handle);
+      diagnostics = &connection->GetDiagnostics();
       break;
     }
 
