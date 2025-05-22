@@ -123,9 +123,10 @@ SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT recNumber,
-                          SQLSMALLINT diagIdentifier, SQLPOINTER diagInfoPtr,
-                          SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr) {
+SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
+                           SQLSMALLINT recNumber, SQLSMALLINT diagIdentifier,
+                           SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLength,
+                           SQLSMALLINT* stringLengthPtr) {
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetStringAttribute;
   using ODBC::ODBCConnection;
@@ -161,7 +162,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
   }
 
   if (!diagnostics) {
-    return SQL_INVALID_HANDLE;
+    return SQL_ERROR;
   }
 
   // Retrieve header level diagnostics if Record 0 specified

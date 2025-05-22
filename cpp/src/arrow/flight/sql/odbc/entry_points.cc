@@ -55,8 +55,8 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle,
                                   SQLSMALLINT recNumber, SQLSMALLINT diagIdentifier,
                                   SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLength,
                                   SQLSMALLINT* stringLengthPtr) {
-  return arrow::SQLGetDiagField(handleType, handle, recNumber, diagIdentifier,
-                                diagInfoPtr, bufferLength, stringLengthPtr);
+  return arrow::SQLGetDiagFieldW(handleType, handle, recNumber, diagIdentifier,
+                                 diagInfoPtr, bufferLength, stringLengthPtr);
 }
 
 SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,

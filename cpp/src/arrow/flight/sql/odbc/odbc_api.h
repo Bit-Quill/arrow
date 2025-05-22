@@ -32,9 +32,10 @@
 namespace arrow {
 SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result);
 SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle);
-SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT recNumber,
-                          SQLSMALLINT diagIdentifier, SQLPOINTER diagInfoPtr,
-                          SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr);
+SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
+                           SQLSMALLINT recNumber, SQLSMALLINT diagIdentifier,
+                           SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLength,
+                           SQLSMALLINT* stringLengthPtr);
 SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                         SQLINTEGER bufferLen, SQLINTEGER* strLenPtr);
 SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
