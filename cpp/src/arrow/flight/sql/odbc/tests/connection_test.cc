@@ -293,8 +293,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
   EXPECT_TRUE(return_env == SQL_SUCCESS);
 
   // Attempt to set using bad data pointer
-  SQLRETURN return_set =
-      SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0);
+  SQLRETURN return_set = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0);
 
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
