@@ -307,15 +307,10 @@ SQLRETURN SQLGetDiagRecW(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT r
     *nativeErrorPtr = diagnostics->GetNativeError(recordIndex);
   }
 
-  if (messageText) {
+  if (messageText || textLengthPtr) {
     const std::string& message = diagnostics->GetMessageText(recordIndex);
     return GetStringAttribute(isUnicode, message, false, messageText, bufferLength,
                               textLengthPtr, *diagnostics);
-  } else if (textLengthPtr) {
-    // Determine the number of wide characters required to represent message
-    const std::string& message = diagnostics->GetMessageText(recordIndex);
-    size_t requiredBytes = ConvertToSqlWChar(message, nullptr, 0);
-    *textLengthPtr = static_cast<SQLSMALLINT>(requiredBytes / GetSqlWCharSize());
   }
 
   return SQL_SUCCESS;
