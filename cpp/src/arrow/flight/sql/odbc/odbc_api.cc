@@ -257,7 +257,7 @@ SQLRETURN SQLGetDiagRecW(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT r
   }
 
   // Set character type to be Unicode by default
-  bool isUnicode = true;
+  const bool isUnicode = true;
   Diagnostics* diagnostics = nullptr;
 
   switch (handleType) {
@@ -290,14 +290,14 @@ SQLRETURN SQLGetDiagRecW(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT r
   }
 
   // Convert from ODBC 1 based record number to internal diagnostics 0 indexed storage
-  size_t recordIndex = static_cast<size_t>(recNumber - 1);
+  const size_t recordIndex = static_cast<size_t>(recNumber - 1);
   if (!diagnostics->HasRecord(recordIndex)) {
     return SQL_NO_DATA;
   }
 
   if (sqlState) {
     // The length of the sql state is always 5 characters plus null
-    SQLSMALLINT size = 6;
+    const SQLSMALLINT size = 6;
     const std::string& state = diagnostics->GetSQLState(recordIndex);
     GetStringAttribute(isUnicode, state, false, sqlState, bufferLength, &size,
                        *diagnostics);
