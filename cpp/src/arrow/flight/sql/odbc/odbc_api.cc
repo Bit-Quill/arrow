@@ -298,23 +298,22 @@ SQLRETURN SQLGetDiagRecW(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT r
   if (sqlState) {
     // The length of the sql state is always 5 characters plus null
     SQLSMALLINT size = 6;
-    const std::string state = diagnostics->GetSQLState(recordIndex);
+    const std::string& state = diagnostics->GetSQLState(recordIndex);
     GetStringAttribute(isUnicode, state, false, sqlState, bufferLength, &size,
                        *diagnostics);
   }
 
   if (nativeErrorPtr) {
-    SQLINTEGER nativeError = diagnostics->GetNativeError(recordIndex);
-    *nativeErrorPtr = nativeError;
+    *nativeErrorPtr = diagnostics->GetNativeError(recordIndex);
   }
 
   if (messageText) {
-    const std::string message = diagnostics->GetMessageText(recordIndex);
-    GetStringAttribute(isUnicode, message, false, messageText, bufferLength,
-                       textLengthPtr, *diagnostics);
+    const std::string& message = diagnostics->GetMessageText(recordIndex);
+    return GetStringAttribute(isUnicode, message, false, messageText, bufferLength,
+                              textLengthPtr, *diagnostics);
   } else if (textLengthPtr) {
     // Determine the number of wide characters required to represent message
-    const std::string message = diagnostics->GetMessageText(recordIndex);
+    const std::string& message = diagnostics->GetMessageText(recordIndex);
     size_t requiredBytes = ConvertToSqlWChar(message, nullptr, 0);
     *textLengthPtr = static_cast<SQLSMALLINT>(requiredBytes / GetSqlWCharSize());
   }
