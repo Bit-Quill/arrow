@@ -230,8 +230,10 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
                                 stringLengthPtr, *diagnostics);
     }
 
-    default:
-      return SQL_ERROR;
+    default: {
+      // TODO Return correct dummy values
+      return SQL_SUCCESS;
+    }
   }
 
   return SQL_ERROR;
@@ -299,7 +301,7 @@ SQLRETURN SQLGetDiagRecW(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT r
     // The length of the sql state is always 5 characters plus null
     SQLSMALLINT size = 6;
     const std::string& state = diagnostics->GetSQLState(recordIndex);
-    GetStringAttribute(isUnicode, state, true, sqlState, size, &size, *diagnostics);
+    GetStringAttribute(isUnicode, state, false, sqlState, size, &size, *diagnostics);
   }
 
   if (nativeErrorPtr) {
@@ -308,7 +310,7 @@ SQLRETURN SQLGetDiagRecW(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT r
 
   if (messageText || textLengthPtr) {
     const std::string& message = diagnostics->GetMessageText(recordIndex);
-    return GetStringAttribute(isUnicode, message, true, messageText, bufferLength,
+    return GetStringAttribute(isUnicode, message, false, messageText, bufferLength,
                               textLengthPtr, *diagnostics);
   }
 
