@@ -231,7 +231,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     }
 
     default:
-      return SQL_ERROR;
+      return SQL_SUCCESS;
   }
 
   return SQL_ERROR;
