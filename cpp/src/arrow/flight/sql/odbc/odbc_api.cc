@@ -299,8 +299,7 @@ SQLRETURN SQLGetDiagRecW(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT r
     // The length of the sql state is always 5 characters plus null
     SQLSMALLINT size = 6;
     const std::string& state = diagnostics->GetSQLState(recordIndex);
-    GetStringAttribute(isUnicode, state, true, sqlState, bufferLength, &size,
-                       *diagnostics);
+    GetStringAttribute(isUnicode, state, true, sqlState, size, &size, *diagnostics);
   }
 
   if (nativeErrorPtr) {
