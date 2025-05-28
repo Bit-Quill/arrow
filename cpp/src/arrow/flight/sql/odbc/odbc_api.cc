@@ -261,7 +261,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     // Return valid 1 based dummy variable for unimplemented field
     case SQL_DIAG_COLUMN_NUMBER: {
       if (diagInfoPtr) {
-        *static_cast<SQLINTEGER*>(diagInfoPtr) = 1;
+        *static_cast<SQLINTEGER*>(diagInfoPtr) = SQL_NO_COLUMN_NUMBER;
       }
 
       if (stringLengthPtr) {
@@ -286,7 +286,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     // Return valid 1 based dummy variable for unimplemented field
     case SQL_DIAG_ROW_NUMBER: {
       if (diagInfoPtr) {
-        *static_cast<SQLLEN*>(diagInfoPtr) = 1;
+        *static_cast<SQLLEN*>(diagInfoPtr) = SQL_NO_ROW_NUMBER;
       }
 
       if (stringLengthPtr) {
