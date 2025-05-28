@@ -139,6 +139,8 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
                            SQLSMALLINT recNumber, SQLSMALLINT diagIdentifier,
                            SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLength,
                            SQLSMALLINT* stringLengthPtr) {
+  // TODO: Implement additional fields types
+  // https://github.com/apache/arrow/issues/46573
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetStringAttribute;
   using ODBC::ODBCConnection;
