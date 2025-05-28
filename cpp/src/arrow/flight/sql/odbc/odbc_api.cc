@@ -486,7 +486,7 @@ SQLRETURN SQLDriverConnectW(SQLHDBC conn, SQLHWND windowHandle,
     connection->connect(dsn, properties, missing_properties);
 #endif
     // Copy connection string to outConnectionString after connection attempt
-    return ODBC::GetStringAttribute(true, connection_string, true, outConnectionString,
+    return ODBC::GetStringAttribute(true, connection_string, false, outConnectionString,
                                     outConnectionStringBufferLen, outConnectionStringLen,
                                     connection->GetDiagnostics());
   });
