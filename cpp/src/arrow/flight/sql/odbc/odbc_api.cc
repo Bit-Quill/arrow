@@ -256,9 +256,46 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
       return SQL_ERROR;
     }
 
-    default: {
-      // TODO Return correct dummy values
+    // Return valid 1 based dummy variable for unimplemented field
+    case SQL_DIAG_COLUMN_NUMBER: {
+      if (diagInfoPtr) {
+        *static_cast<SQLINTEGER*>(diagInfoPtr) = 1;
+      }
+
+      if (stringLengthPtr) {
+        *stringLengthPtr = sizeof(SQLINTEGER);
+      }
+
       return SQL_SUCCESS;
+    }
+
+    // Return empty string dummy variable for unimplemented fields
+    case SQL_DIAG_CLASS_ORIGIN:
+    case SQL_DIAG_CONNECTION_NAME:
+    case SQL_DIAG_SUBCLASS_ORIGIN: {
+      if (diagInfoPtr || stringLengthPtr) {
+        return GetStringAttribute(isUnicode, "", false, diagInfoPtr, bufferLength,
+                                  stringLengthPtr, *diagnostics);
+      }
+
+      return SQL_ERROR;
+    }
+
+    // Return valid 1 based dummy variable for unimplemented field
+    case SQL_DIAG_ROW_NUMBER: {
+      if (diagInfoPtr) {
+        *static_cast<SQLLEN*>(diagInfoPtr) = 1;
+      }
+
+      if (stringLengthPtr) {
+        *stringLengthPtr = sizeof(SQLLEN);
+      }
+
+      return SQL_SUCCESS;
+    }
+
+    default: {
+      return SQL_ERROR;
     }
   }
 
