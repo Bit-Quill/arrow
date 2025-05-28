@@ -204,7 +204,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
 
       case SQL_DIAG_SERVER_NAME: {
         if (diagInfoPtr || stringLengthPtr) {
-          return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
+          return GetStringAttribute(isUnicode, dsn, false, diagInfoPtr, bufferLength,
                                     stringLengthPtr, *diagnostics);
         }
 
@@ -227,7 +227,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     case SQL_DIAG_MESSAGE_TEXT: {
       if (diagInfoPtr || stringLengthPtr) {
         const std::string& message = diagnostics->GetMessageText(recordIndex);
-        return GetStringAttribute(isUnicode, message, true, diagInfoPtr, bufferLength,
+        return GetStringAttribute(isUnicode, message, false, diagInfoPtr, bufferLength,
                                   stringLengthPtr, *diagnostics);
       }
 
@@ -249,7 +249,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     case SQL_DIAG_SQLSTATE: {
       if (diagInfoPtr || stringLengthPtr) {
         const std::string& state = diagnostics->GetSQLState(recordIndex);
-        return GetStringAttribute(isUnicode, state, true, diagInfoPtr, bufferLength,
+        return GetStringAttribute(isUnicode, state, false, diagInfoPtr, bufferLength,
                                   stringLengthPtr, *diagnostics);
       }
 
@@ -512,7 +512,7 @@ SQLRETURN SQLDriverConnectW(SQLHDBC conn, SQLHWND windowHandle,
     connection->connect(dsn, properties, missing_properties);
 #endif
     // Copy connection string to outConnectionString after connection attempt
-    return ODBC::GetStringAttribute(true, connection_string, true, outConnectionString,
+    return ODBC::GetStringAttribute(true, connection_string, false, outConnectionString,
                                     outConnectionStringBufferLen, outConnectionStringLen,
                                     connection->GetDiagnostics());
   });
@@ -576,7 +576,7 @@ SQLRETURN SQLGetInfoW(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValueP
     if (infoType == SQL_DRIVER_ODBC_VER) {
       std::string_view ver("03.80");
 
-      return ODBC::GetStringAttribute(true, ver, true, infoValuePtr, bufLen, length,
+      return ODBC::GetStringAttribute(true, ver, false, infoValuePtr, bufLen, length,
                                       connection->GetDiagnostics());
     }
 
