@@ -154,7 +154,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     return SQL_ERROR;
   }
 
-  // Set character type to be Unicode by defualt (not Ansi)
+  // Set character type to be Unicode by default
   const bool isUnicode = true;
   Diagnostics* diagnostics = nullptr;
   std::string dsn("");
@@ -204,15 +204,6 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
         return SQL_SUCCESS;
       }
 
-      case SQL_DIAG_SERVER_NAME: {
-        if (diagInfoPtr || stringLengthPtr) {
-          return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
-                                    stringLengthPtr, *diagnostics);
-        }
-
-        return SQL_ERROR;
-      }
-
       default:
         return SQL_ERROR;
     }
@@ -246,6 +237,15 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
       }
 
       return SQL_SUCCESS;
+    }
+
+    case SQL_DIAG_SERVER_NAME: {
+      if (diagInfoPtr || stringLengthPtr) {
+        return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
+                                  stringLengthPtr, *diagnostics);
+      }
+
+      return SQL_ERROR;
     }
 
     case SQL_DIAG_SQLSTATE: {
