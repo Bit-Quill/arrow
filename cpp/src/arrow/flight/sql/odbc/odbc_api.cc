@@ -18,15 +18,14 @@
 // flight_sql_connection.h needs to be included first due to conflicts with windows.h
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
 
-#include <arrow/flight/sql/odbc/flight_sql/include/flight_sql/flight_sql_driver.h>
-#include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/diagnostics.h>
-#include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h>
-#include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h>
-#include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h>
-#include <arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h>
-
 #include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/configuration.h"
+#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/flight_sql_driver.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/diagnostics.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/attribute_utils.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h"
 
 #if defined _WIN32 || defined _WIN64
 // For displaying DSN Window
@@ -35,7 +34,7 @@
 
 // odbc_api includes windows.h, which needs to be put behind winsock2.h.
 // odbc_environment.h includes winsock2.h
-#include <arrow/flight/sql/odbc/odbc_api.h>
+#include "arrow/flight/sql/odbc/odbc_api.h"
 
 namespace arrow {
 SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
