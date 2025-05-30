@@ -139,6 +139,8 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
                            SQLSMALLINT recNumber, SQLSMALLINT diagIdentifier,
                            SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLength,
                            SQLSMALLINT* stringLengthPtr) {
+  // TODO: Implement additional fields types
+  // https://github.com/apache/arrow/issues/46573
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetStringAttribute;
   using ODBC::ODBCConnection;
@@ -148,13 +150,14 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     return SQL_INVALID_HANDLE;
   }
 
-  if (!diagInfoPtr) {
+  if (!diagInfoPtr && !stringLengthPtr) {
     return SQL_ERROR;
   }
 
-  // Set character type to be Unicode by defualt (not Ansi)
-  bool isUnicode = true;
+  // Set character type to be Unicode by default
+  const bool isUnicode = true;
   Diagnostics* diagnostics = nullptr;
+  std::string dsn("");
 
   switch (handleType) {
     case SQL_HANDLE_ENV: {
@@ -165,8 +168,17 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
 
     case SQL_HANDLE_DBC: {
       ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(handle);
+      dsn = connection->GetDSN();
       diagnostics = &connection->GetDiagnostics();
       break;
+    }
+
+    case SQL_HANDLE_DESC: {
+      return SQL_ERROR;
+    }
+
+    case SQL_HANDLE_STMT: {
+      return SQL_ERROR;
     }
 
     default:
@@ -181,19 +193,16 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
   if (recNumber == 0) {
     switch (diagIdentifier) {
       case SQL_DIAG_NUMBER: {
-        SQLINTEGER count = static_cast<SQLINTEGER>(diagnostics->GetRecordCount());
-        *static_cast<SQLINTEGER*>(diagInfoPtr) = count;
+        if (diagInfoPtr) {
+          *static_cast<SQLINTEGER*>(diagInfoPtr) =
+              static_cast<SQLINTEGER>(diagnostics->GetRecordCount());
+        }
+
         if (stringLengthPtr) {
           *stringLengthPtr = sizeof(SQLINTEGER);
         }
 
         return SQL_SUCCESS;
-      }
-
-      case SQL_DIAG_SERVER_NAME: {
-        const std::string source = diagnostics->GetDataSourceComponent();
-        return GetStringAttribute(isUnicode, source, false, diagInfoPtr, bufferLength,
-                                  stringLengthPtr, *diagnostics);
       }
 
       default:
@@ -202,7 +211,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
   }
 
   // Retrieve record level diagnostics from specified 1 based record
-  uint32_t recordIndex = static_cast<uint32_t>(recNumber - 1);
+  const uint32_t recordIndex = static_cast<uint32_t>(recNumber - 1);
   if (!diagnostics->HasRecord(recordIndex)) {
     return SQL_NO_DATA;
   }
@@ -210,13 +219,20 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
   // Retrieve record field data
   switch (diagIdentifier) {
     case SQL_DIAG_MESSAGE_TEXT: {
-      const std::string message = diagnostics->GetMessageText(recordIndex);
-      return GetStringAttribute(isUnicode, message, false, diagInfoPtr, bufferLength,
-                                stringLengthPtr, *diagnostics);
+      if (diagInfoPtr || stringLengthPtr) {
+        const std::string& message = diagnostics->GetMessageText(recordIndex);
+        return GetStringAttribute(isUnicode, message, true, diagInfoPtr, bufferLength,
+                                  stringLengthPtr, *diagnostics);
+      }
+
+      return SQL_ERROR;
     }
 
     case SQL_DIAG_NATIVE: {
-      *static_cast<SQLINTEGER*>(diagInfoPtr) = diagnostics->GetNativeError(recordIndex);
+      if (diagInfoPtr) {
+        *static_cast<SQLINTEGER*>(diagInfoPtr) = diagnostics->GetNativeError(recordIndex);
+      }
+
       if (stringLengthPtr) {
         *stringLengthPtr = sizeof(SQLINTEGER);
       }
@@ -224,15 +240,65 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
       return SQL_SUCCESS;
     }
 
+    case SQL_DIAG_SERVER_NAME: {
+      if (diagInfoPtr || stringLengthPtr) {
+        return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
+                                  stringLengthPtr, *diagnostics);
+      }
+
+      return SQL_ERROR;
+    }
+
     case SQL_DIAG_SQLSTATE: {
-      const std::string state = diagnostics->GetSQLState(recordIndex);
-      return GetStringAttribute(isUnicode, state, false, diagInfoPtr, bufferLength,
-                                stringLengthPtr, *diagnostics);
+      if (diagInfoPtr || stringLengthPtr) {
+        const std::string& state = diagnostics->GetSQLState(recordIndex);
+        return GetStringAttribute(isUnicode, state, true, diagInfoPtr, bufferLength,
+                                  stringLengthPtr, *diagnostics);
+      }
+
+      return SQL_ERROR;
+    }
+
+    // Return valid dummy variable for unimplemented field
+    case SQL_DIAG_COLUMN_NUMBER: {
+      if (diagInfoPtr) {
+        *static_cast<SQLINTEGER*>(diagInfoPtr) = SQL_NO_COLUMN_NUMBER;
+      }
+
+      if (stringLengthPtr) {
+        *stringLengthPtr = sizeof(SQLINTEGER);
+      }
+
+      return SQL_SUCCESS;
+    }
+
+    // Return empty string dummy variable for unimplemented fields
+    case SQL_DIAG_CLASS_ORIGIN:
+    case SQL_DIAG_CONNECTION_NAME:
+    case SQL_DIAG_SUBCLASS_ORIGIN: {
+      if (diagInfoPtr || stringLengthPtr) {
+        return GetStringAttribute(isUnicode, "", true, diagInfoPtr, bufferLength,
+                                  stringLengthPtr, *diagnostics);
+      }
+
+      return SQL_ERROR;
+    }
+
+    // Return valid dummy variable for unimplemented field
+    case SQL_DIAG_ROW_NUMBER: {
+      if (diagInfoPtr) {
+        *static_cast<SQLLEN*>(diagInfoPtr) = SQL_NO_ROW_NUMBER;
+      }
+
+      if (stringLengthPtr) {
+        *stringLengthPtr = sizeof(SQLLEN);
+      }
+
+      return SQL_SUCCESS;
     }
 
     default: {
-      // TODO Return correct dummy values
-      return SQL_SUCCESS;
+      return SQL_ERROR;
     }
   }
 
@@ -486,7 +552,7 @@ SQLRETURN SQLDriverConnectW(SQLHDBC conn, SQLHWND windowHandle,
     connection->connect(dsn, properties, missing_properties);
 #endif
     // Copy connection string to outConnectionString after connection attempt
-    return ODBC::GetStringAttribute(true, connection_string, true, outConnectionString,
+    return ODBC::GetStringAttribute(true, connection_string, false, outConnectionString,
                                     outConnectionStringBufferLen, outConnectionStringLen,
                                     connection->GetDiagnostics());
   });
