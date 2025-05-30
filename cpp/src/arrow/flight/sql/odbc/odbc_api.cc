@@ -194,7 +194,8 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     switch (diagIdentifier) {
       case SQL_DIAG_NUMBER: {
         if (diagInfoPtr) {
-          *static_cast<SQLINTEGER*>(diagInfoPtr) = static_cast<SQLINTEGER>(diagnostics->GetRecordCount());
+          *static_cast<SQLINTEGER*>(diagInfoPtr) =
+              static_cast<SQLINTEGER>(diagnostics->GetRecordCount());
         }
 
         if (stringLengthPtr) {
