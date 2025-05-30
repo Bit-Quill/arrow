@@ -789,9 +789,7 @@ TEST(SQLGetDiagFieldW, TestSQLGetDiagFieldWForConnectFailure) {
   SQLSMALLINT HEADER_LEVEL = 0;
   SQLSMALLINT RECORD_1 = 1;
 
-  //
   // SQL_DIAG_NUMBER
-  //
   SQLINTEGER diag_number;
   SQLSMALLINT diag_number_length;
 
@@ -803,7 +801,6 @@ TEST(SQLGetDiagFieldW, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_TRUE(diag_number == 1);
 
   // SQL_DIAG_SERVER_NAME
-  //
   SQLWCHAR server_name[ODBC_BUFFER_SIZE];
   SQLSMALLINT server_name_length;
 
@@ -813,7 +810,6 @@ TEST(SQLGetDiagFieldW, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // SQL_DIAG_MESSAGE_TEXT
-  //
   SQLWCHAR message_text[ODBC_BUFFER_SIZE];
   SQLSMALLINT message_text_length;
 
@@ -825,7 +821,6 @@ TEST(SQLGetDiagFieldW, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_TRUE(message_text_length > 100);
 
   // SQL_DIAG_NATIVE
-  //
   SQLINTEGER diag_native;
   SQLSMALLINT diag_native_length;
 
@@ -837,12 +832,12 @@ TEST(SQLGetDiagFieldW, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_TRUE(diag_native == 200);
 
   // SQL_DIAG_SQLSTATE
-  //
   const SQLSMALLINT sql_state_size = 6;
   SQLWCHAR sql_state[sql_state_size];
   SQLSMALLINT sql_state_length;
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, RECORD_1, SQL_DIAG_SQLSTATE, sql_state,
-                        sql_state_size * 2, &sql_state_length);
+                        sql_state_size * driver::odbcabstraction::GetSqlWCharSize(),
+                        &sql_state_length);
 
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
