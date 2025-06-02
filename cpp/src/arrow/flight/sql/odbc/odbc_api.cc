@@ -242,10 +242,10 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
       if (diagInfoPtr || stringLengthPtr) {
         switch (handleType) {
           case SQL_HANDLE_DBC: {
-              ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(handle);
-              std::string dsn = connection->GetDSN();
-              return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
-                                        stringLengthPtr, *diagnostics);
+            ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(handle);
+            std::string dsn = connection->GetDSN();
+            return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
+                                      stringLengthPtr, *diagnostics);
           }
 
           case SQL_HANDLE_DESC: {
