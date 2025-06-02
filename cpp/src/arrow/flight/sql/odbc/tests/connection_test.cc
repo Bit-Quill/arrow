@@ -798,7 +798,7 @@ TEST(SQLGetDiagFieldW, TestSQLGetDiagFieldWForConnectFailure) {
 
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
-  EXPECT_TRUE(diag_number == 1);
+  EXPECT_EQ(diag_number, 1);
 
   // SQL_DIAG_SERVER_NAME
   SQLWCHAR server_name[ODBC_BUFFER_SIZE];
@@ -818,7 +818,7 @@ TEST(SQLGetDiagFieldW, TestSQLGetDiagFieldWForConnectFailure) {
 
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
-  EXPECT_TRUE(message_text_length > 100);
+  EXPECT_GT(message_text_length, 100);
 
   // SQL_DIAG_NATIVE
   SQLINTEGER diag_native;
@@ -829,7 +829,7 @@ TEST(SQLGetDiagFieldW, TestSQLGetDiagFieldWForConnectFailure) {
 
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
-  EXPECT_TRUE(diag_native == 200);
+  EXPECT_EQ(diag_native, 200);
 
   // SQL_DIAG_SQLSTATE
   const SQLSMALLINT sql_state_size = 6;
@@ -842,11 +842,11 @@ TEST(SQLGetDiagFieldW, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // 28000
-  EXPECT_TRUE(sql_state[0] == '2');
-  EXPECT_TRUE(sql_state[1] == '8');
-  EXPECT_TRUE(sql_state[2] == '0');
-  EXPECT_TRUE(sql_state[3] == '0');
-  EXPECT_TRUE(sql_state[4] == '0');
+  EXPECT_EQ(sql_state[0], '2');
+  EXPECT_EQ(sql_state[1], '8');
+  EXPECT_EQ(sql_state[2], '0');
+  EXPECT_EQ(sql_state[3], '0');
+  EXPECT_EQ(sql_state[4], '0');
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
@@ -908,16 +908,16 @@ TEST(SQLGetDiagRec, TestSQLGetDiagRecForConnectFailure) {
 
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
-  EXPECT_TRUE(message_length > 200);
+  EXPECT_GT(message_length, 200);
 
-  EXPECT_TRUE(native_error == 200);
+  EXPECT_EQ(native_error, 200);
 
   // 28000
-  EXPECT_TRUE(sql_state[0] == '2');
-  EXPECT_TRUE(sql_state[1] == '8');
-  EXPECT_TRUE(sql_state[2] == '0');
-  EXPECT_TRUE(sql_state[3] == '0');
-  EXPECT_TRUE(sql_state[4] == '0');
+  EXPECT_EQ(sql_state[0], '2');
+  EXPECT_EQ(sql_state[1], '8');
+  EXPECT_EQ(sql_state[2], '0');
+  EXPECT_EQ(sql_state[3], '0');
+  EXPECT_EQ(sql_state[4], '0');
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
