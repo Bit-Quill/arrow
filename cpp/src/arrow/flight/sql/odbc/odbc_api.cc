@@ -157,7 +157,6 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
   // Set character type to be Unicode by default
   const bool isUnicode = true;
   Diagnostics* diagnostics = nullptr;
-  std::string dsn("");
 
   switch (handleType) {
     case SQL_HANDLE_ENV: {
@@ -168,7 +167,6 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
 
     case SQL_HANDLE_DBC: {
       ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(handle);
-      dsn = connection->GetDSN();
       diagnostics = &connection->GetDiagnostics();
       break;
     }
@@ -242,8 +240,27 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
 
     case SQL_DIAG_SERVER_NAME: {
       if (diagInfoPtr || stringLengthPtr) {
-        return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
-                                  stringLengthPtr, *diagnostics);
+        switch (handleType) {
+          case SQL_HANDLE_DBC: {
+              ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(handle);
+              std::string dsn = connection->GetDSN();
+              return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
+                                        stringLengthPtr, *diagnostics);
+          }
+
+          case SQL_HANDLE_DESC: {
+            // TODO Implement for case of descriptor
+            return SQL_ERROR;
+          }
+
+          case SQL_HANDLE_STMT: {
+            // TODO Implement for case of statement
+            return SQL_ERROR;
+          }
+
+          default:
+            return SQL_ERROR;
+        }
       }
 
       return SQL_ERROR;
