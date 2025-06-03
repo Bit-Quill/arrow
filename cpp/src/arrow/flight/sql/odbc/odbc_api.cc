@@ -141,6 +141,7 @@ inline bool IsValidStringFieldArgs(SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLen
   const bool hasValidBuffer =
       diagInfoPtr && bufferLength >= 0 && bufferLength % charSize == 0;
 
+  // regardless of capacity return false if invalid
   if (diagInfoPtr && !hasValidBuffer) {
     return false;
   }
