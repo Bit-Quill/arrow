@@ -135,6 +135,19 @@ SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
   return SQL_ERROR;
 }
 
+inline bool IsValidStringFieldArgs(SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLength,
+                                   SQLSMALLINT* stringLengthPtr, bool isUnicode) {
+  const SQLSMALLINT charSize = isUnicode ? GetSqlWCharSize() : sizeof(char);
+  const bool hasValidBuffer =
+      diagInfoPtr && bufferLength >= 0 && bufferLength % charSize == 0;
+
+  if (diagInfoPtr && !hasValidBuffer) {
+    return false;
+  }
+
+  return hasValidBuffer || stringLengthPtr;
+}
+
 SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
                            SQLSMALLINT recNumber, SQLSMALLINT diagIdentifier,
                            SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLength,
@@ -152,6 +165,12 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
 
   if (!diagInfoPtr && !stringLengthPtr) {
     return SQL_ERROR;
+  }
+
+  // If buffer length derived from null terminated string
+  if (diagInfoPtr && bufferLength == SQL_NTS) {
+    const wchar_t* str = reinterpret_cast<wchar_t*>(diagInfoPtr);
+    bufferLength = wcslen(str) * driver::odbcabstraction::GetSqlWCharSize();
   }
 
   // Set character type to be Unicode by default
@@ -187,25 +206,42 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     return SQL_ERROR;
   }
 
-  // Retrieve header level diagnostics if Record 0 specified
-  if (recNumber == 0) {
-    switch (diagIdentifier) {
-      case SQL_DIAG_NUMBER: {
-        if (diagInfoPtr) {
-          *static_cast<SQLINTEGER*>(diagInfoPtr) =
-              static_cast<SQLINTEGER>(diagnostics->GetRecordCount());
-        }
+  // Retrieve and return if header level diagnostics
+  switch (diagIdentifier) {
+    case SQL_DIAG_NUMBER: {
+      if (diagInfoPtr) {
+        *static_cast<SQLINTEGER*>(diagInfoPtr) =
+            static_cast<SQLINTEGER>(diagnostics->GetRecordCount());
+      }
 
-        if (stringLengthPtr) {
-          *stringLengthPtr = sizeof(SQLINTEGER);
-        }
+      if (stringLengthPtr) {
+        *stringLengthPtr = sizeof(SQLINTEGER);
+      }
 
+      return SQL_SUCCESS;
+    }
+
+    // TODO implement return code function
+    case SQL_DIAG_RETURNCODE: {
+      return SQL_SUCCESS;
+    }
+
+    // TODO Implement statement header functions
+    case SQL_DIAG_CURSOR_ROW_COUNT:
+    case SQL_DIAG_DYNAMIC_FUNCTION:
+    case SQL_DIAG_DYNAMIC_FUNCTION_CODE:
+    case SQL_DIAG_ROW_COUNT: {
+      if (handleType == SQL_HANDLE_STMT) {
         return SQL_SUCCESS;
       }
 
-      default:
-        return SQL_ERROR;
+      return SQL_ERROR;
     }
+  }
+
+  // If not a diagnostic header field then the record number must be 1 or greater
+  if (recNumber < 1) {
+    return SQL_ERROR;
   }
 
   // Retrieve record level diagnostics from specified 1 based record
@@ -217,7 +253,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
   // Retrieve record field data
   switch (diagIdentifier) {
     case SQL_DIAG_MESSAGE_TEXT: {
-      if (diagInfoPtr || stringLengthPtr) {
+      if (IsValidStringFieldArgs(diagInfoPtr, bufferLength, stringLengthPtr, isUnicode)) {
         const std::string& message = diagnostics->GetMessageText(recordIndex);
         return GetStringAttribute(isUnicode, message, true, diagInfoPtr, bufferLength,
                                   stringLengthPtr, *diagnostics);
@@ -239,7 +275,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     }
 
     case SQL_DIAG_SERVER_NAME: {
-      if (diagInfoPtr || stringLengthPtr) {
+      if (IsValidStringFieldArgs(diagInfoPtr, bufferLength, stringLengthPtr, isUnicode)) {
         switch (handleType) {
           case SQL_HANDLE_DBC: {
             ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(handle);
@@ -267,7 +303,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     }
 
     case SQL_DIAG_SQLSTATE: {
-      if (diagInfoPtr || stringLengthPtr) {
+      if (IsValidStringFieldArgs(diagInfoPtr, bufferLength, stringLengthPtr, isUnicode)) {
         const std::string& state = diagnostics->GetSQLState(recordIndex);
         return GetStringAttribute(isUnicode, state, true, diagInfoPtr, bufferLength,
                                   stringLengthPtr, *diagnostics);
@@ -293,7 +329,7 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
     case SQL_DIAG_CLASS_ORIGIN:
     case SQL_DIAG_CONNECTION_NAME:
     case SQL_DIAG_SUBCLASS_ORIGIN: {
-      if (diagInfoPtr || stringLengthPtr) {
+      if (IsValidStringFieldArgs(diagInfoPtr, bufferLength, stringLengthPtr, isUnicode)) {
         return GetStringAttribute(isUnicode, "", true, diagInfoPtr, bufferLength,
                                   stringLengthPtr, *diagnostics);
       }
