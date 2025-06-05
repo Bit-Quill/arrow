@@ -1000,6 +1000,23 @@ TEST(SQLGetDiagRec, TestSQLGetDiagRecForConnectFailure) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
+TEST_F(FlightSQLODBCTestBase, TestSQLAllocFreeHandleStatement) {
+  connect();
+  SQLHSTMT statement;
+
+  // Allocate a statement using alloc handle
+  SQLRETURN return_value = SQLAllocHandle(SQL_HANDLE_STMT, conn, &statement);
+
+  EXPECT_TRUE(return_value == SQL_SUCCESS);
+
+  // Free statement handle
+  return_value = SQLFreeHandle(SQL_HANDLE_STMT, statement);
+
+  EXPECT_TRUE(return_value == SQL_SUCCESS);
+
+  disconnect();
+}
+
 }  // namespace integration_tests
 }  // namespace odbc
 }  // namespace flight
