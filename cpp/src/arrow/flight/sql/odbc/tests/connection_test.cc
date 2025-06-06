@@ -1046,7 +1046,7 @@ TEST(SQLAllocStmt, TestCloseConnectionWithOpenStatement) {
 
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
-  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC2, 0);
+  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
