@@ -31,6 +31,8 @@
 #include <sqltypes.h>
 #include <sqlucode.h>
 
+#include <type_traits>
+
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
 
 // For DSN registration
@@ -63,6 +65,9 @@ class FlightSQLODBCTestBase : public ::testing::Test {
 
   /** ODBC Statement. */
   SQLHSTMT stmt;
+
+ protected:
+  void SetUp() override;
 };
 
 class MockFlightSqlServerAuthHandler : public ServerAuthHandler {
@@ -80,20 +85,7 @@ class MockFlightSqlServerAuthHandler : public ServerAuthHandler {
 
 class MockFlightSqlServer : public FlightSQLODBCTestBase {
  public:
-  void connectToMock();
-  // -AL- let's start by getting a mock server, not sure if I need all these.
-  // public:
-  //  std::unique_ptr<FlightSqlClient> sql_client;
-
-  // arrow::Result<int64_t> ExecuteCountQuery(const std::string& query) {
-
-  //   ARROW_ASSIGN_OR_RAISE(auto table, stream->ToTable());
-
-  //   const std::shared_ptr<Array>& result_array = table->column(0)->chunk(0);
-  //   ARROW_ASSIGN_OR_RAISE(auto count_scalar, result_array->GetScalar(0));
-
-  //   return reinterpret_cast<Int64Scalar&>(*count_scalar).value;
-  // }
+  void connect();
   int port;
 
  protected:
@@ -104,6 +96,16 @@ class MockFlightSqlServer : public FlightSQLODBCTestBase {
  private:
   std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server;
 };
+
+// -AL- todo rename the fixtures.
+template <typename T>
+class MyFixture : public T {
+ public:
+  using List = std::list<T>;
+};
+
+using TestTypes = ::testing::Types<MockFlightSqlServer, FlightSQLODBCTestBase>;
+TYPED_TEST_SUITE(MyFixture, TestTypes);
 
 /** ODBC read buffer size. */
 enum { ODBC_BUFFER_SIZE = 1024 };

@@ -89,6 +89,12 @@ void FlightSQLODBCTestBase::disconnect() {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
+void FlightSQLODBCTestBase::SetUp() {
+  if (arrow::internal::GetEnvVar(TEST_CONNECT_STR).ValueOr("").empty()) {
+    GTEST_SKIP() << "Skipping FlightSQLODBCTestBase test: TEST_CONNECT_STR not set";
+  }
+}
+
 MockFlightSqlServerAuthHandler::MockFlightSqlServerAuthHandler(const std::string& token)
     : token_(token) {}
 
@@ -118,7 +124,7 @@ Status MockFlightSqlServerAuthHandler::IsValid(const ServerCallContext& context,
   return Status::OK();
 }
 
-void MockFlightSqlServer::connectToMock() {
+void MockFlightSqlServer::connect() {
   std::string connect_str(
       "driver={Apache Arrow Flight SQL ODBC Driver};HOST=localhost;port=" +
       std::to_string(port) + ";token=t0k3n;useEncryption=false;");
