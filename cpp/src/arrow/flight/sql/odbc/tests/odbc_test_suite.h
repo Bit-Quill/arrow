@@ -19,6 +19,8 @@
 #include "arrow/util/io_util.h"
 #include "arrow/util/utf8.h"
 
+#include "arrow/flight/sql/client.h"
+#include "arrow/flight/sql/example/sqlite_server.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h"
 
 #ifdef _WIN32
@@ -28,6 +30,8 @@
 #include <sql.h>
 #include <sqltypes.h>
 #include <sqlucode.h>
+
+#include <type_traits>
 
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
 
@@ -48,6 +52,8 @@ class FlightSQLODBCTestBase : public ::testing::Test {
   /// \brief Connect to Arrow Flight SQL server using connection string defined in
   /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
   void connect();
+  /// \brief Connect to Arrow Flight SQL server using connection string
+  void connectWithString(std::string connection_str);
   /// \brief Disconnect from server
   void disconnect();
 
@@ -59,7 +65,47 @@ class FlightSQLODBCTestBase : public ::testing::Test {
 
   /** ODBC Statement. */
   SQLHSTMT stmt;
+
+ protected:
+  void SetUp() override;
 };
+
+class MockFlightSqlServerAuthHandler : public ServerAuthHandler {
+ public:
+  MockFlightSqlServerAuthHandler(const std::string& token);
+  ~MockFlightSqlServerAuthHandler() override;
+  Status Authenticate(const ServerCallContext& context, ServerAuthSender* outgoing,
+                      ServerAuthReader* incoming) override;
+  Status IsValid(const ServerCallContext& context, const std::string& token,
+                 std::string* peer_identity) override;
+
+ private:
+  std::string token_;
+};
+
+class MockFlightSqlServer : public FlightSQLODBCTestBase {
+ public:
+  void connect();
+  int port;
+
+ protected:
+  void SetUp() override;
+
+  void TearDown() override;
+
+ private:
+  std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server;
+};
+
+// -AL- todo rename the fixtures.
+template <typename T>
+class MyFixture : public T {
+ public:
+  using List = std::list<T>;
+};
+
+using TestTypes = ::testing::Types<MockFlightSqlServer, FlightSQLODBCTestBase>;
+TYPED_TEST_SUITE(MyFixture, TestTypes);
 
 /** ODBC read buffer size. */
 enum { ODBC_BUFFER_SIZE = 1024 };
