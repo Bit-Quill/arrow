@@ -180,7 +180,8 @@ SQLRETURN SQLFreeStmt(SQLHSTMT handle, SQLUSMALLINT option) {
           return SQL_INVALID_HANDLE;
         }
 
-        statement->closeCursor(false);
+        // Close cursor with suppressErrors set to true
+        statement->closeCursor(true);
 
         return SQL_SUCCESS;
       });
