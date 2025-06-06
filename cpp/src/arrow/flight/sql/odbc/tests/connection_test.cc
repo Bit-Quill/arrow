@@ -1033,7 +1033,8 @@ TEST_F(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
 }
 
 TEST(SQLAllocStmt, TestCloseConnectionWithOpenStatement) {
-  // Test is disabled as disconnecting without closing statement fails
+  // Test is disabled as disconnecting without closing statement fails on Windows.
+  // This test case can be potentially used on macOS/Linux.
   GTEST_SKIP();
   // ODBC Environment
   SQLHENV env;
