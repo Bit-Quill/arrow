@@ -63,11 +63,21 @@ void FlightSQLODBCTestBase::connect() {
 
   // Assert connection is successful before we continue
   ASSERT_TRUE(ret == SQL_SUCCESS);
+
+  // Allocate a statement using alloc handle
+  ret = SQLAllocHandle(SQL_HANDLE_STMT, conn, &stmt);
+
+  ASSERT_TRUE(ret == SQL_SUCCESS);
 }
 
 void FlightSQLODBCTestBase::disconnect() {
+  // Close statement
+  SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
   // Disconnect from ODBC
-  SQLRETURN ret = SQLDisconnect(conn);
+  ret = SQLDisconnect(conn);
 
   if (ret != SQL_SUCCESS) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;

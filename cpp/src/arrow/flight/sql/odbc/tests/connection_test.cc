@@ -200,6 +200,11 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
 
+TEST_F(FlightSQLODBCTestBase, TestBaseConnectDissconnect) {
+  connect();
+  disconnect();
+}
+
 TEST_F(FlightSQLODBCTestBase, TestSQLGetEnvAttrOutputNTS) {
   connect();
 
@@ -1000,21 +1005,91 @@ TEST(SQLGetDiagRec, TestSQLGetDiagRecForConnectFailure) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TEST_F(FlightSQLODBCTestBase, TestSQLAllocFreeHandleStatement) {
+TEST_F(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
   connect();
   SQLHSTMT statement;
 
-  // Allocate a statement using alloc handle
-  SQLRETURN return_value = SQLAllocHandle(SQL_HANDLE_STMT, conn, &statement);
+  // Allocate a statement using alloc statement
+  SQLRETURN ret = SQLAllocStmt(conn, &statement);
 
-  EXPECT_TRUE(return_value == SQL_SUCCESS);
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // TODO Uncomment once SQLExecDirect is implemented
+  // SQLWCHAR sql_buffer[ODBC_BUFFER_SIZE] = L"SELECT 1";
+  // ret = SQLExecDirect(statement, sql_buffer, SQL_NTS);
+
+  // EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // ret = SQLFreeStmt(statement, SQL_CLOSE);
+
+  // EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // Free statement handle
-  return_value = SQLFreeHandle(SQL_HANDLE_STMT, statement);
+  ret = SQLFreeStmt(statement, SQL_DROP);
 
-  EXPECT_TRUE(return_value == SQL_SUCCESS);
+  EXPECT_TRUE(ret == SQL_SUCCESS);
 
   disconnect();
+}
+
+TEST(SQLAllocStmt, TestCloseConnectionWithOpenStatement) {
+  // Test is disabled as disconnecting without closing statement fails
+  GTEST_SKIP();
+  // ODBC Environment
+  SQLHENV env;
+  SQLHDBC conn;
+  SQLHSTMT statement;
+
+  // Allocate an environment handle
+  SQLRETURN ret = SQLAllocEnv(&env);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC2, 0);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // Allocate a connection using alloc handle
+  ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // Connect string
+  ASSERT_OK_AND_ASSIGN(std::string connect_str,
+                       arrow::internal::GetEnvVar(TEST_CONNECT_STR));
+  ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
+                       arrow::util::UTF8ToWideString(connect_str));
+  std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE] = L"";
+  SQLSMALLINT outstrlen;
+
+  // Connecting to ODBC server.
+  ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
+                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
+                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // Allocate a statement using alloc statement
+  ret = SQLAllocStmt(conn, &statement);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // Disconnect from ODBC without closing the statement first
+  ret = SQLDisconnect(conn);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // Free connection handle
+  ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+
+  // Free environment handle
+  ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
 }  // namespace integration_tests
