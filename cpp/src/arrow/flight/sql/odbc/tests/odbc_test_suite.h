@@ -56,6 +56,11 @@ class FlightSQLODBCTestBase : public ::testing::Test {
   void connectWithString(std::string connection_str);
   /// \brief Disconnect from server
   void disconnect();
+  /// \brief Get connection string from environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
+  std::string getConnectionString();
+  /// \brief Get invalid connection string based on connection string defined in
+  /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
+  std::string getInvalidConnectionString();
 
   /** ODBC Environment. */
   SQLHENV env;
@@ -78,14 +83,17 @@ class MockFlightSqlServerAuthHandler : public ServerAuthHandler {
                       ServerAuthReader* incoming) override;
   Status IsValid(const ServerCallContext& context, const std::string& token,
                  std::string* peer_identity) override;
-
  private:
   std::string token_;
 };
 
 class MockFlightSqlServer : public FlightSQLODBCTestBase {
  public:
-  void connect();
+  /// \brief Get connection string for mock server
+  std::string getConnectionString();
+  /// \brief Get invalid connection string for mock server
+  std::string getInvalidConnectionString();
+
   int port;
 
  protected:

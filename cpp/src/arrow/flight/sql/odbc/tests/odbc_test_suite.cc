@@ -30,8 +30,7 @@ namespace flight {
 namespace odbc {
 namespace integration_tests {
 void FlightSQLODBCTestBase::connect() {
-  ASSERT_OK_AND_ASSIGN(std::string connect_str,
-                       arrow::internal::GetEnvVar(TEST_CONNECT_STR));
+  std::string connect_str = getConnectionString();
   connectWithString(connect_str);
 }
 void FlightSQLODBCTestBase::connectWithString(std::string connect_str) {
@@ -89,9 +88,21 @@ void FlightSQLODBCTestBase::disconnect() {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
+std::string FlightSQLODBCTestBase::getConnectionString() {
+  std::string connect_str = arrow::internal::GetEnvVar(TEST_CONNECT_STR).ValueOrDie();
+  return connect_str;
+}
+
+std::string FlightSQLODBCTestBase::getInvalidConnectionString() {
+  std::string connect_str = getConnectionString();
+  // Append invalid uid to connection string
+  connect_str += std::string("uid=non_existent_id;");
+  return connect_str;
+}
+
 void FlightSQLODBCTestBase::SetUp() {
   if (arrow::internal::GetEnvVar(TEST_CONNECT_STR).ValueOr("").empty()) {
-    GTEST_SKIP();
+    GTEST_SKIP() << "Skipping FlightSQLODBCTestBase test: TEST_CONNECT_STR not set";
   }
 }
 
@@ -124,11 +135,18 @@ Status MockFlightSqlServerAuthHandler::IsValid(const ServerCallContext& context,
   return Status::OK();
 }
 
-void MockFlightSqlServer::connect() {
+std::string MockFlightSqlServer::getConnectionString() {
   std::string connect_str(
       "driver={Apache Arrow Flight SQL ODBC Driver};HOST=localhost;port=" +
       std::to_string(port) + ";token=t0k3n;useEncryption=false;");
-  connectWithString(connect_str);
+  return connect_str;
+}
+
+std::string MockFlightSqlServer::getInvalidConnectionString() {
+  std::string connect_str = getConnectionString();
+  // Append invalid token to connection string
+  connect_str += std::string("token=invalid_token;");
+  return connect_str;
 }
 
 void MockFlightSqlServer::SetUp() {
