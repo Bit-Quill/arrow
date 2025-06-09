@@ -47,7 +47,7 @@ namespace odbc {
 namespace integration_tests {
 using driver::odbcabstraction::Connection;
 
-class FlightSQLODBCTestBase : public ::testing::Test {
+class FlightSQLODBCRemoteTestBase : public ::testing::Test {
  public:
   /// \brief Connect to Arrow Flight SQL server using connection string defined in
   /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
@@ -57,10 +57,10 @@ class FlightSQLODBCTestBase : public ::testing::Test {
   /// \brief Disconnect from server
   void disconnect();
   /// \brief Get connection string from environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
-  std::string getConnectionString();
+  std::string virtual getConnectionString();
   /// \brief Get invalid connection string based on connection string defined in
   /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
-  std::string getInvalidConnectionString();
+  std::string virtual getInvalidConnectionString();
 
   /** ODBC Environment. */
   SQLHENV env;
@@ -83,16 +83,18 @@ class MockFlightSqlServerAuthHandler : public ServerAuthHandler {
                       ServerAuthReader* incoming) override;
   Status IsValid(const ServerCallContext& context, const std::string& token,
                  std::string* peer_identity) override;
+
  private:
   std::string token_;
 };
 
-class MockFlightSqlServer : public FlightSQLODBCTestBase {
+class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
+  // Sets up a mock server for each test case
  public:
   /// \brief Get connection string for mock server
-  std::string getConnectionString();
+  std::string getConnectionString() override;
   /// \brief Get invalid connection string for mock server
-  std::string getInvalidConnectionString();
+  std::string getInvalidConnectionString() override;
 
   int port;
 
@@ -105,15 +107,15 @@ class MockFlightSqlServer : public FlightSQLODBCTestBase {
   std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server;
 };
 
-// -AL- todo rename the fixtures.
 template <typename T>
-class MyFixture : public T {
+class FlightSQLODBCTestBase : public T {
  public:
   using List = std::list<T>;
 };
 
-using TestTypes = ::testing::Types<MockFlightSqlServer, FlightSQLODBCTestBase>;
-TYPED_TEST_SUITE(MyFixture, TestTypes);
+using TestTypes =
+    ::testing::Types<FlightSQLODBCMockTestBase, FlightSQLODBCRemoteTestBase>;
+TYPED_TEST_SUITE(FlightSQLODBCTestBase, TestTypes);
 
 /** ODBC read buffer size. */
 enum { ODBC_BUFFER_SIZE = 1024 };

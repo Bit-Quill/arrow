@@ -200,7 +200,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
 
-TYPED_TEST(MyFixture, TestSQLGetEnvAttrOutputNTS) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrOutputNTS) {
   connect();
 
   SQLINTEGER output_nts;
@@ -214,7 +214,7 @@ TYPED_TEST(MyFixture, TestSQLGetEnvAttrOutputNTS) {
   disconnect();
 }
 
-TYPED_TEST(MyFixture, TestSQLGetEnvAttrGetLength) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrGetLength) {
   // Test is disabled because call to SQLGetEnvAttr is handled by the driver manager on
   // Windows. This test case can be potentially used on macOS/Linux
   GTEST_SKIP();
@@ -232,7 +232,7 @@ TYPED_TEST(MyFixture, TestSQLGetEnvAttrGetLength) {
   disconnect();
 }
 
-TYPED_TEST(MyFixture, TestSQLGetEnvAttrNullValuePointer) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrNullValuePointer) {
   // Test is disabled because call to SQLGetEnvAttr is handled by the driver manager on
   // Windows. This test case can be potentially used on macOS/Linux
   GTEST_SKIP();
@@ -292,7 +292,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
 
-TYPED_TEST(MyFixture, TestSQLDriverConnect) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -360,7 +360,7 @@ TYPED_TEST(MyFixture, TestSQLDriverConnect) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TEST_F(FlightSQLODBCTestBase, TestSQLDriverConnectInvalidUid) {
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -414,7 +414,7 @@ TEST_F(FlightSQLODBCTestBase, TestSQLDriverConnectInvalidUid) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TYPED_TEST(MyFixture, TestSQLConnect) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -483,7 +483,7 @@ TYPED_TEST(MyFixture, TestSQLConnect) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TEST_F(FlightSQLODBCTestBase, TestSQLConnectInputUidPwd) {
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -561,7 +561,7 @@ TEST_F(FlightSQLODBCTestBase, TestSQLConnectInputUidPwd) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TEST_F(FlightSQLODBCTestBase, TestSQLConnectInvalidUid) {
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -629,7 +629,7 @@ TEST_F(FlightSQLODBCTestBase, TestSQLConnectInvalidUid) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TEST_F(FlightSQLODBCTestBase, TestSQLConnectDSNPrecedence) {
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -739,7 +739,7 @@ TEST(SQLDisconnect, TestSQLDisconnectWithoutConnection) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TYPED_TEST(MyFixture, TestSQLGetDiagFieldWForConnectFailure) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   //  ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -849,7 +849,7 @@ TYPED_TEST(MyFixture, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TYPED_TEST(MyFixture, TestSQLGetDiagFieldWForConnectFailureNTS) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
   // Test is disabled because driver manager on Windows does not pass through SQL_NTS
   // This test case can be potentially used on macOS/Linux
   GTEST_SKIP();
@@ -916,7 +916,7 @@ TYPED_TEST(MyFixture, TestSQLGetDiagFieldWForConnectFailureNTS) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TYPED_TEST(MyFixture, TestSQLGetDiagRecForConnectFailure) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   //  ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -984,7 +984,7 @@ TYPED_TEST(MyFixture, TestSQLGetDiagRecForConnectFailure) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TYPED_TEST(MyFixture, TestConnect) {
+TYPED_TEST(FlightSQLODBCTestBase, TestConnect) {
   // Verifies connect and disconnect works on its own
   connect();
   disconnect();
