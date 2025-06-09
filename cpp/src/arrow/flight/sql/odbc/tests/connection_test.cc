@@ -292,7 +292,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
 
-TEST(SQLDriverConnect, TestSQLDriverConnect) {
+TEST_F(FlightSQLODBCTestBase, TestSQLDriverConnect) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -361,7 +361,7 @@ TEST(SQLDriverConnect, TestSQLDriverConnect) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TEST(SQLDriverConnect, TestSQLDriverConnectInvalidUid) {
+TEST_F(FlightSQLODBCTestBase, TestSQLDriverConnectInvalidUid) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -418,7 +418,7 @@ TEST(SQLDriverConnect, TestSQLDriverConnectInvalidUid) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TEST(SQLConnect, TestSQLConnect) {
+TEST_F(FlightSQLODBCTestBase, TestSQLConnect) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -488,7 +488,7 @@ TEST(SQLConnect, TestSQLConnect) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TEST(SQLConnect, TestSQLConnectInputUidPwd) {
+TEST_F(FlightSQLODBCTestBase, TestSQLConnectInputUidPwd) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -567,7 +567,7 @@ TEST(SQLConnect, TestSQLConnectInputUidPwd) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TEST(SQLConnect, TestSQLConnectInvalidUid) {
+TEST_F(FlightSQLODBCTestBase, TestSQLConnectInvalidUid) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -636,7 +636,7 @@ TEST(SQLConnect, TestSQLConnectInvalidUid) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 }
 
-TEST(SQLConnect, TestSQLConnectDSNPrecedence) {
+TEST_F(FlightSQLODBCTestBase, TestSQLConnectDSNPrecedence) {
   // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;

@@ -91,7 +91,7 @@ void FlightSQLODBCTestBase::disconnect() {
 
 void FlightSQLODBCTestBase::SetUp() {
   if (arrow::internal::GetEnvVar(TEST_CONNECT_STR).ValueOr("").empty()) {
-    GTEST_SKIP() << "Skipping FlightSQLODBCTestBase test: TEST_CONNECT_STR not set";
+    GTEST_SKIP();
   }
 }
 
