@@ -158,8 +158,8 @@ SQLRETURN SQL_API SQLColumnsW(SQLHSTMT statementHandle, SQLCHAR* catalogName,
       "SQLColumnsW called with statementHandle: {}, catalogName: {}, nameLength1: {}, "
       "schemaName: {}, nameLength2: {}, tableName: {}, nameLength3: {}, columnName: {}, "
       "nameLength4: {}",
-      statementHandle, fmt::ptr(catalogName), nameLength1, fmt::ptr(schemaName), nameLength2, fmt::ptr(tableName),
-      nameLength3, fmt::ptr(columnName), nameLength4);
+      statementHandle, fmt::ptr(catalogName), nameLength1, fmt::ptr(schemaName),
+      nameLength2, fmt::ptr(tableName), nameLength3, fmt::ptr(columnName), nameLength4);
   return SQL_ERROR;
 }
 
@@ -170,8 +170,8 @@ SQLRETURN SQL_API SQLError(SQLHENV handleType, SQLHDBC handle, SQLHSTMT hstmt,
   LOG_DEBUG(
       "SQLError called with handleType: {}, handle: {}, hstmt: {}, szSqlState: {}, "
       "pfNativeError: {}, szErrorMsg: {}, cbErrorMsgMax: {}, pcbErrorMsg: {}",
-      handleType, handle, hstmt, fmt::ptr(szSqlState), fmt::ptr(pfNativeError), fmt::ptr(szErrorMsg), cbErrorMsgMax,
-      fmt::ptr(pcbErrorMsg));
+      handleType, handle, hstmt, fmt::ptr(szSqlState), fmt::ptr(pfNativeError),
+      fmt::ptr(szErrorMsg), cbErrorMsgMax, fmt::ptr(pcbErrorMsg));
   return SQL_ERROR;
 }
 
@@ -205,8 +205,9 @@ SQLRETURN SQL_API SQLForeignKeysW(SQLHSTMT statementHandle, SQLCHAR* pKCatalogNa
       "{}, pKSchemaName: {}, nameLength2: {}, pKTableName: {}, nameLength3: {}, "
       "fKCatalogName: {}, nameLength4: {}, fKSchemaName: {}, nameLength5: {}, "
       "fKTableName: {}, nameLength6 : {}",
-      statementHandle, fmt::ptr(pKCatalogName), nameLength1, fmt::ptr(pKSchemaName), nameLength2, fmt::ptr(pKTableName),
-      nameLength3, fmt::ptr(fKCatalogName), nameLength4, fmt::ptr(fKSchemaName), nameLength5, fmt::ptr(fKTableName),
+      statementHandle, fmt::ptr(pKCatalogName), nameLength1, fmt::ptr(pKSchemaName),
+      nameLength2, fmt::ptr(pKTableName), nameLength3, fmt::ptr(fKCatalogName),
+      nameLength4, fmt::ptr(fKSchemaName), nameLength5, fmt::ptr(fKTableName),
       nameLength6);
   return SQL_ERROR;
 }
@@ -259,8 +260,8 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC connectionHandle, SQLCHAR* inStatementTex
   LOG_DEBUG(
       "SQLNativeSql called with connectionHandle: {}, inStatementText: {}, textLength1: "
       "{}, outStatementText: {}, bufferLength: {}, textLength2Ptr: {}",
-      connectionHandle, fmt::ptr(inStatementText), textLength1, fmt::ptr(outStatementText), bufferLength,
-      fmt::ptr(textLength2Ptr));
+      connectionHandle, fmt::ptr(inStatementText), textLength1,
+      fmt::ptr(outStatementText), bufferLength, fmt::ptr(textLength2Ptr));
   return SQL_ERROR;
 }
 
@@ -286,8 +287,8 @@ SQLRETURN SQL_API SQLPrimaryKeysW(SQLHSTMT statementHandle, SQLCHAR* catalogName
   LOG_DEBUG(
       "SQLPrimaryKeysW called with statementHandle: {}, catalogName: {}, nameLength1: "
       "{}, schemaName: {}, nameLength2: {}, tableName: {}, nameLength3: {}",
-      statementHandle, fmt::ptr(catalogName), nameLength1, fmt::ptr(schemaName), nameLength2, fmt::ptr(tableName),
-      nameLength3);
+      statementHandle, fmt::ptr(catalogName), nameLength1, fmt::ptr(schemaName),
+      nameLength2, fmt::ptr(tableName), nameLength3);
   return SQL_ERROR;
 }
 
@@ -309,7 +310,7 @@ SQLRETURN SQL_API SQLTablesW(SQLHSTMT statementHandle, SQLCHAR* catalogName,
       "SQLTablesW called with statementHandle: {}, catalogName: {}, nameLength1: {}, "
       "schemaName: {}, nameLength2: {}, tableName: {}, nameLength3: {}, columnName: {}, "
       "nameLength4: {}",
-      statementHandle, fmt::ptr(catalogName), nameLength1, fmt::ptr(schemaName), nameLength2, fmt::ptr(tableName),
-      nameLength3, fmt::ptr(tableType), nameLength4);
+      statementHandle, fmt::ptr(catalogName), nameLength1, fmt::ptr(schemaName),
+      nameLength2, fmt::ptr(tableName), nameLength3, fmt::ptr(tableType), nameLength4);
   return SQL_ERROR;
 }
