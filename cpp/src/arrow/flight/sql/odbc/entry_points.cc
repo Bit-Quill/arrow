@@ -81,7 +81,8 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePt
 
 SQLRETURN SQL_API SQLSetConnectAttrW(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value,
                                      SQLINTEGER valueLen) {
-  // TODO implement SQLSetConnectAttr
+  LOG_DEBUG("SQLSetConnectAttrW called with conn: {}, attr: {}, value: {}, valueLen: {}",
+            conn, attr, value, valueLen);
   return SQL_ERROR;
 }
 
