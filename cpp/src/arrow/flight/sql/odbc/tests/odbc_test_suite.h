@@ -46,6 +46,7 @@ namespace flight {
 namespace odbc {
 namespace integration_tests {
 using driver::odbcabstraction::Connection;
+static constexpr std::string_view test_token = "t0k3n";
 
 class FlightSQLODBCRemoteTestBase : public ::testing::Test {
  public:

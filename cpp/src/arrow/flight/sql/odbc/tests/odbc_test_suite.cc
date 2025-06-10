@@ -137,7 +137,8 @@ Status MockFlightSqlServerAuthHandler::IsValid(const ServerCallContext& context,
 std::string FlightSQLODBCMockTestBase::getConnectionString() {
   std::string connect_str(
       "driver={Apache Arrow Flight SQL ODBC Driver};HOST=localhost;port=" +
-      std::to_string(port) + ";token=t0k3n;useEncryption=false;");
+      std::to_string(port) + ";token=" + std::string(test_token) +
+      ";useEncryption=false;");
   return connect_str;
 }
 
@@ -151,7 +152,8 @@ std::string FlightSQLODBCMockTestBase::getInvalidConnectionString() {
 void FlightSQLODBCMockTestBase::SetUp() {
   ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
   arrow::flight::FlightServerOptions options(location);
-  options.auth_handler = std::make_unique<MockFlightSqlServerAuthHandler>("t0k3n");
+  options.auth_handler =
+      std::make_unique<MockFlightSqlServerAuthHandler>(std::string(test_token));
   ASSERT_OK_AND_ASSIGN(server,
                        arrow::flight::sql::example::SQLiteFlightSqlServer::Create());
   ASSERT_OK(server->Init(options));
