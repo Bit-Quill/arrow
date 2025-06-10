@@ -147,10 +147,10 @@ SQLRETURN SQL_API SQLColAttributeW(SQLHSTMT statementHandle, SQLUSMALLINT column
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLColumnsW(SQLHSTMT statementHandle, SQLCHAR* catalogName,
-                              SQLSMALLINT nameLength1, SQLCHAR* schemaName,
-                              SQLSMALLINT nameLength2, SQLCHAR* tableName,
-                              SQLSMALLINT nameLength3, SQLCHAR* columnName,
+SQLRETURN SQL_API SQLColumnsW(SQLHSTMT statementHandle, SQLWCHAR* catalogName,
+                              SQLSMALLINT nameLength1, SQLWCHAR* schemaName,
+                              SQLSMALLINT nameLength2, SQLWCHAR* tableName,
+                              SQLSMALLINT nameLength3, SQLWCHAR* columnName,
                               SQLSMALLINT nameLength4) {
   LOG_DEBUG(
       "SQLColumnsW called with statementHandle: {}, catalogName: {}, nameLength1: {}, "
@@ -162,8 +162,8 @@ SQLRETURN SQL_API SQLColumnsW(SQLHSTMT statementHandle, SQLCHAR* catalogName,
 }
 
 SQLRETURN SQL_API SQLError(SQLHENV handleType, SQLHDBC handle, SQLHSTMT hstmt,
-                           SQLCHAR FAR* szSqlState, SQLINTEGER FAR* pfNativeError,
-                           SQLCHAR FAR* szErrorMsg, SQLSMALLINT cbErrorMsgMax,
+                           SQLWCHAR FAR* szSqlState, SQLINTEGER FAR* pfNativeError,
+                           SQLWCHAR FAR* szErrorMsg, SQLSMALLINT cbErrorMsgMax,
                            SQLSMALLINT FAR* pcbErrorMsg) {
   LOG_DEBUG(
       "SQLError called with handleType: {}, handle: {}, hstmt: {}, szSqlState: {}, "
@@ -173,7 +173,7 @@ SQLRETURN SQL_API SQLError(SQLHENV handleType, SQLHDBC handle, SQLHSTMT hstmt,
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLExecDirectW(SQLHSTMT statementHandle, SQLCHAR* statementText,
+SQLRETURN SQL_API SQLExecDirectW(SQLHSTMT statementHandle, SQLWCHAR* statementText,
                                  SQLINTEGER textLength) {
   LOG_DEBUG(
       "SQLExecDirectW called with statementHandle: {}, statementText: {}, textLength: {}",
@@ -191,12 +191,12 @@ SQLRETURN SQL_API SQLFetch(SQLHSTMT statementHandle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLForeignKeysW(SQLHSTMT statementHandle, SQLCHAR* pKCatalogName,
-                                  SQLSMALLINT nameLength1, SQLCHAR* pKSchemaName,
-                                  SQLSMALLINT nameLength2, SQLCHAR* pKTableName,
-                                  SQLSMALLINT nameLength3, SQLCHAR* fKCatalogName,
-                                  SQLSMALLINT nameLength4, SQLCHAR* fKSchemaName,
-                                  SQLSMALLINT nameLength5, SQLCHAR* fKTableName,
+SQLRETURN SQL_API SQLForeignKeysW(SQLHSTMT statementHandle, SQLWCHAR* pKCatalogName,
+                                  SQLSMALLINT nameLength1, SQLWCHAR* pKSchemaName,
+                                  SQLSMALLINT nameLength2, SQLWCHAR* pKTableName,
+                                  SQLSMALLINT nameLength3, SQLWCHAR* fKCatalogName,
+                                  SQLSMALLINT nameLength4, SQLWCHAR* fKSchemaName,
+                                  SQLSMALLINT nameLength5, SQLWCHAR* fKTableName,
                                   SQLSMALLINT nameLength6) {
   LOG_DEBUG(
       "SQLForeignKeysW called with statementHandle: {}, pKCatalogName: {}, nameLength1: "
@@ -252,8 +252,8 @@ SQLRETURN SQL_API SQLMoreResults(SQLHSTMT statementHandle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLNativeSql(SQLHDBC connectionHandle, SQLCHAR* inStatementText,
-                               SQLINTEGER textLength1, SQLCHAR* outStatementText,
+SQLRETURN SQL_API SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
+                               SQLINTEGER textLength1, SQLWCHAR* outStatementText,
                                SQLINTEGER bufferLength, SQLINTEGER* textLength2Ptr) {
   LOG_DEBUG(
       "SQLNativeSql called with connectionHandle: {}, inStatementText: {}, textLength1: "
@@ -270,7 +270,7 @@ SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementHandle,
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLPrepareW(SQLHSTMT statementHandle, SQLCHAR* statementText,
+SQLRETURN SQL_API SQLPrepareW(SQLHSTMT statementHandle, SQLWCHAR* statementText,
                               SQLINTEGER textLength) {
   LOG_DEBUG(
       "SQLPrepareW called with statementHandle: {}, statementText: {}, textLength: {}",
@@ -278,9 +278,9 @@ SQLRETURN SQL_API SQLPrepareW(SQLHSTMT statementHandle, SQLCHAR* statementText,
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLPrimaryKeysW(SQLHSTMT statementHandle, SQLCHAR* catalogName,
-                                  SQLSMALLINT nameLength1, SQLCHAR* schemaName,
-                                  SQLSMALLINT nameLength2, SQLCHAR* tableName,
+SQLRETURN SQL_API SQLPrimaryKeysW(SQLHSTMT statementHandle, SQLWCHAR* catalogName,
+                                  SQLSMALLINT nameLength1, SQLWCHAR* schemaName,
+                                  SQLSMALLINT nameLength2, SQLWCHAR* tableName,
                                   SQLSMALLINT nameLength3) {
   LOG_DEBUG(
       "SQLPrimaryKeysW called with statementHandle: {}, catalogName: {}, nameLength1: "
@@ -299,14 +299,14 @@ SQLRETURN SQL_API SQLSetStmtAttrW(SQLHSTMT statementHandle, SQLINTEGER attribute
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLTablesW(SQLHSTMT statementHandle, SQLCHAR* catalogName,
-                             SQLSMALLINT nameLength1, SQLCHAR* schemaName,
-                             SQLSMALLINT nameLength2, SQLCHAR* tableName,
-                             SQLSMALLINT nameLength3, SQLCHAR* tableType,
+SQLRETURN SQL_API SQLTablesW(SQLHSTMT statementHandle, SQLWCHAR* catalogName,
+                             SQLSMALLINT nameLength1, SQLWCHAR* schemaName,
+                             SQLSMALLINT nameLength2, SQLWCHAR* tableName,
+                             SQLSMALLINT nameLength3, SQLWCHAR* tableType,
                              SQLSMALLINT nameLength4) {
   LOG_DEBUG(
       "SQLTablesW called with statementHandle: {}, catalogName: {}, nameLength1: {}, "
-      "schemaName: {}, nameLength2: {}, tableName: {}, nameLength3: {}, columnName: {}, "
+      "schemaName: {}, nameLength2: {}, tableName: {}, nameLength3: {}, tableType: {}, "
       "nameLength4: {}",
       statementHandle, fmt::ptr(catalogName), nameLength1, fmt::ptr(schemaName),
       nameLength2, fmt::ptr(tableName), nameLength3, fmt::ptr(tableType), nameLength4);
