@@ -27,6 +27,8 @@
 #include "arrow/flight/sql/odbc/odbc_api.h"
 #include "arrow/flight/sql/odbc/visibility.h"
 
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/logger.h"
+
 SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
   return arrow::SQLAllocHandle(type, parent, result);
 }
@@ -109,3 +111,205 @@ SQLRETURN SQL_API SQLConnectW(SQLHDBC conn, SQLWCHAR* dsnName, SQLSMALLINT dsnNa
 }
 
 SQLRETURN SQL_API SQLDisconnect(SQLHDBC conn) { return arrow::SQLDisconnect(conn); }
+
+// ConfigDSN
+
+SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
+                             SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
+                             SQLLEN bufferLength, SQLLEN* strLen_or_IndPtr) {
+  LOG_DEBUG(
+      "SQLBindCol called with statementHandle: {}, columnNumber: {}, targetType: {}, "
+      "targetValuePtr: {}, bufferLength: {}, strLen_or_IndPtr: {}",
+      statementHandle, columnNumber, targetType, targetValuePtr, bufferLength,
+      strLen_or_IndPtr);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLCancel(SQLHSTMT statementHandle) {
+  LOG_DEBUG("SQLCancel called with statementHandle: {}", statementHandle);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT statementHandle) {
+  LOG_DEBUG("SQLCloseCursor called with statementHandle: {}", statementHandle);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLColAttributeW(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
+                                   SQLUSMALLINT fieldIdentifier,
+                                   SQLPOINTER characterAttributePtr,
+                                   SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr,
+                                   SQLLEN* numericAttributePtr) {
+  LOG_DEBUG(
+      "SQLColAttributeW called with statementHandle: {}, columnNumber: {}, "
+      "fieldIdentifier: {}, characterAttributePtr: {}, bufferLength: {}, "
+      "stringLengthPtr: {}, numericAttributePtr: {}",
+      statementHandle, columnNumber, fieldIdentifier, characterAttributePtr, bufferLength,
+      stringLengthPtr, numericAttributePtr);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLColumnsW(SQLHSTMT statementHandle, SQLCHAR* catalogName,
+                              SQLSMALLINT nameLength1, SQLCHAR* schemaName,
+                              SQLSMALLINT nameLength2, SQLCHAR* tableName,
+                              SQLSMALLINT nameLength3, SQLCHAR* columnName,
+                              SQLSMALLINT nameLength4) {
+  LOG_DEBUG(
+      "SQLColumnsW called with statementHandle: {}, catalogName: {}, nameLength1: {}, "
+      "schemaName: {}, nameLength2: {}, tableName: {}, nameLength3: {}, columnName: {}, "
+      "nameLength4: {}",
+      statementHandle, catalogName, nameLength1, schemaName, nameLength2, tableName,
+      nameLength3, columnName, nameLength4);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLError(SQLHENV handleType, SQLHDBC handle, SQLHSTMT hstmt,
+                           SQLCHAR FAR* szSqlState, SQLINTEGER FAR* pfNativeError,
+                           SQLCHAR FAR* szErrorMsg, SQLSMALLINT cbErrorMsgMax,
+                           SQLSMALLINT FAR* pcbErrorMsg) {
+  LOG_DEBUG(
+      "SQLError called with handleType: {}, handle: {}, hstmt: {}, szSqlState: {}, "
+      "pfNativeError: {}, szErrorMsg: {}, cbErrorMsgMax: {}, pcbErrorMsg: {}",
+      handleType, handle, hstmt, szSqlState, pfNativeError, szErrorMsg, cbErrorMsgMax,
+      pcbErrorMsg);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLExecDirectW(SQLHSTMT statementHandle, SQLCHAR* statementText,
+                                 SQLINTEGER textLength) {
+  LOG_DEBUG(
+      "SQLExecDirectW called with statementHandle: {}, statementText: {}, textLength: {}",
+      statementHandle, statementText, textLength);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLExecute(SQLHSTMT statementHandle) {
+  LOG_DEBUG("SQLExecute called with statementHandle: {}", statementHandle);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLFetch(SQLHSTMT statementHandle) {
+  LOG_DEBUG("SQLFetch called with statementHandle: {}", statementHandle);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLForeignKeysW(SQLHSTMT statementHandle, SQLCHAR* pKCatalogName,
+                                  SQLSMALLINT nameLength1, SQLCHAR* pKSchemaName,
+                                  SQLSMALLINT nameLength2, SQLCHAR* pKTableName,
+                                  SQLSMALLINT nameLength3, SQLCHAR* fKCatalogName,
+                                  SQLSMALLINT nameLength4, SQLCHAR* fKSchemaName,
+                                  SQLSMALLINT nameLength5, SQLCHAR* fKTableName,
+                                  SQLSMALLINT nameLength6) {
+  LOG_DEBUG(
+      "SQLForeignKeysW called with statementHandle: {}, pKCatalogName: {}, nameLength1: "
+      "{}, pKSchemaName: {}, nameLength2: {}, pKTableName: {}, nameLength3: {}, "
+      "fKCatalogName: {}, nameLength4: {}, fKSchemaName: {}, nameLength5: {}, "
+      "fKTableName: {}, nameLength6 : {}",
+      statementHandle, pKCatalogName, nameLength1, pKSchemaName, nameLength2, pKTableName,
+      nameLength3, fKCatalogName, nameLength4, fKSchemaName, nameLength5, fKTableName,
+      nameLength6);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLGetConnectAttrW(SQLHDBC connectionHandle, SQLINTEGER attribute,
+                                     SQLPOINTER valuePtr, SQLINTEGER bufferLength,
+                                     SQLINTEGER* stringLengthPtr) {
+  LOG_DEBUG(
+      "SQLGetConnectAttrW called with connectionHandle: {}, attribute: {}, valuePtr: {}, "
+      "bufferLength: {}, stringLengthPtr: {}",
+      connectionHandle, attribute, valuePtr, bufferLength, stringLengthPtr);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLGetData(SQLHSTMT statementHandle, SQLUSMALLINT col_or_Param_Num,
+                             SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
+                             SQLLEN bufferLength, SQLLEN* strLen_or_IndPtr) {
+  LOG_DEBUG(
+      "SQLGetData called with statementHandle: {}, col_or_Param_Num: {}, targetType: {}, "
+      "targetValuePtr: {}, bufferLength: {}, strLen_or_IndPtr: {}",
+      statementHandle, col_or_Param_Num, targetType, targetValuePtr, bufferLength,
+      strLen_or_IndPtr);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLGetStmtAttr(SQLHSTMT statementHandle, SQLINTEGER attribute,
+                                 SQLPOINTER valuePtr, SQLINTEGER bufferLength,
+                                 SQLINTEGER* stringLengthPtr) {
+  LOG_DEBUG(
+      "SQLGetStmtAttr called with statementHandle: {}, attribute: {}, valuePtr: {}, "
+      "bufferLength: {}, stringLengthPtr: {}",
+      statementHandle, attribute, valuePtr, bufferLength, stringLengthPtr);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLGetTypeInfoW(SQLHSTMT statementHandle, SQLSMALLINT dataType) {
+  LOG_DEBUG("SQLGetTypeInfoW called with statementHandle: {} dataType: {}",
+            statementHandle, dataType);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLMoreResults(SQLHSTMT statementHandle) {
+  LOG_DEBUG("SQLMoreResults called with statementHandle: {}", statementHandle);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLNativeSql(SQLHDBC connectionHandle, SQLCHAR* inStatementText,
+                               SQLINTEGER textLength1, SQLCHAR* outStatementText,
+                               SQLINTEGER bufferLength, SQLINTEGER* textLength2Ptr) {
+  LOG_DEBUG(
+      "SQLNativeSql called with connectionHandle: {}, inStatementText: {}, textLength1: "
+      "{}, outStatementText: {}, bufferLength: {}, textLength2Ptr: {}",
+      connectionHandle, inStatementText, textLength1, outStatementText, bufferLength,
+      textLength2Ptr);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementHandle,
+                                   SQLSMALLINT* columnCountPtr) {
+  LOG_DEBUG("SQLNumResultCols called with statementHandle: {}, columnCountPtr: {}",
+            statementHandle, columnCountPtr);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLPrepareW(SQLHSTMT statementHandle, SQLCHAR* statementText,
+                              SQLINTEGER textLength) {
+  LOG_DEBUG(
+      "SQLPrepareW called with statementHandle: {}, statementText: {}, textLength: {}",
+      statementHandle, statementText, textLength);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLPrimaryKeysW(SQLHSTMT statementHandle, SQLCHAR* catalogName,
+                                  SQLSMALLINT nameLength1, SQLCHAR* schemaName,
+                                  SQLSMALLINT nameLength2, SQLCHAR* tableName,
+                                  SQLSMALLINT nameLength3) {
+  LOG_DEBUG(
+      "SQLPrimaryKeysW called with statementHandle: {}, catalogName: {}, nameLength1: "
+      "{}, schemaName: {}, nameLength2: {}, tableName: {}, nameLength3: {}",
+      statementHandle, catalogName, nameLength1, schemaName, nameLength2, tableName,
+      nameLength3);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLSetStmtAttrW(SQLHSTMT statementHandle, SQLINTEGER attribute,
+                                  SQLPOINTER valuePtr, SQLINTEGER stringLength) {
+  LOG_DEBUG(
+      "SQLSetStmtAttrW called with statementHandle: {}, attribute: {}, valuePtr: {}, "
+      "stringLength: {}",
+      statementHandle, attribute, valuePtr, stringLength);
+  return SQL_SUCCESS;
+}
+
+SQLRETURN SQL_API SQLTablesW(SQLHSTMT statementHandle, SQLCHAR* catalogName,
+                             SQLSMALLINT nameLength1, SQLCHAR* schemaName,
+                             SQLSMALLINT nameLength2, SQLCHAR* tableName,
+                             SQLSMALLINT nameLength3, SQLCHAR* tableType,
+                             SQLSMALLINT nameLength4) {
+  LOG_DEBUG(
+      "SQLTablesW called with statementHandle: {}, catalogName: {}, nameLength1: {}, "
+      "schemaName: {}, nameLength2: {}, tableName: {}, nameLength3: {}, columnName: {}, "
+      "nameLength4: {}",
+      statementHandle, catalogName, nameLength1, schemaName, nameLength2, tableName,
+      nameLength3, tableType, nameLength4);
+  return SQL_SUCCESS;
+}
