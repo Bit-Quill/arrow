@@ -112,7 +112,14 @@ SQLRETURN SQL_API SQLConnectW(SQLHDBC conn, SQLWCHAR* dsnName, SQLSMALLINT dsnNa
 
 SQLRETURN SQL_API SQLDisconnect(SQLHDBC conn) { return arrow::SQLDisconnect(conn); }
 
-// ConfigDSN
+BOOL SQL_API ConfigDSN(HWND hwndParent, WORD fRequest, LPCSTR lpszDriver,
+                       LPCSTR lpszAttributes) {
+  LOG_DEBUG(
+      "ConfigDSN called with hwndParent: {}, fRequest: {}, lpszDriver: {}, "
+      "lpszAttributes: {}",
+      hwndParent, fRequest, lpszDriver, lpszAttributes);
+  return FALSE;
+}
 
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
                              SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
