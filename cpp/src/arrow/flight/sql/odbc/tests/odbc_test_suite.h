@@ -77,7 +77,7 @@ class FlightSQLODBCRemoteTestBase : public ::testing::Test {
 
 class MockFlightSqlServerAuthHandler : public ServerAuthHandler {
  public:
-  MockFlightSqlServerAuthHandler(const std::string& token);
+  explicit MockFlightSqlServerAuthHandler(const std::string& token);
   ~MockFlightSqlServerAuthHandler() override;
   Status Authenticate(const ServerCallContext& context, ServerAuthSender* outgoing,
                       ServerAuthReader* incoming) override;
