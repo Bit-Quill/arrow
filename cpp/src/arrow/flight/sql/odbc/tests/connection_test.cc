@@ -201,17 +201,17 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrOutputNTS) {
-  connect();
+  this->connect();
 
   SQLINTEGER output_nts;
 
-  SQLRETURN return_get = SQLGetEnvAttr(env, SQL_ATTR_OUTPUT_NTS, &output_nts, 0, 0);
+  SQLRETURN return_get = SQLGetEnvAttr(this->env, SQL_ATTR_OUTPUT_NTS, &output_nts, 0, 0);
 
   EXPECT_TRUE(return_get == SQL_SUCCESS);
 
   EXPECT_EQ(output_nts, SQL_TRUE);
 
-  disconnect();
+  this->disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrGetLength) {
@@ -219,30 +219,32 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrGetLength) {
   // Windows. This test case can be potentially used on macOS/Linux
   GTEST_SKIP();
 
-  connect();
+  this->connect();
 
   SQLINTEGER length;
 
-  SQLRETURN return_get = SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0, &length);
+  SQLRETURN return_get =
+      SQLGetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION, nullptr, 0, &length);
 
   EXPECT_TRUE(return_get == SQL_SUCCESS);
 
   EXPECT_EQ(length, sizeof(SQLINTEGER));
 
-  disconnect();
+  this->disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrNullValuePointer) {
   // Test is disabled because call to SQLGetEnvAttr is handled by the driver manager on
   // Windows. This test case can be potentially used on macOS/Linux
   GTEST_SKIP();
-  connect();
+  this->connect();
 
-  SQLRETURN return_get = SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0, nullptr);
+  SQLRETURN return_get =
+      SQLGetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION, nullptr, 0, nullptr);
 
   EXPECT_TRUE(return_get == SQL_ERROR);
 
-  disconnect();
+  this->disconnect();
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSValid) {
@@ -312,7 +314,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // Connect string
-  std::string connect_str = getConnectionString();
+  std::string connect_str = this->getConnectionString();
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
@@ -434,7 +436,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // Connect string
-  std::string connect_str = getConnectionString();
+  std::string connect_str = this->getConnectionString();
 
   // Write connection string content into a DSN,
   // must succeed before continuing
@@ -759,7 +761,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // Invalid connect string
-  std::string connect_str = getInvalidConnectionString();
+  std::string connect_str = this->getInvalidConnectionString();
 
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
@@ -872,7 +874,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // Invalid connect string
-  std::string connect_str = getInvalidConnectionString();
+  std::string connect_str = this->getInvalidConnectionString();
 
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
@@ -889,7 +891,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
   EXPECT_TRUE(ret == SQL_ERROR);
 
   // Retrieve all supported header level and record level data
-  SQLSMALLINT HEADER_LEVEL = 0;
   SQLSMALLINT RECORD_1 = 1;
 
   // SQL_DIAG_MESSAGE_TEXT SQL_NTS
@@ -936,7 +937,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // Invalid connect string
-  std::string connect_str = getInvalidConnectionString();
+  std::string connect_str = this->getInvalidConnectionString();
 
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
@@ -986,8 +987,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
 
 TYPED_TEST(FlightSQLODBCTestBase, TestConnect) {
   // Verifies connect and disconnect works on its own
-  connect();
-  disconnect();
+  this->connect();
+  this->disconnect();
 }
 
 }  // namespace integration_tests
