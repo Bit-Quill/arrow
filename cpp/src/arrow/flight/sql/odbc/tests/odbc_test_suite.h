@@ -19,6 +19,7 @@
 #include "arrow/util/io_util.h"
 #include "arrow/util/utf8.h"
 
+#include "arrow/flight/server_middleware.h"
 #include "arrow/flight/sql/client.h"
 #include "arrow/flight/sql/example/sqlite_server.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h"
@@ -46,7 +47,6 @@ namespace flight {
 namespace odbc {
 namespace integration_tests {
 using driver::odbcabstraction::Connection;
-static constexpr std::string_view test_token = "t0k3n";
 
 class FlightSQLODBCRemoteTestBase : public ::testing::Test {
  public:
@@ -76,17 +76,41 @@ class FlightSQLODBCRemoteTestBase : public ::testing::Test {
   void SetUp() override;
 };
 
-class MockFlightSqlServerAuthHandler : public ServerAuthHandler {
+static constexpr std::string_view kAuthHeader = "authorization";
+static constexpr std::string_view kBearerPrefix = "Bearer ";
+static constexpr std::string_view test_token = "t0k3n";
+
+std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers);
+
+// A server middleware for validating incoming bearer header authentication.
+class MockServerMiddleware : public ServerMiddleware {
  public:
-  explicit MockFlightSqlServerAuthHandler(const std::string& token);
-  ~MockFlightSqlServerAuthHandler() override;
-  Status Authenticate(const ServerCallContext& context, ServerAuthSender* outgoing,
-                      ServerAuthReader* incoming) override;
-  Status IsValid(const ServerCallContext& context, const std::string& token,
-                 std::string* peer_identity) override;
+  explicit MockServerMiddleware(const CallHeaders& incoming_headers, bool* isValid)
+      : isValid_(isValid) {
+    incoming_headers_ = incoming_headers;
+  }
+
+  void SendingHeaders(AddCallHeaders* outgoing_headers) override;
+
+  void CallCompleted(const Status& status) override {}
+
+  std::string name() const override { return "MockServerMiddleware"; }
 
  private:
-  std::string token_;
+  CallHeaders incoming_headers_;
+  bool* isValid_;
+};
+
+// Factory for base64 header authentication testing.
+class MockServerMiddlewareFactory : public ServerMiddlewareFactory {
+ public:
+  MockServerMiddlewareFactory() : isValid_(false) {}
+
+  Status StartCall(const CallInfo& info, const ServerCallContext& context,
+                   std::shared_ptr<ServerMiddleware>* middleware) override;
+
+ private:
+  bool isValid_;
 };
 
 class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {

@@ -106,31 +106,40 @@ void FlightSQLODBCRemoteTestBase::SetUp() {
   }
 }
 
-MockFlightSqlServerAuthHandler::MockFlightSqlServerAuthHandler(const std::string& token)
-    : token_(token) {}
+std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
+  // Lambda function to compare characters without case sensitivity.
+  auto char_compare = [](const char& char1, const char& char2) {
+    return (::toupper(char1) == ::toupper(char2));
+  };
 
-MockFlightSqlServerAuthHandler::~MockFlightSqlServerAuthHandler() {}
-
-Status MockFlightSqlServerAuthHandler::Authenticate(const ServerCallContext& context,
-                                                    ServerAuthSender* outgoing,
-                                                    ServerAuthReader* incoming) {
-  auto headers = context.incoming_headers();
-  std::string bearer_token = std::string(headers.find("authorization")->second);
-  std::string bearer_prefix("Bearer ");
-  if (bearer_token != bearer_prefix + token_) {
-    return MakeFlightError(FlightStatusCode::Unauthenticated, "Invalid token");
+  const std::string auth_val(incoming_headers.find(kAuthHeader)->second);
+  std::string bearer_token("");
+  if (auth_val.size() > kBearerPrefix.length()) {
+    if (std::equal(auth_val.begin(), auth_val.begin() + kBearerPrefix.length(),
+                   kBearerPrefix.begin(), char_compare)) {
+      bearer_token = auth_val.substr(kBearerPrefix.length());
+    }
   }
-  return Status::OK();
+  return bearer_token;
 }
 
-Status MockFlightSqlServerAuthHandler::IsValid(const ServerCallContext& context,
-                                               const std::string& token,
-                                               std::string* peer_identity) {
-  if (token != token_) {
-    return MakeFlightError(FlightStatusCode::Unauthenticated, "Invalid token");
+void MockServerMiddleware::SendingHeaders(AddCallHeaders* outgoing_headers) {
+  std::string bearer_token = FindTokenInCallHeaders(incoming_headers_);
+  *isValid_ = (bearer_token == std::string(test_token));
+}
+
+Status MockServerMiddlewareFactory::StartCall(
+    const CallInfo& info, const ServerCallContext& context,
+    std::shared_ptr<ServerMiddleware>* middleware) {
+  std::string bearer_token = FindTokenInCallHeaders(context.incoming_headers());
+  if (bearer_token == std::string(test_token)) {
+    *middleware =
+        std::make_shared<MockServerMiddleware>(context.incoming_headers(), &isValid_);
+  } else {
+    return MakeFlightError(FlightStatusCode::Unauthenticated,
+                           "Invalid token for mock server");
   }
-  // Does not support peer identity
-  *peer_identity = std::string("");
+
   return Status::OK();
 }
 
@@ -152,8 +161,9 @@ std::string FlightSQLODBCMockTestBase::getInvalidConnectionString() {
 void FlightSQLODBCMockTestBase::SetUp() {
   ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
   arrow::flight::FlightServerOptions options(location);
-  options.auth_handler =
-      std::make_unique<MockFlightSqlServerAuthHandler>(std::string(test_token));
+  options.auth_handler = std::make_unique<NoOpAuthHandler>();
+  options.middleware.push_back(
+      {"bearer-auth-server", std::make_shared<MockServerMiddlewareFactory>()});
   ASSERT_OK_AND_ASSIGN(server,
                        arrow::flight::sql::example::SQLiteFlightSqlServer::Create());
   ASSERT_OK(server->Init(options));
