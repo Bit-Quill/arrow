@@ -26,6 +26,7 @@
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_statement.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h"
 
 #if defined _WIN32 || defined _WIN64
