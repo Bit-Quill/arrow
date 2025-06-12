@@ -1018,7 +1018,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
   this->disconnect();
 }
 
-TEST(SQLAllocStmt, TestCloseConnectionWithOpenStatement) {
+TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
   // Test is disabled as disconnecting without closing statement fails on Windows.
   // This test case can be potentially used on macOS/Linux.
   GTEST_SKIP();
