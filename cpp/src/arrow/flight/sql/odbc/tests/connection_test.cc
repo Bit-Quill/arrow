@@ -1042,8 +1042,7 @@ TEST(SQLAllocStmt, TestCloseConnectionWithOpenStatement) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // Connect string
-  ASSERT_OK_AND_ASSIGN(std::string connect_str,
-                       arrow::internal::GetEnvVar(TEST_CONNECT_STR));
+  std::string connect_str = this->getConnectionString();
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
