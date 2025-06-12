@@ -991,12 +991,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestConnect) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
-  connect();
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
+  this->connect();
   SQLHSTMT statement;
 
   // Allocate a statement using alloc statement
-  SQLRETURN ret = SQLAllocStmt(conn, &statement);
+  SQLRETURN ret = SQLAllocStmt(this->conn, &statement);
 
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
@@ -1015,7 +1015,7 @@ TEST_F(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
 
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
-  disconnect();
+  this->disconnect();
 }
 
 TEST(SQLAllocStmt, TestCloseConnectionWithOpenStatement) {
