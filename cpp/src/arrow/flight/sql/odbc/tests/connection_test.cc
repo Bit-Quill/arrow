@@ -400,10 +400,8 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
 
   VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, std::string("28000"));
 
-  // TODO: Check that outstr remains empty after SqlWcharToString
-  // is fixed to handle empty `outstr`
-  // std::string out_connection_string = ODBC::SqlWcharToString(outstr, outstrlen);
-  // EXPECT_TRUE(out_connection_string.empty());
+  std::string out_connection_string = ODBC::SqlWcharToString(outstr, outstrlen);
+  EXPECT_TRUE(out_connection_string.empty());
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
