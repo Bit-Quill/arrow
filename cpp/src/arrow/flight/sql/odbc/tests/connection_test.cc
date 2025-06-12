@@ -200,11 +200,6 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
   EXPECT_TRUE(return_set == SQL_ERROR);
 }
 
-TEST_F(FlightSQLODBCTestBase, TestBaseConnectDisconnect) {
-  connect();
-  disconnect();
-}
-
 TEST_F(FlightSQLODBCTestBase, TestSQLGetEnvAttrOutputNTS) {
   connect();
 
