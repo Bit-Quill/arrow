@@ -468,7 +468,7 @@ void ODBCConnection::SetConnectAttr(SQLINTEGER attribute, SQLPOINTER value,
   bool successfully_written = false;
   switch (attribute) {
     // Internal connection attributes
-#ifdef SQL_ATR_ASYNC_DBC_EVENT
+#ifdef SQL_ATTR_ASYNC_DBC_EVENT
     case SQL_ATTR_ASYNC_DBC_EVENT:
       throw DriverException("Optional feature not supported.", "HYC00");
 #endif
@@ -476,7 +476,7 @@ void ODBCConnection::SetConnectAttr(SQLINTEGER attribute, SQLPOINTER value,
     case SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE:
       throw DriverException("Optional feature not supported.", "HYC00");
 #endif
-#ifdef SQL_ATTR_ASYNC_PCALLBACK
+#ifdef SQL_ATTR_ASYNC_DBC_PCALLBACK
     case SQL_ATTR_ASYNC_DBC_PCALLBACK:
       throw DriverException("Optional feature not supported.", "HYC00");
 #endif
@@ -586,7 +586,7 @@ void ODBCConnection::GetConnectAttr(SQLINTEGER attribute, SQLPOINTER value,
 
   switch (attribute) {
     // Internal connection attributes
-#ifdef SQL_ATR_ASYNC_DBC_EVENT
+#ifdef SQL_ATTR_ASYNC_DBC_EVENT
     case SQL_ATTR_ASYNC_DBC_EVENT:
       GetAttribute(static_cast<SQLPOINTER>(NULL), value, bufferLength, outputLength);
       return;
@@ -597,7 +597,7 @@ void ODBCConnection::GetConnectAttr(SQLINTEGER attribute, SQLPOINTER value,
                    bufferLength, outputLength);
       return;
 #endif
-#ifdef SQL_ATTR_ASYNC_PCALLBACK
+#ifdef SQL_ATTR_ASYNC_DBC_PCALLBACK
     case SQL_ATTR_ASYNC_DBC_PCALLBACK:
       GetAttribute(static_cast<SQLPOINTER>(NULL), value, bufferLength, outputLength);
       return;
