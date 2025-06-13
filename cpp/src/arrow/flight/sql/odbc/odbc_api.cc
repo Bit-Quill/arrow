@@ -410,7 +410,8 @@ SQLRETURN SQLGetDiagFieldW(SQLSMALLINT handleType, SQLHANDLE handle,
             ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(handle);
             ODBCConnection* connection = &statement->GetConnection();
             std::string dsn = connection->GetDSN();
-            return SQL_ERROR;
+            return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
+                                      stringLengthPtr, *diagnostics);
           }
 
           default:
@@ -525,7 +526,7 @@ SQLRETURN SQLGetDiagRecW(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT r
     }
 
     case SQL_HANDLE_STMT: {
-      ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(handle);
+      auto* statement = ODBCStatement::of(handle);
       diagnostics = &statement->GetDiagnostics();
     }
 
