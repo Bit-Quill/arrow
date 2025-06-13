@@ -463,7 +463,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // Remove DSN
-  EXPECT_TRUE(UnregisterDsn(dsn));
+  EXPECT_TRUE(UnregisterDsn(wdsn));
 
   // Disconnect from ODBC
   ret = SQLDisconnect(conn);
@@ -541,7 +541,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // Remove DSN
-  EXPECT_TRUE(UnregisterDsn(dsn));
+  EXPECT_TRUE(UnregisterDsn(wdsn));
 
   // Disconnect from ODBC
   ret = SQLDisconnect(conn);
@@ -618,7 +618,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
   VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, std::string("28000"));
 
   // Remove DSN
-  EXPECT_TRUE(UnregisterDsn(dsn));
+  EXPECT_TRUE(UnregisterDsn(wdsn));
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
@@ -681,7 +681,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
   EXPECT_TRUE(ret == SQL_SUCCESS);
 
   // Remove DSN
-  EXPECT_TRUE(UnregisterDsn(dsn));
+  EXPECT_TRUE(UnregisterDsn(wdsn));
 
   // Disconnect from ODBC
   ret = SQLDisconnect(conn);
