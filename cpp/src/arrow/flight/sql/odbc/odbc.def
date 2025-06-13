@@ -23,17 +23,20 @@ EXPORTS
 	SQLAllocHandle
 	SQLAllocStmt
 	SQLBindCol
+	SQLBindParameter
 	SQLCancel
 	SQLCloseCursor
 	SQLColAttributeW
 	SQLColumnsW
 	SQLConnectW
+	SQLDescribeColW
 	SQLDisconnect
 	SQLDriverConnectW
 	SQLErrorW
 	SQLExecDirectW
 	SQLExecute
 	SQLFetch
+	SQLFetchScroll
 	SQLForeignKeysW
 	SQLFreeEnv
 	SQLFreeHandle
@@ -49,6 +52,7 @@ EXPORTS
 	SQLMoreResults
 	SQLNativeSqlW
 	SQLNumResultCols
+	SQLRowCount
 	SQLPrepareW
 	SQLPrimaryKeysW
 	SQLSetConnectAttrW

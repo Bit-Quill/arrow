@@ -334,3 +334,8 @@ SQLRETURN SQL_API SQLTablesW(SQLHSTMT statementHandle, SQLWCHAR* catalogName,
       tableTypeLength);
   return SQL_ERROR;
 }
+
+// -AL- SQLBindParameter not supported - todo add
+// -AL- SQLDescribeColW not supported - todo add
+// -AL- SQLFetchScroll not suppported - todo add
+// -AL- SQLRowCount not supported - todo add
