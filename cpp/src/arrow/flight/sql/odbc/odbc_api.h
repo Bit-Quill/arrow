@@ -44,6 +44,10 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                         SQLINTEGER bufferLen, SQLINTEGER* strLenPtr);
 SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                         SQLINTEGER strLen);
+SQLRETURN SQLGetConnectAttrW(SQLHDBC conn, SQLINTEGER attribute, SQLPOINTER valuePtr,
+                             SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr);
+SQLRETURN SQLSetConnectAttrW(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value,
+                             SQLINTEGER valueLen);
 SQLRETURN SQLDriverConnectW(SQLHDBC conn, SQLHWND windowHandle,
                             SQLWCHAR* inConnectionString,
                             SQLSMALLINT inConnectionStringLen,
