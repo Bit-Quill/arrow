@@ -30,28 +30,28 @@ namespace arrow {
 namespace flight {
 namespace odbc {
 namespace integration_tests {
-TYPED_TEST(FlightSQLODBCTestBase, TestConnectEXAMPLE) {
+  // -AL- add connection attribute tests in this file.
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTimeoutValid) {
   this->connect();
 
-  /*
-    SQLUINTEGER timeout = -1;
-  SQLRETURN ret = SQLGetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
+  SQLUINTEGER timeout = -1;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
 
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(timeout, 0);
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(timeout, 0);
 
-  ret = SQLSetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT,
+  ret = SQLSetConnectAttr(this->conn, SQL_ATTR_CONNECTION_TIMEOUT,
                           reinterpret_cast<SQLPOINTER>(42), 0);
 
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
+  EXPECT_TRUE(ret == SQL_SUCCESS);
 
   timeout = -1;
 
-  ret = SQLGetConnectAttr(dbc, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
+  ret = SQLGetConnectAttr(this->conn, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
 
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_DBC, dbc);
-  BOOST_REQUIRE_EQUAL(timeout, 42);
-  */
+  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(timeout, 42);
 
   this->disconnect();
 }
