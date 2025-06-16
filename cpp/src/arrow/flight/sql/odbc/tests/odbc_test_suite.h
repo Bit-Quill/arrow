@@ -50,8 +50,10 @@ using driver::odbcabstraction::Connection;
 
 class FlightSQLODBCRemoteTestBase : public ::testing::Test {
  public:
+  /// \brief Allocate environment and connection handles
+  void allocEnvConnHandles();
   /// \brief Connect to Arrow Flight SQL server using connection string defined in
-  /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
+  /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN", allocate statement handle
   void connect();
   /// \brief Connect to Arrow Flight SQL server using connection string
   void connectWithString(std::string connection_str);
@@ -154,6 +156,11 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle);
 
 static constexpr std::string_view error_state_08003 = "08003";
 static constexpr std::string_view error_state_28000 = "28000";
+static constexpr std::string_view error_state_HY000 = "HY000";
+static constexpr std::string_view error_state_HY024 = "HY024";
+static constexpr std::string_view error_state_HY092 = "HY092";
+static constexpr std::string_view error_state_HYC00 = "HYC00";
+static constexpr std::string_view error_state_HY118 = "HY118";
 
 /// Verify ODBC Error State
 void VerifyOdbcErrorState(SQLSMALLINT handle_type, SQLHANDLE handle,

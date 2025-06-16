@@ -29,11 +29,8 @@ namespace arrow {
 namespace flight {
 namespace odbc {
 namespace integration_tests {
-void FlightSQLODBCRemoteTestBase::connect() {
-  std::string connect_str = getConnectionString();
-  connectWithString(connect_str);
-}
-void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
+
+void FlightSQLODBCRemoteTestBase::allocEnvConnHandles() {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
@@ -47,7 +44,15 @@ void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
+}
 
+void FlightSQLODBCRemoteTestBase::connect() {
+  allocEnvConnHandles();
+  std::string connect_str = getConnectionString();
+  connectWithString(connect_str);
+}
+
+void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
   // Connect string
   std::vector<SQLWCHAR> connect_str0(connect_str.begin(), connect_str.end());
 
@@ -55,7 +60,7 @@ void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
   SQLSMALLINT outstrlen;
 
   // Connecting to ODBC server.
-  ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
+  SQLRETURN ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
                          static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
                          ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
 

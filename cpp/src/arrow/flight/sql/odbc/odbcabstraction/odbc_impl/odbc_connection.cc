@@ -504,7 +504,7 @@ void ODBCConnection::SetConnectAttr(SQLINTEGER attribute, SQLPOINTER value,
       throw DriverException("Cannot set read-only attribute", "HY092");
     case SQL_ATTR_TRACE:  // DM-only
       throw DriverException("Cannot set read-only attribute", "HY092");
-    case SQL_ATTR_TRACEFILE:
+    case SQL_ATTR_TRACEFILE:  // DM-only
       throw DriverException("Optional feature not supported.", "HYC00");
     case SQL_ATTR_TRANSLATE_LIB:
       throw DriverException("Optional feature not supported.", "HYC00");
