@@ -61,8 +61,8 @@ void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
 
   // Connecting to ODBC server.
   SQLRETURN ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+                                   static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
+                                   ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
 
   if (ret != SQL_SUCCESS) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
@@ -73,17 +73,17 @@ void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
 
   // TODO: enable after SQLGetStmtAttr is supported.
   //// Allocate a statement using alloc handle
-  //ret = SQLAllocHandle(SQL_HANDLE_STMT, conn, &stmt);
+  // ret = SQLAllocHandle(SQL_HANDLE_STMT, conn, &stmt);
 
-  //ASSERT_TRUE(ret == SQL_SUCCESS);
+  // ASSERT_TRUE(ret == SQL_SUCCESS);
 }
 
 void FlightSQLODBCRemoteTestBase::disconnect() {
   // TODO: enable after SQLGetStmtAttr is supported.
   //// Close statement
-  //SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+  // SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 
-  //EXPECT_EQ(ret, SQL_SUCCESS);
+  // EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Disconnect from ODBC
   SQLRETURN ret = SQLDisconnect(conn);

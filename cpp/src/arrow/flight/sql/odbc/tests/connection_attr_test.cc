@@ -30,16 +30,11 @@ namespace arrow {
 namespace flight {
 namespace odbc {
 namespace integration_tests {
-  // -AL- add connection attribute tests in this file.
-  // First, do unsupported attributes for set, then do unsupported attributes for get to make sure null is returned.
-
-
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAsyncDbcEventUnsupported) {
   this->connect();
 
 #ifdef SQL_ATTR_ASYNC_DBC_EVENT
-  SQLRETURN ret =
-      SQLSetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_EVENT, 0, 0);
+  SQLRETURN ret = SQLSetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_EVENT, 0, 0);
 
   EXPECT_EQ(ret, SQL_ERROR);
   // Driver Manager on Windows returns error code HY118
@@ -66,8 +61,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAyncDbcPcCallbackUnsuppor
   this->connect();
 
 #ifdef SQL_ATTR_ASYNC_DBC_PCALLBACK
-  SQLRETURN ret =
-      SQLSetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_PCALLBACK, 0, 0);
+  SQLRETURN ret = SQLSetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_PCALLBACK, 0, 0);
 
   EXPECT_EQ(ret, SQL_ERROR);
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
@@ -180,7 +174,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTracefileDMOnly) {
   this->connect();
 
   // Verify DM-only attribute is handled by Driver Manager
-  
+
   // Use placeholder value as we want the call to fail, or else
   // the driver manager will produce a trace file.
   std::wstring trace_file = L"invalid/file/path";
@@ -219,7 +213,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTranslateOptionUnsupporte
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTxnIsolationUnsupported) {
   this->connect();
 
-  SQLRETURN ret = SQLSetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION,
+  SQLRETURN ret =
+      SQLSetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION,
                         reinterpret_cast<SQLPOINTER>(SQL_TXN_READ_UNCOMMITTED), 0);
   EXPECT_EQ(ret, SQL_ERROR);
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
@@ -247,7 +242,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrOdbcCursorsDMOnly) {
 
   // Verify that DM-only attribute is handled by driver manager
   SQLULEN cursor_attr;
-  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_ODBC_CURSORS, &cursor_attr, 0, 0);
+  SQLRETURN ret =
+      SQLGetConnectAttr(this->conn, SQL_ATTR_ODBC_CURSORS, &cursor_attr, 0, 0);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(cursor_attr, SQL_CUR_USE_DRIVER);
@@ -278,7 +274,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTraceFileDMOnly) {
                                     ODBC_BUFFER_SIZE, &outstrlen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  std::string out_connection_string = ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
+  std::string out_connection_string =
+      ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
   EXPECT_TRUE(!out_connection_string.empty());
 
   this->disconnect();
@@ -302,8 +299,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTranslateOptionUnsupporte
   this->connect();
 
   SQLINTEGER option;
-  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_TRANSLATE_OPTION, &option,
-                                    0,0);
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_TRANSLATE_OPTION, &option, 0, 0);
 
   EXPECT_EQ(ret, SQL_ERROR);
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
@@ -444,11 +440,49 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrQuietModeDefault) {
   this->disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTimeoutValid) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAccessModeValid) {
   this->connect();
 
+  // The driver always returns SQL_MODE_READ_WRITE
+
+  // Check default value first
+  SQLUINTEGER mode = -1;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_ACCESS_MODE, &mode, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(mode, SQL_MODE_READ_WRITE);
+
+  ret = SQLSetConnectAttr(this->conn, SQL_ATTR_ACCESS_MODE,
+                          reinterpret_cast<SQLPOINTER>(SQL_MODE_READ_WRITE), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  mode = -1;
+
+  ret = SQLGetConnectAttr(this->conn, SQL_ATTR_ACCESS_MODE, &mode, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(mode, SQL_MODE_READ_WRITE);
+
+  // Attempt to set to SQL_MODE_READ_ONLY, driver should return warning and not error
+  ret = SQLSetConnectAttr(this->conn, SQL_ATTR_ACCESS_MODE,
+                          reinterpret_cast<SQLPOINTER>(SQL_MODE_READ_ONLY), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+
+  // Verify warning status
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_01S02);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrConnectionTimeoutValid) {
+  this->connect();
+
+  // Check default value first
   SQLUINTEGER timeout = -1;
-  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
+  SQLRETURN ret =
+      SQLGetConnectAttr(this->conn, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(timeout, 0);
@@ -464,6 +498,67 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTimeoutValid) {
 
   EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(timeout, 42);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrLoginTimeoutValid) {
+  this->connect();
+
+  // Check default value first
+  SQLUINTEGER timeout = -1;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_LOGIN_TIMEOUT, &timeout, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(timeout, 0);
+
+  ret = SQLSetConnectAttr(this->conn, SQL_ATTR_LOGIN_TIMEOUT,
+                          reinterpret_cast<SQLPOINTER>(42), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  timeout = -1;
+
+  ret = SQLGetConnectAttr(this->conn, SQL_ATTR_LOGIN_TIMEOUT, &timeout, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(timeout, 42);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrPacketSizeValid) {
+  this->connect();
+
+  // The driver always returns 0. PACKET_SIZE value is unused by the driver.
+
+  // Check default value first
+  SQLUINTEGER size = -1;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_PACKET_SIZE, &size, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(size, 0);
+
+  ret = SQLSetConnectAttr(this->conn, SQL_ATTR_PACKET_SIZE,
+                          reinterpret_cast<SQLPOINTER>(0), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  size = -1;
+
+  ret = SQLGetConnectAttr(this->conn, SQL_ATTR_PACKET_SIZE, &size, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(size, 0);
+
+  // Attempt to set to non-zero value, driver should return warning and not error
+  ret = SQLSetConnectAttr(this->conn, SQL_ATTR_PACKET_SIZE,
+                          reinterpret_cast<SQLPOINTER>(2), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+
+  // Verify warning status
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_01S02);
 
   this->disconnect();
 }
