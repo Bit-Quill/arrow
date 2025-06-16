@@ -640,7 +640,7 @@ void ODBCConnection::GetConnectAttr(SQLINTEGER attribute, SQLPOINTER value,
     case SQL_ATTR_TRANSLATE_OPTION:
       throw DriverException("Optional feature not supported.", "HYC00");
     case SQL_ATTR_TXN_ISOLATION:
-      throw DriverException("Optional feature not supported.", "HCY00");
+      throw DriverException("Optional feature not supported.", "HYC00");
 
     // ODBCAbstraction-level connection attributes.
     case SQL_ATTR_CURRENT_CATALOG: {
