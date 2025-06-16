@@ -160,6 +160,7 @@ static constexpr std::string_view error_state_HY000 = "HY000";
 static constexpr std::string_view error_state_HY024 = "HY024";
 static constexpr std::string_view error_state_HY092 = "HY092";
 static constexpr std::string_view error_state_HYC00 = "HYC00";
+static constexpr std::string_view error_state_HY114 = "HY114";
 static constexpr std::string_view error_state_HY118 = "HY118";
 
 /// Verify ODBC Error State

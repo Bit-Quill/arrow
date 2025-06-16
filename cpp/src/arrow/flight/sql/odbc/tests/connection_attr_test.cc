@@ -323,13 +323,120 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTxnIsolationUnsupported) 
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase,
+           TestSQLGetConnectAttrAsyncDbcFunctionsEnableUnsupported) {
+  this->connect();
+
+#ifdef SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE
+  // Verifies that the Windows driver manager returns HY114 for unsupported functionality
+  SQLUINTEGER enable;
+  SQLRETURN ret =
+      SQLGetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE, &enable, 0, 0);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY114);
+#endif
+
+  this->disconnect();
+}
+
 // Tests for supported attributes
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAsyncDbcEventDefault) {
+  this->connect();
+
+#ifdef SQL_ATTR_ASYNC_DBC_EVENT
+  SQLPOINTER ptr = NULL;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_EVENT, ptr, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ptr, reinterpret_cast<SQLPOINTER>(NULL));
+#endif
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAsyncDbcPcallbackDefault) {
+  this->connect();
+
+#ifdef SQL_ATTR_ASYNC_DBC_PCALLBACK
+  SQLPOINTER ptr = NULL;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_PCALLBACK, ptr, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ptr, reinterpret_cast<SQLPOINTER>(NULL));
+#endif
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAsyncDbcPcontextDefault) {
+  this->connect();
+
+#ifdef SQL_ATTR_ASYNC_DBC_PCONTEXT
+  SQLPOINTER ptr = NULL;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_PCONTEXT, ptr, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ptr, reinterpret_cast<SQLPOINTER>(NULL));
+#endif
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAsyncEnableDefault) {
+  this->connect();
+
+  SQLULEN enable;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_ASYNC_ENABLE, &enable, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(enable, SQL_ASYNC_ENABLE_OFF);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAutoIpdDefault) {
+  this->connect();
+
+  SQLUINTEGER ipd;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_AUTO_IPD, &ipd, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ipd, static_cast<SQLUINTEGER>(SQL_FALSE));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAutocommitDefault) {
+  this->connect();
+
+  SQLUINTEGER auto_commit;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_AUTOCOMMIT, &auto_commit, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(auto_commit, SQL_AUTOCOMMIT_ON);
+
+  this->disconnect();
+}
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrEnlistInDtcDefault) {
   this->connect();
 
   SQLPOINTER ptr = NULL;
   SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_ENLIST_IN_DTC, ptr, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ptr, reinterpret_cast<SQLPOINTER>(NULL));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrQuietModeDefault) {
+  this->connect();
+
+  SQLPOINTER ptr = NULL;
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_QUIET_MODE, ptr, 0, 0);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(ptr, reinterpret_cast<SQLPOINTER>(NULL));
