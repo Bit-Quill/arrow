@@ -37,16 +37,16 @@ void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
   std::vector<SQLWCHAR> connect_str0(connect_str.begin(), connect_str.end());
@@ -78,7 +78,7 @@ void FlightSQLODBCRemoteTestBase::disconnect() {
   //// Close statement
   //SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 
-  //EXPECT_TRUE(ret == SQL_SUCCESS);
+  //EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Disconnect from ODBC
   SQLRETURN ret = SQLDisconnect(conn);
@@ -87,17 +87,17 @@ void FlightSQLODBCRemoteTestBase::disconnect() {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 std::string FlightSQLODBCRemoteTestBase::getConnectionString() {
@@ -199,7 +199,7 @@ bool compareConnPropertyMap(Connection::ConnPropertyMap map1,
 }
 
 void VerifyOdbcErrorState(SQLSMALLINT handle_type, SQLHANDLE handle,
-                          std::string expected_state) {
+                          std::string_view expected_state) {
   using ODBC::SqlWcharToString;
 
   SQLWCHAR sql_state[7] = {};

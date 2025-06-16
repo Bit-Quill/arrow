@@ -32,25 +32,38 @@ namespace odbc {
 namespace integration_tests {
   // -AL- add connection attribute tests in this file.
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrUnsupported) {
+  this->connect();
+
+  SQLUINTEGER uint = -1;
+
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_CONNECTION_TIMEOUT, &uint, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  //VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_28000);
+
+  this->disconnect();
+}
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTimeoutValid) {
   this->connect();
 
   SQLUINTEGER timeout = -1;
   SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(timeout, 0);
 
   ret = SQLSetConnectAttr(this->conn, SQL_ATTR_CONNECTION_TIMEOUT,
                           reinterpret_cast<SQLPOINTER>(42), 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   timeout = -1;
 
   ret = SQLGetConnectAttr(this->conn, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(timeout, 42);
 
   this->disconnect();

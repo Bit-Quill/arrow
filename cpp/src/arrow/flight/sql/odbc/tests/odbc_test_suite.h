@@ -152,9 +152,12 @@ bool compareConnPropertyMap(Connection::ConnPropertyMap map1,
 /// Get error message from ODBC driver using SQLGetDiagRec
 std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle);
 
+static constexpr std::string_view error_state_08003 = "08003";
+static constexpr std::string_view error_state_28000 = "28000";
+
 /// Verify ODBC Error State
 void VerifyOdbcErrorState(SQLSMALLINT handle_type, SQLHANDLE handle,
-                          std::string expected_state);
+                          std::string_view expected_state);
 
 /// \brief Write connection string into DSN
 /// \param[in] connection_str the connection string.
