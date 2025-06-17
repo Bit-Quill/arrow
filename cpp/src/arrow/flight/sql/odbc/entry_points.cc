@@ -120,6 +120,14 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC conn, SQLWCHAR* dsnName, SQLSMALLINT dsnNam
 
 SQLRETURN SQL_API SQLDisconnect(SQLHDBC conn) { return arrow::SQLDisconnect(conn); }
 
+SQLRETURN SQL_API SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) {
+  return arrow::SQLPrepare(stmt, queryText, textLength);
+}
+
+SQLRETURN SQL_API SQLExecute(SQLHSTMT stmt) {
+  return arrow::SQLExecute(stmt);
+}
+
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
                              SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
                              SQLLEN bufferLength, SQLLEN* strLen_or_IndPtr) {
@@ -189,11 +197,6 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementHandle, SQLWCHAR* statementTex
   LOG_DEBUG(
       "SQLExecDirectW called with statementHandle: {}, statementText: {}, textLength: {}",
       statementHandle, fmt::ptr(statementText), textLength);
-  return SQL_ERROR;
-}
-
-SQLRETURN SQL_API SQLExecute(SQLHSTMT statementHandle) {
-  LOG_DEBUG("SQLExecute called with statementHandle: {}", statementHandle);
   return SQL_ERROR;
 }
 
@@ -284,14 +287,6 @@ SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementHandle,
                                    SQLSMALLINT* columnCountPtr) {
   LOG_DEBUG("SQLNumResultCols called with statementHandle: {}, columnCountPtr: {}",
             statementHandle, fmt::ptr(columnCountPtr));
-  return SQL_ERROR;
-}
-
-SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementHandle, SQLWCHAR* statementText,
-                             SQLINTEGER textLength) {
-  LOG_DEBUG(
-      "SQLPrepareW called with statementHandle: {}, statementText: {}, textLength: {}",
-      statementHandle, fmt::ptr(statementText), textLength);
   return SQL_ERROR;
 }
 

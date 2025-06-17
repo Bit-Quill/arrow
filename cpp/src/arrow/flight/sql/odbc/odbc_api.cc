@@ -835,4 +835,12 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
   });
 }
 
+SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) {
+  LOG_DEBUG("SQLPrepareW called with stmt: {}, queryText: {}, textLength: {}", stmt,
+            fmt::ptr(queryText), textLength);
+  return SQL_ERROR;
+}
+SQLRETURN SQLExecute(SQLHSTMT stmt) {
+  LOG_DEBUG("SQLExecute called with stmt: {}", stmt);
+  return SQL_ERROR; }
 }  // namespace arrow
