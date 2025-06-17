@@ -137,9 +137,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrOdbcCursorsDMOnly) {
   // Verify DM-only attribute is settable via Driver Manager
   SQLRETURN ret = SQLSetConnectAttr(this->conn, SQL_ATTR_ODBC_CURSORS,
                                     reinterpret_cast<SQLPOINTER>(SQL_CUR_USE_DRIVER), 0);
-  if (ret != SQL_SUCCESS) {
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
-  }
+
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   std::string connect_str = this->getConnectionString();
@@ -471,7 +469,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAccessModeValid) {
   EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
 
   // Verify warning status
-  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_01S02);
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_01S02);
 
   this->disconnect();
 }
@@ -558,7 +556,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrPacketSizeValid) {
   EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
 
   // Verify warning status
-  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_01S02);
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_01S02);
 
   this->disconnect();
 }
