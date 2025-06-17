@@ -83,8 +83,8 @@ class ODBCStatement : public ODBCHandle<ODBCStatement> {
 
   inline SQLULEN GetRowsetSize() { return m_rowsetSize; }
 
-  bool GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType, SQLPOINTER dataPtr,
-               SQLLEN bufferLength, SQLLEN* indicatorPtr);
+  SQLRETURN GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType, SQLPOINTER dataPtr,
+                    SQLLEN bufferLength, SQLLEN* indicatorPtr);
 
   /**
    * @brief Closes the cursor. This does _not_ un-prepare the statement or change

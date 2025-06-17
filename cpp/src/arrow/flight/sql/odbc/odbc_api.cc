@@ -25,6 +25,7 @@
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_descriptor.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_statement.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h"
@@ -905,4 +906,43 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLengt
     return SQL_SUCCESS;
   });
 }
+
+SQLRETURN SQLFetch(SQLHSTMT stmt) {
+  LOG_DEBUG("SQLFetch called with stmt: {}", stmt);
+  using ODBC::ODBCDescriptor;
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    // The SQL_ATTR_ROW_ARRAY_SIZE statement attribute specifies the number of rows in the
+    // rowset.
+    ODBCDescriptor* ard = statement->GetARD();
+    size_t rows = static_cast<size_t>(ard->GetArraySize());
+    if (statement->Fetch(rows)) {
+      return SQL_SUCCESS;
+    } else {
+      // Reached the end of rowset
+      return SQL_NO_DATA;
+    }
+  });
+}
+
+SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
+                     SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr) {
+  LOG_DEBUG(
+      "SQLGetData called with stmt: {}, recordNumber: {}, cType: {}, "
+      "dataPtr: {}, bufferLength: {}, indicatorPtr: {}",
+      stmt, recordNumber, cType, dataPtr, bufferLength, fmt::ptr(indicatorPtr));
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    if (statement->GetData(recordNumber, cType, dataPtr, bufferLength, indicatorPtr)) {
+      // There is data truncation warning
+      return SQL_SUCCESS_WITH_INFO;
+    } else {
+      return SQL_SUCCESS;
+    }
+  });
+}
+
 }  // namespace arrow

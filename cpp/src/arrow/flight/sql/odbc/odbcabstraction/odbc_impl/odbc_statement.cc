@@ -693,9 +693,9 @@ void ODBCStatement::closeCursor(bool suppressErrors) {
   m_hasReachedEndOfResult = false;
 }
 
-bool ODBCStatement::GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType,
-                            SQLPOINTER dataPtr, SQLLEN bufferLength,
-                            SQLLEN* indicatorPtr) {
+SQLRETURN ODBCStatement::GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType,
+                                 SQLPOINTER dataPtr, SQLLEN bufferLength,
+                                 SQLLEN* indicatorPtr) {
   if (recordNumber == 0) {
     throw DriverException("Bookmarks are not supported", "07009");
   } else if (recordNumber > m_ird->GetRecords().size()) {

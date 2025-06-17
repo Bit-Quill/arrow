@@ -135,6 +135,15 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText,
   return arrow::SQLExecDirect(stmt, queryText, textLength);
 }
 
+SQLRETURN SQL_API SQLFetch(SQLHSTMT stmt) { return arrow::SQLFetch(stmt); }
+
+SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
+                             SQLPOINTER dataPtr, SQLLEN bufferLength,
+                             SQLLEN* indicatorPtr) {
+  return arrow::SQLGetData(stmt, recordNumber, cType, dataPtr, bufferLength,
+                           indicatorPtr);
+}
+
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
                              SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
                              SQLLEN bufferLength, SQLLEN* strLen_or_IndPtr) {
@@ -204,11 +213,6 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementHandle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLFetch(SQLHSTMT statementHandle) {
-  LOG_DEBUG("SQLFetch called with statementHandle: {}", statementHandle);
-  return SQL_ERROR;
-}
-
 SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementHandle, SQLWCHAR* pKCatalogName,
                                  SQLSMALLINT pKCatalogNameLength, SQLWCHAR* pKSchemaName,
                                  SQLSMALLINT pKSchemaNameLength, SQLWCHAR* pKTableName,
@@ -229,17 +233,6 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementHandle, SQLWCHAR* pKCatalogNa
       pKTableNameLength, fmt::ptr(fKCatalogName), fKCatalogNameLength,
       fmt::ptr(fKSchemaName), fKSchemaNameLength, fmt::ptr(fKTableName),
       fKTableNameLength);
-  return SQL_ERROR;
-}
-
-SQLRETURN SQL_API SQLGetData(SQLHSTMT statementHandle, SQLUSMALLINT col_or_Param_Num,
-                             SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
-                             SQLLEN bufferLength, SQLLEN* strLen_or_IndPtr) {
-  LOG_DEBUG(
-      "SQLGetData called with statementHandle: {}, col_or_Param_Num: {}, targetType: {}, "
-      "targetValuePtr: {}, bufferLength: {}, strLen_or_IndPtr: {}",
-      statementHandle, col_or_Param_Num, targetType, targetValuePtr, bufferLength,
-      fmt::ptr(strLen_or_IndPtr));
   return SQL_ERROR;
 }
 

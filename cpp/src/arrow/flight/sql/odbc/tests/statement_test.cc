@@ -24,6 +24,8 @@
 #include <sqltypes.h>
 #include <sqlucode.h>
 
+#include <limits>
+
 #include "gtest/gtest.h"
 
 namespace arrow::flight::sql::odbc {
@@ -38,7 +40,27 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
       SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  // TODO: after SQLFetch and SQLGetData are implemented, fetch data to verify
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+  SQLLEN bufLen = sizeof(val);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify 1 is returned
+  EXPECT_EQ(val, 1);
+
+  ret = SQLFetch(stmt);
+
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // Invalid cursor state
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
 
   this->disconnect();
 }
@@ -58,4 +80,40 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectInvalidQuery) {
 
   this->disconnect();
 }
+
+ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
+//TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQuery) {
+  this->connect();
+
+  std::wstring wsql = this->getQueryAllDataTypes();
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+  SQLLEN bufLen = sizeof(val);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify int min is returned
+  EXPECT_EQ(val, std::numeric_limits<SQLINTEGER>::min());
+
+  ret = SQLGetData(this->stmt, 2, SQL_C_LONG, &val, 0, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify int max is returned
+  EXPECT_EQ(val, std::numeric_limits<SQLINTEGER>::max());
+
+
+  // -AL- todo add more checks
+
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc

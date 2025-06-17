@@ -112,6 +112,31 @@ std::string FlightSQLODBCRemoteTestBase::getInvalidConnectionString() {
   return connect_str;
 }
 
+std::wstring FlightSQLODBCRemoteTestBase::getQueryAllDataTypes() {
+  std::wstring wsql =
+      L"SELECT CAST(-2147483648 AS INTEGER) AS integer_min, CAST(2147483647 AS INTEGER) "
+      L"AS integer_max, CAST(-9223372036854775808 AS BIGINT) AS bigint_min, "
+      L"CAST(9223372036854775807 AS BIGINT) AS bigint_max, CAST(-999999999.99 AS "
+      L"DECIMAL(18,2)) AS decimal_min, CAST(999999999.99 AS DECIMAL(18,2)) AS "
+      L"decimal_max, CAST(-3.4E38 AS FLOAT) AS real_min, CAST(3.4E38 AS FLOAT) AS "
+      L"real_max, CAST(-1.79E308 AS DOUBLE) AS double_min, CAST(1.79E308 AS DOUBLE) AS "
+      L"double_max, CAST(false AS BOOLEAN) AS bit_min, CAST(true AS BOOLEAN) AS bit_max, "
+      L"'' AS char_min, 'Z' AS char_max, '' AS varchar_min, REPEAT('Z', 1000) AS "
+      L"varchar_max, '' AS varbinary_min, REPEAT('FF', 1000) AS varbinary_max, CAST(DATE "
+      L"'0001-01-01' AS DATE) AS date_min, CAST(DATE '9999-12-31' AS DATE) AS date_max, "
+      L"CAST(TIME '00:00:00' AS TIME) AS time_min, CAST(TIME '23:59:59' AS TIME) AS "
+      L"time_max, CAST(TIMESTAMP '0001-01-01 00:00:00' AS TIMESTAMP) AS timestamp_min, "
+      L"CAST(TIMESTAMP '9999-12-31 23:59:59' AS TIMESTAMP) AS timestamp_max, "
+      L"'00000000-0000-0000-0000-000000000000' AS guid_min, "
+      L"'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF' AS guid_max, INTERVAL '99' YEAR AS "
+      L"interval_year, INTERVAL '12' MONTH AS interval_month, INTERVAL '99-11' YEAR TO "
+      L"MONTH AS interval_year_to_month, INTERVAL '99' DAY AS interval_day, INTERVAL "
+      L"'23' HOUR AS interval_hour, INTERVAL '59' MINUTE AS interval_minute, INTERVAL "
+      L"'59.999' SECOND(2,3) AS interval_second, INTERVAL '99 23:59:59.999' DAY TO "
+      L"SECOND AS interval_day_to_second;";
+  return wsql;
+}
+
 void FlightSQLODBCRemoteTestBase::SetUp() {
   if (arrow::internal::GetEnvVar(TEST_CONNECT_STR).ValueOr("").empty()) {
     GTEST_SKIP() << "Skipping FlightSQLODBCRemoteTestBase test: TEST_CONNECT_STR not set";
@@ -171,6 +196,27 @@ std::string FlightSQLODBCMockTestBase::getInvalidConnectionString() {
   // Append invalid token to connection string
   connect_str += std::string("token=invalid_token;");
   return connect_str;
+}
+
+std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
+  std::wstring wsql =
+      L"SELECT CAST(-2147483648 AS INTEGER) AS integer_min, CAST(2147483647 AS INTEGER) "
+      L"AS integer_max, CAST(-9223372036854775808 AS INTEGER) AS bigint_min, "
+      L"CAST(9223372036854775807 AS INTEGER) AS bigint_max, CAST(-999999999.99 AS REAL) "
+      L"AS decimal_min, CAST(999999999.99 AS REAL) AS decimal_max, CAST(-3.4E38 AS REAL) "
+      L"AS real_min, CAST(3.4E38 AS REAL) AS real_max, CAST(-1.79E308 AS REAL) AS "
+      L"double_min, CAST(1.79E308 AS REAL) AS double_max, 0 AS bit_min, 1 AS bit_max, '' "
+      L"AS char_min, 'Z' AS char_max, '' AS varchar_min, 'ZZZZZZZZZZZZZZZZZZZZ' AS "
+      L"varchar_max, '' AS varbinary_min, 'FFFFFFFFFFFFFFFFFFFF' AS varbinary_max, "
+      L"'0001-01-01' AS date_min, '9999-12-31' AS date_max, '00:00:00' AS time_min, "
+      L"'23:59:59' AS time_max, '0001-01-01 00:00:00' AS timestamp_min, '9999-12-31 "
+      L"23:59:59' AS timestamp_max, '00000000-0000-0000-0000-000000000000' AS guid_min, "
+      L"'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF' AS guid_max, '99 years' AS interval_year, "
+      L"'12 months' AS interval_month, '99 years 11 months' AS interval_year_to_month, "
+      L"'99 days' AS interval_day, '23 hours' AS interval_hour, '59 minutes' AS "
+      L"interval_minute, '59.999 seconds' AS interval_second, '99 days 23:59:59.999' AS "
+      L"interval_day_to_second;";
+  return wsql;
 }
 
 void FlightSQLODBCMockTestBase::SetUp() {
