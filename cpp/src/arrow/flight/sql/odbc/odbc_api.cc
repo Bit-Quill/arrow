@@ -689,9 +689,8 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attribute, SQLPOINTER value
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     const bool isUnicode = true;
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
-    connection->GetConnectAttr(attribute, valuePtr, bufferLength, stringLengthPtr,
-                               isUnicode);
-    return SQL_SUCCESS;
+    return connection->GetConnectAttr(attribute, valuePtr, bufferLength, stringLengthPtr,
+                                      isUnicode);
   });
 }
 
