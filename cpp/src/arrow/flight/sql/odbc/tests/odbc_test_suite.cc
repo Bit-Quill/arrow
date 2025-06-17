@@ -68,22 +68,20 @@ void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
   // Assert connection is successful before we continue
   ASSERT_TRUE(ret == SQL_SUCCESS);
 
-  // TODO: enable after SQLGetStmtAttr is supported.
-  //// Allocate a statement using alloc handle
-  // ret = SQLAllocHandle(SQL_HANDLE_STMT, conn, &stmt);
+  // Allocate a statement using alloc handle
+  ret = SQLAllocHandle(SQL_HANDLE_STMT, conn, &stmt);
 
-  // ASSERT_TRUE(ret == SQL_SUCCESS);
+  ASSERT_TRUE(ret == SQL_SUCCESS);
 }
 
 void FlightSQLODBCRemoteTestBase::disconnect() {
-  // TODO: enable after SQLGetStmtAttr is supported.
-  //// Close statement
-  // SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+  // Close statement
+  SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 
-  // EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Disconnect from ODBC
-  SQLRETURN ret = SQLDisconnect(conn);
+  ret = SQLDisconnect(conn);
 
   if (ret != SQL_SUCCESS) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;

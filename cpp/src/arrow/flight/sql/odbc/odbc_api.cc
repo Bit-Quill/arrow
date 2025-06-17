@@ -869,6 +869,26 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
     return static_cast<SQLRETURN>(SQL_ERROR);
   });
 }
+
+SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
+  SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr) {
+  using ODBC::ODBCStatement;
+  // TODO: complete implementation of SQLGetStmtAttrW and write tests
+  LOG_DEBUG(
+      "SQLGetStmtAttrW called with stmt: {}, attribute: {}, valuePtr: {}, "
+      "bufferLength: {}, stringLengthPtr: {}",
+      stmt, attribute, valuePtr, bufferLength, fmt::ptr(stringLengthPtr));
+
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    bool isUnicode = true;
+    statement->GetStmtAttr(attribute, valuePtr, bufferLength, stringLengthPtr, isUnicode);
+    // TODO: change GetStmtAttr to return SQLRETURN instead of void,
+    // and return value from GetStmtAttr instead
+    return SQL_SUCCESS;
+  });
+}
+
 SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) {
   LOG_DEBUG("SQLExecDirectW called with stmt: {}, queryText: {}, textLength: {}", stmt,
             fmt::ptr(queryText), textLength);
