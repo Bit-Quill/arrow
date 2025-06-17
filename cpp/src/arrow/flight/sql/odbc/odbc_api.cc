@@ -869,5 +869,9 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
     return static_cast<SQLRETURN>(SQL_ERROR);
   });
 }
-
+SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) {
+  LOG_DEBUG("SQLExecDirectW called with stmt: {}, queryText: {}, textLength: {}", stmt,
+            fmt::ptr(queryText), textLength);
+  return SQL_ERROR;
+}
 }  // namespace arrow

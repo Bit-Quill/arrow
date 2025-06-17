@@ -60,4 +60,5 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* dsnName, SQLSMALLINT dsnNameLen,
 SQLRETURN SQLDisconnect(SQLHDBC conn);
 SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePtr,
                      SQLSMALLINT bufLen, SQLSMALLINT* length);
+SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength);
 }  // namespace arrow
