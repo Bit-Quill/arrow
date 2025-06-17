@@ -125,6 +125,11 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC conn, SQLWCHAR* dsnName, SQLSMALLINT dsnNam
 
 SQLRETURN SQL_API SQLDisconnect(SQLHDBC conn) { return arrow::SQLDisconnect(conn); }
 
+SQLRETURN SQL_API SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText,
+                                SQLINTEGER textLength) {
+  return arrow::SQLExecDirect(stmt, queryText, textLength);
+}
+
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
                              SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
                              SQLLEN bufferLength, SQLLEN* strLen_or_IndPtr) {
@@ -186,14 +191,6 @@ SQLRETURN SQL_API SQLError(SQLHENV handleType, SQLHDBC handle, SQLHSTMT hstmt,
       "pfNativeError: {}, szErrorMsg: {}, cbErrorMsgMax: {}, pcbErrorMsg: {}",
       handleType, handle, hstmt, fmt::ptr(szSqlState), fmt::ptr(pfNativeError),
       fmt::ptr(szErrorMsg), cbErrorMsgMax, fmt::ptr(pcbErrorMsg));
-  return SQL_ERROR;
-}
-
-SQLRETURN SQL_API SQLExecDirect(SQLHSTMT statementHandle, SQLWCHAR* statementText,
-                                SQLINTEGER textLength) {
-  LOG_DEBUG(
-      "SQLExecDirectW called with statementHandle: {}, statementText: {}, textLength: {}",
-      statementHandle, fmt::ptr(statementText), textLength);
   return SQL_ERROR;
 }
 
