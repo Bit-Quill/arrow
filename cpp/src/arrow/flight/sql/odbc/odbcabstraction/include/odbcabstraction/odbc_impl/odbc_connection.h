@@ -64,8 +64,9 @@ class ODBCConnection : public ODBCHandle<ODBCConnection> {
                SQLSMALLINT* outputLength, bool isUnicode);
   void SetConnectAttr(SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER stringLength,
                       bool isUnicode);
-  void GetConnectAttr(SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER bufferLength,
-                      SQLINTEGER* outputLength, bool isUnicode);
+  SQLRETURN GetConnectAttr(SQLINTEGER attribute, SQLPOINTER value,
+                           SQLINTEGER bufferLength, SQLINTEGER* outputLength,
+                           bool isUnicode);
 
   ~ODBCConnection() = default;
 

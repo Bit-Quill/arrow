@@ -676,6 +676,41 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
   });
 }
 
+SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attribute, SQLPOINTER valuePtr,
+                            SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr) {
+  using driver::odbcabstraction::Connection;
+  using ODBC::ODBCConnection;
+
+  LOG_DEBUG(
+      "SQLGetConnectAttrW called with conn: {}, attribute: {}, valuePtr: {}, "
+      "bufferLength: {}, stringLengthPtr: {}",
+      conn, attribute, valuePtr, bufferLength, fmt::ptr(stringLengthPtr));
+
+  return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    const bool isUnicode = true;
+    ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
+    return connection->GetConnectAttr(attribute, valuePtr, bufferLength, stringLengthPtr,
+                                      isUnicode);
+  });
+}
+
+SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER valuePtr,
+                            SQLINTEGER valueLen) {
+  using driver::odbcabstraction::Connection;
+  using ODBC::ODBCConnection;
+
+  LOG_DEBUG(
+      "SQLSetConnectAttrW called with conn: {}, attr: {}, valuePtr: {}, valueLen: {}",
+      conn, attr, valuePtr, valueLen);
+
+  return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    const bool isUnicode = true;
+    ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
+    connection->SetConnectAttr(attr, valuePtr, valueLen, isUnicode);
+    return SQL_SUCCESS;
+  });
+}
+
 SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
                            SQLWCHAR* inConnectionString,
                            SQLSMALLINT inConnectionStringLen,

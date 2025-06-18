@@ -29,25 +29,30 @@ namespace arrow {
 namespace flight {
 namespace odbc {
 namespace integration_tests {
-void FlightSQLODBCRemoteTestBase::connect() {
-  std::string connect_str = getConnectionString();
-  connectWithString(connect_str);
-}
-void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
+
+void FlightSQLODBCRemoteTestBase::allocEnvConnHandles() {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+}
 
+void FlightSQLODBCRemoteTestBase::connect() {
+  allocEnvConnHandles();
+  std::string connect_str = getConnectionString();
+  connectWithString(connect_str);
+}
+
+void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
   // Connect string
   std::vector<SQLWCHAR> connect_str0(connect_str.begin(), connect_str.end());
 
@@ -55,9 +60,9 @@ void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
   SQLSMALLINT outstrlen;
 
   // Connecting to ODBC server.
-  ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+  SQLRETURN ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
+                                   static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
+                                   ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
 
   if (ret != SQL_SUCCESS) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
@@ -66,36 +71,38 @@ void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
   // Assert connection is successful before we continue
   ASSERT_TRUE(ret == SQL_SUCCESS);
 
-  // Allocate a statement using alloc handle
-  ret = SQLAllocHandle(SQL_HANDLE_STMT, conn, &stmt);
+  // TODO: enable after SQLGetStmtAttr is supported.
+  //// Allocate a statement using alloc handle
+  // ret = SQLAllocHandle(SQL_HANDLE_STMT, conn, &stmt);
 
-  ASSERT_TRUE(ret == SQL_SUCCESS);
+  // ASSERT_TRUE(ret == SQL_SUCCESS);
 }
 
 void FlightSQLODBCRemoteTestBase::disconnect() {
-  // Close statement
-  SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+  // TODO: enable after SQLGetStmtAttr is supported.
+  //// Close statement
+  // SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  // EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Disconnect from ODBC
-  ret = SQLDisconnect(conn);
+  SQLRETURN ret = SQLDisconnect(conn);
 
   if (ret != SQL_SUCCESS) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 std::string FlightSQLODBCRemoteTestBase::getConnectionString() {
@@ -197,7 +204,7 @@ bool compareConnPropertyMap(Connection::ConnPropertyMap map1,
 }
 
 void VerifyOdbcErrorState(SQLSMALLINT handle_type, SQLHANDLE handle,
-                          std::string expected_state) {
+                          std::string_view expected_state) {
   using ODBC::SqlWcharToString;
 
   SQLWCHAR sql_state[7] = {};
