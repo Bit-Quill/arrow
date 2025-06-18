@@ -581,6 +581,7 @@ void ODBCStatement::SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value,
       return;
 
     case SQL_ATTR_ASYNC_ENABLE:
+      throw DriverException("Unsupported attribute", "HYC00");
 #ifdef SQL_ATTR_ASYNC_STMT_EVENT
     case SQL_ATTR_ASYNC_STMT_EVENT:
       throw DriverException("Unsupported attribute", "HYC00");

@@ -36,6 +36,7 @@ EXPORTS
 	SQLFetch
 	SQLForeignKeysW
 	SQLFreeEnv
+	SQLFreeConnect
 	SQLFreeHandle
 	SQLFreeStmt
 	SQLGetConnectAttrW
