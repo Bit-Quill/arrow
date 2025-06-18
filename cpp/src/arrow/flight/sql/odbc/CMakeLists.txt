@@ -34,6 +34,17 @@ endif()
 
 add_definitions(-DUNICODE=1)
 
+include(FetchContent)
+fetchcontent_declare(spdlog
+                     URL https://github.com/gabime/spdlog/archive/76fb40d95455f249bd70824ecfcae7a8f0930fa3.zip
+                         CONFIGURE_COMMAND
+                         ""
+                         BUILD_COMMAND
+                         "")
+FetchContent_MakeAvailable(spdlog)
+target_include_directories(spdlog PUBLIC ${spdlog_SOURCE_DIR}/include)
+message(STATUS "-AL- spdlog spdlog_SOURCE_DIR: ${spdlog_SOURCE_DIR}/include")
+
 add_subdirectory(flight_sql)
 add_subdirectory(odbcabstraction)
 add_subdirectory(tests)
@@ -45,6 +56,9 @@ set(ARROW_FLIGHT_SQL_ODBC_SRCS entry_points.cc odbc_api.cc)
 if(WIN32)
   list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def)
 endif()
+
+get_target_property(SPDLOG_INCLUDE_DIR spdlog::spdlog INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "-AL- spdlog include dirs: ${SPDLOG_INCLUDE_DIR}")
 
 add_arrow_lib(arrow_flight_sql_odbc
               CMAKE_PACKAGE_NAME
@@ -71,7 +85,8 @@ add_arrow_lib(arrow_flight_sql_odbc
               ${ODBC_LIBRARIES}
               ${ODBCINST}
               odbcabstraction
-              arrow_odbc_spi_impl)
+              arrow_odbc_spi_impl
+              spdlog::spdlog)
 
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
