@@ -125,9 +125,8 @@ SQLRETURN SQL_API SQLConnect(SQLHDBC conn, SQLWCHAR* dsnName, SQLSMALLINT dsnNam
 
 SQLRETURN SQL_API SQLDisconnect(SQLHDBC conn) { return arrow::SQLDisconnect(conn); }
 
-SQLRETURN SQL_API SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute,
-                                 SQLPOINTER valuePtr, SQLINTEGER bufferLength,
-                                 SQLINTEGER* stringLengthPtr) {
+SQLRETURN SQL_API SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
+                                 SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr) {
   return arrow::SQLGetStmtAttr(stmt, attribute, valuePtr, bufferLength, stringLengthPtr);
 }
 

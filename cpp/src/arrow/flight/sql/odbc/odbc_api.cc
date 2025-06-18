@@ -872,7 +872,7 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
 }
 
 SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
-  SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr) {
+                         SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr) {
   using ODBC::ODBCStatement;
   // TODO: complete implementation of SQLGetStmtAttrW and write tests
   LOG_DEBUG(
@@ -894,13 +894,11 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLengt
   LOG_DEBUG("SQLExecDirectW called with stmt: {}, queryText: {}, textLength: {}", stmt,
             fmt::ptr(queryText), textLength);
   using ODBC::ODBCStatement;
+  // The driver is built to handle select statements only.
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
-    std::string query =
-        ODBC::SqlWcharToString(queryText, textLength);
+    std::string query = ODBC::SqlWcharToString(queryText, textLength);
     statement->ExecuteDirect(query);
-    // -AL- check if I need to change ExecuteDirect to return SQLRETURN instead of void,
-    // and return value from ExecuteDirect instead
     return SQL_SUCCESS;
   });
 }
