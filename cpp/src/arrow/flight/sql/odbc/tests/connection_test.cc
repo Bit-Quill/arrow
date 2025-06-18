@@ -24,6 +24,7 @@
 #include <sqltypes.h>
 #include <sqlucode.h>
 
+#include "google/protobuf/message_lite.h"
 #include "gtest/gtest.h"
 
 namespace arrow {
@@ -1083,5 +1084,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  int ret = RUN_ALL_TESTS();
+
+  // Shutdown protobuf runtime to prevent test program from hanging (see
+  // "protobuf::ShutdownProtobufLibrary" in
+  // https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.message_lite#ShutdownProtobufLibrary.details)
+  google::protobuf::ShutdownProtobufLibrary();
+  return ret;
 }
