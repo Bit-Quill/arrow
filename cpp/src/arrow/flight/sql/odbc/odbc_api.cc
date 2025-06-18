@@ -527,6 +527,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT re
     case SQL_HANDLE_STMT: {
       auto* statement = ODBCStatement::of(handle);
       diagnostics = &statement->GetDiagnostics();
+      break;
     }
 
     default:
