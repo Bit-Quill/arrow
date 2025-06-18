@@ -892,6 +892,15 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePt
 SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) {
   LOG_DEBUG("SQLExecDirectW called with stmt: {}, queryText: {}, textLength: {}", stmt,
             fmt::ptr(queryText), textLength);
-  return SQL_ERROR;
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    std::string query =
+        ODBC::SqlWcharToString(queryText, textLength);
+    statement->ExecuteDirect(query);
+    // -AL- check if I need to change ExecuteDirect to return SQLRETURN instead of void,
+    // and return value from ExecuteDirect instead
+    return SQL_SUCCESS;
+  });
 }
 }  // namespace arrow
