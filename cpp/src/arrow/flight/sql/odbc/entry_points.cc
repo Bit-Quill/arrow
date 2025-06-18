@@ -87,11 +87,16 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePt
   return arrow::SQLSetEnvAttr(env, attr, valuePtr, strLen);
 }
 
+SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attribute,
+                                    SQLPOINTER valuePtr, SQLINTEGER bufferLength,
+                                    SQLINTEGER* stringLengthPtr) {
+  return arrow::SQLGetConnectAttr(conn, attribute, valuePtr, bufferLength,
+                                  stringLengthPtr);
+}
+
 SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value,
                                     SQLINTEGER valueLen) {
-  LOG_DEBUG("SQLSetConnectAttrW called with conn: {}, attr: {}, value: {}, valueLen: {}",
-            conn, attr, value, valueLen);
-  return SQL_ERROR;
+  return arrow::SQLSetConnectAttr(conn, attr, value, valueLen);
 }
 
 SQLRETURN SQL_API SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePtr,
@@ -222,16 +227,6 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementHandle, SQLWCHAR* pKCatalogNa
       pKTableNameLength, fmt::ptr(fKCatalogName), fKCatalogNameLength,
       fmt::ptr(fKSchemaName), fKSchemaNameLength, fmt::ptr(fKTableName),
       fKTableNameLength);
-  return SQL_ERROR;
-}
-
-SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC connectionHandle, SQLINTEGER attribute,
-                                    SQLPOINTER valuePtr, SQLINTEGER bufferLength,
-                                    SQLINTEGER* stringLengthPtr) {
-  LOG_DEBUG(
-      "SQLGetConnectAttrW called with connectionHandle: {}, attribute: {}, valuePtr: {}, "
-      "bufferLength: {}, stringLengthPtr: {}",
-      connectionHandle, attribute, valuePtr, bufferLength, fmt::ptr(stringLengthPtr));
   return SQL_ERROR;
 }
 

@@ -302,16 +302,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
   std::string connect_str = this->getConnectionString();
@@ -331,7 +331,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Check that outstr has same content as connect_str
   std::string out_connection_string = ODBC::SqlWcharToString(outstr, outstrlen);
@@ -349,17 +349,17 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
@@ -370,16 +370,16 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Invalid connect string
   std::string connect_str = getInvalidConnectionString();
@@ -398,7 +398,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
 
   EXPECT_TRUE(ret == SQL_ERROR);
 
-  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, std::string("28000"));
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_28000);
 
   std::string out_connection_string = ODBC::SqlWcharToString(outstr, outstrlen);
   EXPECT_TRUE(out_connection_string.empty());
@@ -406,12 +406,12 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
@@ -422,16 +422,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
   std::string connect_str = this->getConnectionString();
@@ -458,7 +458,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Remove DSN
   EXPECT_TRUE(UnregisterDsn(wdsn));
@@ -470,17 +470,17 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
@@ -491,16 +491,16 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
   std::string connect_str = getConnectionString();
@@ -536,7 +536,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Remove DSN
   EXPECT_TRUE(UnregisterDsn(wdsn));
@@ -548,17 +548,17 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
@@ -569,16 +569,16 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
   std::string connect_str = getConnectionString();
@@ -613,7 +613,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
   // so connection still fails despite passing valid uid in SQLConnect call
   EXPECT_TRUE(ret == SQL_ERROR);
 
-  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, std::string("28000"));
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_28000);
 
   // Remove DSN
   EXPECT_TRUE(UnregisterDsn(wdsn));
@@ -621,12 +621,12 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
@@ -637,16 +637,16 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
   std::string connect_str = getConnectionString();
@@ -676,7 +676,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Remove DSN
   EXPECT_TRUE(UnregisterDsn(wdsn));
@@ -688,17 +688,17 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 TEST(SQLDisconnect, TestSQLDisconnectWithoutConnection) {
@@ -709,16 +709,16 @@ TEST(SQLDisconnect, TestSQLDisconnectWithoutConnection) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Attempt to disconnect without a connection, expect to fail
   ret = SQLDisconnect(conn);
@@ -726,17 +726,17 @@ TEST(SQLDisconnect, TestSQLDisconnectWithoutConnection) {
   EXPECT_TRUE(ret == SQL_ERROR);
 
   // Expect ODBC driver manager to return error state
-  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, std::string("08003"));
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_08003);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
@@ -747,16 +747,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Invalid connect string
   std::string connect_str = this->getInvalidConnectionString();
@@ -786,7 +786,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, HEADER_LEVEL, SQL_DIAG_NUMBER, &diag_number,
                         sizeof(SQLINTEGER), &diag_number_length);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_EQ(diag_number, 1);
 
@@ -797,7 +797,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, RECORD_1, SQL_DIAG_SERVER_NAME, server_name,
                         ODBC_BUFFER_SIZE, &server_name_length);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // SQL_DIAG_MESSAGE_TEXT
   SQLWCHAR message_text[ODBC_BUFFER_SIZE];
@@ -806,7 +806,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
                         message_text, ODBC_BUFFER_SIZE, &message_text_length);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_GT(message_text_length, 100);
 
@@ -817,7 +817,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, RECORD_1, SQL_DIAG_NATIVE, &diag_native,
                         sizeof(diag_native), &diag_native_length);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_EQ(diag_native, 200);
 
@@ -829,7 +829,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
                         sql_state_size * driver::odbcabstraction::GetSqlWCharSize(),
                         &sql_state_length);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // 28000
   EXPECT_EQ(sql_state[0], '2');
@@ -841,12 +841,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
@@ -860,16 +860,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Invalid connect string
   std::string connect_str = this->getInvalidConnectionString();
@@ -900,19 +900,19 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
                         message_text, SQL_NTS, &message_text_length);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_GT(message_text_length, 100);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
@@ -923,16 +923,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Invalid connect string
   std::string connect_str = this->getInvalidConnectionString();
@@ -959,7 +959,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   ret = SQLGetDiagRec(SQL_HANDLE_DBC, conn, 1, sql_state, &native_error, message,
                       ODBC_BUFFER_SIZE, &message_length);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_GT(message_length, 120);
 
@@ -975,12 +975,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestConnect) {
@@ -996,22 +996,22 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
   // Allocate a statement using alloc statement
   SQLRETURN ret = SQLAllocStmt(this->conn, &statement);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // TODO Uncomment once SQLExecDirect is implemented
   // SQLWCHAR sql_buffer[ODBC_BUFFER_SIZE] = L"SELECT 1";
   // ret = SQLExecDirect(statement, sql_buffer, SQL_NTS);
 
-  // EXPECT_TRUE(ret == SQL_SUCCESS);
+  // EXPECT_EQ(ret, SQL_SUCCESS);
 
   // ret = SQLFreeStmt(statement, SQL_CLOSE);
 
-  // EXPECT_TRUE(ret == SQL_SUCCESS);
+  // EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free statement handle
   ret = SQLFreeStmt(statement, SQL_DROP);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   this->disconnect();
 }
@@ -1028,16 +1028,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
   std::string connect_str = this->getConnectionString();
@@ -1053,27 +1053,27 @@ TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
                          static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
                          ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Allocate a statement using alloc statement
   ret = SQLAllocStmt(conn, &statement);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Disconnect from ODBC without closing the statement first
   ret = SQLDisconnect(conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(ret == SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
 }  // namespace integration_tests
