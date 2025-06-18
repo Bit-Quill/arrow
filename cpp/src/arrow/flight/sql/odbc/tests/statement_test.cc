@@ -36,12 +36,27 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   std::wstring wsql = L"SELECT 1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  if (ret != SQL_SUCCESS) {
-    // -AL- remove this later
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
-  }
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // TODO: after SQLFetch and SQLGetData are implemented, fetch data to verify
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectInvalidQuery) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // ODBC provides generic error code HY000 to all statement errors
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY000);
 
   this->disconnect();
 }
@@ -49,4 +64,3 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
 }  // namespace odbc
 }  // namespace flight
 }  // namespace arrow
-
