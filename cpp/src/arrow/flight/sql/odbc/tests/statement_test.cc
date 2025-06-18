@@ -30,8 +30,7 @@ namespace arrow {
 namespace flight {
 namespace odbc {
 namespace integration_tests {
-  // -AL- example test
-TYPED_TEST(FlightSQLODBCTestBase, TestStatement) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   this->connect();
 
   std::wstring wsql = L"SELECT 1;";
@@ -42,6 +41,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestStatement) {
     // -AL- remove this later
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   this->disconnect();
 }
