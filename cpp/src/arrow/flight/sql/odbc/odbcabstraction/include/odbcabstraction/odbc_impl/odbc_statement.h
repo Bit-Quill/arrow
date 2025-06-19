@@ -83,6 +83,9 @@ class ODBCStatement : public ODBCHandle<ODBCStatement> {
 
   inline SQLULEN GetRowsetSize() { return m_rowsetSize; }
 
+  /**
+   * @brief Returns true if there is warning on truncation.
+   */
   bool GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType, SQLPOINTER dataPtr,
                SQLLEN bufferLength, SQLLEN* indicatorPtr);
 

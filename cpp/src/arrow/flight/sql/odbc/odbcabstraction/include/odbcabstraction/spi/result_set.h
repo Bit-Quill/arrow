@@ -88,8 +88,8 @@ class ResultSet {
   /// \param buffer Target buffer to be populated.
   /// \param buffer_length Target buffer length.
   /// \param strlen_buffer Buffer that holds the length of value being fetched.
-  /// \returns true if there is more data to fetch from the current cell;
-  ///          false if the whole value was already fetched.
+  /// \returns true if data truncation occurred;
+  ///          false otherwise.
   virtual bool GetData(int column, int16_t target_type, int precision, int scale,
                        void* buffer, size_t buffer_length, ssize_t* strlen_buffer) = 0;
 };
