@@ -846,27 +846,33 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
 }
 
 SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePtr,
-                     SQLSMALLINT bufLen, SQLSMALLINT* length) {
+                     SQLSMALLINT bufLen, SQLSMALLINT* stringLengthPtr) {
   // TODO: complete implementation of SQLGetInfoW and write tests
   using ODBC::ODBCConnection;
 
+  // Set character type to be Unicode by default
+  const bool isUnicode = true;
+
   LOG_DEBUG(
       "SQLGetInfoW called with conn: {}, infoType: {}, infoValuePtr: {}, bufLen: {}, "
-      "length: {}",
-      conn, infoType, infoValuePtr, bufLen, fmt::ptr(length));
+      "stringLengthPtr: {}",
+      conn, infoType, infoValuePtr, bufLen, fmt::ptr(stringLengthPtr));
+
+  if (!conn) {
+    return SQL_INVALID_HANDLE;
+  }
+
+  if (!infoValuePtr && !stringLengthPtr) {
+    return SQL_ERROR;
+  }
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
 
-    // Partially stubbed implementation of SQLGetInfoW
-    if (infoType == SQL_DRIVER_ODBC_VER) {
-      std::string_view ver("03.80");
+    // TODO Validate buffer
 
-      return ODBC::GetStringAttribute(true, ver, true, infoValuePtr, bufLen, length,
-                                      connection->GetDiagnostics());
-    }
-
-    return static_cast<SQLRETURN>(SQL_ERROR);
+    return connection->GetInfo(infoType, infoValuePtr, bufLen, stringLengthPtr,
+                               isUnicode);
   });
 }
 
