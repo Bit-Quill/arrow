@@ -468,7 +468,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrEnlistInDtcDefault) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrQuietModeDefault) {
   this->connect();
 
-  SQLPOINTER ptr = NULL;
+  HWND ptr = NULL;
   SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_QUIET_MODE, ptr, 0, 0);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
