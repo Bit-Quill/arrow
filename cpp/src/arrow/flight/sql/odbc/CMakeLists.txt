@@ -42,8 +42,6 @@ fetchcontent_declare(spdlog
                          BUILD_COMMAND
                          "")
 FetchContent_MakeAvailable(spdlog)
-target_include_directories(spdlog PUBLIC ${spdlog_SOURCE_DIR}/include)
-message(STATUS "-AL- spdlog spdlog_SOURCE_DIR: ${spdlog_SOURCE_DIR}/include")
 
 add_subdirectory(flight_sql)
 add_subdirectory(odbcabstraction)
@@ -56,9 +54,6 @@ set(ARROW_FLIGHT_SQL_ODBC_SRCS entry_points.cc odbc_api.cc)
 if(WIN32)
   list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def)
 endif()
-
-get_target_property(SPDLOG_INCLUDE_DIR spdlog::spdlog INTERFACE_INCLUDE_DIRECTORIES)
-message(STATUS "-AL- spdlog include dirs: ${SPDLOG_INCLUDE_DIR}")
 
 add_arrow_lib(arrow_flight_sql_odbc
               CMAKE_PACKAGE_NAME
