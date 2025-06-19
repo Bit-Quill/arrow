@@ -60,34 +60,34 @@ endif()
 get_target_property(SPDLOG_INCLUDE_DIR spdlog::spdlog INTERFACE_INCLUDE_DIRECTORIES)
 message(STATUS "-AL- spdlog include dirs: ${SPDLOG_INCLUDE_DIR}")
 
-add_arrow_lib(arrow_flight_sql_odbc
-              CMAKE_PACKAGE_NAME
-              ArrowFlightSqlOdbc
-              PKG_CONFIG_NAME
-              arrow-flight-sql-odbc
-              OUTPUTS
-              ARROW_FLIGHT_SQL_ODBC_LIBRARIES
-              SOURCES
-              ${ARROW_FLIGHT_SQL_ODBC_SRCS}
-              DEPENDENCIES
-              arrow_flight_sql
-              SHARED_LINK_FLAGS
-              ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
-              SHARED_LINK_LIBS
-              arrow_flight_sql_shared
-              SHARED_INSTALL_INTERFACE_LIBS
-              ArrowFlight::arrow_flight_sql_shared
-              STATIC_LINK_LIBS
-              arrow_flight_sql_static
-              STATIC_INSTALL_INTERFACE_LIBS
-              ArrowFlight::arrow_flight_sql_static
-              SHARED_PRIVATE_LINK_LIBS
-              ${ODBC_LIBRARIES}
-              ${ODBCINST}
-              odbcabstraction
-              arrow_odbc_spi_impl
-              spdlog::spdlog)
+#add_arrow_lib(arrow_flight_sql_odbc
+#              CMAKE_PACKAGE_NAME
+#              ArrowFlightSqlOdbc
+#              PKG_CONFIG_NAME
+#              arrow-flight-sql-odbc
+#              OUTPUTS
+#              ARROW_FLIGHT_SQL_ODBC_LIBRARIES
+#              SOURCES
+#              ${ARROW_FLIGHT_SQL_ODBC_SRCS}
+#              DEPENDENCIES
+#              arrow_flight_sql
+#              SHARED_LINK_FLAGS
+#              ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
+#              SHARED_LINK_LIBS
+#              arrow_flight_sql_shared
+#              spdlog::spdlog
+#              SHARED_INSTALL_INTERFACE_LIBS
+#              ArrowFlight::arrow_flight_sql_shared
+#              STATIC_LINK_LIBS
+#              arrow_flight_sql_static
+#              STATIC_INSTALL_INTERFACE_LIBS
+#              ArrowFlight::arrow_flight_sql_static
+#              SHARED_PRIVATE_LINK_LIBS
+#              ${ODBC_LIBRARIES}
+#              ${ODBCINST}
+#              odbcabstraction
+#              arrow_odbc_spi_impl)
 
-foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
-  target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
-endforeach()
+#foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
+#  target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
+#endforeach()
