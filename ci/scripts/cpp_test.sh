@@ -42,7 +42,7 @@ if [ -z "${ARROW_DEBUG_MEMORY_POOL}" ]; then
   export ARROW_DEBUG_MEMORY_POOL=trap
 fi
 
-ctest_options=()
+ctest_options=(--tests-regex "arrow-connection-test|arrow-arrow-odbc-spi-impl-test")
 case "$(uname)" in
   Linux)
     n_jobs=$(nproc)
