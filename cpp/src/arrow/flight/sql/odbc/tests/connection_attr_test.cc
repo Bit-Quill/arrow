@@ -272,6 +272,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTraceFileDMOnly) {
                                     ODBC_BUFFER_SIZE, &outstrlen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
+  // Length is returned in bytes for SQLGetConnectAttr,
+  // we want the number of characters
+  outstrlen /= driver::odbcabstraction::GetSqlWCharSize();
   std::string out_connection_string =
       ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
   EXPECT_TRUE(!out_connection_string.empty());
