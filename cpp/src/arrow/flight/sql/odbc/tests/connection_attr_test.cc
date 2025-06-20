@@ -30,6 +30,7 @@ namespace arrow {
 namespace flight {
 namespace odbc {
 namespace integration_tests {
+/*
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAsyncDbcEventUnsupported) {
   this->connect();
 
@@ -44,7 +45,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAsyncDbcEventUnsupported)
   this->disconnect();
 }
 
-/*
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAyncEnableUnsupported) {
   this->connect();
 

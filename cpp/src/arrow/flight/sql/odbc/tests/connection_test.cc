@@ -1076,6 +1076,21 @@ TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
+// -AL- see if moving test to connection_test resolves the seg fault issue
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrInsideConnectionTest) {
+  this->connect();
+
+#ifdef SQL_ATTR_ASYNC_DBC_EVENT
+  SQLRETURN ret = SQLSetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_EVENT, 0, 0);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // Driver Manager on Windows returns error code HY118
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY118);
+#endif
+
+  this->disconnect();
+}
+
 }  // namespace integration_tests
 }  // namespace odbc
 }  // namespace flight
