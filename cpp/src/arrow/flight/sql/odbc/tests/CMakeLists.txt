@@ -32,6 +32,8 @@ set(ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS
 add_arrow_test(connection_test
                SOURCES
                connection_attr_test.cc
+               # connection_test needs to be put after
+               # other test files to avoid seg fault on Windows GitHub workflows
                connection_test.cc
                odbc_test_suite.cc
                odbc_test_suite.h
