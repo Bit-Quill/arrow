@@ -33,10 +33,15 @@ TEST(DummyTestSuite, DummyTestBool) {
   EXPECT_EQ(true_bool, true);
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, DummyTestODBCRemote) {
+TEST_F(FlightSQLODBCMockTestBase, DummyTestODBCMock) {
   bool true_bool = true;
   EXPECT_EQ(true_bool, true);
 }
+
+//TEST_F(FlightSQLODBCRemoteTestBase, DummyTestODBCRemote) {
+//  bool true_bool = true;
+//  EXPECT_EQ(true_bool, true);
+//}
 
 // FlightSQLODBCTestBase is known to cause seg fault
 //TYPED_TEST(FlightSQLODBCTestBase, DummyTestODBC) {
