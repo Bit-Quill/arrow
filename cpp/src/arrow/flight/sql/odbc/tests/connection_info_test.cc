@@ -31,6 +31,8 @@ namespace flight {
 namespace odbc {
 namespace integration_tests {
 
+// Driver Information
+
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ACTIVE_ENVIRONMENTS) {
   this->connect();
 
@@ -94,7 +96,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DATA_SOURCE_NAME) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_AWARE_POOLING_SUPPORTED) {
-  // TODO A driver does not need to implement SQL_DRIVER_AWARE_POOLING_SUPPORTED and the
+  // A driver does not need to implement SQL_DRIVER_AWARE_POOLING_SUPPORTED and the
   // Driver Manager will not honor to the driver's return value.
   this->connect();
 
@@ -108,6 +110,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_AWARE_POOLING_SUPPORTED) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HDBC) {
   this->connect();
 
+  // Value returned from driver manager is the connection address
   validateGreaterThan(conn, SQL_DRIVER_HDBC, static_cast<SQLULEN>(0));
 
   this->disconnect();
@@ -115,13 +118,11 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HDBC) {
 
 // These information types are implemented by the Driver Manager alone.
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HDESC) {
-  // TODO Exception thrown at 0x00007FFCB628E6DA (odbc32.dll) in
-  // arrow-connection-test.exe: 0xC0000005: Access violation reading location
-  // 0xFFFFFFFFFFFFFFFF.
+  // TODO This is failing due to no descriptor being created
   GTEST_SKIP();
   this->connect();
 
-  validateGreaterThan(conn, SQL_DRIVER_HDESC, static_cast<SQLULEN>(0));
+  validate(conn, SQL_DRIVER_HDESC, static_cast<SQLULEN>(0));
 
   this->disconnect();
 }
@@ -130,6 +131,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HDESC) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HENV) {
   this->connect();
 
+  // Value returned from driver manager is the env address
   validateGreaterThan(conn, SQL_DRIVER_HENV, static_cast<SQLULEN>(0));
 
   this->disconnect();
@@ -139,6 +141,9 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HENV) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HLIB) {
   this->connect();
 
+  // An SQLULEN value, the hinst from the load library returned to the Driver Manager when
+  // it loaded the driver DLL on a Microsoft Windows operating system, or its equivalent
+  // on another operating system.
   validateGreaterThan(conn, SQL_DRIVER_HLIB, static_cast<SQLULEN>(0));
 
   this->disconnect();
@@ -146,11 +151,12 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HLIB) {
 
 // These information types are implemented by the Driver Manager alone.
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HSTMT) {
-  // TODO unknown file: error: SEH exception with code 0xc0000005 thrown in the test body.
+  // TODO This is failing due to no statement being created
+  // This should run after SQLGetStmtAttr is implemented
   GTEST_SKIP();
   this->connect();
 
-  validateGreaterThan(conn, SQL_DRIVER_HSTMT, static_cast<SQLULEN>(0));
+  validate(conn, SQL_DRIVER_HSTMT, static_cast<SQLULEN>(0));
 
   this->disconnect();
 }
@@ -222,23 +228,19 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_FILE_USAGE) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_GETDATA_EXTENSIONS) {
-  // TODO Run-Time Check Failure #2 - Stack around the variable 'info_value' was
-  // corrupted.
-  GTEST_SKIP();
   this->connect();
 
-  validate(conn, SQL_GETDATA_EXTENSIONS, static_cast<SQLUSMALLINT>(3));
+  validate(conn, SQL_GETDATA_EXTENSIONS, static_cast<SQLUINTEGER>(3));
 
   this->disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INFO_SCHEMA_VIEWS) {
-  // TODO Run-Time Check Failure #2 - Stack around the variable 'info_value' was
-  // corrupted.
-  GTEST_SKIP();
   this->connect();
 
-  validate(conn, SQL_INFO_SCHEMA_VIEWS, static_cast<SQLUSMALLINT>(64));
+  // An SQLUINTEGER bitmask enumerating the views in the INFORMATION_SCHEMA that are
+  // supported by the driver.
+  validateGreaterThan(conn, SQL_INFO_SCHEMA_VIEWS, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -268,11 +270,11 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_ASYNC_CONCURRENT_STATEMENTS) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_CONCURRENT_ACTIVITIES) {
-  // TODO Driver manager returns failure code
+  // Driver manager returns failure code
   GTEST_SKIP();
   this->connect();
 
-  validateGreaterThan(conn, SQL_MAX_CONCURRENT_ACTIVITIES, static_cast<SQLUSMALLINT>(0));
+  validate(conn, SQL_MAX_CONCURRENT_ACTIVITIES, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -296,17 +298,18 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ODBC_INTERFACE_CONFORMANCE) {
 // case SQL_ODBC_STANDARD_CLI_CONFORMANCE: - mentioned in SQLGetInfo spec with no
 // description and there is no constant for this.
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ODBC_STANDARD_CLI_CONFORMANCE) {
-  // Type not supported in odbc_connection.cc GetInfo
+  // Type not supported in odbc_connection.cc
   GTEST_SKIP();
   this->connect();
 
-  // validate(conn, SQL_ODBC_STANDARD_CLI_CONFORMANCE, );
+  // Type does not exist in sql.h
+  // validate(conn, SQL_ODBC_STANDARD_CLI_CONFORMANCE, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ODBC_VER) {
-  // TODO This is implemented only in the Driver Manager.
+  // This is implemented only in the Driver Manager.
   this->connect();
 
   validate(conn, SQL_ODBC_VER, L"03.80.0000");
@@ -376,7 +379,7 @@ void validateNotEmptySQLWCHAR(SQLHDBC connection, SQLUSMALLINT infoType) {
   SQLSMALLINT message_length;
 
   SQLRETURN ret =
-      SQLGetInfoW(connection, infoType, info_value, ODBC_BUFFER_SIZE, &message_length);
+      SQLGetInfo(connection, infoType, info_value, ODBC_BUFFER_SIZE, &message_length);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -389,36 +392,23 @@ void validate(SQLHDBC connection, SQLUSMALLINT infoType, SQLWCHAR* expected_valu
   SQLSMALLINT message_length;
 
   SQLRETURN ret =
-      SQLGetInfoW(connection, infoType, info_value, ODBC_BUFFER_SIZE, &message_length);
+      SQLGetInfo(connection, infoType, info_value, ODBC_BUFFER_SIZE, &message_length);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_EQ(*info_value, *expected_value);
 }
 
-// long
+// unsigned short
 void validate(SQLHDBC connection, SQLUSMALLINT infoType, SQLUSMALLINT expected_value) {
   SQLUSMALLINT info_value;
   SQLSMALLINT message_length;
 
-  SQLRETURN ret = SQLGetInfoW(connection, infoType, &info_value, 0, &message_length);
+  SQLRETURN ret = SQLGetInfo(connection, infoType, &info_value, 0, &message_length);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_EQ(info_value, expected_value);
-}
-
-// long
-void validateGreaterThan(SQLHDBC connection, SQLUSMALLINT infoType,
-                         SQLUSMALLINT compared_value) {
-  SQLUSMALLINT info_value;
-  SQLSMALLINT message_length;
-
-  SQLRETURN ret = SQLGetInfoW(connection, infoType, &info_value, 0, &message_length);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  EXPECT_GT(info_value, compared_value);
 }
 
 // unsigned long
@@ -426,11 +416,24 @@ void validate(SQLHDBC connection, SQLUSMALLINT infoType, SQLUINTEGER expected_va
   SQLUINTEGER info_value;
   SQLSMALLINT message_length;
 
-  SQLRETURN ret = SQLGetInfoW(connection, infoType, &info_value, 0, &message_length);
+  SQLRETURN ret = SQLGetInfo(connection, infoType, &info_value, 0, &message_length);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_EQ(info_value, expected_value);
+}
+
+// unsigned long
+void validateGreaterThan(SQLHDBC connection, SQLUSMALLINT infoType,
+                         SQLUINTEGER compared_value) {
+  SQLUINTEGER info_value;
+  SQLSMALLINT message_length;
+
+  SQLRETURN ret = SQLGetInfo(connection, infoType, &info_value, 0, &message_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_GT(info_value, compared_value);
 }
 
 // sql unsigned length
@@ -438,7 +441,7 @@ void validate(SQLHDBC connection, SQLUSMALLINT infoType, SQLULEN expected_value)
   SQLULEN info_value;
   SQLSMALLINT message_length;
 
-  SQLRETURN ret = SQLGetInfoW(connection, infoType, &info_value, 0, &message_length);
+  SQLRETURN ret = SQLGetInfo(connection, infoType, &info_value, 0, &message_length);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -451,7 +454,7 @@ void validateGreaterThan(SQLHDBC connection, SQLUSMALLINT infoType,
   SQLULEN info_value;
   SQLSMALLINT message_length;
 
-  SQLRETURN ret = SQLGetInfoW(connection, infoType, &info_value, 0, &message_length);
+  SQLRETURN ret = SQLGetInfo(connection, infoType, &info_value, 0, &message_length);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 

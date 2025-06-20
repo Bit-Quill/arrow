@@ -847,20 +847,12 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
 
 SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePtr,
                      SQLSMALLINT bufLen, SQLSMALLINT* stringLengthPtr) {
-  // TODO: complete implementation of SQLGetInfoW and write tests
   using ODBC::ODBCConnection;
 
-  // Set character type to be Unicode by default
-  const bool isUnicode = true;
-
   LOG_DEBUG(
-      "SQLGetInfoW called with conn: {}, infoType: {}, infoValuePtr: {}, bufLen: {}, "
+      "SQLGetInfo called with conn: {}, infoType: {}, infoValuePtr: {}, bufLen: {}, "
       "stringLengthPtr: {}",
       conn, infoType, infoValuePtr, bufLen, fmt::ptr(stringLengthPtr));
-
-  if (!conn) {
-    return SQL_INVALID_HANDLE;
-  }
 
   if (!infoValuePtr && !stringLengthPtr) {
     return SQL_ERROR;
@@ -869,7 +861,8 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
 
-    // TODO Validate buffer
+    // Set character type to be Unicode by default
+    const bool isUnicode = true;
 
     return connection->GetInfo(infoType, infoValuePtr, bufLen, stringLengthPtr,
                                isUnicode);
