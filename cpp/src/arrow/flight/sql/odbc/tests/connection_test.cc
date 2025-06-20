@@ -26,10 +26,8 @@
 
 #include "gtest/gtest.h"
 
-namespace arrow {
-namespace flight {
-namespace odbc {
-namespace integration_tests {
+namespace arrow::flight::sql::odbc {
+
 TEST(SQLAllocHandle, TestSQLAllocHandleEnv) {
   // ODBC Environment
   SQLHENV env;
@@ -1076,10 +1074,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
-}  // namespace integration_tests
-}  // namespace odbc
-}  // namespace flight
-}  // namespace arrow
+}  // namespace arrow::flight::sql::odbc
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);

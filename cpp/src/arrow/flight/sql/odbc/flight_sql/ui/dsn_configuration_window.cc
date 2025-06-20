@@ -94,7 +94,7 @@ void DsnConfigurationWindow::Create() {
     throw odbcabstraction::DriverException(buf.str());
   }
 }
-//-AL- fix this file next
+
 void DsnConfigurationWindow::OnCreate() {
   tabControl = CreateTabControl(ChildId::TAB_CONTROL);
   tabControl->AddTab(L"Common", COMMON_TAB);

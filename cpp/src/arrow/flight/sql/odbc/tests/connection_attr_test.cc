@@ -26,10 +26,8 @@
 
 #include "gtest/gtest.h"
 
-namespace arrow {
-namespace flight {
-namespace odbc {
-namespace integration_tests {
+namespace arrow::flight::sql::odbc {
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAsyncDbcEventUnsupported) {
   this->connect();
 
@@ -272,6 +270,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTraceFileDMOnly) {
                                     ODBC_BUFFER_SIZE, &outstrlen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
+  // Length is returned in bytes for SQLGetConnectAttr,
+  // we want the number of characters
+  outstrlen /= driver::odbcabstraction::GetSqlWCharSize();
   std::string out_connection_string =
       ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
   EXPECT_TRUE(!out_connection_string.empty());
@@ -429,7 +430,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrEnlistInDtcDefault) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrQuietModeDefault) {
   this->connect();
 
-  SQLPOINTER ptr = NULL;
+  HWND ptr = NULL;
   SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_QUIET_MODE, ptr, 0, 0);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -561,7 +562,4 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrPacketSizeValid) {
   this->disconnect();
 }
 
-}  // namespace integration_tests
-}  // namespace odbc
-}  // namespace flight
-}  // namespace arrow
+}  // namespace arrow::flight::sql::odbc

@@ -42,10 +42,7 @@
 #define TEST_CONNECT_STR "ARROW_FLIGHT_SQL_ODBC_CONN"
 #define TEST_DSN "Apache Arrow Flight SQL Test DSN"
 
-namespace arrow {
-namespace flight {
-namespace odbc {
-namespace integration_tests {
+namespace arrow::flight::sql::odbc {
 using driver::odbcabstraction::Connection;
 
 class FlightSQLODBCRemoteTestBase : public ::testing::Test {
@@ -177,7 +174,4 @@ bool writeDSN(std::string connection_str);
 /// \param[in] properties map.
 /// \return true on success
 bool writeDSN(Connection::ConnPropertyMap properties);
-}  // namespace integration_tests
-}  // namespace odbc
-}  // namespace flight
-}  // namespace arrow
+}  // namespace arrow::flight::sql::odbc

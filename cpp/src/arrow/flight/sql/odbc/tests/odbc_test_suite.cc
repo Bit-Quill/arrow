@@ -25,10 +25,7 @@
 #include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/configuration.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
 
-namespace arrow {
-namespace flight {
-namespace odbc {
-namespace integration_tests {
+namespace arrow::flight::sql::odbc {
 
 void FlightSQLODBCRemoteTestBase::allocEnvConnHandles() {
   // Allocate an environment handle
@@ -272,7 +269,5 @@ bool writeDSN(Connection::ConnPropertyMap properties) {
   std::wstring wDriver = arrow::util::UTF8ToWideString(driver).ValueOr(L"");
   return RegisterDsn(config, wDriver.c_str());
 }
-}  // namespace integration_tests
-}  // namespace odbc
-}  // namespace flight
-}  // namespace arrow
+
+}  // namespace arrow::flight::sql::odbc
