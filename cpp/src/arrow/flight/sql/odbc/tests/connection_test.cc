@@ -1649,10 +1649,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrPacketSizeValid) {
 
 }  // namespace arrow::flight::sql::odbc
 
-// -AL- consider removing this. Then I will need to find a different way, maybe like other arrow tests,
-// by adding an enviornment
-// to clean up protobuf after all tests.
-//int main(int argc, char** argv) {
-//  ::testing::InitGoogleTest(&argc, argv);
-//  return RUN_ALL_TESTS();
-//}
+int main(int argc, char** argv) {
+ ::testing::InitGoogleTest(&argc, argv);
+ return RUN_ALL_TESTS();
+}
