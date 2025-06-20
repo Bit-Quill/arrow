@@ -373,6 +373,32 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_STATIC_CURSOR_ATTRIBUTES2) {
   this->disconnect();
 }
 
+// DBMS Product Information
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DATABASE_NAME) {
+  this->connect();
+
+  validate(conn, SQL_DATABASE_NAME, L"");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DBMS_NAME) {
+  this->connect();
+
+  validateNotEmptySQLWCHAR(conn, SQL_DBMS_NAME);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DBMS_VER) {
+  this->connect();
+
+  validateNotEmptySQLWCHAR(conn, SQL_DBMS_VER);
+
+  this->disconnect();
+}
+
 // wchar
 void validateNotEmptySQLWCHAR(SQLHDBC connection, SQLUSMALLINT infoType) {
   SQLWCHAR info_value[ODBC_BUFFER_SIZE] = L"";
