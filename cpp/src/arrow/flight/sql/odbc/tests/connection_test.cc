@@ -26,10 +26,8 @@
 
 #include "gtest/gtest.h"
 
-namespace arrow {
-namespace flight {
-namespace odbc {
-namespace integration_tests {
+namespace arrow::flight::sql::odbc {
+
 TEST(SQLAllocHandle, TestSQLAllocHandleEnv) {
   // ODBC Environment
   SQLHENV env;
@@ -1649,12 +1647,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrPacketSizeValid) {
 }
 // -AL- end of copied tests
 
-}  // namespace integration_tests
-}  // namespace odbc
-}  // namespace flight
-}  // namespace arrow
+}  // namespace arrow::flight::sql::odbc
 
-int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+// -AL- consider removing this. Then I will need to find a different way, maybe like other arrow tests,
+// by adding an enviornment
+// to clean up protobuf after all tests.
+//int main(int argc, char** argv) {
+//  ::testing::InitGoogleTest(&argc, argv);
+//  return RUN_ALL_TESTS();
+//}
