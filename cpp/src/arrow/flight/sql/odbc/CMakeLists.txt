@@ -41,7 +41,7 @@ fetchcontent_declare(spdlog
                          ""
                          BUILD_COMMAND
                          "")
-FetchContent_MakeAvailable(spdlog)
+fetchcontent_makeavailable(spdlog)
 
 add_subdirectory(flight_sql)
 add_subdirectory(odbcabstraction)
