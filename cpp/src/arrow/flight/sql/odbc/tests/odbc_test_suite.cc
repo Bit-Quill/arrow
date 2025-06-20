@@ -187,7 +187,11 @@ void FlightSQLODBCMockTestBase::SetUp() {
   ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
 }
 
-void FlightSQLODBCMockTestBase::TearDown() { ASSERT_OK(server->Shutdown()); }
+void FlightSQLODBCMockTestBase::TearDown() {
+  std::cout << "FlightSQLODBCMockTestBase teardown start\n";
+  ASSERT_OK(server->Shutdown());
+  std::cout << "FlightSQLODBCMockTestBase teardown complete\n";
+}
 
 bool compareConnPropertyMap(Connection::ConnPropertyMap map1,
                             Connection::ConnPropertyMap map2) {
