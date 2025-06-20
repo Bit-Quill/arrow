@@ -31,7 +31,7 @@ namespace flight {
 namespace odbc {
 namespace integration_tests {
   // -AL- add dummy test to see if seg fault is invoked without driver usage
-TYPED_TEST(FlightSQLODBCTestBase, DummyTest) {
+TEST(DummyTestSuite, DummyTest) {
   bool true_bool = true;
   EXPECT_EQ(true_bool, true);
 }
