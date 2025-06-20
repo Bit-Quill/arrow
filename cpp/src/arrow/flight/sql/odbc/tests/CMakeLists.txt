@@ -29,12 +29,10 @@ set(ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS
     ../../example/sqlite_server.cc
     ../../example/sqlite_tables_schema_batch_reader.cc)
 
-add_arrow_test(connection_test
+add_arrow_test(odbc_test
                SOURCES
-               connection_attr_test.cc
-               # connection_test needs to be put after
-               # other test files to avoid seg fault on Windows GitHub workflows
                connection_test.cc
+               connection_attr_test.cc
                odbc_test_suite.cc
                odbc_test_suite.h
                ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
