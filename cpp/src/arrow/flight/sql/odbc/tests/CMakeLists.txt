@@ -29,7 +29,7 @@ set(ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS
     ../../example/sqlite_server.cc
     ../../example/sqlite_tables_schema_batch_reader.cc)
 
-add_arrow_test(odbc_test
+add_arrow_test(flight_sql_odbc_test
                SOURCES
                connection_attr_test.cc
                # Connection test needs to be put last to resolve segfault issue
