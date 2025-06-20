@@ -156,6 +156,7 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle);
 
 static constexpr std::string_view error_state_01S02 = "01S02";
 static constexpr std::string_view error_state_08003 = "08003";
+static constexpr std::string_view error_state_24000 = "24000";
 static constexpr std::string_view error_state_28000 = "28000";
 static constexpr std::string_view error_state_HY000 = "HY000";
 static constexpr std::string_view error_state_HY024 = "HY024";
