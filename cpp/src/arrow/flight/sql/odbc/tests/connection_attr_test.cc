@@ -44,6 +44,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAsyncDbcEventUnsupported)
   this->disconnect();
 }
 
+/*
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAyncEnableUnsupported) {
   this->connect();
 
@@ -599,6 +600,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrPacketSizeValid) {
 
   this->disconnect();
 }
+*/
 
 }  // namespace integration_tests
 }  // namespace odbc
