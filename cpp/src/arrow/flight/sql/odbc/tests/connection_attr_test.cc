@@ -277,42 +277,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTraceFileDMOnly) {
       ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
   EXPECT_TRUE(!out_connection_string.empty());
 
-  out_connection_string =
-      ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
-  EXPECT_TRUE(!out_connection_string.empty());
-
-  out_connection_string =
-      ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
-  EXPECT_TRUE(!out_connection_string.empty());
-
-  out_connection_string =
-      ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
-  EXPECT_TRUE(!out_connection_string.empty());
-
-  out_connection_string =
-      ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
-  EXPECT_TRUE(!out_connection_string.empty());
-
-  out_connection_string =
-      ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
-  EXPECT_TRUE(!out_connection_string.empty());
-
-  out_connection_string =
-      ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
-  EXPECT_TRUE(!out_connection_string.empty());
-
-  out_connection_string =
-      ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
-  EXPECT_TRUE(!out_connection_string.empty());
-
-  out_connection_string =
-      ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
-  EXPECT_TRUE(!out_connection_string.empty());
-
-  out_connection_string =
-      ODBC::SqlWcharToString(outstr, static_cast<SQLSMALLINT>(outstrlen));
-  EXPECT_TRUE(!out_connection_string.empty());
-
   this->disconnect();
 }
 
