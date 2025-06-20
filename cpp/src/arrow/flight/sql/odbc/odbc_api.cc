@@ -854,15 +854,15 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
       "stringLengthPtr: {}",
       conn, infoType, infoValuePtr, bufLen, fmt::ptr(stringLengthPtr));
 
-  if (!infoValuePtr && !stringLengthPtr) {
-    return SQL_ERROR;
-  }
-
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
 
     // Set character type to be Unicode by default
     const bool isUnicode = true;
+
+    if (!infoValuePtr && !stringLengthPtr) {
+      return static_cast<SQLRETURN> SQL_ERROR;
+    }
 
     return connection->GetInfo(infoType, infoValuePtr, bufLen, stringLengthPtr,
                                isUnicode);
