@@ -49,7 +49,7 @@ TYPED_TEST(FlightSQLODBCTestBase, DummyTestODBC) {
   EXPECT_EQ(true_bool, true);
 }
 
-/*
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAsyncDbcEventUnsupported) {
 this->connect();
 
@@ -620,6 +620,5 @@ VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_01S02);
 
 this->disconnect();
 }
-*/
 
 }  // namespace arrow::flight::sql::odbc

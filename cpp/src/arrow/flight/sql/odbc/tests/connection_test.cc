@@ -1076,6 +1076,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
 
 // -AL- see if moving ConnectAttr tests to connection_test resolves the seg fault issue
 // Tests are copied without changes
+/*
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAsyncDbcEventUnsupported) {
   this->connect();
 
@@ -1644,7 +1645,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrPacketSizeValid) {
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_01S02);
 
   this->disconnect();
-}
+}*/
 // -AL- end of copied tests
 
 }  // namespace arrow::flight::sql::odbc
