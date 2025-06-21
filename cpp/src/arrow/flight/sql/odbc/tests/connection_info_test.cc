@@ -493,6 +493,192 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DBMS_VER) {
   this->disconnect();
 }
 
+// Data Source Information
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ACCESSIBLE_PROCEDURES) {
+  this->connect();
+
+  validate(conn, SQL_ACCESSIBLE_PROCEDURES, L"N");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ACCESSIBLE_TABLES) {
+  this->connect();
+
+  validate(conn, SQL_ACCESSIBLE_TABLES, L"Y");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_BOOKMARK_PERSISTENCE) {
+  this->connect();
+
+  validate(conn, SQL_BOOKMARK_PERSISTENCE, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_TERM) {
+  this->connect();
+
+  validate(conn, SQL_CATALOG_TERM, L"");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_COLLATION_SEQ) {
+  this->connect();
+
+  validate(conn, SQL_COLLATION_SEQ, L"");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONCAT_NULL_BEHAVIOR) {
+  this->connect();
+
+  validate(conn, SQL_CONCAT_NULL_BEHAVIOR, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_COMMIT_BEHAVIOR) {
+  this->connect();
+
+  validate(conn, SQL_CURSOR_COMMIT_BEHAVIOR, static_cast<SQLUSMALLINT>(1));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_ROLLBACK_BEHAVIOR) {
+  this->connect();
+
+  validate(conn, SQL_CURSOR_ROLLBACK_BEHAVIOR, static_cast<SQLUSMALLINT>(1));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_SENSITIVITY) {
+  this->connect();
+
+  validate(conn, SQL_CURSOR_SENSITIVITY, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DATA_SOURCE_READ_ONLY) {
+  this->connect();
+
+  validate(conn, SQL_DATA_SOURCE_READ_ONLY, L"N");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DEFAULT_TXN_ISOLATION) {
+  this->connect();
+
+  validate(conn, SQL_DEFAULT_TXN_ISOLATION, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DESCRIBE_PARAMETER) {
+  this->connect();
+
+  validate(conn, SQL_DESCRIBE_PARAMETER, L"N");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MULT_RESULT_SETS) {
+  this->connect();
+
+  validate(conn, SQL_MULT_RESULT_SETS, L"N");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MULTIPLE_ACTIVE_TXN) {
+  this->connect();
+
+  validate(conn, SQL_MULTIPLE_ACTIVE_TXN, L"N");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_NEED_LONG_DATA_LEN) {
+  this->connect();
+
+  validate(conn, SQL_NEED_LONG_DATA_LEN, L"N");
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_NULL_COLLATION) {
+  this->connect();
+
+  validate(conn, SQL_NULL_COLLATION, static_cast<SQLUSMALLINT>(2));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_PROCEDURE_TERM) {
+  this->connect();
+
+  validate(conn, SQL_PROCEDURE_TERM, L"");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SCHEMA_TERM) {
+  this->connect();
+
+  validate(conn, SQL_SCHEMA_TERM, L"schema");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SCROLL_OPTIONS) {
+  this->connect();
+
+  validate(conn, SQL_SCROLL_OPTIONS, static_cast<SQLUINTEGER>(SQL_SO_FORWARD_ONLY));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TABLE_TERM) {
+  this->connect();
+
+  validate(conn, SQL_TABLE_TERM, L"table");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TXN_CAPABLE) {
+  this->connect();
+
+  validate(conn, SQL_TXN_CAPABLE, static_cast<SQLUSMALLINT>(SQL_TC_NONE));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TXN_ISOLATION_OPTION) {
+  this->connect();
+
+  validate(conn, SQL_TXN_ISOLATION_OPTION, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_USER_NAME) {
+  this->connect();
+
+  validate(conn, SQL_USER_NAME, L"");
+
+  this->disconnect();
+}
+
 }  // namespace integration_tests
 }  // namespace odbc
 }  // namespace flight
