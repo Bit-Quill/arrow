@@ -498,6 +498,7 @@ jobs:
         run: |
           $procdump = "$env:USERPROFILE\procdump\procdump.exe"
           $bash = "C:\msys64\usr\bin\bash.exe"
+          cd "${{github.workspace}}"
           mkdir -Force crash_dumps
 
           $pwd = (Get-Location).Path -replace '\\', '/'  # convert to POSIX-style for MSYS2
@@ -511,4 +512,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: crash-dumps
-          path: crash_dumps\*.dmp
+          path: ${{github.workspace}}\crash_dumps\*.dmp
