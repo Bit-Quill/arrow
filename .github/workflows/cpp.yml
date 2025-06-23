@@ -502,7 +502,7 @@ jobs:
           mkdir -Force crash_dumps
 
           $pwd = (Get-Location).Path -replace '\\', '/'  # convert to POSIX-style for MSYS2
-          $script = "ci/scripts/cpp_test.sh '$pwd' '$pwd/build'"
+          $script = "D:/a/arrow/arrow/ci/scripts/cpp_test.sh '$pwd' '$pwd/build'"
 
           # Run it with procdump monitoring
           & $procdump -accepteula -e -ma -x crash_dumps $bash -lc $script
