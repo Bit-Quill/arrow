@@ -1237,6 +1237,68 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_USER_NAME_LEN) {
   this->disconnect();
 }
 
+// Scalar Function Information
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_FUNCTIONS) {
+  // TODO Driver manager returns -1
+  GTEST_SKIP();
+  this->connect();
+
+  validate(conn, SQL_CONVERT_FUNCTIONS, static_cast<SQLUINTEGER>(3435973836));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_NUMERIC_FUNCTIONS) {
+  this->connect();
+
+  validate(conn, SQL_NUMERIC_FUNCTIONS, static_cast<SQLUINTEGER>(4058942));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_STRING_FUNCTIONS) {
+  this->connect();
+
+  validate(conn, SQL_STRING_FUNCTIONS, static_cast<SQLUINTEGER>(1304));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SYSTEM_FUNCTIONS) {
+  this->connect();
+
+  validate(conn, SQL_SYSTEM_FUNCTIONS, static_cast<SQLUINTEGER>(5));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_ADD_INTERVALS) {
+  this->connect();
+
+  validate(conn, SQL_TIMEDATE_ADD_INTERVALS, static_cast<SQLUINTEGER>(511));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_DIFF_INTERVALS) {
+  this->connect();
+
+  validate(conn, SQL_TIMEDATE_DIFF_INTERVALS, static_cast<SQLUINTEGER>(511));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_FUNCTIONS) {
+  // TODO Driver manager returns -1
+  GTEST_SKIP();
+  this->connect();
+
+  validate(conn, SQL_TIMEDATE_FUNCTIONS, static_cast<SQLUINTEGER>(3435973836));
+
+  this->disconnect();
+}
+
 }  // namespace integration_tests
 }  // namespace odbc
 }  // namespace flight
