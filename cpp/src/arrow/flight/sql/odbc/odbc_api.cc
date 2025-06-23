@@ -898,7 +898,11 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLengt
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
     std::string query = ODBC::SqlWcharToString(queryText, textLength);
+
+    // -AL- Implementation using regular statement flow, not compatible with DBT Labs
+    // Need to check FlightSqlClient, for example flight_sql_statement.cc
     statement->ExecuteDirect(query);
+
     return SQL_SUCCESS;
   });
 }

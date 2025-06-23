@@ -30,6 +30,28 @@ namespace arrow {
 namespace flight {
 namespace odbc {
 namespace integration_tests {
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQueryDbt) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1 limit 10;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // -AL- debug
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  // TODO: after SQLFetch and SQLGetData are implemented, fetch data to verify
+
+  this->disconnect();
+}
+
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   this->connect();
 
