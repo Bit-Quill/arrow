@@ -1299,6 +1299,176 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_FUNCTIONS) {
   this->disconnect();
 }
 
+// Conversion Information
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_BIGINT) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_BIGINT, static_cast<SQLUINTEGER>(8));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_BINARY) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_BINARY, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_BIT) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_BIT, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_CHAR) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_CHAR, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_DATE) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_DATE, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_DECIMAL) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_DECIMAL, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_DOUBLE) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_DOUBLE, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_FLOAT) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_FLOAT, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_INTEGER) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_INTEGER, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_INTERVAL_DAY_TIME) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_INTERVAL_DAY_TIME, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_INTERVAL_YEAR_MONTH) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_INTERVAL_YEAR_MONTH, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_LONGVARBINARY) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_LONGVARBINARY, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_LONGVARCHAR) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_LONGVARCHAR, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_NUMERIC) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_NUMERIC, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_REAL) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_REAL, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_SMALLINT) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_SMALLINT, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_TIME) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_TIME, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_TIMESTAMP) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_TIMESTAMP, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_TINYINT) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_TINYINT, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_VARBINARY) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_VARBINARY, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_VARCHAR) {
+  this->connect();
+
+  validate(conn, SQL_CONVERT_VARCHAR, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
 }  // namespace integration_tests
 }  // namespace odbc
 }  // namespace flight
