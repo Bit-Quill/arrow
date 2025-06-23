@@ -679,6 +679,402 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_USER_NAME) {
   this->disconnect();
 }
 
+// Supported SQL
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_AGGREGATE_FUNCTIONS) {
+  this->connect();
+
+  validate(conn, SQL_AGGREGATE_FUNCTIONS, static_cast<SQLUINTEGER>(127));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ALTER_DOMAIN) {
+  this->connect();
+
+  validate(conn, SQL_ALTER_DOMAIN, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ALTER_SCHEMA) {
+  // TODO Value commented out in odbc_connection.cc and does not exist in sql.h
+  GTEST_SKIP();
+  this->connect();
+
+  // validate(conn, SQL_ALTER_SCHEMA, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ALTER_TABLE) {
+  this->connect();
+
+  validate(conn, SQL_ALTER_TABLE, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ANSI_SQL_DATETIME_LITERALS) {
+  // TODO Value does not exist in odbc_connection.cc or in sql.h
+  GTEST_SKIP();
+  this->connect();
+
+  // validate(conn, SQL_ANSI_SQL_DATETIME_LITERALS, L"");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_LOCATION) {
+  this->connect();
+
+  validate(conn, SQL_CATALOG_LOCATION, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_NAME) {
+  this->connect();
+
+  validate(conn, SQL_CATALOG_NAME, L"N");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_NAME_SEPARATOR) {
+  this->connect();
+
+  validate(conn, SQL_CATALOG_NAME_SEPARATOR, L"");
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CATALOG_USAGE) {
+  this->connect();
+
+  validate(conn, SQL_CATALOG_USAGE, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_COLUMN_ALIAS) {
+  this->connect();
+
+  validate(conn, SQL_COLUMN_ALIAS, L"Y");
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CORRELATION_NAME) {
+  this->connect();
+
+  validate(conn, SQL_CORRELATION_NAME, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_ASSERTION) {
+  this->connect();
+
+  validate(conn, SQL_CREATE_ASSERTION, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_CHARACTER_SET) {
+  this->connect();
+
+  validate(conn, SQL_CREATE_CHARACTER_SET, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_COLLATION) {
+  this->connect();
+
+  validate(conn, SQL_CREATE_COLLATION, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_DOMAIN) {
+  this->connect();
+
+  validate(conn, SQL_CREATE_DOMAIN, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CREATE_SCHEMA) {
+  this->connect();
+
+  validate(conn, SQL_CREATE_SCHEMA, static_cast<SQLUINTEGER>(1));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CREATE_TABLE) {
+  this->connect();
+
+  validate(conn, SQL_CREATE_TABLE, static_cast<SQLUINTEGER>(1));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_TRANSLATION) {
+  this->connect();
+
+  validate(conn, SQL_CREATE_TRANSLATION, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DDL_INDEX) {
+  this->connect();
+
+  validate(conn, SQL_DDL_INDEX, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_ASSERTION) {
+  this->connect();
+
+  validate(conn, SQL_DROP_ASSERTION, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_CHARACTER_SET) {
+  this->connect();
+
+  validate(conn, SQL_DROP_CHARACTER_SET, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_COLLATION) {
+  this->connect();
+
+  validate(conn, SQL_DROP_COLLATION, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_DOMAIN) {
+  this->connect();
+
+  validate(conn, SQL_DROP_DOMAIN, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_SCHEMA) {
+  this->connect();
+
+  validate(conn, SQL_DROP_SCHEMA, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_TABLE) {
+  this->connect();
+
+  validate(conn, SQL_DROP_TABLE, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_TRANSLATION) {
+  this->connect();
+
+  validate(conn, SQL_DROP_TRANSLATION, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_VIEW) {
+  this->connect();
+
+  validate(conn, SQL_DROP_VIEW, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_EXPRESSIONS_IN_ORDERBY) {
+  this->connect();
+
+  validate(conn, SQL_EXPRESSIONS_IN_ORDERBY, L"N");
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_GROUP_BY) {
+  this->connect();
+
+  validate(conn, SQL_GROUP_BY, static_cast<SQLUSMALLINT>(2));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_IDENTIFIER_CASE) {
+  this->connect();
+
+  validate(conn, SQL_IDENTIFIER_CASE, static_cast<SQLUSMALLINT>(4));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_IDENTIFIER_QUOTE_CHAR) {
+  this->connect();
+
+  validate(conn, SQL_IDENTIFIER_QUOTE_CHAR, L"\"");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INDEX_KEYWORDS) {
+  this->connect();
+
+  validate(conn, SQL_INDEX_KEYWORDS, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INSERT_STATEMENT) {
+  this->connect();
+
+  validate(conn, SQL_INSERT_STATEMENT, static_cast<SQLUINTEGER>(7));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INTEGRITY) {
+  this->connect();
+
+  validate(conn, SQL_INTEGRITY, L"N");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_KEYWORDS) {
+  GTEST_SKIP();
+  this->connect();
+
+  validate(
+      conn, SQL_KEYWORDS,
+      L"ABORT, ACTION, ADD, AFTER, ALL, ALTER, ALWAYS, ANALYZE, AND, AS, ASC, ATTACH, "
+      L"AUTOINCREMENT, BEFORE, BEGIN, BETWEEN, BY, CASCADE, CASE, CAST, CHECK, COLLATE, "
+      L"COLUMN, COMMIT, CONFLICT, CONSTRAINT, CREATE, CROSS, CURRENT, CURRENT_DATE, "
+      L"CURRENT_TIME, CURRENT_TIMESTAMP, DATABASE, DEFAULT, DEFERRABLE, DEFERRED, "
+      L"DELETE, DESC, DETACH, DISTINCT, DO, DROP, EACH, ELSE, END, ESCAPE, EXCEPT, "
+      L"EXCLUDE, EXCLUSIVE, EXISTS, EXPLAIN, FAIL, FILTER, FIRST, FOLLOWING, FOR, "
+      L"FOREIGN, FROM, FULL, GENERATED, GLOB, GROUP, GROUPS, H");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_LIKE_ESCAPE_CLAUSE) {
+  this->connect();
+
+  validate(conn, SQL_LIKE_ESCAPE_CLAUSE, L"Y");
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_NON_NULLABLE_COLUMNS) {
+  this->connect();
+
+  validate(conn, SQL_NON_NULLABLE_COLUMNS, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_OJ_CAPABILITIES) {
+  this->connect();
+
+  validate(this->conn, SQL_OJ_CAPABILITIES, static_cast<SQLUINTEGER>(7));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_ORDER_BY_COLUMNS_IN_SELECT) {
+  this->connect();
+
+  validate(conn, SQL_ORDER_BY_COLUMNS_IN_SELECT, L"Y");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_OUTER_JOINS) {
+  // Not documented in SQLGetInfo, but other drivers return Y/N
+  // TODO The call returns value SQL_ERROR
+  GTEST_SKIP();
+  this->connect();
+
+  validate(conn, SQL_OUTER_JOINS, L"Y");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_PROCEDURES) {
+  this->connect();
+
+  validate(conn, SQL_PROCEDURES, L"N");
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_QUOTED_IDENTIFIER_CASE) {
+  this->connect();
+
+  validate(conn, SQL_QUOTED_IDENTIFIER_CASE, static_cast<SQLUSMALLINT>(4));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SCHEMA_USAGE) {
+  this->connect();
+
+  validate(conn, SQL_SCHEMA_USAGE, static_cast<SQLUINTEGER>(1));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SPECIAL_CHARACTERS) {
+  // TODO The call returns value SQL_ERROR
+  GTEST_SKIP();
+  this->connect();
+
+  validate(conn, SQL_SPECIAL_CHARACTERS, L"");
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SQL_CONFORMANCE) {
+  this->connect();
+
+  validate(conn, SQL_SQL_CONFORMANCE, static_cast<SQLUINTEGER>(1));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SUBQUERIES) {
+  this->connect();
+
+  validate(conn, SQL_SUBQUERIES, static_cast<SQLUINTEGER>(31));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_UNION) {
+  this->connect();
+
+  validate(conn, SQL_UNION, static_cast<SQLUINTEGER>(3));
+
+  this->disconnect();
+}
+
 }  // namespace integration_tests
 }  // namespace odbc
 }  // namespace flight
