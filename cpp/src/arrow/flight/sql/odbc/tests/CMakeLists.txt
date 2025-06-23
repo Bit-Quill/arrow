@@ -37,6 +37,7 @@ add_arrow_test(flight_sql_odbc_test
                connection_test.cc
                odbc_test_suite.cc
                odbc_test_suite.h
+               ../../../../engine/substrait/protobuf_test_util.cc
                ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
                EXTRA_LINK_LIBS
                ${ODBC_LIBRARIES}
