@@ -106,14 +106,18 @@ void validateGreaterThan(SQLHDBC connection, SQLUSMALLINT infoType,
 }
 
 // Validate wchar string SQLWCHAR return value is not empty
-void validateNotEmptySQLWCHAR(SQLHDBC connection, SQLUSMALLINT infoType) {
+void validateNotEmptySQLWCHAR(SQLHDBC connection, SQLUSMALLINT infoType, bool allowTruncation) {
   SQLWCHAR info_value[ODBC_BUFFER_SIZE] = L"";
   SQLSMALLINT message_length;
 
   SQLRETURN ret =
       SQLGetInfo(connection, infoType, info_value, ODBC_BUFFER_SIZE, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (allowTruncation && ret == SQL_SUCCESS_WITH_INFO) {
+    EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  } else {
+    EXPECT_EQ(ret, SQL_SUCCESS);
+  }
 
   EXPECT_GT(wcslen(info_value), 0);
 }
@@ -440,7 +444,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SEARCH_PATTERN_ESCAPE) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SERVER_NAME) {
   this->connect();
 
-  validateNotEmptySQLWCHAR(this->conn, SQL_SERVER_NAME);
+  validateNotEmptySQLWCHAR(this->conn, SQL_SERVER_NAME, false);
 
   this->disconnect();
 }
@@ -474,7 +478,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DATABASE_NAME) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DBMS_NAME) {
   this->connect();
 
-  validateNotEmptySQLWCHAR(this->conn, SQL_DBMS_NAME);
+  validateNotEmptySQLWCHAR(this->conn, SQL_DBMS_NAME, false);
 
   this->disconnect();
 }
@@ -482,7 +486,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DBMS_NAME) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DBMS_VER) {
   this->connect();
 
-  validateNotEmptySQLWCHAR(this->conn, SQL_DBMS_VER);
+  validateNotEmptySQLWCHAR(this->conn, SQL_DBMS_VER, false);
 
   this->disconnect();
 }
@@ -954,18 +958,9 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INTEGRITY) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_KEYWORDS) {
-  GTEST_SKIP();
   this->connect();
 
-  validate(
-      conn, SQL_KEYWORDS,
-      L"ABORT, ACTION, ADD, AFTER, ALL, ALTER, ALWAYS, ANALYZE, AND, AS, ASC, ATTACH, "
-      L"AUTOINCREMENT, BEFORE, BEGIN, BETWEEN, BY, CASCADE, CASE, CAST, CHECK, COLLATE, "
-      L"COLUMN, COMMIT, CONFLICT, CONSTRAINT, CREATE, CROSS, CURRENT, CURRENT_DATE, "
-      L"CURRENT_TIME, CURRENT_TIMESTAMP, DATABASE, DEFAULT, DEFERRABLE, DEFERRED, "
-      L"DELETE, DESC, DETACH, DISTINCT, DO, DROP, EACH, ELSE, END, ESCAPE, EXCEPT, "
-      L"EXCLUDE, EXCLUSIVE, EXISTS, EXPLAIN, FAIL, FILTER, FIRST, FOLLOWING, FOR, "
-      L"FOREIGN, FROM, FULL, GENERATED, GLOB, GROUP, GROUPS, H");
+  validateNotEmptySQLWCHAR(conn, SQL_KEYWORDS, true);
 
   this->disconnect();
 }
