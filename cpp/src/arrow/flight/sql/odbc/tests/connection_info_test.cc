@@ -358,7 +358,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_ASYNC_CONCURRENT_STATEMENTS) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_CONCURRENT_ACTIVITIES) {
-  // Driver manager returns failure code
+  // TODO Call to GetInfo returns SQL_ERROR
   GTEST_SKIP();
   this->connect();
 
