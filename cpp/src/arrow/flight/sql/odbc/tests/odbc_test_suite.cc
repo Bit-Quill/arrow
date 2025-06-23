@@ -124,12 +124,15 @@ std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
     return (::toupper(char1) == ::toupper(char2));
   };
 
-  const std::string auth_val(incoming_headers.find(kAuthHeader)->second);
   std::string bearer_token("");
-  if (auth_val.size() > kBearerPrefix.length()) {
-    if (std::equal(auth_val.begin(), auth_val.begin() + kBearerPrefix.length(),
-                   kBearerPrefix.begin(), char_compare)) {
-      bearer_token = auth_val.substr(kBearerPrefix.length());
+  auto authHeader = incoming_headers.find(kAuthHeader);
+  if (authHeader != incoming_headers.end()) {
+    const std::string auth_val(authHeader->second);
+    if (auth_val.size() > kBearerPrefix.length()) {
+      if (std::equal(auth_val.begin(), auth_val.begin() + kBearerPrefix.length(),
+                     kBearerPrefix.begin(), char_compare)) {
+        bearer_token = auth_val.substr(kBearerPrefix.length());
+      }
     }
   }
   return bearer_token;
