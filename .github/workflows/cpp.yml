@@ -442,6 +442,13 @@ jobs:
       - name: Setup MSYS2
         shell: msys2 {0}
         run: ci/scripts/msys2_setup.sh cpp
+
+      # -AL- coredump
+      - name: Download procdump 
+        run: |
+          Invoke-WebRequest https://download.sysinternals.com/files/Procdump.zip -OutFile procdump.zip
+          Expand-Archive procdump.zip -DestinationPath $env:USERPROFILE\procdump
+
       - name: Cache ccache
         uses: actions/cache@v4
         with:
@@ -480,7 +487,28 @@ jobs:
         shell: cmd
         run: |
           call "cpp\src\arrow\flight\sql\odbc\install\install_amd64.cmd" ${{github.workspace}}\build\cpp\%ARROW_BUILD_TYPE%\libarrow_flight_sql_odbc.dll
-      - name: Test
-        shell: msys2 {0}
+      # - name: Test
+      #   shell: msys2 {0}
+      #   run: |
+      #     ci/scripts/cpp_test.sh "$(pwd)" "$(pwd)/build"
+
+      # -AL- test for coredump
+      - name: Run cpp_test.sh with procdump
+        shell: pwsh
         run: |
-          ci/scripts/cpp_test.sh "$(pwd)" "$(pwd)/build"
+          $procdump = "$env:USERPROFILE\procdump\procdump.exe"
+          $bash = "C:\msys64\usr\bin\bash.exe"
+          mkdir -Force crash_dumps
+
+          # Build the command to run inside MSYS2 bash
+          $script = "ci/scripts/cpp_test.sh \"$(pwd)\" \"$(pwd)/build\""
+
+          # Run it with procdump monitoring
+          & $procdump -accepteula -e -ma -x crash_dumps $bash -lc $script
+
+      - name: Upload crash dump
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crash-dumps
+          path: crash_dumps\*.dmp
