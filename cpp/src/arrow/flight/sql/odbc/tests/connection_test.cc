@@ -1001,6 +1001,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
   ret = SQLExecDirect(statement, sql_buffer, SQL_NTS);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
+  // -AL- debug
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, statement) << std::endl;
+  }
 
   // Close statement handle
   ret = SQLFreeStmt(statement, SQL_CLOSE);
