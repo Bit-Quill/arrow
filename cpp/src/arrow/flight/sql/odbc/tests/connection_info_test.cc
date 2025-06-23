@@ -26,10 +26,7 @@
 
 #include "gtest/gtest.h"
 
-namespace arrow {
-namespace flight {
-namespace odbc {
-namespace integration_tests {
+namespace arrow::flight::odbc::integration_tests {
 
 // Helper Functions
 
@@ -1469,7 +1466,4 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_VARCHAR) {
   this->disconnect();
 }
 
-}  // namespace integration_tests
-}  // namespace odbc
-}  // namespace flight
-}  // namespace arrow
+}  // namespace arrow::flight::odbc::integration_tests
