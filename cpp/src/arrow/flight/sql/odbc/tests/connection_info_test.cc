@@ -228,9 +228,6 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HENV) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HLIB) {
   this->connect();
 
-  // An SQLULEN value, the hinst from the load library returned to the Driver Manager when
-  // it loaded the driver DLL on a Microsoft Windows operating system, or its equivalent
-  // on another operating system.
   validateGreaterThan(this->conn, SQL_DRIVER_HLIB, static_cast<SQLULEN>(0));
 
   this->disconnect();
@@ -386,7 +383,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ODBC_INTERFACE_CONFORMANCE) {
 // case SQL_ODBC_STANDARD_CLI_CONFORMANCE: - mentioned in SQLGetInfo spec with no
 // description and there is no constant for this.
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ODBC_STANDARD_CLI_CONFORMANCE) {
-  // Type not supported in odbc_connection.cc
+  // Type commented out in odbc_connection.cc
   GTEST_SKIP();
   this->connect();
 
@@ -695,10 +692,11 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ALTER_DOMAIN) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ALTER_SCHEMA) {
-  // TODO Value commented out in odbc_connection.cc and does not exist in sql.h
+  // Type commented out in odbc_connection.cc
   GTEST_SKIP();
   this->connect();
 
+  // Type does not exist in sql.h
   // validate(conn, SQL_ALTER_SCHEMA, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
@@ -713,10 +711,11 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ALTER_TABLE) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ANSI_SQL_DATETIME_LITERALS) {
-  // TODO Value does not exist in odbc_connection.cc or in sql.h
+  // Type commented out in odbc_connection.cc
   GTEST_SKIP();
   this->connect();
 
+  // Type does not exist in sql.h
   // validate(conn, SQL_ANSI_SQL_DATETIME_LITERALS, L"");
 
   this->disconnect();
@@ -1005,7 +1004,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_ORDER_BY_COLUMNS_IN_SELECT) {
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_OUTER_JOINS) {
   // Not documented in SQLGetInfo, but other drivers return Y/N
-  // TODO The call returns value SQL_ERROR
+  // TODO Call to GetInfo returns SQL_ERROR
   GTEST_SKIP();
   this->connect();
 
@@ -1039,7 +1038,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SCHEMA_USAGE) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SPECIAL_CHARACTERS) {
-  // TODO The call returns value SQL_ERROR
+  // TODO Call to GetInfo returns SQL_ERROR
   GTEST_SKIP();
   this->connect();
 
@@ -1237,7 +1236,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_USER_NAME_LEN) {
 // Scalar Function Information
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_FUNCTIONS) {
-  // TODO Driver manager returns -1
+  // TODO Call to GetInfo returns SQL_ERROR
   GTEST_SKIP();
   this->connect();
 
@@ -1287,7 +1286,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_DIFF_INTERVALS) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_FUNCTIONS) {
-  // TODO Driver manager returns -1
+  // TODO Call to GetInfo returns SQL_ERROR
   GTEST_SKIP();
   this->connect();
 
