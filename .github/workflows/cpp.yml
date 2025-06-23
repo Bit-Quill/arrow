@@ -500,8 +500,8 @@ jobs:
           $bash = "C:\msys64\usr\bin\bash.exe"
           mkdir -Force crash_dumps
 
-          # Build the command to run inside MSYS2 bash
-          $script = "ci/scripts/cpp_test.sh \"$(pwd)\" \"$(pwd)/build\""
+          $pwd = (Get-Location).Path -replace '\\', '/'  # convert to POSIX-style for MSYS2
+          $script = "ci/scripts/cpp_test.sh '$pwd' '$pwd/build'"
 
           # Run it with procdump monitoring
           & $procdump -accepteula -e -ma -x crash_dumps $bash -lc $script
