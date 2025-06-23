@@ -1075,6 +1075,168 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_UNION) {
   this->disconnect();
 }
 
+// SQL Limits
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_BINARY_LITERAL_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_BINARY_LITERAL_LEN, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_CATALOG_NAME_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_CATALOG_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_CHAR_LITERAL_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_CHAR_LITERAL_LEN, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_COLUMN_NAME_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_COLUMN_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_GROUP_BY) {
+  this->connect();
+
+  validate(conn, SQL_MAX_COLUMNS_IN_GROUP_BY, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_INDEX) {
+  this->connect();
+
+  validate(conn, SQL_MAX_COLUMNS_IN_INDEX, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_ORDER_BY) {
+  this->connect();
+
+  validate(conn, SQL_MAX_COLUMNS_IN_ORDER_BY, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_SELECT) {
+  this->connect();
+
+  validate(conn, SQL_MAX_COLUMNS_IN_SELECT, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_TABLE) {
+  this->connect();
+
+  validate(conn, SQL_MAX_COLUMNS_IN_TABLE, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_CURSOR_NAME_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_CURSOR_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_IDENTIFIER_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_IDENTIFIER_LEN, static_cast<SQLUSMALLINT>(65535));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_INDEX_SIZE) {
+  this->connect();
+
+  validate(conn, SQL_MAX_INDEX_SIZE, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_PROCEDURE_NAME_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_PROCEDURE_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_ROW_SIZE) {
+  this->connect();
+
+  validate(conn, SQL_MAX_ROW_SIZE, L"");
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_ROW_SIZE_INCLUDES_LONG) {
+  this->connect();
+
+  validate(conn, SQL_MAX_ROW_SIZE_INCLUDES_LONG, L"N");
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_SCHEMA_NAME_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_SCHEMA_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_STATEMENT_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_STATEMENT_LEN, static_cast<SQLUINTEGER>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_TABLE_NAME_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_TABLE_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_TABLES_IN_SELECT) {
+  this->connect();
+
+  validate(conn, SQL_MAX_TABLES_IN_SELECT, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_USER_NAME_LEN) {
+  this->connect();
+
+  validate(conn, SQL_MAX_USER_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+
+  this->disconnect();
+}
+
 }  // namespace integration_tests
 }  // namespace odbc
 }  // namespace flight
