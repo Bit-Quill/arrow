@@ -442,13 +442,6 @@ jobs:
       - name: Setup MSYS2
         shell: msys2 {0}
         run: ci/scripts/msys2_setup.sh cpp
-
-      # -AL- coredump
-      - name: Download procdump 
-        run: |
-          Invoke-WebRequest https://download.sysinternals.com/files/Procdump.zip -OutFile procdump.zip
-          Expand-Archive procdump.zip -DestinationPath $env:USERPROFILE\procdump
-
       - name: Cache ccache
         uses: actions/cache@v4
         with:
@@ -491,25 +484,4 @@ jobs:
         shell: msys2 {0}
         run: |
           ci/scripts/cpp_test.sh "$(pwd)" "$(pwd)/build"
-
-      # # -AL- test for coredump
-      # - name: Run cpp_test.sh with procdump
-      #   shell: pwsh
-      #   run: |
-      #     $procdump = "$env:USERPROFILE\procdump\procdump.exe"
-      #     $bash = "C:\msys64\usr\bin\bash.exe"
-      #     cd "${{github.workspace}}"
-      #     mkdir -Force crash_dumps
-
-      #     $pwd = (Get-Location).Path -replace '\\', '/'  # convert to POSIX-style for MSYS2
-      #     $script = "D:/a/arrow/arrow/ci/scripts/cpp_test.sh '$pwd' '$pwd/build'"
-
-      #     # Run it with procdump monitoring
-      #     & $procdump -accepteula -e -ma -x crash_dumps $bash -lc $script
-
-      # - name: Upload crash dump
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: crash-dumps
-      #     path: ${{github.workspace}}\crash_dumps\*.dmp
+          
