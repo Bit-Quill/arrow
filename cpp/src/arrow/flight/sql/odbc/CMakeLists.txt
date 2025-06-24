@@ -34,6 +34,15 @@ endif()
 
 add_definitions(-DUNICODE=1)
 
+include(FetchContent)
+fetchcontent_declare(spdlog
+                     URL https://github.com/gabime/spdlog/archive/76fb40d95455f249bd70824ecfcae7a8f0930fa3.zip
+                         CONFIGURE_COMMAND
+                         ""
+                         BUILD_COMMAND
+                         "")
+fetchcontent_makeavailable(spdlog)
+
 add_subdirectory(flight_sql)
 add_subdirectory(odbcabstraction)
 add_subdirectory(tests)
@@ -71,7 +80,8 @@ add_arrow_lib(arrow_flight_sql_odbc
               ${ODBC_LIBRARIES}
               ${ODBCINST}
               odbcabstraction
-              arrow_odbc_spi_impl)
+              arrow_odbc_spi_impl
+              spdlog::spdlog)
 
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
