@@ -488,6 +488,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-logs
+          name: test-logs-${{ matrix.msystem_lower}}
           path: D:/a/arrow/arrow/build/cpp/build/test-logs/
           
