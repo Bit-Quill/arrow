@@ -1275,7 +1275,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_DIFF_INTERVALS) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_TIMEDATE_FUNCTIONS) {
   this->connect();
 
-  validate(conn, SQL_TIMEDATE_FUNCTIONS, static_cast<SQLUINTEGER>(0));
+  validate(conn, SQL_TIMEDATE_FUNCTIONS, static_cast<SQLUINTEGER>(2097151));
 
   this->disconnect();
 }

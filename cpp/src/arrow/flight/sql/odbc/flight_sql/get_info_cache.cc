@@ -1336,7 +1336,16 @@ void GetInfoCache::LoadDefaultsForMissingEntries() {
                           SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND | SQL_FN_TSI_MINUTE |
                           SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY | SQL_FN_TSI_WEEK |
                           SQL_FN_TSI_MONTH | SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR));
-  SetDefaultIfMissing(info_, SQL_TIMEDATE_FUNCTIONS, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(
+      info_, SQL_TIMEDATE_FUNCTIONS,
+      static_cast<uint32_t>(
+          SQL_FN_TD_CURRENT_DATE | SQL_FN_TD_CURRENT_TIME | SQL_FN_TD_CURRENT_TIMESTAMP |
+          SQL_FN_TD_CURDATE | SQL_FN_TD_CURTIME | SQL_FN_TD_DAYNAME |
+          SQL_FN_TD_DAYOFMONTH | SQL_FN_TD_DAYOFWEEK | SQL_FN_TD_DAYOFYEAR |
+          SQL_FN_TD_EXTRACT | SQL_FN_TD_HOUR | SQL_FN_TD_MINUTE | SQL_FN_TD_MONTH |
+          SQL_FN_TD_MONTHNAME | SQL_FN_TD_NOW | SQL_FN_TD_QUARTER | SQL_FN_TD_SECOND |
+          SQL_FN_TD_TIMESTAMPADD | SQL_FN_TD_TIMESTAMPDIFF | SQL_FN_TD_WEEK |
+          SQL_FN_TD_YEAR));
   SetDefaultIfMissing(info_, SQL_UNION,
                       static_cast<uint32_t>(SQL_U_UNION | SQL_U_UNION_ALL));
   SetDefaultIfMissing(info_, SQL_XOPEN_CLI_YEAR, "1995");
