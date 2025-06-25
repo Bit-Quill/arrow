@@ -484,4 +484,10 @@ jobs:
         shell: msys2 {0}
         run: |
           ci/scripts/cpp_test.sh "$(pwd)" "$(pwd)/build"
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: D:/a/arrow/arrow/build/cpp/build/test-logs/
           
