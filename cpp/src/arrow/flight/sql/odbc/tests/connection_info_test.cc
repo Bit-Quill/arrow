@@ -358,8 +358,6 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_ASYNC_CONCURRENT_STATEMENTS) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_CONCURRENT_ACTIVITIES) {
-  // TODO Call to GetInfo returns SQL_ERROR
-  GTEST_SKIP();
   this->connect();
 
   validate(this->conn, SQL_MAX_CONCURRENT_ACTIVITIES, static_cast<SQLUSMALLINT>(0));
@@ -997,13 +995,10 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_ORDER_BY_COLUMNS_IN_SELECT) {
   this->disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_OUTER_JOINS) {
-  // Not documented in SQLGetInfo, but other drivers return Y/N
-  // TODO Call to GetInfo returns SQL_ERROR
-  GTEST_SKIP();
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_OUTER_JOINS) {
   this->connect();
 
-  validate(conn, SQL_OUTER_JOINS, L"Y");
+  validate(conn, SQL_OUTER_JOINS, L"N");
 
   this->disconnect();
 }
@@ -1033,8 +1028,6 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SCHEMA_USAGE) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SPECIAL_CHARACTERS) {
-  // TODO Call to GetInfo returns SQL_ERROR
-  GTEST_SKIP();
   this->connect();
 
   validate(conn, SQL_SPECIAL_CHARACTERS, L"");
@@ -1230,12 +1223,10 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_USER_NAME_LEN) {
 
 // Scalar Function Information
 
-TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_FUNCTIONS) {
-  // TODO Call to GetInfo returns SQL_ERROR
-  GTEST_SKIP();
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_FUNCTIONS) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_FUNCTIONS, static_cast<SQLUINTEGER>(3435973836));
+  validate(conn, SQL_CONVERT_FUNCTIONS, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1280,12 +1271,10 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_DIFF_INTERVALS) {
   this->disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_FUNCTIONS) {
-  // TODO Call to GetInfo returns SQL_ERROR
-  GTEST_SKIP();
+TEST_F(FlightSQLODBCMockTestBase, Test_SQL_TIMEDATE_FUNCTIONS) {
   this->connect();
 
-  validate(conn, SQL_TIMEDATE_FUNCTIONS, static_cast<SQLUINTEGER>(3435973836));
+  validate(conn, SQL_TIMEDATE_FUNCTIONS, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
