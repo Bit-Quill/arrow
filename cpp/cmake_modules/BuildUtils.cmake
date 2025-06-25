@@ -740,7 +740,7 @@ function(ADD_TEST_CASE REL_TEST_NAME)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} ${ARG_TEST_ARGUMENTS})
   else()
     add_test(${TEST_NAME}
-             /usr/bin/env bash ${BUILD_SUPPORT_DIR}/run-test.sh
+             bash ${BUILD_SUPPORT_DIR}/run-test.sh
              ${CMAKE_BINARY_DIR}
              test
              ${TEST_PATH}
