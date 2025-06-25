@@ -106,7 +106,8 @@ void validateGreaterThan(SQLHDBC connection, SQLUSMALLINT infoType,
 }
 
 // Validate wchar string SQLWCHAR return value is not empty
-void validateNotEmptySQLWCHAR(SQLHDBC connection, SQLUSMALLINT infoType, bool allowTruncation) {
+void validateNotEmptySQLWCHAR(SQLHDBC connection, SQLUSMALLINT infoType,
+                              bool allowTruncation) {
   SQLWCHAR info_value[ODBC_BUFFER_SIZE] = L"";
   SQLSMALLINT message_length;
 
