@@ -480,6 +480,22 @@ jobs:
         shell: cmd
         run: |
           call "cpp\src\arrow\flight\sql\odbc\install\install_amd64.cmd" ${{github.workspace}}\build\cpp\%ARROW_BUILD_TYPE%\libarrow_flight_sql_odbc.dll
+      - name: Enable full user-mode dumps
+        shell: pwsh
+        run: |
+          $key = "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps"
+          if (-not (Test-Path $key)) {
+              New-Item -Path $key -Force
+          }
+
+          # Set DumpFolder (optional, default goes to %LOCALAPPDATA%\CrashDumps)
+          Set-ItemProperty -Path $key -Name "DumpFolder" -Value "D:/a/arrow/arrow/build/cpp/build/test-logs" -Type ExpandString
+
+          # Set DumpCount (optional, default is 10)
+          Set-ItemProperty -Path $key -Name "DumpCount" -Value 10 -Type DWord
+
+          # Set DumpType (2 = full dump, 1 = mini dump)
+          Set-ItemProperty -Path $key -Name "DumpType" -Value 2 -Type DWord
       - name: Test
         shell: msys2 {0}
         run: |
