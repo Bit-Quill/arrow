@@ -319,7 +319,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_FILE_USAGE) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_GETDATA_EXTENSIONS) {
   this->connect();
 
-  validate(this->conn, SQL_GETDATA_EXTENSIONS, static_cast<SQLUINTEGER>(3));
+  validate(this->conn, SQL_GETDATA_EXTENSIONS, static_cast<SQLUINTEGER>(SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER));
 
   this->disconnect();
 }
