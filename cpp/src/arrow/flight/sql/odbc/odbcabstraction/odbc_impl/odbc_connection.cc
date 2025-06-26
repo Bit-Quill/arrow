@@ -448,7 +448,8 @@ SQLRETURN ODBCConnection::GetInfo(SQLUSMALLINT infoType, SQLPOINTER value,
                                 GetDiagnostics());
     }
     default:
-      throw DriverException("Unknown SQLGetInfo type: " + std::to_string(infoType));
+      throw DriverException("Unknown SQLGetInfo type: " + std::to_string(infoType),
+                            "HYC00");
   }
 
   return SQL_ERROR;
