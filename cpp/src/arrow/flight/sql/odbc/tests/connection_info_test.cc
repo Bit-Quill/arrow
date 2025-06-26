@@ -681,7 +681,8 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_USER_NAME) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_AGGREGATE_FUNCTIONS) {
   this->connect();
 
-  validate(conn, SQL_AGGREGATE_FUNCTIONS, static_cast<SQLUINTEGER>(127));
+  validate(conn, SQL_AGGREGATE_FUNCTIONS, static_cast<SQLUINTEGER>(SQL_AF_ALL | SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT |
+                            SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM));
 
   this->disconnect();
 }
