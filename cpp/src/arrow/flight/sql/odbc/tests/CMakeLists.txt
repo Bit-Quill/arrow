@@ -32,10 +32,14 @@ set(ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS
 add_arrow_test(flight_sql_odbc_test
                SOURCES
                connection_attr_test.cc
+               statement_test.cc
                # Connection test needs to be put last to resolve segfault issue
                connection_test.cc
                odbc_test_suite.cc
                odbc_test_suite.h
+               # Enable Protobuf cleanup after test execution
+               # GH-46889: move protobuf_test_util to a more common location
+               ../../../../engine/substrait/protobuf_test_util.cc
                ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
                EXTRA_LINK_LIBS
                ${ODBC_LIBRARIES}
