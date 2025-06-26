@@ -24,6 +24,7 @@
 #include <sqltypes.h>
 #include <sqlucode.h>
 
+#include "google/protobuf/message_lite.h"
 #include "gtest/gtest.h"
 
 namespace arrow::flight::sql::odbc {
@@ -996,15 +997,15 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  // TODO Uncomment once SQLExecDirect is implemented
-  // SQLWCHAR sql_buffer[ODBC_BUFFER_SIZE] = L"SELECT 1";
-  // ret = SQLExecDirect(statement, sql_buffer, SQL_NTS);
+  SQLWCHAR sql_buffer[ODBC_BUFFER_SIZE] = L"SELECT 1";
+  ret = SQLExecDirect(statement, sql_buffer, SQL_NTS);
 
-  // EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
-  // ret = SQLFreeStmt(statement, SQL_CLOSE);
+  // Close statement handle
+  ret = SQLFreeStmt(statement, SQL_CLOSE);
 
-  // EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Free statement handle
   ret = SQLFreeStmt(statement, SQL_DROP);
