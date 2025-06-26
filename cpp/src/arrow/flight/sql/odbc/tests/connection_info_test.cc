@@ -559,7 +559,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_ROLLBACK_BEHAVIOR) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_SENSITIVITY) {
   this->connect();
 
-  validate(conn, SQL_CURSOR_SENSITIVITY, static_cast<SQLUINTEGER>(0));
+  validate(conn, SQL_CURSOR_SENSITIVITY, static_cast<SQLUINTEGER>(SQL_UNSPECIFIED));
 
   this->disconnect();
 }
