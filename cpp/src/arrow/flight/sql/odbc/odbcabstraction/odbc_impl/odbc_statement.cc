@@ -153,6 +153,9 @@ SQLSMALLINT getCTypeForSQLType(const DescriptorRecord& record) {
     case SQL_DOUBLE:
       return SQL_C_DOUBLE;
 
+    case SQL_GUID:
+      return SQL_C_GUID;
+
     case SQL_DATE:
     case SQL_TYPE_DATE:
       return SQL_C_TYPE_DATE;
