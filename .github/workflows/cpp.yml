@@ -496,6 +496,8 @@ jobs:
 
           # Set DumpType (2 = full dump, 1 = mini dump)
           Set-ItemProperty -Path $key -Name "DumpType" -Value 2 -Type DWord
+
+          Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps"
       - name: Test
         shell: msys2 {0}
         run: |
@@ -506,4 +508,9 @@ jobs:
         with:
           name: test-logs-${{ matrix.msystem_lower}}
           path: D:/a/arrow/arrow/build/cpp/build/test-logs/
+      - name: Upload crash dumps from default location
+        uses: actions/upload-artifact@v4
+        with:
+          name: crash-dumps-${{ matrix.msystem_lower}}
+          path: ${{ env.LOCALAPPDATA }}\CrashDumps
           
