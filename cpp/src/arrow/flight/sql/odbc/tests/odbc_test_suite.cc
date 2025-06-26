@@ -68,22 +68,20 @@ void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
   // Assert connection is successful before we continue
   ASSERT_TRUE(ret == SQL_SUCCESS);
 
-  // TODO: enable after SQLGetStmtAttr is supported.
-  //// Allocate a statement using alloc handle
-  // ret = SQLAllocHandle(SQL_HANDLE_STMT, conn, &stmt);
+  // Allocate a statement using alloc handle
+  ret = SQLAllocHandle(SQL_HANDLE_STMT, conn, &stmt);
 
-  // ASSERT_TRUE(ret == SQL_SUCCESS);
+  ASSERT_TRUE(ret == SQL_SUCCESS);
 }
 
 void FlightSQLODBCRemoteTestBase::disconnect() {
-  // TODO: enable after SQLGetStmtAttr is supported.
-  //// Close statement
-  // SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
+  // Close statement
+  SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 
-  // EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Disconnect from ODBC
-  SQLRETURN ret = SQLDisconnect(conn);
+  ret = SQLDisconnect(conn);
 
   if (ret != SQL_SUCCESS) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
@@ -126,12 +124,15 @@ std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
     return (::toupper(char1) == ::toupper(char2));
   };
 
-  const std::string auth_val(incoming_headers.find(kAuthHeader)->second);
   std::string bearer_token("");
-  if (auth_val.size() > kBearerPrefix.length()) {
-    if (std::equal(auth_val.begin(), auth_val.begin() + kBearerPrefix.length(),
-                   kBearerPrefix.begin(), char_compare)) {
-      bearer_token = auth_val.substr(kBearerPrefix.length());
+  auto authHeader = incoming_headers.find(kAuthHeader);
+  if (authHeader != incoming_headers.end()) {
+    const std::string auth_val(authHeader->second);
+    if (auth_val.size() > kBearerPrefix.length()) {
+      if (std::equal(auth_val.begin(), auth_val.begin() + kBearerPrefix.length(),
+                     kBearerPrefix.begin(), char_compare)) {
+        bearer_token = auth_val.substr(kBearerPrefix.length());
+      }
     }
   }
   return bearer_token;
