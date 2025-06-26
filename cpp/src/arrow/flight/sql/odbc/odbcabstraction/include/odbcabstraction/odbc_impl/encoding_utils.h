@@ -82,7 +82,7 @@ inline size_t ConvertToSqlWChar(const std::string_view& str, SQLWCHAR* buffer,
 /// \param[in] wchar_msg SqlWchar to convert
 /// \param[in] msg_len Number of characters in wchar_msg
 /// \return wchar_msg in std::string format
-inline std::string SqlWcharToString(SQLWCHAR* wchar_msg, SQLSMALLINT msg_len = SQL_NTS) {
+inline std::string SqlWcharToString(SQLWCHAR* wchar_msg, SQLINTEGER msg_len = SQL_NTS) {
   if (!wchar_msg || wchar_msg[0] == 0 || msg_len == 0) {
     return std::string();
   }
