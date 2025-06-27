@@ -92,19 +92,24 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectInvalidQuery) {
       SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
   EXPECT_EQ(ret, SQL_SUCCESS);
 
+ if (ret != SQL_SUCCESS) {
+      // -AL- remove later
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   SQLINTEGER val;
   SQLLEN bufLen = sizeof(val);
 
-  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
+  ret = SQLGetData(this->stmt, 9, SQL_C_LONG, &val, 0, &bufLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
   // Verify int min is returned
   EXPECT_EQ(val, std::numeric_limits<SQLINTEGER>::min());
 
-  ret = SQLGetData(this->stmt, 2, SQL_C_LONG, &val, 0, &bufLen);
+  ret = SQLGetData(this->stmt, 10, SQL_C_LONG, &val, 0, &bufLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
   // Verify int max is returned
