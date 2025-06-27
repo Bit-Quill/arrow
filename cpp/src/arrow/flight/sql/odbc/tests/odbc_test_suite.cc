@@ -119,7 +119,7 @@ std::wstring FlightSQLODBCRemoteTestBase::getQueryAllDataTypes() {
           -128 as stiny_int_min, 127 as stiny_int_max,
           0 as utiny_int_min, 255 as utiny_int_max,
 
-          -32768 as ssmall_int_min, 32767 as stiny_int_max,
+          -32768 as ssmall_int_min, 32767 as ssmall_int_max,
           0 as usmall_int_min, 65535 as usmall_int_max,
 
           CAST(-2147483648 AS INTEGER) AS sinteger_min,
@@ -137,14 +137,10 @@ std::wstring FlightSQLODBCRemoteTestBase::getQueryAllDataTypes() {
           CAST(-999999999.99 AS DECIMAL(18, 2)) AS decimal_min,
           CAST(999999999.99 AS DECIMAL(18, 2)) AS decimal_max,
 
-          --use same decimal value to convert to numeric by ODBC
-          CAST(-999999999.99 AS DECIMAL(18, 2)) AS numeric_min,
-          CAST(999999999.99 AS DECIMAL(18, 2)) AS numeric_max,
+          CAST(-3.40282347E38 AS FLOAT) AS float_min, CAST(3.40282347E38 AS FLOAT) AS float_max,
 
-          CAST(-3.4E38 AS FLOAT) AS float_min, CAST(3.4E38 AS FLOAT) AS float_max,
-
-          CAST(-1.79E308 AS DOUBLE) AS double_min,
-          CAST(1.79E308 AS DOUBLE) AS double_max,
+          CAST(-1.7976931348623157E308 AS DOUBLE) AS double_min,
+          CAST(1.7976931348623157E308 AS DOUBLE) AS double_max,
 
           --Boolean
           CAST(false AS BOOLEAN) AS bit_false,
@@ -274,15 +270,11 @@ std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
       CAST(-999999999.99 AS REAL) AS decimal_min,
       CAST(999999999.99 AS REAL) AS decimal_max,
 
-      -- use same decimal value to convert to numeric by ODBC
-      CAST(-999999999.99 AS REAL) AS numeric_min,
-      CAST(999999999.99 AS REAL) AS numeric_max,
+      CAST(-3.40282347E38 AS REAL) AS float_min,
+      CAST(3.40282347E38 AS REAL) AS float_max,
 
-      CAST(-3.4E38 AS REAL) AS float_min,
-      CAST(3.4E38 AS REAL) AS float_max,
-
-      CAST(-1.79E308 AS REAL) AS double_min,
-      CAST(1.79E308 AS REAL) AS double_max,
+      CAST(-1.7976931348623157E308 AS REAL) AS double_min,
+      CAST(1.7976931348623157E308 AS REAL) AS double_max,
 
       -- Boolean
       0 AS bit_false,
