@@ -60,8 +60,8 @@ class ODBCConnection : public ODBCHandle<ODBCConnection> {
                const driver::odbcabstraction::Connection::ConnPropertyMap& properties,
                std::vector<std::string_view>& missing_properties);
 
-  void GetInfo(SQLUSMALLINT infoType, SQLPOINTER value, SQLSMALLINT bufferLength,
-               SQLSMALLINT* outputLength, bool isUnicode);
+  SQLRETURN GetInfo(SQLUSMALLINT infoType, SQLPOINTER value, SQLSMALLINT bufferLength,
+                    SQLSMALLINT* outputLength, bool isUnicode);
   void SetConnectAttr(SQLINTEGER attribute, SQLPOINTER value, SQLINTEGER stringLength,
                       bool isUnicode);
   SQLRETURN GetConnectAttr(SQLINTEGER attribute, SQLPOINTER value,
