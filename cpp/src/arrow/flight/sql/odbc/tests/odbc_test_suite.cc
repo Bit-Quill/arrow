@@ -151,10 +151,7 @@ std::wstring FlightSQLODBCRemoteTestBase::getQueryAllDataTypes() {
 
           '你好' AS c_wvarchar,
 
-          'ZZZ' AS c_varchar,
-
-          --Binary(as strings in remote server)
-          'ZZZZZZZZ' AS c_varbinary,
+          'XYZ' AS c_varchar,
 
           --Date / time
           CAST(DATE '0001-01-01' AS DATE) AS date_min,
@@ -284,10 +281,7 @@ std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
       'Z' AS c_char,
       '你' AS c_wchar,
       '你好' AS c_wvarchar,
-      'ZZZ' AS c_varchar,
-
-      -- Binary as TEXT
-      'ZZZZZZZZ' AS c_varbinary,
+      'XYZ' AS c_varchar,
 
       -- Date/time as TEXT
       '0001-01-01' AS date_min,

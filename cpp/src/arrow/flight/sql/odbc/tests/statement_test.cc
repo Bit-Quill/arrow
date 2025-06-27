@@ -300,9 +300,68 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectInvalidQuery) {
   EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(char_val[0], 'Z');
 
+  // WChar
+  SQLWCHAR wchar_val[2];
+  bufLen = sizeof(wchar_val) * 2;
+
+  ret = SQLGetData(this->stmt, 26, SQL_C_WCHAR, &wchar_val, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(wchar_val[0], L'你');
+
+  // WVarchar
+  SQLWCHAR wvarchar_val[3];
+  bufLen = sizeof(wvarchar_val) * 3;
+
+  ret = SQLGetData(this->stmt, 27, SQL_C_WCHAR, &wvarchar_val, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(wvarchar_val[0], L'你');
+  EXPECT_EQ(wvarchar_val[1], L'好');
+
+  // varchar
+  SQLCHAR varchar_val[4];
+  bufLen = sizeof(varchar_val) * 4;
+
+  ret = SQLGetData(this->stmt, 28, SQL_C_CHAR, &varchar_val, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(varchar_val[0], 'X');
+  EXPECT_EQ(varchar_val[1], 'Y');
+  EXPECT_EQ(varchar_val[2], 'Z');
+
+
   // -AL- todo add more checks
 
   this->disconnect();
 }
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectVarbinaryQuery) {
+  // Have binary test on mock test base as remote test servers tend to have different
+  // formats for binary data
+  this->connect();
+
+  std::wstring wsql = L"SELECT X'ABCDEF' AS c_varbinary;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // varbinary
+  std::vector<int8_t> varbinary_val(3);
+  SQLLEN bufLen = varbinary_val.size();
+  ret = SQLGetData(this->stmt, 1, SQL_C_BINARY, &varbinary_val[0], bufLen, &bufLen);
+  EXPECT_EQ(varbinary_val[0], '\xAB');
+  EXPECT_EQ(varbinary_val[1], '\xCD');
+  EXPECT_EQ(varbinary_val[2], '\xEF');
+
+  this->disconnect();
+}
+
+//-AL- todo add checks for fetching a table with many rows.
 
 }  // namespace arrow::flight::sql::odbc
