@@ -740,6 +740,14 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType,
                                  bufferLength, indicatorPtr);
 }
 
+void ODBCStatement::getColumnCount(SQLSMALLINT* columnCountPtr) {
+  if (!columnCountPtr) {
+    throw DriverException("Invalid null pointer for number of column results.", "HY000");
+  }
+  size_t columnCount = m_currentArd->GetRecords().size();
+  *columnCountPtr = columnCount;
+}
+
 void ODBCStatement::releaseStatement() {
   closeCursor(true);
   m_connection.dropStatement(this);

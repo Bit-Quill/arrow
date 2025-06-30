@@ -87,6 +87,11 @@ class ODBCStatement : public ODBCHandle<ODBCStatement> {
                     SQLLEN bufferLength, SQLLEN* indicatorPtr);
 
   /**
+   * @brief Get number of columns from data set
+   */
+  void getColumnCount(SQLSMALLINT* columnCountPtr);
+
+  /**
    * @brief Closes the cursor. This does _not_ un-prepare the statement or change
    * bindings.
    */

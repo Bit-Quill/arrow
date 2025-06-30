@@ -260,11 +260,9 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementTe
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementHandle,
+SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT stmt,
                                    SQLSMALLINT* columnCountPtr) {
-  LOG_DEBUG("SQLNumResultCols called with statementHandle: {}, columnCountPtr: {}",
-            statementHandle, fmt::ptr(columnCountPtr));
-  return SQL_ERROR;
+  return arrow::SQLNumResultCols(stmt, columnCountPtr);
 }
 
 SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementHandle, SQLWCHAR* statementText,
