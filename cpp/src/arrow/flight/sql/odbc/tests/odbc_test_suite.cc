@@ -283,13 +283,13 @@ std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
       '你好' AS c_wvarchar,
       'XYZ' AS c_varchar,
 
-      -- Date/time as TEXT
-      '0001-01-01' AS date_min,
-      '9999-12-31' AS date_max,
+      DATE('0001-01-01') AS date_min,
+      DATE('9999-12-31') AS date_max,
 
-      '00:00:00' AS time_min,
-      '23:59:59' AS time_max,
+      TIME('00:00:00') AS time_min,
+      TIME('23:59:59') AS time_max,
 
+	    -- Timestamp as TEXT
       '0001-01-01 00:00:00' AS timestamp_min,
       '9999-12-31 23:59:59' AS timestamp_max,
 

@@ -761,8 +761,8 @@ void ODBCStatement::getRowCount(SQLLEN* rowCountPtr) {
   if (!rowCountPtr) {
     throw DriverException("Invalid null pointer for number of rows affected.", "HY000");
   }
-  // Will always be 0 if only SELECT is supported
-  *rowCountPtr = 0;
+  // Will always be -1 (number of rows unknown) if only SELECT is supported
+  *rowCountPtr = -1;
 }
 
 void ODBCStatement::releaseStatement() {

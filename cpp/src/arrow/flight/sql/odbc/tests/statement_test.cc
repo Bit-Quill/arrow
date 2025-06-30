@@ -26,8 +26,8 @@
 
 #include <limits>
 
-#include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace arrow::flight::sql::odbc {
 
@@ -82,7 +82,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectInvalidQuery) {
   this->disconnect();
 }
 
- TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
   this->connect();
 
   std::wstring wsql = this->getQueryAllDataTypes();
@@ -92,8 +92,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectInvalidQuery) {
       SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
   EXPECT_EQ(ret, SQL_SUCCESS);
 
- if (ret != SQL_SUCCESS) {
-      // -AL- remove later
+  if (ret != SQL_SUCCESS) {
+    // -AL- remove later
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
   }
 
@@ -330,8 +330,68 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectInvalidQuery) {
   EXPECT_EQ(varchar_val[1], 'Y');
   EXPECT_EQ(varchar_val[2], 'Z');
 
+  // Date and Time, Timestamp
+
+  SQL_DATE_STRUCT date_var{};
+  bufLen = sizeof(date_var);
+
+  ret = SQLGetData(this->stmt, 29, SQL_C_TYPE_DATE, &date_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check min values for date
+  EXPECT_EQ(date_var.day, 1);
+  EXPECT_EQ(date_var.month, 1);
+  EXPECT_EQ(date_var.year, 1);
+
+  /*
+  ret = SQLGetData(this->stmt, 30, SQL_C_TYPE_DATE, &date_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check max values for date
+  EXPECT_EQ(date_var.day, 1);
+  EXPECT_EQ(date_var.month, 1);
+  EXPECT_EQ(date_var.year, 1);
+  */
 
   // -AL- todo add more checks
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectTEMPQuery) {
+  // -AL- TEMP test for date,it works.
+  this->connect();
+
+  std::wstring wsql = L"SELECT DATE('2024-01-23') AS date, DATE('1920-03-07') AS date2;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // date
+  SQL_DATE_STRUCT date_var{};
+  SQLLEN bufLen = sizeof(date_var);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_TYPE_DATE, &date_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check min values for date
+  EXPECT_EQ(date_var.day, 23);
+  EXPECT_EQ(date_var.month, 1);
+  EXPECT_EQ(date_var.year, 2024);
+
+  // date 2
+  ret = SQLGetData(this->stmt, 2, SQL_C_TYPE_DATE, &date_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check min values for date
+  EXPECT_EQ(date_var.day, 7);
+  EXPECT_EQ(date_var.month, 3);
+  EXPECT_EQ(date_var.year, 1920);
 
   this->disconnect();
 }

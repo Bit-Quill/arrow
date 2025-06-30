@@ -953,7 +953,6 @@ SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
     return statement->getMoreResults();
-    // return SQL_NO_DATA;
   });
 }
 
