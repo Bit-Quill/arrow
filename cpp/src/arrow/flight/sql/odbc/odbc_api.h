@@ -67,4 +67,5 @@ SQLRETURN SQLFetch(SQLHSTMT stmt);
 SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
                      SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr);
 SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr);
+SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr);
 }  // namespace arrow

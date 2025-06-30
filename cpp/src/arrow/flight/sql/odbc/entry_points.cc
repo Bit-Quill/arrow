@@ -265,6 +265,10 @@ SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT stmt,
   return arrow::SQLNumResultCols(stmt, columnCountPtr);
 }
 
+SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
+  return arrow::SQLRowCount(stmt, rowCountPtr);
+}
+
 SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementHandle, SQLWCHAR* statementText,
                              SQLINTEGER textLength) {
   LOG_DEBUG(

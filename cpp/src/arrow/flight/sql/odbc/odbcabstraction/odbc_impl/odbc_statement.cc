@@ -748,6 +748,14 @@ void ODBCStatement::getColumnCount(SQLSMALLINT* columnCountPtr) {
   *columnCountPtr = columnCount;
 }
 
+void ODBCStatement::getRowCount(SQLLEN* rowCountPtr) {
+  if (!rowCountPtr) {
+    throw DriverException("Invalid null pointer for number of rows affected.", "HY000");
+  }
+  // Will always be 0 if only SELECT is supported
+  *rowCountPtr = 0;
+}
+
 void ODBCStatement::releaseStatement() {
   closeCursor(true);
   m_connection.dropStatement(this);

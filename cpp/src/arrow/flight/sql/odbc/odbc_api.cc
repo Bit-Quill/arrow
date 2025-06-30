@@ -341,7 +341,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
     case SQL_DIAG_ROW_COUNT: {
       if (handleType == SQL_HANDLE_STMT) {
         if (diagInfoPtr) {
-          // Will always be 0 if only select supported
+          // Will always be 0 if only SELECT is supported
           *static_cast<SQLLEN*>(diagInfoPtr) = 0;
         }
 
@@ -946,13 +946,25 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
 }
 
 SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
-  LOG_DEBUG("SQLNumResultCols called with v: {}, columnCountPtr: {}", stmt,
+  LOG_DEBUG("SQLNumResultCols called with stmt: {}, columnCountPtr: {}", stmt,
             fmt::ptr(columnCountPtr));
   // TODO: write tests for SQLNumResultCols
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
     statement->getColumnCount(columnCountPtr);
+    return SQL_SUCCESS;
+  });
+}
+
+SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
+  LOG_DEBUG("SQLRowCount called with stmt: {}, columnCountPtr: {}", stmt,
+            fmt::ptr(rowCountPtr));
+  // TODO: write tests for SQLRowCount
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    statement->getRowCount(rowCountPtr);
     return SQL_SUCCESS;
   });
 }

@@ -92,6 +92,11 @@ class ODBCStatement : public ODBCHandle<ODBCStatement> {
   void getColumnCount(SQLSMALLINT* columnCountPtr);
 
   /**
+   * @brief Get number of rows affected by an UPDATE, INSERT, or DELETE statement
+   */
+  void getRowCount(SQLLEN* rowCountPtr);
+
+  /**
    * @brief Closes the cursor. This does _not_ un-prepare the statement or change
    * bindings.
    */
