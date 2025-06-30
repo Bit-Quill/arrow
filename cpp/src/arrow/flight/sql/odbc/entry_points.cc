@@ -242,10 +242,7 @@ SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementHandle, SQLSMALLINT dataType)
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLMoreResults(SQLHSTMT statementHandle) {
-  LOG_DEBUG("SQLMoreResults called with statementHandle: {}", statementHandle);
-  return SQL_ERROR;
-}
+SQLRETURN SQL_API SQLMoreResults(SQLHSTMT stmt) { return arrow::SQLMoreResults(stmt); }
 
 SQLRETURN SQL_API SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
                                SQLINTEGER inStatementTextLength,
@@ -260,8 +257,7 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementTe
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT stmt,
-                                   SQLSMALLINT* columnCountPtr) {
+SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
   return arrow::SQLNumResultCols(stmt, columnCountPtr);
 }
 

@@ -945,6 +945,18 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
   });
 }
 
+SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
+  LOG_DEBUG("SQLMoreResults called with stmt: {}", stmt);
+  // TODO: write tests for SQLMoreResults
+  using ODBC::ODBCStatement;
+  // Multiple result sets not supported. Return SQL_NO_DATA by default.
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    return statement->getMoreResults();
+    // return SQL_NO_DATA;
+  });
+}
+
 SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
   LOG_DEBUG("SQLNumResultCols called with stmt: {}, columnCountPtr: {}", stmt,
             fmt::ptr(columnCountPtr));

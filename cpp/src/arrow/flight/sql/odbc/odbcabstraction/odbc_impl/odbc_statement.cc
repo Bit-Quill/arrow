@@ -740,6 +740,15 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType,
                                  bufferLength, indicatorPtr);
 }
 
+SQLRETURN ODBCStatement::getMoreResults() {
+  // Multiple result sets are not supported.
+  if (m_currenResult) {
+    return SQL_NO_DATA;
+  } else {
+    throw DriverException("Function sequence error", "HY010");
+  }
+}
+
 void ODBCStatement::getColumnCount(SQLSMALLINT* columnCountPtr) {
   if (!columnCountPtr) {
     throw DriverException("Invalid null pointer for number of column results.", "HY000");

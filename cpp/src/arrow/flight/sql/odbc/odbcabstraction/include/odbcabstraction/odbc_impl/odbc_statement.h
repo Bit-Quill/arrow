@@ -86,6 +86,8 @@ class ODBCStatement : public ODBCHandle<ODBCStatement> {
   SQLRETURN GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType, SQLPOINTER dataPtr,
                     SQLLEN bufferLength, SQLLEN* indicatorPtr);
 
+  SQLRETURN getMoreResults();
+
   /**
    * @brief Get number of columns from data set
    */
