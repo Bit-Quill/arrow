@@ -338,20 +338,18 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
   ret = SQLGetData(this->stmt, 29, SQL_C_TYPE_DATE, &date_var, bufLen, &bufLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // Check min values for date
+  // Check min values for date. Min valid year is 1400.
   EXPECT_EQ(date_var.day, 1);
   EXPECT_EQ(date_var.month, 1);
-  EXPECT_EQ(date_var.year, 1);
+  EXPECT_EQ(date_var.year, 1400);
 
-  /*
   ret = SQLGetData(this->stmt, 30, SQL_C_TYPE_DATE, &date_var, bufLen, &bufLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // Check max values for date
-  EXPECT_EQ(date_var.day, 1);
-  EXPECT_EQ(date_var.month, 1);
-  EXPECT_EQ(date_var.year, 1);
-  */
+  // Check max values for date. Max valid year is 9999.
+  EXPECT_EQ(date_var.day, 31);
+  EXPECT_EQ(date_var.month, 12);
+  EXPECT_EQ(date_var.year, 9999);
 
   // -AL- todo add more checks
 
