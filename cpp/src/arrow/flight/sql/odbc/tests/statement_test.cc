@@ -92,11 +92,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
       SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  if (ret != SQL_SUCCESS) {
-    // -AL- remove later
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
-
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -288,7 +283,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
 
   // Char
   SQLCHAR char_val[2];
-  bufLen = sizeof(char_val) * 2;
+  bufLen = sizeof(SQLCHAR) * 2;
 
   ret = SQLGetData(this->stmt, 25, SQL_C_CHAR, &char_val, bufLen, &bufLen);
 
@@ -297,7 +292,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
 
   // WChar
   SQLWCHAR wchar_val[2];
-  bufLen = sizeof(wchar_val) * 2;
+  bufLen = sizeof(SQLWCHAR) * 2;
 
   ret = SQLGetData(this->stmt, 26, SQL_C_WCHAR, &wchar_val, bufLen, &bufLen);
 
@@ -306,7 +301,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
 
   // WVarchar
   SQLWCHAR wvarchar_val[3];
-  bufLen = sizeof(wvarchar_val) * 3;
+  bufLen = sizeof(SQLWCHAR) * 3;
 
   ret = SQLGetData(this->stmt, 27, SQL_C_WCHAR, &wvarchar_val, bufLen, &bufLen);
 
@@ -316,7 +311,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
 
   // varchar
   SQLCHAR varchar_val[4];
-  bufLen = sizeof(varchar_val) * 4;
+  bufLen = sizeof(SQLCHAR) * 4;
 
   ret = SQLGetData(this->stmt, 28, SQL_C_CHAR, &varchar_val, bufLen, &bufLen);
 
@@ -374,40 +369,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
   EXPECT_EQ(timestamp_var.minute, 59);
   EXPECT_EQ(timestamp_var.second, 59);
   EXPECT_EQ(timestamp_var.fraction, 0);
-
-  this->disconnect();
-}
-
-TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectTEMPQuery) {
-  // -AL- TEMP test for date,it works.
-  this->connect();
-
-  std::wstring wsql =
-      L"SELECT  TIME('00:00:00') AS time_min, TIME('23:59:59') AS time_max;";
-  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
-
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  // date
-  SQL_TIME_STRUCT time_var{};
-  SQLLEN bufLen = sizeof(time_var);
-
-  ret = SQLGetData(this->stmt, 1, SQL_C_TYPE_TIME, &time_var, bufLen, &bufLen);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- remove later
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
-  // Check min values for time.
-  EXPECT_EQ(time_var.hour, 0);
-  EXPECT_EQ(time_var.minute, 0);
-  EXPECT_EQ(time_var.second, 0);
 
   this->disconnect();
 }
@@ -505,8 +466,123 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectGuidQueryUnsupported) {
   this->disconnect();
 }
 
-//-AL- todo add checks for fetching a table with many rows.
 // -AL- todo add tests for float truncation
 // -AL- todo add tests for varchar truncation
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
+  this->connect();
+
+  std::wstring wsql = LR"(
+    SELECT 1 AS small_table
+    UNION ALL
+    SELECT 2
+    UNION ALL
+    SELECT 3;
+  )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Fetch row 1
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+  SQLLEN bufLen = sizeof(val);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify 1 is returned
+  EXPECT_EQ(val, 1);
+
+  // Fetch row 2
+  ret = SQLFetch(stmt);
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify 2 is returned
+  EXPECT_EQ(val, 2);
+
+  // Fetch row 3
+  ret = SQLFetch(stmt);
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify 3 is returned
+  EXPECT_EQ(val, 3);
+
+  // Verify result set has no more data beyond row 3
+  ret = SQLFetch(stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // Invalid cursor state
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectVarcharTruncation) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  const int len = 17;
+  SQLCHAR char_val[len];
+  SQLLEN bufLen = sizeof(SQLCHAR) * len;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  // Verify string truncation is reported
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01004);
+
+  EXPECT_EQ(ODBC::SqlStringToString(char_val), std::string("VERY LONG STRING"));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectFloatTruncation) {
+  this->connect();
+
+
+  std::wstring wsql = L"SELECT 1.1 AS float;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  int16_t ssmall_int_val;
+  SQLLEN bufLen = sizeof(ssmall_int_val);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_SSHORT, &ssmall_int_val, 0, &bufLen);
+  if (ret != SQL_SUCCESS) {
+    // -AL- remove later
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  // Verify float truncation is reported
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01S07);
+
+  EXPECT_EQ(ssmall_int_val, 1);
+
+  this->disconnect();
+}
 
 }  // namespace arrow::flight::sql::odbc
