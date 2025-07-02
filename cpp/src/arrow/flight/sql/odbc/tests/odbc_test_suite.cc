@@ -134,8 +134,8 @@ std::wstring FlightSQLODBCRemoteTestBase::getQueryAllDataTypes() {
           --remote test server
           '18446744073709551615' AS ubigint_max,
 
-          CAST(-999999999.99 AS DECIMAL(18, 2)) AS decimal_min,
-          CAST(999999999.99 AS DECIMAL(18, 2)) AS decimal_max,
+          CAST(-999999999 AS DECIMAL(38, 0)) AS decimal_negative,
+          CAST(999999999 AS DECIMAL(38, 0)) AS decimal_positive,
 
           CAST(-3.40282347E38 AS FLOAT) AS float_min, CAST(3.40282347E38 AS FLOAT) AS float_max,
 
@@ -153,31 +153,12 @@ std::wstring FlightSQLODBCRemoteTestBase::getQueryAllDataTypes() {
 
           'XYZ' AS c_varchar,
 
-          --Date / time
+          --Date / timestamp
           CAST(DATE '1400-01-01' AS DATE) AS date_min,
           CAST(DATE '9999-12-31' AS DATE) AS date_max,
 
-          CAST(TIME '00:00:00' AS TIME) AS time_min,
-          CAST(TIME '23:59:59' AS TIME) AS time_max,
-
           CAST(TIMESTAMP '1400-01-01 00:00:00' AS TIMESTAMP) AS timestamp_min,
-          CAST(TIMESTAMP '9999-12-31 23:59:59' AS TIMESTAMP) AS timestamp_max,
-
-          --GUID as Varchar
-          'C77313CF-4E08-47CE-B6DF-94DD2FCF3541' AS guid,
-
-          --Interval
-          INTERVAL '99' YEAR AS interval_year, INTERVAL '12' MONTH AS interval_month,
-          INTERVAL '99-11' YEAR TO MONTH AS interval_year_to_month,
-          INTERVAL '99' DAY AS interval_day, INTERVAL '23' HOUR AS interval_hour,
-          INTERVAL '59' MINUTE AS interval_minute,
-          INTERVAL '59.999' SECOND(2, 3) AS interval_second,
-          INTERVAL '99 23' DAY TO HOUR AS interval_day_to_hour,
-          INTERVAL '99 23:59' DAY TO MINUTE AS interval_day_to_minute,
-          INTERVAL '99 23:59:59.999' DAY TO SECOND AS interval_day_to_second,
-          INTERVAL '23:59' HOUR TO MINUTE AS interval_hour_to_minute,
-          INTERVAL '23:59:59' HOUR TO SECOND AS interval_hour_to_second,
-          INTERVAL '59:59' MINUTE TO SECOND AS interval_minute_to_second;
+          CAST(TIMESTAMP '9999-12-31 23:59:59' AS TIMESTAMP) AS timestamp_max;
       )";
   return wsql;
 }
@@ -264,8 +245,8 @@ std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
       -- stored as TEXT as SQLite doesn't support unsigned big int
       '18446744073709551615' AS ubigint_max,  
 
-      CAST(-999999999.99 AS REAL) AS decimal_min,
-      CAST(999999999.99 AS REAL) AS decimal_max,
+      CAST('-999999999' AS NUMERIC) AS decimal_negative,
+      CAST('999999999' AS NUMERIC) AS decimal_positive,
 
       CAST(-3.40282347E38 AS REAL) AS float_min,
       CAST(3.40282347E38 AS REAL) AS float_max,
@@ -286,30 +267,8 @@ std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
       DATE('1400-01-01') AS date_min,
       DATE('9999-12-31') AS date_max,
 
-      TIME('00:00:00') AS time_min,
-      TIME('23:59:59') AS time_max,
-
-	    -- Timestamp as TEXT
-      '1400-01-01 00:00:00' AS timestamp_min,
-      '9999-12-31 23:59:59' AS timestamp_max,
-
-      -- GUID as TEXT
-      'C77313CF-4E08-47CE-B6DF-94DD2FCF3541' AS guid,
-
-      -- Interval types as TEXT
-      '99 years' AS interval_year,
-      '12 months' AS interval_month,
-      '99 years 11 months' AS interval_year_to_month,
-      '99 days' AS interval_day,
-      '23 hours' AS interval_hour,
-      '59 minutes' AS interval_minute,
-      '59.999 seconds' AS interval_second,
-      '99 days 23 hours' AS interval_day_to_hour,
-      '99 days 23:59' AS interval_day_to_minute,
-      '99 days 23:59:59.999' AS interval_day_to_second,
-      '23:59' AS interval_hour_to_minute,
-      '23:59:59' AS interval_hour_to_second,
-      '59:59' AS interval_minute_to_second;
+      DATETIME('1400-01-01 00:00:00') AS timestamp_min,
+      DATETIME('9999-12-31 23:59:59') AS timestamp_max;
       )";
   return wsql;
 }

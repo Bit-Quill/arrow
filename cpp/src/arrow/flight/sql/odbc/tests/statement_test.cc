@@ -214,36 +214,31 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
   EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(ubig_int_val, std::numeric_limits<SQLUBIGINT>::max());
 
-  // Decimal Types
-  /*
-  * //-AL- todo circle back to this later.
-  * //-AL- need for both
-  //  CAST(-999999999.99 AS DECIMAL(18, 2)) AS decimal_min,
-  //        CAST(999999999.99 AS DECIMAL(18, 2)) AS decimal_max,
+  // Decimal
+  SQL_NUMERIC_STRUCT decimal_val;
+  memset(&decimal_val, 0, sizeof(decimal_val));
+  bufLen = sizeof(SQL_NUMERIC_STRUCT);
 
-  SQL_NUMERIC_STRUCT decimal;
-  memset(&decimal, 0, sizeof(decimal));
-
-  //num.sign = 1;
-  //num.precision = 1;
-
-    bufLen = sizeof(SQL_NUMERIC_STRUCT);
-
-  ret = SQLGetData(this->stmt, 17, SQL_C_NUMERIC, &decimal, bufLen, &bufLen);
+  ret = SQLGetData(this->stmt, 17, SQL_C_NUMERIC, &decimal_val, bufLen, &bufLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- remove later
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
-  EXPECT_EQ(decimal.sign, 1);
-  EXPECT_EQ(decimal.scale, 1);
-  EXPECT_EQ(decimal.precision, 38);
-  EXPECT_THAT(decimal.val, ::testing::ElementsAre(0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-                                                  0xFF, 0xFF, 0, 0, 0, 0, 0, 0, 0, 0));
+  // Check for negative decimal_val value
+  EXPECT_EQ(decimal_val.sign, 0);
+  EXPECT_EQ(decimal_val.scale, 0);
+  EXPECT_EQ(decimal_val.precision, 38);
+  EXPECT_THAT(decimal_val.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0, 0,
+                                                      0, 0, 0, 0, 0, 0, 0, 0));
 
- // -AL- TODO and 1 more for row 18
-*/
+  memset(&decimal_val, 0, sizeof(decimal_val));
+  ret = SQLGetData(this->stmt, 18, SQL_C_NUMERIC, &decimal_val, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check for positive decimal_val value
+  EXPECT_EQ(decimal_val.sign, 1);
+  EXPECT_EQ(decimal_val.scale, 0);
+  EXPECT_EQ(decimal_val.precision, 38);
+  EXPECT_THAT(decimal_val.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0, 0,
+                                                      0, 0, 0, 0, 0, 0, 0, 0));
 
   // Float
   float float_val;
@@ -330,8 +325,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
   EXPECT_EQ(varchar_val[1], 'Y');
   EXPECT_EQ(varchar_val[2], 'Z');
 
-  // Date and Time, Timestamp
+  // Date and Timestamp
 
+  // Date
   SQL_DATE_STRUCT date_var{};
   bufLen = sizeof(date_var);
 
@@ -351,7 +347,33 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
   EXPECT_EQ(date_var.month, 12);
   EXPECT_EQ(date_var.year, 9999);
 
-  // -AL- todo add more checks
+  // Timestamp
+  SQL_TIMESTAMP_STRUCT timestamp_var{};
+  bufLen = sizeof(timestamp_var);
+
+  ret = SQLGetData(this->stmt, 31, SQL_C_TYPE_TIMESTAMP, &timestamp_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check min values for date. Min valid year is 1400.
+  EXPECT_EQ(timestamp_var.day, 1);
+  EXPECT_EQ(timestamp_var.month, 1);
+  EXPECT_EQ(timestamp_var.year, 1400);
+  EXPECT_EQ(timestamp_var.hour, 0);
+  EXPECT_EQ(timestamp_var.minute, 0);
+  EXPECT_EQ(timestamp_var.second, 0);
+  EXPECT_EQ(timestamp_var.fraction, 0);
+
+  ret = SQLGetData(this->stmt, 32, SQL_C_TYPE_TIMESTAMP, &timestamp_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check max values for date. Max valid year is 9999.
+  EXPECT_EQ(timestamp_var.day, 31);
+  EXPECT_EQ(timestamp_var.month, 12);
+  EXPECT_EQ(timestamp_var.year, 9999);
+  EXPECT_EQ(timestamp_var.hour, 23);
+  EXPECT_EQ(timestamp_var.minute, 59);
+  EXPECT_EQ(timestamp_var.second, 59);
+  EXPECT_EQ(timestamp_var.fraction, 0);
 
   this->disconnect();
 }
@@ -360,7 +382,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectTEMPQuery) {
   // -AL- TEMP test for date,it works.
   this->connect();
 
-  std::wstring wsql = L"SELECT DATE('2024-01-23') AS date, DATE('1920-03-07') AS date2;";
+  std::wstring wsql =
+      L"SELECT  TIME('00:00:00') AS time_min, TIME('23:59:59') AS time_max;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
   SQLRETURN ret =
@@ -371,25 +394,61 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectTEMPQuery) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // date
-  SQL_DATE_STRUCT date_var{};
-  SQLLEN bufLen = sizeof(date_var);
+  SQL_TIME_STRUCT time_var{};
+  SQLLEN bufLen = sizeof(time_var);
 
-  ret = SQLGetData(this->stmt, 1, SQL_C_TYPE_DATE, &date_var, bufLen, &bufLen);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-  // Check min values for date
-  EXPECT_EQ(date_var.day, 23);
-  EXPECT_EQ(date_var.month, 1);
-  EXPECT_EQ(date_var.year, 2024);
-
-  // date 2
-  ret = SQLGetData(this->stmt, 2, SQL_C_TYPE_DATE, &date_var, bufLen, &bufLen);
+  ret = SQLGetData(this->stmt, 1, SQL_C_TYPE_TIME, &time_var, bufLen, &bufLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // Check min values for date
-  EXPECT_EQ(date_var.day, 7);
-  EXPECT_EQ(date_var.month, 3);
-  EXPECT_EQ(date_var.year, 1920);
+  if (ret != SQL_SUCCESS) {
+    // -AL- remove later
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+  // Check min values for time.
+  EXPECT_EQ(time_var.hour, 0);
+  EXPECT_EQ(time_var.minute, 0);
+  EXPECT_EQ(time_var.second, 0);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectTimeQuery) {
+  // Mock server test is skipped due to limitation on the mock server.
+  // Time type from mock server does not include the fraction
+  this->connect();
+
+  std::wstring wsql =
+      LR"(
+    SELECT CAST(TIME '00:00:00' AS TIME) AS time_min,
+           CAST(TIME '23:59:59' AS TIME) AS time_max;
+    )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQL_TIME_STRUCT time_var{};
+  SQLLEN bufLen = sizeof(time_var);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_TYPE_TIME, &time_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check min values for time.
+  EXPECT_EQ(time_var.hour, 0);
+  EXPECT_EQ(time_var.minute, 0);
+  EXPECT_EQ(time_var.second, 0);
+
+  ret = SQLGetData(this->stmt, 2, SQL_C_TYPE_TIME, &time_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check max values for time.
+  EXPECT_EQ(time_var.hour, 23);
+  EXPECT_EQ(time_var.minute, 59);
+  EXPECT_EQ(time_var.second, 59);
 
   this->disconnect();
 }
@@ -420,6 +479,34 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectVarbinaryQuery) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectGuidQueryUnsupported) {
+  this->connect();
+
+  // Query GUID as string as SQLite does not support GUID
+  std::wstring wsql = L"SELECT 'C77313CF-4E08-47CE-B6DF-94DD2FCF3541' AS guid;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLGUID guid_var;
+  SQLLEN bufLen = sizeof(guid_var);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_GUID, &guid_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // GUID is not supported by ODBC
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY000);
+
+  this->disconnect();
+}
+
 //-AL- todo add checks for fetching a table with many rows.
+// -AL- todo add tests for float truncation
+// -AL- todo add tests for varchar truncation
 
 }  // namespace arrow::flight::sql::odbc
