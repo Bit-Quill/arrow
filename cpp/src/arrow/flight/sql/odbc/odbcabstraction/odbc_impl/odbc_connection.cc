@@ -169,8 +169,8 @@ SQLRETURN ODBCConnection::GetInfo(SQLUSMALLINT infoType, SQLPOINTER value,
       return GetStringAttribute(isUnicode, m_dsn, true, value, bufferLength, outputLength,
                                 GetDiagnostics());
     case SQL_DRIVER_ODBC_VER:
-      return GetStringAttribute(isUnicode, "03.80", true, value, bufferLength, outputLength,
-                                GetDiagnostics());
+      return GetStringAttribute(isUnicode, "03.80", true, value, bufferLength,
+                                outputLength, GetDiagnostics());
     case SQL_DYNAMIC_CURSOR_ATTRIBUTES1:
       GetAttribute(static_cast<SQLUINTEGER>(0), value, bufferLength, outputLength);
       return SQL_SUCCESS;
@@ -248,8 +248,8 @@ SQLRETURN ODBCConnection::GetInfo(SQLUSMALLINT infoType, SQLPOINTER value,
       GetAttribute(static_cast<SQLUINTEGER>(0), value, bufferLength, outputLength);
       return SQL_SUCCESS;
     case SQL_TABLE_TERM:
-      return GetStringAttribute(isUnicode, "table", true, value, bufferLength, outputLength,
-                                GetDiagnostics());
+      return GetStringAttribute(isUnicode, "table", true, value, bufferLength,
+                                outputLength, GetDiagnostics());
     // Deprecated ODBC 2.x fields required for backwards compatibility.
     case SQL_ODBC_API_CONFORMANCE:
       GetAttribute(static_cast<SQLUSMALLINT>(SQL_OAC_LEVEL1), value, bufferLength,
@@ -308,8 +308,8 @@ SQLRETURN ODBCConnection::GetInfo(SQLUSMALLINT infoType, SQLPOINTER value,
     case SQL_XOPEN_CLI_YEAR: {
       const auto& info = m_spiConnection->GetInfo(infoType);
       const std::string& infoValue = boost::get<std::string>(info);
-      return GetStringAttribute(isUnicode, infoValue, true, value, bufferLength, outputLength,
-                                GetDiagnostics());
+      return GetStringAttribute(isUnicode, infoValue, true, value, bufferLength,
+                                outputLength, GetDiagnostics());
     }
 
     // Driver-level 32-bit integer properties.
@@ -444,11 +444,12 @@ SQLRETURN ODBCConnection::GetInfo(SQLUSMALLINT infoType, SQLPOINTER value,
         throw DriverException("Optional feature not supported.", "HYC00");
       }
       const std::string& infoValue = boost::get<std::string>(*attr);
-      return GetStringAttribute(isUnicode, infoValue, true, value, bufferLength, outputLength,
-                                GetDiagnostics());
+      return GetStringAttribute(isUnicode, infoValue, true, value, bufferLength,
+                                outputLength, GetDiagnostics());
     }
     default:
-      throw DriverException("Unknown SQLGetInfo type: " + std::to_string(infoType), "HY096");
+      throw DriverException("Unknown SQLGetInfo type: " + std::to_string(infoType),
+                            "HY096");
   }
 
   return SQL_ERROR;
