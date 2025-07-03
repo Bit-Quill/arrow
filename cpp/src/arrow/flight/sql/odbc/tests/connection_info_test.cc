@@ -495,7 +495,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DBMS_VER) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ACCESSIBLE_PROCEDURES) {
   this->connect();
 
-  validate(conn, SQL_ACCESSIBLE_PROCEDURES, L"N");
+  validate(this->conn, SQL_ACCESSIBLE_PROCEDURES, L"N");
 
   this->disconnect();
 }
@@ -503,7 +503,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ACCESSIBLE_PROCEDURES) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ACCESSIBLE_TABLES) {
   this->connect();
 
-  validate(conn, SQL_ACCESSIBLE_TABLES, L"Y");
+  validate(this->conn, SQL_ACCESSIBLE_TABLES, L"Y");
 
   this->disconnect();
 }
@@ -511,7 +511,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ACCESSIBLE_TABLES) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_BOOKMARK_PERSISTENCE) {
   this->connect();
 
-  validate(conn, SQL_BOOKMARK_PERSISTENCE, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_BOOKMARK_PERSISTENCE, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -519,7 +519,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_BOOKMARK_PERSISTENCE) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_TERM) {
   this->connect();
 
-  validate(conn, SQL_CATALOG_TERM, L"");
+  validate(this->conn, SQL_CATALOG_TERM, L"");
 
   this->disconnect();
 }
@@ -527,7 +527,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_TERM) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_COLLATION_SEQ) {
   this->connect();
 
-  validate(conn, SQL_COLLATION_SEQ, L"");
+  validate(this->conn, SQL_COLLATION_SEQ, L"");
 
   this->disconnect();
 }
@@ -535,7 +535,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_COLLATION_SEQ) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONCAT_NULL_BEHAVIOR) {
   this->connect();
 
-  validate(conn, SQL_CONCAT_NULL_BEHAVIOR, static_cast<SQLUSMALLINT>(SQL_CB_NULL));
+  validate(this->conn, SQL_CONCAT_NULL_BEHAVIOR, static_cast<SQLUSMALLINT>(SQL_CB_NULL));
 
   this->disconnect();
 }
@@ -543,7 +543,8 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONCAT_NULL_BEHAVIOR) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_COMMIT_BEHAVIOR) {
   this->connect();
 
-  validate(conn, SQL_CURSOR_COMMIT_BEHAVIOR, static_cast<SQLUSMALLINT>(SQL_CB_CLOSE));
+  validate(this->conn, SQL_CURSOR_COMMIT_BEHAVIOR,
+           static_cast<SQLUSMALLINT>(SQL_CB_CLOSE));
 
   this->disconnect();
 }
@@ -551,7 +552,8 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_COMMIT_BEHAVIOR) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_ROLLBACK_BEHAVIOR) {
   this->connect();
 
-  validate(conn, SQL_CURSOR_ROLLBACK_BEHAVIOR, static_cast<SQLUSMALLINT>(SQL_CB_CLOSE));
+  validate(this->conn, SQL_CURSOR_ROLLBACK_BEHAVIOR,
+           static_cast<SQLUSMALLINT>(SQL_CB_CLOSE));
 
   this->disconnect();
 }
@@ -559,7 +561,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_ROLLBACK_BEHAVIOR) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_SENSITIVITY) {
   this->connect();
 
-  validate(conn, SQL_CURSOR_SENSITIVITY, static_cast<SQLUINTEGER>(SQL_UNSPECIFIED));
+  validate(this->conn, SQL_CURSOR_SENSITIVITY, static_cast<SQLUINTEGER>(SQL_UNSPECIFIED));
 
   this->disconnect();
 }
@@ -567,7 +569,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CURSOR_SENSITIVITY) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DATA_SOURCE_READ_ONLY) {
   this->connect();
 
-  validate(conn, SQL_DATA_SOURCE_READ_ONLY, L"N");
+  validate(this->conn, SQL_DATA_SOURCE_READ_ONLY, L"N");
 
   this->disconnect();
 }
@@ -575,7 +577,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DATA_SOURCE_READ_ONLY) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DEFAULT_TXN_ISOLATION) {
   this->connect();
 
-  validate(conn, SQL_DEFAULT_TXN_ISOLATION, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_DEFAULT_TXN_ISOLATION, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -583,7 +585,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DEFAULT_TXN_ISOLATION) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DESCRIBE_PARAMETER) {
   this->connect();
 
-  validate(conn, SQL_DESCRIBE_PARAMETER, L"N");
+  validate(this->conn, SQL_DESCRIBE_PARAMETER, L"N");
 
   this->disconnect();
 }
@@ -591,7 +593,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DESCRIBE_PARAMETER) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MULT_RESULT_SETS) {
   this->connect();
 
-  validate(conn, SQL_MULT_RESULT_SETS, L"N");
+  validate(this->conn, SQL_MULT_RESULT_SETS, L"N");
 
   this->disconnect();
 }
@@ -599,7 +601,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MULT_RESULT_SETS) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MULTIPLE_ACTIVE_TXN) {
   this->connect();
 
-  validate(conn, SQL_MULTIPLE_ACTIVE_TXN, L"N");
+  validate(this->conn, SQL_MULTIPLE_ACTIVE_TXN, L"N");
 
   this->disconnect();
 }
@@ -607,7 +609,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MULTIPLE_ACTIVE_TXN) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_NEED_LONG_DATA_LEN) {
   this->connect();
 
-  validate(conn, SQL_NEED_LONG_DATA_LEN, L"N");
+  validate(this->conn, SQL_NEED_LONG_DATA_LEN, L"N");
 
   this->disconnect();
 }
@@ -615,7 +617,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_NEED_LONG_DATA_LEN) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_NULL_COLLATION) {
   this->connect();
 
-  validate(conn, SQL_NULL_COLLATION, static_cast<SQLUSMALLINT>(SQL_NC_START));
+  validate(this->conn, SQL_NULL_COLLATION, static_cast<SQLUSMALLINT>(SQL_NC_START));
 
   this->disconnect();
 }
@@ -623,7 +625,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_NULL_COLLATION) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_PROCEDURE_TERM) {
   this->connect();
 
-  validate(conn, SQL_PROCEDURE_TERM, L"");
+  validate(this->conn, SQL_PROCEDURE_TERM, L"");
 
   this->disconnect();
 }
@@ -631,7 +633,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_PROCEDURE_TERM) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SCHEMA_TERM) {
   this->connect();
 
-  validate(conn, SQL_SCHEMA_TERM, L"schema");
+  validate(this->conn, SQL_SCHEMA_TERM, L"schema");
 
   this->disconnect();
 }
@@ -639,7 +641,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SCHEMA_TERM) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SCROLL_OPTIONS) {
   this->connect();
 
-  validate(conn, SQL_SCROLL_OPTIONS, static_cast<SQLUINTEGER>(SQL_SO_FORWARD_ONLY));
+  validate(this->conn, SQL_SCROLL_OPTIONS, static_cast<SQLUINTEGER>(SQL_SO_FORWARD_ONLY));
 
   this->disconnect();
 }
@@ -647,7 +649,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SCROLL_OPTIONS) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TABLE_TERM) {
   this->connect();
 
-  validate(conn, SQL_TABLE_TERM, L"table");
+  validate(this->conn, SQL_TABLE_TERM, L"table");
 
   this->disconnect();
 }
@@ -655,7 +657,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TABLE_TERM) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TXN_CAPABLE) {
   this->connect();
 
-  validate(conn, SQL_TXN_CAPABLE, static_cast<SQLUSMALLINT>(SQL_TC_NONE));
+  validate(this->conn, SQL_TXN_CAPABLE, static_cast<SQLUSMALLINT>(SQL_TC_NONE));
 
   this->disconnect();
 }
@@ -663,7 +665,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TXN_CAPABLE) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TXN_ISOLATION_OPTION) {
   this->connect();
 
-  validate(conn, SQL_TXN_ISOLATION_OPTION, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_TXN_ISOLATION_OPTION, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -671,7 +673,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TXN_ISOLATION_OPTION) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_USER_NAME) {
   this->connect();
 
-  validate(conn, SQL_USER_NAME, L"");
+  validate(this->conn, SQL_USER_NAME, L"");
 
   this->disconnect();
 }
@@ -682,7 +684,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_AGGREGATE_FUNCTIONS) {
   this->connect();
 
   validate(
-      conn, SQL_AGGREGATE_FUNCTIONS,
+      this->conn, SQL_AGGREGATE_FUNCTIONS,
       static_cast<SQLUINTEGER>(SQL_AF_ALL | SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT |
                                SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM));
 
@@ -692,7 +694,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_AGGREGATE_FUNCTIONS) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ALTER_DOMAIN) {
   this->connect();
 
-  validate(conn, SQL_ALTER_DOMAIN, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_ALTER_DOMAIN, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -703,7 +705,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ALTER_SCHEMA) {
   this->connect();
 
   // Type does not exist in sql.h
-  // validate(conn, SQL_ALTER_SCHEMA, static_cast<SQLUINTEGER>(0));
+  // validate(this->conn, SQL_ALTER_SCHEMA, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -711,7 +713,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ALTER_SCHEMA) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ALTER_TABLE) {
   this->connect();
 
-  validate(conn, SQL_ALTER_TABLE, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_ALTER_TABLE, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -722,7 +724,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ANSI_SQL_DATETIME_LITERALS) {
   this->connect();
 
   // Type does not exist in sql.h
-  // validate(conn, SQL_ANSI_SQL_DATETIME_LITERALS, L"");
+  // validate(this->conn, SQL_ANSI_SQL_DATETIME_LITERALS, L"");
 
   this->disconnect();
 }
@@ -730,7 +732,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ANSI_SQL_DATETIME_LITERALS) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_LOCATION) {
   this->connect();
 
-  validate(conn, SQL_CATALOG_LOCATION, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_CATALOG_LOCATION, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -738,7 +740,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_LOCATION) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_NAME) {
   this->connect();
 
-  validate(conn, SQL_CATALOG_NAME, L"N");
+  validate(this->conn, SQL_CATALOG_NAME, L"N");
 
   this->disconnect();
 }
@@ -746,7 +748,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_NAME) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_NAME_SEPARATOR) {
   this->connect();
 
-  validate(conn, SQL_CATALOG_NAME_SEPARATOR, L"");
+  validate(this->conn, SQL_CATALOG_NAME_SEPARATOR, L"");
 
   this->disconnect();
 }
@@ -754,7 +756,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CATALOG_NAME_SEPARATOR) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CATALOG_USAGE) {
   this->connect();
 
-  validate(conn, SQL_CATALOG_USAGE, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CATALOG_USAGE, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -762,7 +764,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CATALOG_USAGE) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_COLUMN_ALIAS) {
   this->connect();
 
-  validate(conn, SQL_COLUMN_ALIAS, L"Y");
+  validate(this->conn, SQL_COLUMN_ALIAS, L"Y");
 
   this->disconnect();
 }
@@ -770,7 +772,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_COLUMN_ALIAS) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CORRELATION_NAME) {
   this->connect();
 
-  validate(conn, SQL_CORRELATION_NAME, static_cast<SQLUSMALLINT>(SQL_CN_NONE));
+  validate(this->conn, SQL_CORRELATION_NAME, static_cast<SQLUSMALLINT>(SQL_CN_NONE));
 
   this->disconnect();
 }
@@ -778,7 +780,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CORRELATION_NAME) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_ASSERTION) {
   this->connect();
 
-  validate(conn, SQL_CREATE_ASSERTION, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CREATE_ASSERTION, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -786,7 +788,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_ASSERTION) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_CHARACTER_SET) {
   this->connect();
 
-  validate(conn, SQL_CREATE_CHARACTER_SET, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CREATE_CHARACTER_SET, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -794,7 +796,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_CHARACTER_SET) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_COLLATION) {
   this->connect();
 
-  validate(conn, SQL_CREATE_COLLATION, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CREATE_COLLATION, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -802,7 +804,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_COLLATION) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_DOMAIN) {
   this->connect();
 
-  validate(conn, SQL_CREATE_DOMAIN, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CREATE_DOMAIN, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -810,7 +812,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_DOMAIN) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CREATE_SCHEMA) {
   this->connect();
 
-  validate(conn, SQL_CREATE_SCHEMA, static_cast<SQLUINTEGER>(1));
+  validate(this->conn, SQL_CREATE_SCHEMA, static_cast<SQLUINTEGER>(1));
 
   this->disconnect();
 }
@@ -818,7 +820,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CREATE_SCHEMA) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CREATE_TABLE) {
   this->connect();
 
-  validate(conn, SQL_CREATE_TABLE, static_cast<SQLUINTEGER>(1));
+  validate(this->conn, SQL_CREATE_TABLE, static_cast<SQLUINTEGER>(1));
 
   this->disconnect();
 }
@@ -826,7 +828,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CREATE_TABLE) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_TRANSLATION) {
   this->connect();
 
-  validate(conn, SQL_CREATE_TRANSLATION, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CREATE_TRANSLATION, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -834,7 +836,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CREATE_TRANSLATION) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DDL_INDEX) {
   this->connect();
 
-  validate(conn, SQL_DDL_INDEX, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_DDL_INDEX, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -842,7 +844,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DDL_INDEX) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_ASSERTION) {
   this->connect();
 
-  validate(conn, SQL_DROP_ASSERTION, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_DROP_ASSERTION, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -850,7 +852,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_ASSERTION) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_CHARACTER_SET) {
   this->connect();
 
-  validate(conn, SQL_DROP_CHARACTER_SET, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_DROP_CHARACTER_SET, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -858,7 +860,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_CHARACTER_SET) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_COLLATION) {
   this->connect();
 
-  validate(conn, SQL_DROP_COLLATION, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_DROP_COLLATION, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -866,7 +868,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_COLLATION) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_DOMAIN) {
   this->connect();
 
-  validate(conn, SQL_DROP_DOMAIN, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_DROP_DOMAIN, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -874,7 +876,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_DOMAIN) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_SCHEMA) {
   this->connect();
 
-  validate(conn, SQL_DROP_SCHEMA, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_DROP_SCHEMA, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -882,7 +884,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_SCHEMA) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_TABLE) {
   this->connect();
 
-  validate(conn, SQL_DROP_TABLE, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_DROP_TABLE, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -890,7 +892,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_TABLE) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_TRANSLATION) {
   this->connect();
 
-  validate(conn, SQL_DROP_TRANSLATION, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_DROP_TRANSLATION, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -898,7 +900,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_TRANSLATION) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_VIEW) {
   this->connect();
 
-  validate(conn, SQL_DROP_VIEW, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_DROP_VIEW, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -906,7 +908,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DROP_VIEW) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_EXPRESSIONS_IN_ORDERBY) {
   this->connect();
 
-  validate(conn, SQL_EXPRESSIONS_IN_ORDERBY, L"N");
+  validate(this->conn, SQL_EXPRESSIONS_IN_ORDERBY, L"N");
 
   this->disconnect();
 }
@@ -914,7 +916,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_EXPRESSIONS_IN_ORDERBY) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_GROUP_BY) {
   this->connect();
 
-  validate(conn, SQL_GROUP_BY,
+  validate(this->conn, SQL_GROUP_BY,
            static_cast<SQLUSMALLINT>(SQL_GB_GROUP_BY_CONTAINS_SELECT));
 
   this->disconnect();
@@ -923,7 +925,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_GROUP_BY) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_IDENTIFIER_CASE) {
   this->connect();
 
-  validate(conn, SQL_IDENTIFIER_CASE, static_cast<SQLUSMALLINT>(SQL_IC_MIXED));
+  validate(this->conn, SQL_IDENTIFIER_CASE, static_cast<SQLUSMALLINT>(SQL_IC_MIXED));
 
   this->disconnect();
 }
@@ -931,7 +933,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_IDENTIFIER_CASE) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_IDENTIFIER_QUOTE_CHAR) {
   this->connect();
 
-  validate(conn, SQL_IDENTIFIER_QUOTE_CHAR, L"\"");
+  validate(this->conn, SQL_IDENTIFIER_QUOTE_CHAR, L"\"");
 
   this->disconnect();
 }
@@ -939,7 +941,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_IDENTIFIER_QUOTE_CHAR) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INDEX_KEYWORDS) {
   this->connect();
 
-  validate(conn, SQL_INDEX_KEYWORDS, static_cast<SQLUINTEGER>(SQL_IK_NONE));
+  validate(this->conn, SQL_INDEX_KEYWORDS, static_cast<SQLUINTEGER>(SQL_IK_NONE));
 
   this->disconnect();
 }
@@ -947,7 +949,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INDEX_KEYWORDS) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INSERT_STATEMENT) {
   this->connect();
 
-  validate(conn, SQL_INSERT_STATEMENT,
+  validate(this->conn, SQL_INSERT_STATEMENT,
            static_cast<SQLUINTEGER>(SQL_IS_INSERT_LITERALS | SQL_IS_INSERT_SEARCHED |
                                     SQL_IS_SELECT_INTO));
 
@@ -957,7 +959,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INSERT_STATEMENT) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INTEGRITY) {
   this->connect();
 
-  validate(conn, SQL_INTEGRITY, L"N");
+  validate(this->conn, SQL_INTEGRITY, L"N");
 
   this->disconnect();
 }
@@ -965,7 +967,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_INTEGRITY) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_KEYWORDS) {
   this->connect();
 
-  validateNotEmptySQLWCHAR(conn, SQL_KEYWORDS, true);
+  validateNotEmptySQLWCHAR(this->conn, SQL_KEYWORDS, true);
 
   this->disconnect();
 }
@@ -973,7 +975,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_KEYWORDS) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_LIKE_ESCAPE_CLAUSE) {
   this->connect();
 
-  validate(conn, SQL_LIKE_ESCAPE_CLAUSE, L"Y");
+  validate(this->conn, SQL_LIKE_ESCAPE_CLAUSE, L"Y");
 
   this->disconnect();
 }
@@ -981,7 +983,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_LIKE_ESCAPE_CLAUSE) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_NON_NULLABLE_COLUMNS) {
   this->connect();
 
-  validate(conn, SQL_NON_NULLABLE_COLUMNS, static_cast<SQLUSMALLINT>(SQL_NNC_NULL));
+  validate(this->conn, SQL_NON_NULLABLE_COLUMNS, static_cast<SQLUSMALLINT>(SQL_NNC_NULL));
 
   this->disconnect();
 }
@@ -998,7 +1000,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_OJ_CAPABILITIES) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_ORDER_BY_COLUMNS_IN_SELECT) {
   this->connect();
 
-  validate(conn, SQL_ORDER_BY_COLUMNS_IN_SELECT, L"Y");
+  validate(this->conn, SQL_ORDER_BY_COLUMNS_IN_SELECT, L"Y");
 
   this->disconnect();
 }
@@ -1006,7 +1008,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_ORDER_BY_COLUMNS_IN_SELECT) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_OUTER_JOINS) {
   this->connect();
 
-  validate(conn, SQL_OUTER_JOINS, L"N");
+  validate(this->conn, SQL_OUTER_JOINS, L"N");
 
   this->disconnect();
 }
@@ -1014,7 +1016,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_OUTER_JOINS) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_PROCEDURES) {
   this->connect();
 
-  validate(conn, SQL_PROCEDURES, L"N");
+  validate(this->conn, SQL_PROCEDURES, L"N");
 
   this->disconnect();
 }
@@ -1022,7 +1024,8 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_PROCEDURES) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_QUOTED_IDENTIFIER_CASE) {
   this->connect();
 
-  validate(conn, SQL_QUOTED_IDENTIFIER_CASE, static_cast<SQLUSMALLINT>(SQL_IC_MIXED));
+  validate(this->conn, SQL_QUOTED_IDENTIFIER_CASE,
+           static_cast<SQLUSMALLINT>(SQL_IC_MIXED));
 
   this->disconnect();
 }
@@ -1030,7 +1033,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_QUOTED_IDENTIFIER_CASE) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SCHEMA_USAGE) {
   this->connect();
 
-  validate(conn, SQL_SCHEMA_USAGE, static_cast<SQLUINTEGER>(SQL_SU_DML_STATEMENTS));
+  validate(this->conn, SQL_SCHEMA_USAGE, static_cast<SQLUINTEGER>(SQL_SU_DML_STATEMENTS));
 
   this->disconnect();
 }
@@ -1038,7 +1041,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SCHEMA_USAGE) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SPECIAL_CHARACTERS) {
   this->connect();
 
-  validate(conn, SQL_SPECIAL_CHARACTERS, L"");
+  validate(this->conn, SQL_SPECIAL_CHARACTERS, L"");
 
   this->disconnect();
 }
@@ -1046,7 +1049,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SPECIAL_CHARACTERS) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SQL_CONFORMANCE) {
   this->connect();
 
-  validate(conn, SQL_SQL_CONFORMANCE, static_cast<SQLUINTEGER>(SQL_SC_SQL92_ENTRY));
+  validate(this->conn, SQL_SQL_CONFORMANCE, static_cast<SQLUINTEGER>(SQL_SC_SQL92_ENTRY));
 
   this->disconnect();
 }
@@ -1054,7 +1057,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_SQL_CONFORMANCE) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SUBQUERIES) {
   this->connect();
 
-  validate(conn, SQL_SUBQUERIES,
+  validate(this->conn, SQL_SUBQUERIES,
            static_cast<SQLUINTEGER>(SQL_SQ_CORRELATED_SUBQUERIES | SQL_SQ_COMPARISON |
                                     SQL_SQ_EXISTS | SQL_SQ_IN | SQL_SQ_QUANTIFIED));
 
@@ -1064,7 +1067,8 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SUBQUERIES) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_UNION) {
   this->connect();
 
-  validate(conn, SQL_UNION, static_cast<SQLUINTEGER>(SQL_U_UNION | SQL_U_UNION_ALL));
+  validate(this->conn, SQL_UNION,
+           static_cast<SQLUINTEGER>(SQL_U_UNION | SQL_U_UNION_ALL));
 
   this->disconnect();
 }
@@ -1074,7 +1078,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_UNION) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_BINARY_LITERAL_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_BINARY_LITERAL_LEN, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_MAX_BINARY_LITERAL_LEN, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1082,7 +1086,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_BINARY_LITERAL_LEN) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_CATALOG_NAME_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_CATALOG_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_CATALOG_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1090,7 +1094,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_CATALOG_NAME_LEN) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_CHAR_LITERAL_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_CHAR_LITERAL_LEN, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_MAX_CHAR_LITERAL_LEN, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1098,7 +1102,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_CHAR_LITERAL_LEN) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_COLUMN_NAME_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_COLUMN_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_COLUMN_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1106,7 +1110,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_COLUMN_NAME_LEN) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_GROUP_BY) {
   this->connect();
 
-  validate(conn, SQL_MAX_COLUMNS_IN_GROUP_BY, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_COLUMNS_IN_GROUP_BY, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1114,7 +1118,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_GROUP_BY) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_INDEX) {
   this->connect();
 
-  validate(conn, SQL_MAX_COLUMNS_IN_INDEX, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_COLUMNS_IN_INDEX, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1122,7 +1126,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_INDEX) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_ORDER_BY) {
   this->connect();
 
-  validate(conn, SQL_MAX_COLUMNS_IN_ORDER_BY, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_COLUMNS_IN_ORDER_BY, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1130,7 +1134,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_ORDER_BY) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_SELECT) {
   this->connect();
 
-  validate(conn, SQL_MAX_COLUMNS_IN_SELECT, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_COLUMNS_IN_SELECT, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1138,7 +1142,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_SELECT) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_TABLE) {
   this->connect();
 
-  validate(conn, SQL_MAX_COLUMNS_IN_TABLE, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_COLUMNS_IN_TABLE, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1146,7 +1150,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_COLUMNS_IN_TABLE) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_CURSOR_NAME_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_CURSOR_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_CURSOR_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1154,7 +1158,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_CURSOR_NAME_LEN) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_IDENTIFIER_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_IDENTIFIER_LEN, static_cast<SQLUSMALLINT>(65535));
+  validate(this->conn, SQL_MAX_IDENTIFIER_LEN, static_cast<SQLUSMALLINT>(65535));
 
   this->disconnect();
 }
@@ -1162,7 +1166,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_IDENTIFIER_LEN) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_INDEX_SIZE) {
   this->connect();
 
-  validate(conn, SQL_MAX_INDEX_SIZE, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_MAX_INDEX_SIZE, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1170,7 +1174,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_INDEX_SIZE) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_PROCEDURE_NAME_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_PROCEDURE_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_PROCEDURE_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1178,7 +1182,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_PROCEDURE_NAME_LEN) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_ROW_SIZE) {
   this->connect();
 
-  validate(conn, SQL_MAX_ROW_SIZE, L"");
+  validate(this->conn, SQL_MAX_ROW_SIZE, L"");
 
   this->disconnect();
 }
@@ -1186,7 +1190,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_ROW_SIZE) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_ROW_SIZE_INCLUDES_LONG) {
   this->connect();
 
-  validate(conn, SQL_MAX_ROW_SIZE_INCLUDES_LONG, L"N");
+  validate(this->conn, SQL_MAX_ROW_SIZE_INCLUDES_LONG, L"N");
 
   this->disconnect();
 }
@@ -1194,7 +1198,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_ROW_SIZE_INCLUDES_LONG) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_SCHEMA_NAME_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_SCHEMA_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_SCHEMA_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1202,7 +1206,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_SCHEMA_NAME_LEN) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_STATEMENT_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_STATEMENT_LEN, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_MAX_STATEMENT_LEN, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1210,7 +1214,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_STATEMENT_LEN) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_TABLE_NAME_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_TABLE_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_TABLE_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1218,7 +1222,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_TABLE_NAME_LEN) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_TABLES_IN_SELECT) {
   this->connect();
 
-  validate(conn, SQL_MAX_TABLES_IN_SELECT, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_TABLES_IN_SELECT, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1226,7 +1230,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_MAX_TABLES_IN_SELECT) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_USER_NAME_LEN) {
   this->connect();
 
-  validate(conn, SQL_MAX_USER_NAME_LEN, static_cast<SQLUSMALLINT>(0));
+  validate(this->conn, SQL_MAX_USER_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 
   this->disconnect();
 }
@@ -1236,7 +1240,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_MAX_USER_NAME_LEN) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_FUNCTIONS) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_FUNCTIONS, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_FUNCTIONS, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1244,7 +1248,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_FUNCTIONS) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_NUMERIC_FUNCTIONS) {
   this->connect();
 
-  validate(conn, SQL_NUMERIC_FUNCTIONS, static_cast<SQLUINTEGER>(4058942));
+  validate(this->conn, SQL_NUMERIC_FUNCTIONS, static_cast<SQLUINTEGER>(4058942));
 
   this->disconnect();
 }
@@ -1252,7 +1256,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_NUMERIC_FUNCTIONS) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_STRING_FUNCTIONS) {
   this->connect();
 
-  validate(conn, SQL_STRING_FUNCTIONS,
+  validate(this->conn, SQL_STRING_FUNCTIONS,
            static_cast<SQLUINTEGER>(SQL_FN_STR_LTRIM | SQL_FN_STR_LENGTH |
                                     SQL_FN_STR_REPLACE | SQL_FN_STR_RTRIM));
 
@@ -1262,7 +1266,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_STRING_FUNCTIONS) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SYSTEM_FUNCTIONS) {
   this->connect();
 
-  validate(conn, SQL_SYSTEM_FUNCTIONS,
+  validate(this->conn, SQL_SYSTEM_FUNCTIONS,
            static_cast<SQLUINTEGER>(SQL_FN_SYS_IFNULL | SQL_FN_SYS_USERNAME));
 
   this->disconnect();
@@ -1271,7 +1275,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_SYSTEM_FUNCTIONS) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_ADD_INTERVALS) {
   this->connect();
 
-  validate(conn, SQL_TIMEDATE_ADD_INTERVALS,
+  validate(this->conn, SQL_TIMEDATE_ADD_INTERVALS,
            static_cast<SQLUINTEGER>(SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND |
                                     SQL_FN_TSI_MINUTE | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY |
                                     SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH |
@@ -1283,7 +1287,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_ADD_INTERVALS) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_DIFF_INTERVALS) {
   this->connect();
 
-  validate(conn, SQL_TIMEDATE_DIFF_INTERVALS,
+  validate(this->conn, SQL_TIMEDATE_DIFF_INTERVALS,
            static_cast<SQLUINTEGER>(SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND |
                                     SQL_FN_TSI_MINUTE | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY |
                                     SQL_FN_TSI_WEEK | SQL_FN_TSI_MONTH |
@@ -1295,7 +1299,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_TIMEDATE_DIFF_INTERVALS) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_TIMEDATE_FUNCTIONS) {
   this->connect();
 
-  validate(conn, SQL_TIMEDATE_FUNCTIONS,
+  validate(this->conn, SQL_TIMEDATE_FUNCTIONS,
            static_cast<SQLUINTEGER>(
                SQL_FN_TD_CURRENT_DATE | SQL_FN_TD_CURRENT_TIME |
                SQL_FN_TD_CURRENT_TIMESTAMP | SQL_FN_TD_CURDATE | SQL_FN_TD_CURTIME |
@@ -1313,7 +1317,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_TIMEDATE_FUNCTIONS) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_BIGINT) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_BIGINT, static_cast<SQLUINTEGER>(8));
+  validate(this->conn, SQL_CONVERT_BIGINT, static_cast<SQLUINTEGER>(8));
 
   this->disconnect();
 }
@@ -1321,7 +1325,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_BIGINT) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_BINARY) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_BINARY, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_BINARY, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1329,7 +1333,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_BINARY) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_BIT) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_BIT, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_BIT, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1337,7 +1341,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_BIT) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_CHAR) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_CHAR, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_CHAR, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1345,7 +1349,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_CHAR) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_DATE) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_DATE, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_DATE, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1353,7 +1357,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_DATE) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_DECIMAL) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_DECIMAL, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_DECIMAL, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1361,7 +1365,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_DECIMAL) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_DOUBLE) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_DOUBLE, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_DOUBLE, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1369,7 +1373,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_DOUBLE) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_FLOAT) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_FLOAT, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_FLOAT, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1377,7 +1381,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_FLOAT) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_INTEGER) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_INTEGER, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_INTEGER, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1385,7 +1389,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_INTEGER) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_INTERVAL_DAY_TIME) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_INTERVAL_DAY_TIME, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_INTERVAL_DAY_TIME, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1393,7 +1397,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_INTERVAL_DAY_TIME) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_INTERVAL_YEAR_MONTH) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_INTERVAL_YEAR_MONTH, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_INTERVAL_YEAR_MONTH, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1401,7 +1405,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_INTERVAL_YEAR_MONTH) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_LONGVARBINARY) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_LONGVARBINARY, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_LONGVARBINARY, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1409,7 +1413,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_LONGVARBINARY) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_LONGVARCHAR) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_LONGVARCHAR, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_LONGVARCHAR, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1417,7 +1421,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_LONGVARCHAR) {
 TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_NUMERIC) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_NUMERIC, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_NUMERIC, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1425,7 +1429,7 @@ TEST_F(FlightSQLODBCMockTestBase, Test_SQL_CONVERT_NUMERIC) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_REAL) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_REAL, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_REAL, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1433,7 +1437,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_REAL) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_SMALLINT) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_SMALLINT, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_SMALLINT, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1441,7 +1445,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_SMALLINT) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_TIME) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_TIME, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_TIME, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1449,7 +1453,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_TIME) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_TIMESTAMP) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_TIMESTAMP, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_TIMESTAMP, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1457,7 +1461,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_TIMESTAMP) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_TINYINT) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_TINYINT, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_TINYINT, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1465,7 +1469,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_TINYINT) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_VARBINARY) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_VARBINARY, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_VARBINARY, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
@@ -1473,7 +1477,7 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_VARBINARY) {
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_CONVERT_VARCHAR) {
   this->connect();
 
-  validate(conn, SQL_CONVERT_VARCHAR, static_cast<SQLUINTEGER>(0));
+  validate(this->conn, SQL_CONVERT_VARCHAR, static_cast<SQLUINTEGER>(0));
 
   this->disconnect();
 }
