@@ -466,8 +466,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectGuidQueryUnsupported) {
   this->disconnect();
 }
 
-// -AL- todo add tests for float truncation
-// -AL- todo add tests for varchar truncation
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
   this->connect();
 
@@ -554,11 +552,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectVarcharTruncation) {
   this->disconnect();
 }
 
+// -AL- todo add tests for float truncation
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectFloatTruncation) {
   this->connect();
 
-
-  std::wstring wsql = L"SELECT 1.1 AS float;";
+  std::wstring wsql;
+  if constexpr (std::is_same_v<TypeParam, FlightSQLODBCMockTestBase>) {
+    wsql = std::wstring(L"SELECT CAST(1.234 AS REAL) AS float_val");
+  } else if constexpr (std::is_same_v<TypeParam, FlightSQLODBCRemoteTestBase>) {
+    wsql = std::wstring(L"SELECT CAST(1.234 AS FLOAT) AS float_val");
+  }
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
   SQLRETURN ret =
