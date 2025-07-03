@@ -931,6 +931,7 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
                      SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr) {
   // GH-46979: support SQL_C_GUID data type
   // GH-46980: support Interval data types
+  // GH-46985: return warning message instead of error on float truncation case
   LOG_DEBUG(
       "SQLGetData called with stmt: {}, recordNumber: {}, cType: {}, "
       "dataPtr: {}, bufferLength: {}, indicatorPtr: {}",
@@ -939,13 +940,6 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
     return statement->GetData(recordNumber, cType, dataPtr, bufferLength, indicatorPtr);
-    // -AL- remove comments after tests with truncation is finished
-    //if (statement->GetData(recordNumber, cType, dataPtr, bufferLength, indicatorPtr)) {
-    //  // There is data truncation warning
-    //  return SQL_SUCCESS_WITH_INFO;
-    //} else {
-    //  return SQL_SUCCESS;
-    //}
   });
 }
 

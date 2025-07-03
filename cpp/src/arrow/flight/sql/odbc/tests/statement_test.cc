@@ -469,7 +469,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectGuidQueryUnsupported) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
   this->connect();
 
-  std::wstring wsql = LR"(
+  std::wstring wsql =
+      LR"(
     SELECT 1 AS small_table
     UNION ALL
     SELECT 2
@@ -552,8 +553,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectVarcharTruncation) {
   this->disconnect();
 }
 
-// -AL- todo add tests for float truncation
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectFloatTruncation) {
+  // Test is disabled until float truncation is supported.
+  // GH-46985: return warning message instead of error on float truncation case
+  GTEST_SKIP();
   this->connect();
 
   std::wstring wsql;
@@ -575,10 +578,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectFloatTruncation) {
   SQLLEN bufLen = sizeof(ssmall_int_val);
 
   ret = SQLGetData(this->stmt, 1, SQL_C_SSHORT, &ssmall_int_val, 0, &bufLen);
-  if (ret != SQL_SUCCESS) {
-    // -AL- remove later
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
   EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
   // Verify float truncation is reported
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01S07);

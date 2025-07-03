@@ -235,8 +235,7 @@ SQLRETURN FlightSqlResultSet::GetData(int column_n, int16_t target_type, int pre
   // Check if the offset is already at the end.
   int64_t& value_offset = get_data_offsets_[column_n - 1];
   if (value_offset == -1) {
-    // return false;
-    return SQL_NO_DATA;  // orig bool return //-AL-
+    return SQL_NO_DATA;
   }
 
   ColumnBinding binding(ConvertCDataTypeFromV2ToV3(target_type), precision, scale, buffer,
@@ -252,9 +251,6 @@ SQLRETURN FlightSqlResultSet::GetData(int column_n, int16_t target_type, int pre
                             diagnostics_, nullptr);
 
   // If there was truncation, the converter would have reported it to the diagnostics.
-  // return diagnostics_.HasWarning(); // orig bool return
-  // -AL- I could also be wrong. maybe need to fix return value if they don't align with
-  // tests
   if (diagnostics_.HasWarning()) {
     return SQL_SUCCESS_WITH_INFO;
   } else {
