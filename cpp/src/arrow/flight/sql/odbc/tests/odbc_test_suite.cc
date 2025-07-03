@@ -124,7 +124,7 @@ std::wstring FlightSQLODBCRemoteTestBase::getQueryAllDataTypes() {
 
           CAST(-2147483648 AS INTEGER) AS sinteger_min,
           CAST(2147483647 AS INTEGER) AS sinteger_max,
-          CAST(0 AS INTEGER) AS uinteger_min,
+          CAST(0 AS BIGINT) AS uinteger_min,
           CAST(4294967295 AS BIGINT) AS uinteger_max,
 
           CAST(-9223372036854775808 AS BIGINT) AS sbigint_min,

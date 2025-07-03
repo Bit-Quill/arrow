@@ -129,6 +129,9 @@ SQLSMALLINT getCTypeForSQLType(const DescriptorRecord& record) {
     case SQL_WLONGVARCHAR:
       return SQL_C_WCHAR;
 
+    case SQL_BIT:
+      return SQL_C_BIT;
+
     case SQL_BINARY:
     case SQL_VARBINARY:
     case SQL_LONGVARBINARY:
@@ -146,10 +149,14 @@ SQLSMALLINT getCTypeForSQLType(const DescriptorRecord& record) {
     case SQL_BIGINT:
       return record.m_unsigned ? SQL_C_UBIGINT : SQL_C_SBIGINT;
 
+    case SQL_NUMERIC:
+    case SQL_DECIMAL:
+      return SQL_C_NUMERIC;
+
+    case SQL_FLOAT:
     case SQL_REAL:
       return SQL_C_FLOAT;
 
-    case SQL_FLOAT:
     case SQL_DOUBLE:
       return SQL_C_DOUBLE;
 
@@ -751,15 +758,18 @@ SQLRETURN ODBCStatement::getMoreResults() {
 
 void ODBCStatement::getColumnCount(SQLSMALLINT* columnCountPtr) {
   if (!columnCountPtr) {
-    throw DriverException("Invalid null pointer for number of column results.", "HY000");
+    // columnCountPtr is not valid, do nothing as ODBC spec does not mention this as an
+    // error
+    return;
   }
   size_t columnCount = m_currentArd->GetRecords().size();
-  *columnCountPtr = columnCount;
+  *columnCountPtr = static_cast<SQLSMALLINT>(columnCount);
 }
 
 void ODBCStatement::getRowCount(SQLLEN* rowCountPtr) {
   if (!rowCountPtr) {
-    throw DriverException("Invalid null pointer for number of rows affected.", "HY000");
+    // rowCountPtr is not valid, do nothing as ODBC spec does not mention this as an error
+    return;
   }
   // Will always be -1 (number of rows unknown) if only SELECT is supported
   *rowCountPtr = -1;

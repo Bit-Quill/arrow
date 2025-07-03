@@ -440,6 +440,283 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectVarbinaryQuery) {
   this->disconnect();
 }
 
+// Tests with SQL_C_DEFAULT as the target type
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
+  // Test with default types. Only testing target types supported by server.
+  this->connect();
+
+  std::wstring wsql = this->getQueryAllDataTypes();
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Numeric Types
+  // Signed Integer
+  SQLINTEGER slong_val;
+  SQLLEN bufLen = sizeof(slong_val);
+  SQLLEN ind;
+
+  ret = SQLGetData(this->stmt, 9, SQL_C_DEFAULT, &slong_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(slong_val, std::numeric_limits<SQLINTEGER>::min());
+
+  ret = SQLGetData(this->stmt, 10, SQL_C_DEFAULT, &slong_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(slong_val, std::numeric_limits<SQLINTEGER>::max());
+
+  // Signed Big Int
+  SQLBIGINT sbig_int_val;
+  bufLen = sizeof(sbig_int_val);
+
+  ret = SQLGetData(this->stmt, 13, SQL_C_DEFAULT, &sbig_int_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(sbig_int_val, std::numeric_limits<SQLBIGINT>::min());
+
+  ret = SQLGetData(this->stmt, 14, SQL_C_DEFAULT, &sbig_int_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(sbig_int_val, std::numeric_limits<SQLBIGINT>::max());
+
+  // Decimal
+  SQL_NUMERIC_STRUCT decimal_val;
+  memset(&decimal_val, 0, sizeof(decimal_val));
+  bufLen = sizeof(SQL_NUMERIC_STRUCT);
+
+  ret = SQLGetData(this->stmt, 17, SQL_C_DEFAULT, &decimal_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check for negative decimal_val value
+  EXPECT_EQ(decimal_val.sign, 0);
+  EXPECT_EQ(decimal_val.scale, 0);
+  EXPECT_EQ(decimal_val.precision, 38);
+  EXPECT_THAT(decimal_val.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0, 0,
+                                                      0, 0, 0, 0, 0, 0, 0, 0));
+
+  memset(&decimal_val, 0, sizeof(decimal_val));
+  ret = SQLGetData(this->stmt, 18, SQL_C_DEFAULT, &decimal_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check for positive decimal_val value
+  EXPECT_EQ(decimal_val.sign, 1);
+  EXPECT_EQ(decimal_val.scale, 0);
+  EXPECT_EQ(decimal_val.precision, 38);
+  EXPECT_THAT(decimal_val.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0, 0,
+                                                      0, 0, 0, 0, 0, 0, 0, 0));
+
+  // Float
+  float float_val;
+  bufLen = sizeof(float_val);
+
+  ret = SQLGetData(this->stmt, 19, SQL_C_DEFAULT, &float_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Get minimum negative float value
+  EXPECT_EQ(float_val, -std::numeric_limits<float>::max());
+
+  ret = SQLGetData(this->stmt, 20, SQL_C_DEFAULT, &float_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(float_val, std::numeric_limits<float>::max());
+
+  // Double
+  SQLDOUBLE double_val;
+  bufLen = sizeof(double_val);
+
+  ret = SQLGetData(this->stmt, 21, SQL_C_DEFAULT, &double_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Get minimum negative double value
+  EXPECT_EQ(double_val, -std::numeric_limits<SQLDOUBLE>::max());
+
+  ret = SQLGetData(this->stmt, 22, SQL_C_DEFAULT, &double_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(double_val, std::numeric_limits<SQLDOUBLE>::max());
+
+  // Bit
+  bool bit_val;
+  bufLen = sizeof(bit_val);
+
+  ret = SQLGetData(this->stmt, 23, SQL_C_DEFAULT, &bit_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(bit_val, false);
+
+  ret = SQLGetData(this->stmt, 24, SQL_C_DEFAULT, &bit_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(bit_val, true);
+
+  // Characters
+
+  // Char will be fetched as wchar by default
+  SQLWCHAR wchar_val[2];
+  bufLen = sizeof(SQLWCHAR) * 2;
+
+  ret = SQLGetData(this->stmt, 25, SQL_C_DEFAULT, &wchar_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(wchar_val[0], L'Z');
+
+  // WChar
+  SQLWCHAR wchar_val2[2];
+  bufLen = sizeof(SQLWCHAR) * 2;
+  ret = SQLGetData(this->stmt, 26, SQL_C_DEFAULT, &wchar_val2, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(wchar_val2[0], L'你');
+
+  // WVarchar
+  SQLWCHAR wvarchar_val[3];
+  bufLen = sizeof(SQLWCHAR) * 3;
+
+  ret = SQLGetData(this->stmt, 27, SQL_C_DEFAULT, &wvarchar_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(wvarchar_val[0], L'你');
+  EXPECT_EQ(wvarchar_val[1], L'好');
+
+  // Varchar will be fetched as WVarchar by default
+  SQLWCHAR wvarchar_val2[4];
+  bufLen = sizeof(SQLWCHAR) * 4;
+
+  ret = SQLGetData(this->stmt, 28, SQL_C_DEFAULT, &wvarchar_val2, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(wvarchar_val2[0], L'X');
+  EXPECT_EQ(wvarchar_val2[1], L'Y');
+  EXPECT_EQ(wvarchar_val2[2], L'Z');
+
+  // Date and Timestamp
+
+  // Date
+  SQL_DATE_STRUCT date_var{};
+  bufLen = sizeof(date_var);
+
+  ret = SQLGetData(this->stmt, 29, SQL_C_DEFAULT, &date_var, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check min values for date. Min valid year is 1400.
+  EXPECT_EQ(date_var.day, 1);
+  EXPECT_EQ(date_var.month, 1);
+  EXPECT_EQ(date_var.year, 1400);
+
+  ret = SQLGetData(this->stmt, 30, SQL_C_DEFAULT, &date_var, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check max values for date. Max valid year is 9999.
+  EXPECT_EQ(date_var.day, 31);
+  EXPECT_EQ(date_var.month, 12);
+  EXPECT_EQ(date_var.year, 9999);
+
+  // Timestamp
+  SQL_TIMESTAMP_STRUCT timestamp_var{};
+  bufLen = sizeof(timestamp_var);
+
+  ret = SQLGetData(this->stmt, 31, SQL_C_DEFAULT, &timestamp_var, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check min values for date. Min valid year is 1400.
+  EXPECT_EQ(timestamp_var.day, 1);
+  EXPECT_EQ(timestamp_var.month, 1);
+  EXPECT_EQ(timestamp_var.year, 1400);
+  EXPECT_EQ(timestamp_var.hour, 0);
+  EXPECT_EQ(timestamp_var.minute, 0);
+  EXPECT_EQ(timestamp_var.second, 0);
+  EXPECT_EQ(timestamp_var.fraction, 0);
+
+  ret = SQLGetData(this->stmt, 32, SQL_C_DEFAULT, &timestamp_var, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check max values for date. Max valid year is 9999.
+  EXPECT_EQ(timestamp_var.day, 31);
+  EXPECT_EQ(timestamp_var.month, 12);
+  EXPECT_EQ(timestamp_var.year, 9999);
+  EXPECT_EQ(timestamp_var.hour, 23);
+  EXPECT_EQ(timestamp_var.minute, 59);
+  EXPECT_EQ(timestamp_var.second, 59);
+  EXPECT_EQ(timestamp_var.fraction, 0);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectTimeQueryDefaultType) {
+  // Mock server test is skipped due to limitation on the mock server.
+  // Time type from mock server does not include the fraction
+  this->connect();
+
+  std::wstring wsql =
+      LR"(
+    SELECT CAST(TIME '00:00:00' AS TIME) AS time_min,
+           CAST(TIME '23:59:59' AS TIME) AS time_max;
+    )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQL_TIME_STRUCT time_var{};
+  SQLLEN bufLen = sizeof(time_var);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_DEFAULT, &time_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check min values for time.
+  EXPECT_EQ(time_var.hour, 0);
+  EXPECT_EQ(time_var.minute, 0);
+  EXPECT_EQ(time_var.second, 0);
+
+  ret = SQLGetData(this->stmt, 2, SQL_C_DEFAULT, &time_var, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check max values for time.
+  EXPECT_EQ(time_var.hour, 23);
+  EXPECT_EQ(time_var.minute, 59);
+  EXPECT_EQ(time_var.second, 59);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectVarbinaryQueryDefaultType) {
+  // Limitation on mock test server prevents SQL_C_DEFAULT from working properly.
+  // Mock server has type `DENSE_UNION` for varbinary.
+  // Note that not all remote servers support "from_hex" function
+  this->connect();
+
+  std::wstring wsql = L"SELECT from_hex('ABCDEF') AS c_varbinary;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // varbinary
+  std::vector<int8_t> varbinary_val(3);
+  SQLLEN bufLen = varbinary_val.size();
+  ret = SQLGetData(this->stmt, 1, SQL_C_DEFAULT, &varbinary_val[0], bufLen, &bufLen);
+  EXPECT_EQ(varbinary_val[0], '\xAB');
+  EXPECT_EQ(varbinary_val[1], '\xCD');
+  EXPECT_EQ(varbinary_val[2], '\xEF');
+
+  this->disconnect();
+}
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectGuidQueryUnsupported) {
   this->connect();
 
@@ -541,14 +818,162 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectVarcharTruncation) {
   const int len = 17;
   SQLCHAR char_val[len];
   SQLLEN bufLen = sizeof(SQLCHAR) * len;
+  SQLLEN ind;
 
-  ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val, bufLen, &bufLen);
+  ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val, bufLen, &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
   // Verify string truncation is reported
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01004);
 
   EXPECT_EQ(ODBC::SqlStringToString(char_val), std::string("VERY LONG STRING"));
+  EXPECT_EQ(ind, 21);
+
+  // Fetch same column 2nd time
+  const int len2 = 2;
+  SQLCHAR char_val2[len2];
+  bufLen = sizeof(SQLCHAR) * len2;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val2, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  // Verify string truncation is reported
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01004);
+
+  EXPECT_EQ(ODBC::SqlStringToString(char_val2), std::string(" "));
+  EXPECT_EQ(ind, 5);
+
+  // Fetch same column 3rd time
+  const int len3 = 5;
+  SQLCHAR char_val3[len3];
+  bufLen = sizeof(SQLCHAR) * len3;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val3, bufLen, &ind);
+
+  // Verify that there is no more truncation reports. The full string has been fetched.
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(ODBC::SqlStringToString(char_val3), std::string("here"));
+  EXPECT_EQ(ind, 4);
+
+  // Attempt to fetch data 4th time
+  SQLCHAR char_val4[len];
+  ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val4, 0, &ind);
+  // Verify SQL_NO_DATA is returned
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectWVarcharTruncation) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 'VERY LONG Unicode STRING 句子 here' AS wstring_col;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  const int len = 28;
+  SQLWCHAR wchar_val[len];
+  SQLLEN bufLen = sizeof(SQLWCHAR) * len;
+  SQLLEN ind;
+  constexpr size_t wchar_size = driver::odbcabstraction::GetSqlWCharSize();
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_WCHAR, &wchar_val, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  // Verify string truncation is reported
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01004);
+
+  EXPECT_EQ(std::wstring(wchar_val), std::wstring(L"VERY LONG Unicode STRING 句子"));
+  EXPECT_EQ(ind, 32 * wchar_size);
+
+  // Fetch same column 2nd time
+  const int len2 = 2;
+  SQLWCHAR wchar_val2[len2];
+  bufLen = sizeof(SQLWCHAR) * len2;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_WCHAR, &wchar_val2, bufLen, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  // Verify string truncation is reported
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01004);
+
+  EXPECT_EQ(std::wstring(wchar_val2), std::wstring(L" "));
+  EXPECT_EQ(ind, 5 * wchar_size);
+
+  // Fetch same column 3rd time
+  const int len3 = 5;
+  SQLWCHAR wchar_val3[len3];
+  bufLen = sizeof(SQLWCHAR) * len3;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_WCHAR, &wchar_val3, bufLen, &ind);
+
+  // Verify that there is no more truncation reports. The full string has been fetched.
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(std::wstring(wchar_val3), std::wstring(L"here"));
+  EXPECT_EQ(ind, 4 * wchar_size);
+
+  // Attempt to fetch data 4th time
+  SQLWCHAR wchar_val4[len];
+  ret = SQLGetData(this->stmt, 1, SQL_C_WCHAR, &wchar_val4, 0, &ind);
+  // Verify SQL_NO_DATA is returned
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectVarbinaryTruncation) {
+  // Have binary test on mock test base as remote test servers tend to have different
+  // formats for binary data
+  this->connect();
+
+  std::wstring wsql = L"SELECT X'ABCDEFAB' AS c_varbinary;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // varbinary
+  std::vector<int8_t> varbinary_val(3);
+  SQLLEN bufLen = varbinary_val.size();
+  SQLLEN ind;
+  ret = SQLGetData(this->stmt, 1, SQL_C_BINARY, &varbinary_val[0], bufLen, &ind);
+  // Verify binary truncation is reported
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01004);
+  EXPECT_EQ(varbinary_val[0], '\xAB');
+  EXPECT_EQ(varbinary_val[1], '\xCD');
+  EXPECT_EQ(varbinary_val[2], '\xEF');
+  EXPECT_EQ(ind, 4);
+
+  // Fetch same column 2nd time
+  std::vector<int8_t> varbinary_val2(1);
+  bufLen = varbinary_val2.size();
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_BINARY, &varbinary_val2[0], bufLen, &ind);
+
+  // Verify that there is no more truncation reports. The full binary has been fetched.
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(varbinary_val[0], '\xAB');
+  EXPECT_EQ(ind, 1);
+
+  // Attempt to fetch data 3rd time
+  std::vector<int8_t> varbinary_val3(1);
+  bufLen = varbinary_val3.size();
+  ret = SQLGetData(this->stmt, 1, SQL_C_BINARY, &varbinary_val3[0], 0, &ind);
+  // Verify SQL_NO_DATA is returned
+  EXPECT_EQ(ret, SQL_NO_DATA);
 
   this->disconnect();
 }
@@ -583,6 +1008,121 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectFloatTruncation) {
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01S07);
 
   EXPECT_EQ(ssmall_int_val, 1);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectNullQuery) {
+  // Limitation on mock test server prevents null from working properly.
+  // Mock server has type `DENSE_UNION` for null column data.
+  this->connect();
+
+  std::wstring wsql = L"SELECT null as null_col;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+  SQLLEN ind;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify SQL_NULL_DATA is returned for indicator
+  EXPECT_EQ(ind, SQL_NULL_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectTruncationQueryNullIndicator) {
+  // Driver should not error out when indicator is null if the cell is non-null
+  // Have binary test on mock test base as remote test servers tend to have different
+  // formats for binary data
+  this->connect();
+
+  std::wstring wsql =
+      LR"(
+        SELECT 1,
+        'VERY LONG STRING here' AS string_col,
+        'VERY LONG Unicode STRING 句子 here' AS wstring_col,
+        X'ABCDEFAB' AS c_varbinary;
+  )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify 1 is returned for non-truncation case.
+  EXPECT_EQ(val, 1);
+
+  // Char
+  const int len = 17;
+  SQLCHAR char_val[len];
+  SQLLEN bufLen = sizeof(SQLCHAR) * len;
+
+  ret = SQLGetData(this->stmt, 2, SQL_C_CHAR, &char_val, bufLen, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  // Verify string truncation is reported
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01004);
+
+  // WChar
+  const int len2 = 28;
+  SQLWCHAR wchar_val[len2];
+  bufLen = sizeof(SQLWCHAR) * len2;
+  constexpr size_t wchar_size = driver::odbcabstraction::GetSqlWCharSize();
+
+  ret = SQLGetData(this->stmt, 3, SQL_C_WCHAR, &wchar_val, bufLen, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  // Verify string truncation is reported
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01004);
+
+  // varbinary
+  std::vector<int8_t> varbinary_val(3);
+  bufLen = varbinary_val.size();
+  ret = SQLGetData(this->stmt, 4, SQL_C_BINARY, &varbinary_val[0], bufLen, 0);
+  // Verify binary truncation is reported
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01004);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectNullQueryNullIndicator) {
+  // Limitation on mock test server prevents null from working properly.
+  // Mock server has type `DENSE_UNION` for null column data.
+  this->connect();
+
+  std::wstring wsql = L"SELECT null as null_col;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // Verify invalid null indicator is reported, as it is required
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_22002);
 
   this->disconnect();
 }
