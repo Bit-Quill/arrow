@@ -279,13 +279,9 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementHandle, SQLWCHAR* catalogName
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT statementHandle, SQLINTEGER attribute,
+SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute,
                                  SQLPOINTER valuePtr, SQLINTEGER stringLength) {
-  LOG_DEBUG(
-      "SQLSetStmtAttrW called with statementHandle: {}, attribute: {}, valuePtr: {}, "
-      "stringLength: {}",
-      statementHandle, attribute, valuePtr, stringLength);
-  return SQL_ERROR;
+  return arrow::SQLSetStmtAttr(stmt, attribute, valuePtr, stringLength);
 }
 
 SQLRETURN SQL_API SQLTables(SQLHSTMT statementHandle, SQLWCHAR* catalogName,

@@ -360,7 +360,7 @@ bool ODBCStatement::Fetch(size_t rows) {
   return rowsFetched != 0;
 }
 
-void ODBCStatement::GetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER output,
+SQLRETURN ODBCStatement::GetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER output,
                                 SQLINTEGER bufferSize, SQLINTEGER* strLenPtr,
                                 bool isUnicode) {
   using driver::odbcabstraction::Statement;
@@ -369,63 +369,63 @@ void ODBCStatement::GetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER output
     // Descriptor accessor attributes
     case SQL_ATTR_APP_PARAM_DESC:
       DescriptorToHandle(output, m_currentApd, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_APP_ROW_DESC:
       DescriptorToHandle(output, m_currentArd, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_IMP_PARAM_DESC:
       DescriptorToHandle(output, m_ipd.get(), strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_IMP_ROW_DESC:
       DescriptorToHandle(output, m_ird.get(), strLenPtr);
-      return;
+      return SQL_SUCCESS;
 
     // Attributes that are descriptor fields
     case SQL_ATTR_PARAM_BIND_OFFSET_PTR:
       m_currentApd->GetHeaderField(SQL_DESC_BIND_OFFSET_PTR, output, bufferSize,
                                    strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAM_BIND_TYPE:
       m_currentApd->GetHeaderField(SQL_DESC_BIND_TYPE, output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAM_OPERATION_PTR:
       m_currentApd->GetHeaderField(SQL_DESC_ARRAY_STATUS_PTR, output, bufferSize,
                                    strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAM_STATUS_PTR:
       m_ipd->GetHeaderField(SQL_DESC_ARRAY_STATUS_PTR, output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAMS_PROCESSED_PTR:
       m_ipd->GetHeaderField(SQL_DESC_ROWS_PROCESSED_PTR, output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAMSET_SIZE:
       m_currentApd->GetHeaderField(SQL_DESC_ARRAY_SIZE, output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_ARRAY_SIZE:
       m_currentArd->GetHeaderField(SQL_DESC_ARRAY_SIZE, output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_BIND_OFFSET_PTR:
       m_currentArd->GetHeaderField(SQL_DESC_BIND_OFFSET_PTR, output, bufferSize,
                                    strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_BIND_TYPE:
       m_currentArd->GetHeaderField(SQL_DESC_BIND_TYPE, output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_OPERATION_PTR:
       m_currentArd->GetHeaderField(SQL_DESC_ARRAY_STATUS_PTR, output, bufferSize,
                                    strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_STATUS_PTR:
       m_ird->GetHeaderField(SQL_DESC_ARRAY_STATUS_PTR, output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROWS_FETCHED_PTR:
       m_ird->GetHeaderField(SQL_DESC_ROWS_PROCESSED_PTR, output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
 
     case SQL_ATTR_ASYNC_ENABLE:
       GetAttribute(static_cast<SQLULEN>(SQL_ASYNC_ENABLE_OFF), output, bufferSize,
                    strLenPtr);
-      return;
+      return SQL_SUCCESS;
 
 #ifdef SQL_ATTR_ASYNC_STMT_EVENT
     case SQL_ATTR_ASYNC_STMT_EVENT:
@@ -442,51 +442,51 @@ void ODBCStatement::GetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER output
     case SQL_ATTR_CURSOR_SCROLLABLE:
       GetAttribute(static_cast<SQLULEN>(SQL_NONSCROLLABLE), output, bufferSize,
                    strLenPtr);
-      return;
+      return SQL_SUCCESS;
 
     case SQL_ATTR_CURSOR_SENSITIVITY:
       GetAttribute(static_cast<SQLULEN>(SQL_UNSPECIFIED), output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
 
     case SQL_ATTR_CURSOR_TYPE:
       GetAttribute(static_cast<SQLULEN>(SQL_CURSOR_FORWARD_ONLY), output, bufferSize,
                    strLenPtr);
-      return;
+      return SQL_SUCCESS;
 
     case SQL_ATTR_ENABLE_AUTO_IPD:
       GetAttribute(static_cast<SQLULEN>(SQL_FALSE), output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
 
     case SQL_ATTR_FETCH_BOOKMARK_PTR:
       GetAttribute(static_cast<SQLPOINTER>(NULL), output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
 
     case SQL_ATTR_KEYSET_SIZE:
       GetAttribute(static_cast<SQLULEN>(0), output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
 
     case SQL_ATTR_ROW_NUMBER:
       GetAttribute(static_cast<SQLULEN>(m_rowNumber), output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_SIMULATE_CURSOR:
       GetAttribute(static_cast<SQLULEN>(SQL_SC_UNIQUE), output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_USE_BOOKMARKS:
       GetAttribute(static_cast<SQLULEN>(SQL_UB_OFF), output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_CONCURRENCY:
       GetAttribute(static_cast<SQLULEN>(SQL_CONCUR_READ_ONLY), output, bufferSize,
                    strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_MAX_ROWS:
       GetAttribute(static_cast<SQLULEN>(m_maxRows), output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_RETRIEVE_DATA:
       GetAttribute(static_cast<SQLULEN>(SQL_RD_ON), output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
     case SQL_ROWSET_SIZE:
       GetAttribute(static_cast<SQLULEN>(m_rowsetSize), output, bufferSize, strLenPtr);
-      return;
+      return SQL_SUCCESS;
 
     // Driver-level statement attributes. These are all SQLULEN attributes.
     case SQL_ATTR_MAX_LENGTH:
@@ -509,15 +509,15 @@ void ODBCStatement::GetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER output
   if (spiAttribute) {
     GetAttribute(static_cast<SQLULEN>(boost::get<size_t>(*spiAttribute)), output,
                  bufferSize, strLenPtr);
-    return;
+    return SQL_SUCCESS;
   }
 
   throw DriverException(
       "Invalid statement attribute: " + std::to_string(statementAttribute), "HY092");
 }
 
-void ODBCStatement::SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value,
-                                SQLINTEGER bufferSize, bool isUnicode) {
+SQLRETURN ODBCStatement::SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value,
+                                     SQLINTEGER bufferSize, bool isUnicode) {
   size_t attributeToWrite = 0;
   bool successfully_written = false;
 
@@ -533,7 +533,7 @@ void ODBCStatement::SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value,
           desc->RegisterToStatement(this, true);
         }
       }
-      return;
+      return SQL_SUCCESS;
     }
     case SQL_ATTR_APP_ROW_DESC: {
       ODBCDescriptor* desc = static_cast<ODBCDescriptor*>(value);
@@ -546,7 +546,7 @@ void ODBCStatement::SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value,
           desc->RegisterToStatement(this, false);
         }
       }
-      return;
+      return SQL_SUCCESS;
     }
     case SQL_ATTR_IMP_PARAM_DESC:
       throw DriverException("Cannot assign implementation descriptor.", "HY017");
@@ -555,40 +555,40 @@ void ODBCStatement::SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value,
       // Attributes that are descriptor fields
     case SQL_ATTR_PARAM_BIND_OFFSET_PTR:
       m_currentApd->SetHeaderField(SQL_DESC_BIND_OFFSET_PTR, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAM_BIND_TYPE:
       m_currentApd->SetHeaderField(SQL_DESC_BIND_TYPE, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAM_OPERATION_PTR:
       m_currentApd->SetHeaderField(SQL_DESC_ARRAY_STATUS_PTR, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAM_STATUS_PTR:
       m_ipd->SetHeaderField(SQL_DESC_ARRAY_STATUS_PTR, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAMS_PROCESSED_PTR:
       m_ipd->SetHeaderField(SQL_DESC_ROWS_PROCESSED_PTR, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_PARAMSET_SIZE:
       m_currentApd->SetHeaderField(SQL_DESC_ARRAY_SIZE, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_ARRAY_SIZE:
       m_currentArd->SetHeaderField(SQL_DESC_ARRAY_SIZE, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_BIND_OFFSET_PTR:
       m_currentArd->SetHeaderField(SQL_DESC_BIND_OFFSET_PTR, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_BIND_TYPE:
       m_currentArd->SetHeaderField(SQL_DESC_BIND_TYPE, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_OPERATION_PTR:
       m_currentArd->SetHeaderField(SQL_DESC_ARRAY_STATUS_PTR, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_STATUS_PTR:
       m_ird->SetHeaderField(SQL_DESC_ARRAY_STATUS_PTR, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROWS_FETCHED_PTR:
       m_ird->SetHeaderField(SQL_DESC_ROWS_PROCESSED_PTR, value, bufferSize);
-      return;
+      return SQL_SUCCESS;
 
     case SQL_ATTR_ASYNC_ENABLE:
       throw DriverException("Unsupported attribute", "HYC00");
@@ -607,43 +607,43 @@ void ODBCStatement::SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value,
     case SQL_ATTR_CONCURRENCY:
       CheckIfAttributeIsSetToOnlyValidValue(value,
                                             static_cast<SQLULEN>(SQL_CONCUR_READ_ONLY));
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_CURSOR_SCROLLABLE:
       CheckIfAttributeIsSetToOnlyValidValue(value,
                                             static_cast<SQLULEN>(SQL_NONSCROLLABLE));
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_CURSOR_SENSITIVITY:
       CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_UNSPECIFIED));
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_CURSOR_TYPE:
       CheckIfAttributeIsSetToOnlyValidValue(
           value, static_cast<SQLULEN>(SQL_CURSOR_FORWARD_ONLY));
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ENABLE_AUTO_IPD:
       CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_FALSE));
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_FETCH_BOOKMARK_PTR:
       if (value != NULL) {
         throw DriverException("Optional feature not implemented", "HYC00");
       }
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_KEYSET_SIZE:
       CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(0));
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_ROW_NUMBER:
       throw DriverException("Cannot set read-only attribute", "HY092");
     case SQL_ATTR_SIMULATE_CURSOR:
       CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_SC_UNIQUE));
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_USE_BOOKMARKS:
       CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_UB_OFF));
-      return;
+      return SQL_SUCCESS;
     case SQL_ATTR_RETRIEVE_DATA:
       CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_TRUE));
-      return;
+      return SQL_SUCCESS;
     case SQL_ROWSET_SIZE:
       SetAttribute(value, m_rowsetSize);
-      return;
+      return SQL_SUCCESS;
 
     case SQL_ATTR_MAX_ROWS:
       throw DriverException("Cannot set read-only attribute", "HY092");
@@ -673,9 +673,12 @@ void ODBCStatement::SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value,
       throw DriverException("Invalid attribute: " + std::to_string(attributeToWrite),
                             "HY092");
   }
-  if (!successfully_written) {
+  if (successfully_written) {
+    return SQL_SUCCESS;
+  } else {
     GetDiagnostics().AddWarning("Optional value changed.", "01S02",
                                 driver::odbcabstraction::ODBCErrorCodes_GENERAL_WARNING);
+    return SQL_SUCCESS_WITH_INFO;
   }
 }
 
