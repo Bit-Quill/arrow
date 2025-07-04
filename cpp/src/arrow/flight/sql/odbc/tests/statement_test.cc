@@ -1432,9 +1432,325 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectIgnoreInvalidBufLen) {
   this->disconnect();
 }
 
-//-AL- TODO: add tests that use SQLBindCol to fetch all data <TestSQLExecDirectDataQuery>.
+//-AL- TODOs for tests
 // TODO: add tests that replicate queries for 1) varibinary (mock server)
 // <TestSQLExecDirectVarbinaryQuery>
 //  and 2) time (remote server) <TestSQLExecDirectTimeQuery>
+// TODO: add tests for indicator pointer for null data etc <TestSQLExecDirectNullQuery>
+// TODO: add SQLBindCol tests for row fetching <TestSQLExecDirectRowFetching>
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColSimpleQuery) {
+  // -AL- TODO can perhaps delete this test later after TestSQLBindColDataQuery is done,
+  // this is just proof of concept
+  this->connect();
+
+  // Numeric Types
+
+  // Signed Tiny Int
+  int8_t stiny_int_val;
+  SQLLEN buf_len = sizeof(stiny_int_val);
+  SQLLEN ind;
+
+  SQLRETURN ret =
+      SQLBindCol(this->stmt, 1, SQL_C_STINYINT, &stiny_int_val, buf_len, &ind);
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Check that 1 is fetched
+  EXPECT_EQ(stiny_int_val, 1);
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColDataQuery) {
+  this->connect();
+
+  // Numeric Types
+
+  // Signed Tiny Int
+  int8_t stiny_int_val_min;
+  int8_t stiny_int_val_max;
+  SQLLEN buf_len = 0;
+  SQLLEN ind;
+
+  SQLRETURN ret =
+      SQLBindCol(this->stmt, 1, SQL_C_STINYINT, &stiny_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  
+  ret = SQLBindCol(this->stmt, 2, SQL_C_STINYINT, &stiny_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Unsigned Tiny Int
+  uint8_t utiny_int_val_min;
+  uint8_t utiny_int_val_max;
+
+  ret = SQLBindCol(this->stmt, 3, SQL_C_UTINYINT, &utiny_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 4, SQL_C_UTINYINT, &utiny_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Signed Small Int
+  int16_t ssmall_int_val_min;
+  int16_t ssmall_int_val_max;
+
+  ret = SQLBindCol(this->stmt, 5, SQL_C_SSHORT, &ssmall_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 6, SQL_C_SSHORT, &ssmall_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Unsigned Small Int
+  uint16_t usmall_int_val_min;
+  uint16_t usmall_int_val_max;
+
+  ret = SQLBindCol(this->stmt, 7, SQL_C_USHORT, &usmall_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 8, SQL_C_USHORT, &usmall_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Signed Integer
+  SQLINTEGER slong_val_min;
+  SQLINTEGER slong_val_max;
+
+  ret = SQLBindCol(this->stmt, 9, SQL_C_SLONG, &slong_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 10, SQL_C_SLONG, &slong_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Unsigned Integer
+  SQLUINTEGER ulong_val_min;
+  SQLUINTEGER ulong_val_max;
+
+  ret = SQLBindCol(this->stmt, 11, SQL_C_ULONG, &ulong_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 12, SQL_C_ULONG, &ulong_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Signed Big Int
+  SQLBIGINT sbig_int_val_min;
+  SQLBIGINT sbig_int_val_max;
+
+  ret = SQLBindCol(this->stmt, 13, SQL_C_SBIGINT, &sbig_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 14, SQL_C_SBIGINT, &sbig_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Unsigned Big Int
+  SQLUBIGINT ubig_int_val_min;
+  SQLUBIGINT ubig_int_val_max;
+
+  ret = SQLBindCol(this->stmt, 15, SQL_C_UBIGINT, &ubig_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 16, SQL_C_UBIGINT, &ubig_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Decimal
+  SQL_NUMERIC_STRUCT decimal_val_neg;
+  SQL_NUMERIC_STRUCT decimal_val_pos;
+  memset(&decimal_val_neg, 0, sizeof(decimal_val_neg));
+  memset(&decimal_val_pos, 0, sizeof(decimal_val_pos));
+
+  ret = SQLBindCol(this->stmt, 17, SQL_C_NUMERIC, &decimal_val_neg, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 18, SQL_C_NUMERIC, &decimal_val_pos, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Float
+  float float_val_min;
+  float float_val_max;
+
+  ret = SQLBindCol(this->stmt, 19, SQL_C_FLOAT, &float_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 20, SQL_C_FLOAT, &float_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Double
+  SQLDOUBLE double_val_min;
+  SQLDOUBLE double_val_max;
+
+  ret = SQLBindCol(this->stmt, 21, SQL_C_DOUBLE, &double_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 22, SQL_C_DOUBLE, &double_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Bit
+  bool bit_val_false;
+  bool bit_val_true;
+
+  ret = SQLBindCol(this->stmt, 23, SQL_C_BIT, &bit_val_false, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 24, SQL_C_BIT, &bit_val_true, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Characters
+  SQLCHAR char_val[2];
+  buf_len = sizeof(SQLCHAR) * 2;
+
+  ret = SQLBindCol(this->stmt, 25, SQL_C_CHAR, &char_val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLWCHAR wchar_val[2];
+  constexpr size_t wchar_size = driver::odbcabstraction::GetSqlWCharSize();
+  buf_len = wchar_size * 2;
+
+  ret = SQLBindCol(this->stmt, 26, SQL_C_WCHAR, &wchar_val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLWCHAR wvarchar_val[3];
+  buf_len = wchar_size * 3;
+
+  ret = SQLBindCol(this->stmt, 27, SQL_C_WCHAR, &wvarchar_val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLCHAR varchar_val[4];
+  buf_len = sizeof(SQLCHAR) * 4;
+
+  ret = SQLBindCol(this->stmt, 28, SQL_C_CHAR, &varchar_val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Date and Timestamp
+  SQL_DATE_STRUCT date_val_min{}, date_val_max{};
+  buf_len = 0;
+
+  ret = SQLBindCol(this->stmt, 29, SQL_C_TYPE_DATE, &date_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 30, SQL_C_TYPE_DATE, &date_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQL_TIMESTAMP_STRUCT timestamp_val_min{}, timestamp_val_max{};
+
+  ret =
+      SQLBindCol(this->stmt, 31, SQL_C_TYPE_TIMESTAMP, &timestamp_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret =
+      SQLBindCol(this->stmt, 32, SQL_C_TYPE_TIMESTAMP, &timestamp_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Execute query and fetch data once since there is only 1 row.
+  std::wstring wsql = this->getQueryAllDataTypes();
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Data verification
+
+  // Signed Tiny Int
+  EXPECT_EQ(stiny_int_val_min, std::numeric_limits<int8_t>::min());
+  EXPECT_EQ(stiny_int_val_max, std::numeric_limits<int8_t>::max());
+
+  // Unsigned Tiny Int
+  EXPECT_EQ(utiny_int_val_min, std::numeric_limits<uint8_t>::min());
+  EXPECT_EQ(utiny_int_val_max, std::numeric_limits<uint8_t>::max());
+
+  // Signed Small Int
+  EXPECT_EQ(ssmall_int_val_min, std::numeric_limits<int16_t>::min());
+  EXPECT_EQ(ssmall_int_val_max, std::numeric_limits<int16_t>::max());
+
+  // Unsigned Small Int
+  EXPECT_EQ(usmall_int_val_min, std::numeric_limits<uint16_t>::min());
+  EXPECT_EQ(usmall_int_val_max, std::numeric_limits<uint16_t>::max());
+
+  // Signed Long
+  EXPECT_EQ(slong_val_min, std::numeric_limits<SQLINTEGER>::min());
+  EXPECT_EQ(slong_val_max, std::numeric_limits<SQLINTEGER>::max());
+
+  // Unsigned Long
+  EXPECT_EQ(ulong_val_min, std::numeric_limits<SQLUINTEGER>::min());
+  EXPECT_EQ(ulong_val_max, std::numeric_limits<SQLUINTEGER>::max());
+
+  // Signed Big Int
+  EXPECT_EQ(sbig_int_val_min, std::numeric_limits<SQLBIGINT>::min());
+  EXPECT_EQ(sbig_int_val_max, std::numeric_limits<SQLBIGINT>::max());
+
+  // Unsigned Big Int
+  EXPECT_EQ(ubig_int_val_min, std::numeric_limits<SQLUBIGINT>::min());
+  EXPECT_EQ(ubig_int_val_max, std::numeric_limits<SQLUBIGINT>::max());
+
+  // Decimal
+  EXPECT_EQ(decimal_val_neg.sign, 0);
+  EXPECT_EQ(decimal_val_neg.scale, 0);
+  EXPECT_EQ(decimal_val_neg.precision, 38);
+  EXPECT_THAT(decimal_val_neg.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0,
+                                                          0, 0, 0, 0, 0, 0, 0, 0, 0));
+
+  EXPECT_EQ(decimal_val_pos.sign, 1);
+  EXPECT_EQ(decimal_val_pos.scale, 0);
+  EXPECT_EQ(decimal_val_pos.precision, 38);
+  EXPECT_THAT(decimal_val_pos.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0,
+                                                          0, 0, 0, 0, 0, 0, 0, 0, 0));
+
+  // Float
+  EXPECT_EQ(float_val_min, -std::numeric_limits<float>::max());
+  EXPECT_EQ(float_val_max, std::numeric_limits<float>::max());
+
+  // Double
+  EXPECT_EQ(double_val_min, -std::numeric_limits<SQLDOUBLE>::max());
+  EXPECT_EQ(double_val_max, std::numeric_limits<SQLDOUBLE>::max());
+
+  // Bit
+  EXPECT_EQ(bit_val_false, false);
+  EXPECT_EQ(bit_val_true, true);
+
+  // Characters
+  EXPECT_EQ(char_val[0], 'Z');
+  EXPECT_EQ(wchar_val[0], L'你');
+  EXPECT_EQ(wvarchar_val[0], L'你');
+  EXPECT_EQ(wvarchar_val[1], L'好');
+
+  EXPECT_EQ(varchar_val[0], 'X');
+  EXPECT_EQ(varchar_val[1], 'Y');
+  EXPECT_EQ(varchar_val[2], 'Z');
+
+  // Date
+  EXPECT_EQ(date_val_min.day, 1);
+  EXPECT_EQ(date_val_min.month, 1);
+  EXPECT_EQ(date_val_min.year, 1400);
+
+  EXPECT_EQ(date_val_max.day, 31);
+  EXPECT_EQ(date_val_max.month, 12);
+  EXPECT_EQ(date_val_max.year, 9999);
+
+  // Timestamp
+  EXPECT_EQ(timestamp_val_min.day, 1);
+  EXPECT_EQ(timestamp_val_min.month, 1);
+  EXPECT_EQ(timestamp_val_min.year, 1400);
+  EXPECT_EQ(timestamp_val_min.hour, 0);
+  EXPECT_EQ(timestamp_val_min.minute, 0);
+  EXPECT_EQ(timestamp_val_min.second, 0);
+  EXPECT_EQ(timestamp_val_min.fraction, 0);
+
+  EXPECT_EQ(timestamp_val_max.day, 31);
+  EXPECT_EQ(timestamp_val_max.month, 12);
+  EXPECT_EQ(timestamp_val_max.year, 9999);
+  EXPECT_EQ(timestamp_val_max.hour, 23);
+  EXPECT_EQ(timestamp_val_max.minute, 59);
+  EXPECT_EQ(timestamp_val_max.second, 59);
+  EXPECT_EQ(timestamp_val_max.fraction, 0);
+
+  this->disconnect();
+}
 
 }  // namespace arrow::flight::sql::odbc
