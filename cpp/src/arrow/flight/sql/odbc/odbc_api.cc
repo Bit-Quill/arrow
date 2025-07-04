@@ -906,6 +906,34 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLengt
   });
 }
 
+SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) {
+  LOG_DEBUG("SQLPrepareW called with stmt: {}, queryText: {}, textLength: {}", stmt,
+            fmt::ptr(queryText), textLength);
+  using ODBC::ODBCStatement;
+  // The driver is built to handle select statements only.
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    std::string query = ODBC::SqlWcharToString(queryText, textLength);
+
+    statement->Prepare(query);
+
+    return SQL_SUCCESS;
+  });
+}
+
+SQLRETURN SQLExecute(SQLHSTMT stmt) {
+  LOG_DEBUG("SQLExecute called with stmt: {}", stmt);
+  using ODBC::ODBCStatement;
+  // The driver is built to handle select statements only.
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    statement->ExecutePrepared();
+
+    return SQL_SUCCESS;
+  });
+}
+
 SQLRETURN SQLFetch(SQLHSTMT stmt) {
   LOG_DEBUG("SQLFetch called with stmt: {}", stmt);
   using ODBC::ODBCDescriptor;
@@ -976,5 +1004,4 @@ SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
     return SQL_SUCCESS;
   });
 }
-
 }  // namespace arrow
