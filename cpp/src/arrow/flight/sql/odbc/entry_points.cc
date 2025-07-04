@@ -135,6 +135,15 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText,
   return arrow::SQLExecDirect(stmt, queryText, textLength);
 }
 
+SQLRETURN SQL_API SQLFetch(SQLHSTMT stmt) { return arrow::SQLFetch(stmt); }
+
+SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
+                             SQLPOINTER dataPtr, SQLLEN bufferLength,
+                             SQLLEN* indicatorPtr) {
+  return arrow::SQLGetData(stmt, recordNumber, cType, dataPtr, bufferLength,
+                           indicatorPtr);
+}
+
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
                              SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
                              SQLLEN bufferLength, SQLLEN* strLen_or_IndPtr) {
@@ -204,11 +213,6 @@ SQLRETURN SQL_API SQLExecute(SQLHSTMT statementHandle) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLFetch(SQLHSTMT statementHandle) {
-  LOG_DEBUG("SQLFetch called with statementHandle: {}", statementHandle);
-  return SQL_ERROR;
-}
-
 SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementHandle, SQLWCHAR* pKCatalogName,
                                  SQLSMALLINT pKCatalogNameLength, SQLWCHAR* pKSchemaName,
                                  SQLSMALLINT pKSchemaNameLength, SQLWCHAR* pKTableName,
@@ -232,27 +236,13 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT statementHandle, SQLWCHAR* pKCatalogNa
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLGetData(SQLHSTMT statementHandle, SQLUSMALLINT col_or_Param_Num,
-                             SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
-                             SQLLEN bufferLength, SQLLEN* strLen_or_IndPtr) {
-  LOG_DEBUG(
-      "SQLGetData called with statementHandle: {}, col_or_Param_Num: {}, targetType: {}, "
-      "targetValuePtr: {}, bufferLength: {}, strLen_or_IndPtr: {}",
-      statementHandle, col_or_Param_Num, targetType, targetValuePtr, bufferLength,
-      fmt::ptr(strLen_or_IndPtr));
-  return SQL_ERROR;
-}
-
 SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT statementHandle, SQLSMALLINT dataType) {
   LOG_DEBUG("SQLGetTypeInfoW called with statementHandle: {} dataType: {}",
             statementHandle, dataType);
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLMoreResults(SQLHSTMT statementHandle) {
-  LOG_DEBUG("SQLMoreResults called with statementHandle: {}", statementHandle);
-  return SQL_ERROR;
-}
+SQLRETURN SQL_API SQLMoreResults(SQLHSTMT stmt) { return arrow::SQLMoreResults(stmt); }
 
 SQLRETURN SQL_API SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
                                SQLINTEGER inStatementTextLength,
@@ -267,11 +257,12 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementTe
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT statementHandle,
-                                   SQLSMALLINT* columnCountPtr) {
-  LOG_DEBUG("SQLNumResultCols called with statementHandle: {}, columnCountPtr: {}",
-            statementHandle, fmt::ptr(columnCountPtr));
-  return SQL_ERROR;
+SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
+  return arrow::SQLNumResultCols(stmt, columnCountPtr);
+}
+
+SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
+  return arrow::SQLRowCount(stmt, rowCountPtr);
 }
 
 SQLRETURN SQL_API SQLPrepare(SQLHSTMT statementHandle, SQLWCHAR* statementText,

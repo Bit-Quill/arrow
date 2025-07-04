@@ -83,8 +83,20 @@ class ODBCStatement : public ODBCHandle<ODBCStatement> {
 
   inline SQLULEN GetRowsetSize() { return m_rowsetSize; }
 
-  bool GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType, SQLPOINTER dataPtr,
-               SQLLEN bufferLength, SQLLEN* indicatorPtr);
+  SQLRETURN GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType, SQLPOINTER dataPtr,
+                    SQLLEN bufferLength, SQLLEN* indicatorPtr);
+
+  SQLRETURN getMoreResults();
+
+  /**
+   * @brief Get number of columns from data set
+   */
+  void getColumnCount(SQLSMALLINT* columnCountPtr);
+
+  /**
+   * @brief Get number of rows affected by an UPDATE, INSERT, or DELETE statement
+   */
+  void getRowCount(SQLLEN* rowCountPtr);
 
   /**
    * @brief Closes the cursor. This does _not_ un-prepare the statement or change
