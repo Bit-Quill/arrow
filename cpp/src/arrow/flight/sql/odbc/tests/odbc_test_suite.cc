@@ -112,6 +112,57 @@ std::string FlightSQLODBCRemoteTestBase::getInvalidConnectionString() {
   return connect_str;
 }
 
+std::wstring FlightSQLODBCRemoteTestBase::getQueryAllDataTypes() {
+  std::wstring wsql =
+      LR"( SELECT
+           -- Numeric types
+          -128 as stiny_int_min, 127 as stiny_int_max,
+          0 as utiny_int_min, 255 as utiny_int_max,
+
+          -32768 as ssmall_int_min, 32767 as ssmall_int_max,
+          0 as usmall_int_min, 65535 as usmall_int_max,
+
+          CAST(-2147483648 AS INTEGER) AS sinteger_min,
+          CAST(2147483647 AS INTEGER) AS sinteger_max,
+          CAST(0 AS BIGINT) AS uinteger_min,
+          CAST(4294967295 AS BIGINT) AS uinteger_max,
+
+          CAST(-9223372036854775808 AS BIGINT) AS sbigint_min,
+          CAST(9223372036854775807 AS BIGINT) AS sbigint_max,
+          CAST(0 AS BIGINT) AS ubigint_min,
+          --Use string to represent unsigned big int due to lack of support from
+          --remote test server
+          '18446744073709551615' AS ubigint_max,
+
+          CAST(-999999999 AS DECIMAL(38, 0)) AS decimal_negative,
+          CAST(999999999 AS DECIMAL(38, 0)) AS decimal_positive,
+
+          CAST(-3.40282347E38 AS FLOAT) AS float_min, CAST(3.40282347E38 AS FLOAT) AS float_max,
+
+          CAST(-1.7976931348623157E308 AS DOUBLE) AS double_min,
+          CAST(1.7976931348623157E308 AS DOUBLE) AS double_max,
+
+          --Boolean
+          CAST(false AS BOOLEAN) AS bit_false,
+          CAST(true AS BOOLEAN) AS bit_true,
+
+          --Character types
+          'Z' AS c_char, '你' AS c_wchar,
+
+          '你好' AS c_wvarchar,
+
+          'XYZ' AS c_varchar,
+
+          --Date / timestamp
+          CAST(DATE '1400-01-01' AS DATE) AS date_min,
+          CAST(DATE '9999-12-31' AS DATE) AS date_max,
+
+          CAST(TIMESTAMP '1400-01-01 00:00:00' AS TIMESTAMP) AS timestamp_min,
+          CAST(TIMESTAMP '9999-12-31 23:59:59' AS TIMESTAMP) AS timestamp_max;
+      )";
+  return wsql;
+}
+
 void FlightSQLODBCRemoteTestBase::SetUp() {
   if (arrow::internal::GetEnvVar(TEST_CONNECT_STR).ValueOr("").empty()) {
     GTEST_SKIP() << "Skipping FlightSQLODBCRemoteTestBase test: TEST_CONNECT_STR not set";
@@ -171,6 +222,55 @@ std::string FlightSQLODBCMockTestBase::getInvalidConnectionString() {
   // Append invalid token to connection string
   connect_str += std::string("token=invalid_token;");
   return connect_str;
+}
+
+std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
+  std::wstring wsql =
+      LR"( SELECT
+      -- Numeric types
+      -128 AS stiny_int_min, 127 AS stiny_int_max,
+      0 AS utiny_int_min, 255 AS utiny_int_max,
+
+      -32768 AS ssmall_int_min, 32767 AS ssmall_int_max,
+      0 AS usmall_int_min, 65535 AS usmall_int_max,
+
+      CAST(-2147483648 AS INTEGER) AS sinteger_min,
+      CAST(2147483647 AS INTEGER) AS sinteger_max,
+      CAST(0 AS INTEGER) AS uinteger_min,
+      CAST(4294967295 AS INTEGER) AS uinteger_max,
+
+      CAST(-9223372036854775808 AS INTEGER) AS sbigint_min,
+      CAST(9223372036854775807 AS INTEGER) AS sbigint_max,
+      CAST(0 AS INTEGER) AS ubigint_min,
+      -- stored as TEXT as SQLite doesn't support unsigned big int
+      '18446744073709551615' AS ubigint_max,  
+
+      CAST('-999999999' AS NUMERIC) AS decimal_negative,
+      CAST('999999999' AS NUMERIC) AS decimal_positive,
+
+      CAST(-3.40282347E38 AS REAL) AS float_min,
+      CAST(3.40282347E38 AS REAL) AS float_max,
+
+      CAST(-1.7976931348623157E308 AS REAL) AS double_min,
+      CAST(1.7976931348623157E308 AS REAL) AS double_max,
+
+      -- Boolean
+      0 AS bit_false,
+      1 AS bit_true,
+
+      -- Character types
+      'Z' AS c_char,
+      '你' AS c_wchar,
+      '你好' AS c_wvarchar,
+      'XYZ' AS c_varchar,
+
+      DATE('1400-01-01') AS date_min,
+      DATE('9999-12-31') AS date_max,
+
+      DATETIME('1400-01-01 00:00:00') AS timestamp_min,
+      DATETIME('9999-12-31 23:59:59') AS timestamp_max;
+      )";
+  return wsql;
 }
 
 void FlightSQLODBCMockTestBase::SetUp() {
