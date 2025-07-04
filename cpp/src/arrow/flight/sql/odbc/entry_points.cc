@@ -279,8 +279,8 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT statementHandle, SQLWCHAR* catalogName
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute,
-                                 SQLPOINTER valuePtr, SQLINTEGER stringLength) {
+SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
+                                 SQLINTEGER stringLength) {
   return arrow::SQLSetStmtAttr(stmt, attribute, valuePtr, stringLength);
 }
 

@@ -890,8 +890,8 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePt
   });
 }
 
-SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute,
-                         SQLPOINTER valuePtr, SQLINTEGER stringLength) {
+SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
+                         SQLINTEGER stringLength) {
   using ODBC::ODBCStatement;
 
   LOG_DEBUG(

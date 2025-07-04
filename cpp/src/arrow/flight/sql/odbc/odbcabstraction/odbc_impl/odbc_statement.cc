@@ -361,8 +361,8 @@ bool ODBCStatement::Fetch(size_t rows) {
 }
 
 SQLRETURN ODBCStatement::GetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER output,
-                                SQLINTEGER bufferSize, SQLINTEGER* strLenPtr,
-                                bool isUnicode) {
+                                     SQLINTEGER bufferSize, SQLINTEGER* strLenPtr,
+                                     bool isUnicode) {
   using driver::odbcabstraction::Statement;
   boost::optional<Statement::Attribute> spiAttribute;
   switch (statementAttribute) {
