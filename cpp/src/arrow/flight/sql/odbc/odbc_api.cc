@@ -976,6 +976,16 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
   });
 }
 
+SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
+                     SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr) {
+  LOG_DEBUG(
+      "SQLBindCol called with stmt: {}, recordNumber: {}, cType: {}, "
+      "dataPtr: {}, bufferLength: {}, strLen_or_IndPtr: {}",
+      stmt, recordNumber, cType, dataPtr, bufferLength, fmt::ptr(indicatorPtr));
+  return SQL_ERROR;
+  //-AL - TODO: implement SQLBindCol functionality
+}
+
 SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
                      SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr) {
   // GH-46979: support SQL_C_GUID data type

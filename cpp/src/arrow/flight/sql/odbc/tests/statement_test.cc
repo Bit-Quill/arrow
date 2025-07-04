@@ -1432,4 +1432,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectIgnoreInvalidBufLen) {
   this->disconnect();
 }
 
+//-AL- TODO: add tests that use SQLBindCol to fetch all data <TestSQLExecDirectDataQuery>.
+// TODO: add tests that replicate queries for 1) varibinary (mock server)
+// <TestSQLExecDirectVarbinaryQuery>
+//  and 2) time (remote server) <TestSQLExecDirectTimeQuery>
+
 }  // namespace arrow::flight::sql::odbc
