@@ -53,7 +53,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   // Verify 1 is returned
   EXPECT_EQ(val, 1);
 
-  ret = SQLFetch(stmt);
+  ret = SQLFetch(this->stmt);
 
   EXPECT_EQ(ret, SQL_NO_DATA);
 
@@ -292,7 +292,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
 
   // WChar
   SQLWCHAR wchar_val[2];
-  bufLen = sizeof(SQLWCHAR) * 2;
+  constexpr size_t wchar_size = driver::odbcabstraction::GetSqlWCharSize();
+  bufLen = wchar_size * 2;
 
   ret = SQLGetData(this->stmt, 26, SQL_C_WCHAR, &wchar_val, bufLen, &bufLen);
 
@@ -301,7 +302,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
 
   // WVarchar
   SQLWCHAR wvarchar_val[3];
-  bufLen = sizeof(SQLWCHAR) * 3;
+  bufLen = wchar_size * 3;
 
   ret = SQLGetData(this->stmt, 27, SQL_C_WCHAR, &wvarchar_val, bufLen, &bufLen);
 
@@ -560,7 +561,8 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
 
   // Char will be fetched as wchar by default
   SQLWCHAR wchar_val[2];
-  bufLen = sizeof(SQLWCHAR) * 2;
+  constexpr size_t wchar_size = driver::odbcabstraction::GetSqlWCharSize();
+  bufLen = wchar_size * 2;
 
   ret = SQLGetData(this->stmt, 25, SQL_C_DEFAULT, &wchar_val, bufLen, &ind);
 
@@ -569,7 +571,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
 
   // WChar
   SQLWCHAR wchar_val2[2];
-  bufLen = sizeof(SQLWCHAR) * 2;
+  bufLen = wchar_size * 2;
   ret = SQLGetData(this->stmt, 26, SQL_C_DEFAULT, &wchar_val2, bufLen, &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -577,7 +579,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
 
   // WVarchar
   SQLWCHAR wvarchar_val[3];
-  bufLen = sizeof(SQLWCHAR) * 3;
+  bufLen = wchar_size * 3;
 
   ret = SQLGetData(this->stmt, 27, SQL_C_DEFAULT, &wvarchar_val, bufLen, &ind);
 
@@ -587,7 +589,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
 
   // Varchar will be fetched as WVarchar by default
   SQLWCHAR wvarchar_val2[4];
-  bufLen = sizeof(SQLWCHAR) * 4;
+  bufLen = wchar_size * 4;
 
   ret = SQLGetData(this->stmt, 28, SQL_C_DEFAULT, &wvarchar_val2, bufLen, &ind);
 
@@ -774,7 +776,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
   EXPECT_EQ(val, 1);
 
   // Fetch row 2
-  ret = SQLFetch(stmt);
+  ret = SQLFetch(this->stmt);
   ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -880,9 +882,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectWVarcharTruncation) {
 
   const int len = 28;
   SQLWCHAR wchar_val[len];
-  SQLLEN bufLen = sizeof(SQLWCHAR) * len;
-  SQLLEN ind;
   constexpr size_t wchar_size = driver::odbcabstraction::GetSqlWCharSize();
+  SQLLEN bufLen = wchar_size * len;
+  SQLLEN ind;
 
   ret = SQLGetData(this->stmt, 1, SQL_C_WCHAR, &wchar_val, bufLen, &ind);
 
@@ -896,7 +898,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectWVarcharTruncation) {
   // Fetch same column 2nd time
   const int len2 = 2;
   SQLWCHAR wchar_val2[len2];
-  bufLen = sizeof(SQLWCHAR) * len2;
+  bufLen = wchar_size * len2;
 
   ret = SQLGetData(this->stmt, 1, SQL_C_WCHAR, &wchar_val2, bufLen, &ind);
 
@@ -910,7 +912,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectWVarcharTruncation) {
   // Fetch same column 3rd time
   const int len3 = 5;
   SQLWCHAR wchar_val3[len3];
-  bufLen = sizeof(SQLWCHAR) * len3;
+  bufLen = wchar_size * len3;
 
   ret = SQLGetData(this->stmt, 1, SQL_C_WCHAR, &wchar_val3, bufLen, &ind);
 
@@ -1082,8 +1084,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectTruncationQueryNullIndicator)
   // WChar
   const int len2 = 28;
   SQLWCHAR wchar_val[len2];
-  bufLen = sizeof(SQLWCHAR) * len2;
   constexpr size_t wchar_size = driver::odbcabstraction::GetSqlWCharSize();
+  bufLen = wchar_size * len2;
 
   ret = SQLGetData(this->stmt, 3, SQL_C_WCHAR, &wchar_val, bufLen, 0);
 

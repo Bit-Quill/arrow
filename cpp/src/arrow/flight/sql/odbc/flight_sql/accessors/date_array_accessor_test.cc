@@ -75,7 +75,6 @@ TEST(DateArrayAccessor, Test_Date64Array_CDataType_DATE) {
                                  0,         345600000,      432000000, 518400000,
                                  -86400000, -17987443200000};
   std::vector<DATE_STRUCT> expected = {
-
       /* year(16), month(u16), day(u16) */
       {1970, 1, 2},
       {1970, 1, 3},
