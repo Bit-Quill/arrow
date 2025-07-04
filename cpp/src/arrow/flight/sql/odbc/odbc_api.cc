@@ -982,8 +982,14 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
       "SQLBindCol called with stmt: {}, recordNumber: {}, cType: {}, "
       "dataPtr: {}, bufferLength: {}, strLen_or_IndPtr: {}",
       stmt, recordNumber, cType, dataPtr, bufferLength, fmt::ptr(indicatorPtr));
-  return SQL_ERROR;
-  //-AL - TODO: implement SQLBindCol functionality
+  using ODBC::ODBCDescriptor;
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    ODBCDescriptor* ard = statement->GetARD();
+    ard->BindCol(recordNumber, cType, dataPtr, bufferLength, indicatorPtr);
+    return SQL_SUCCESS;
+  });
 }
 
 SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
