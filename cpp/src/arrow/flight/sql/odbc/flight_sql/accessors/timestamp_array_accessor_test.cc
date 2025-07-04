@@ -98,8 +98,15 @@ TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_MILLI) {
 }
 
 TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_SECONDS) {
-  std::vector<int64_t> values = {86400,  172800, 259200, 1649793238,
-                                 345600, 432000, 518400};
+  std::vector<int64_t> values = {86400,  172800, 259200, 1649793238, 345600,
+                                 432000, 518400, -86399, 0};
+  std::vector<TIMESTAMP_STRUCT> expected = {
+      /* year(16), month(u16), day(u16), hour(u16), minute(u16), second(u16),
+         fraction(u32) */
+      {1970, 1, 2, 0, 0, 0, 0},     {1970, 1, 3, 0, 0, 0, 0},   {1970, 1, 4, 0, 0, 0, 0},
+      {2022, 4, 12, 19, 53, 58, 0}, {1970, 1, 5, 0, 0, 0, 0},   {1970, 1, 6, 0, 0, 0, 0},
+      {1970, 1, 7, 0, 0, 0, 0},     {1969, 12, 31, 0, 0, 1, 0}, {1970, 1, 1, 0, 0, 0, 0},
+  };
 
   std::shared_ptr<Array> timestamp_array;
 
@@ -140,7 +147,15 @@ TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_SECONDS) {
 }
 
 TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_MICRO) {
-  std::vector<int64_t> values = {86400000000, 1649793238000000};
+  std::vector<int64_t> values = {0, 86400000000, 1649793238000000, -86399999999,
+                                 -86399000001};
+  std::vector<TIMESTAMP_STRUCT> expected = {
+      /* year(16), month(u16), day(u16), hour(u16), minute(u16), second(u16),
+         fraction(u32) */
+      {1970, 1, 1, 0, 0, 0, 0},           {1970, 1, 2, 0, 0, 0, 0},
+      {2022, 4, 12, 19, 53, 58, 0},       {1969, 12, 31, 0, 0, 0, 1000},
+      {1969, 12, 31, 0, 0, 0, 999999000},
+  };
 
   std::shared_ptr<Array> timestamp_array;
 
@@ -184,7 +199,28 @@ TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_MICRO) {
 }
 
 TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_NANO) {
-  std::vector<int64_t> values = {86400000010000, 1649793238000000000};
+  std::vector<int64_t> values = {86400000010000,
+                                 1649793238000000000,
+                                 -86399999999999,
+                                 -86399000000001,
+                                 86400000000001,
+                                 86400999999999,
+                                 0,
+                                 -9223372036000000001};
+  std::vector<TIMESTAMP_STRUCT> expected = {
+      /* year(16), month(u16), day(u16), hour(u16), minute(u16), second(u16),
+         fraction(u32) */
+      {1970, 1, 2, 0, 0, 0, 10000},
+      {2022, 4, 12, 19, 53, 58, 0},
+      {1969, 12, 31, 0, 0, 0, 1},
+      {1969, 12, 31, 0, 0, 0, 999999999},
+      {1970, 1, 2, 0, 0, 0, 1},
+      {1970, 1, 2, 0, 0, 0, 999999999},
+      {1970, 1, 1, 0, 0, 0, 0},
+      /* Test within range where floor (seconds) value is below INT64_MIN in nanoseconds
+       */
+      {1677, 9, 21, 0, 12, 43, 999999999},
+  };
 
   std::shared_ptr<Array> timestamp_array;
 
@@ -209,7 +245,6 @@ TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_NANO) {
 
   for (size_t i = 0; i < values.size(); ++i) {
     ASSERT_EQ(sizeof(TIMESTAMP_STRUCT), strlen_buffer[i]);
-    tm date{};
 
     auto converted_time = values[i] / odbcabstraction::NANO_TO_SECONDS_DIVISOR;
     GetTimeForSecondsSinceEpoch(converted_time, date);

@@ -129,6 +129,9 @@ SQLSMALLINT getCTypeForSQLType(const DescriptorRecord& record) {
     case SQL_WLONGVARCHAR:
       return SQL_C_WCHAR;
 
+    case SQL_BIT:
+      return SQL_C_BIT;
+
     case SQL_BINARY:
     case SQL_VARBINARY:
     case SQL_LONGVARBINARY:
@@ -146,12 +149,19 @@ SQLSMALLINT getCTypeForSQLType(const DescriptorRecord& record) {
     case SQL_BIGINT:
       return record.m_unsigned ? SQL_C_UBIGINT : SQL_C_SBIGINT;
 
+    case SQL_NUMERIC:
+    case SQL_DECIMAL:
+      return SQL_C_NUMERIC;
+
+    case SQL_FLOAT:
     case SQL_REAL:
       return SQL_C_FLOAT;
 
-    case SQL_FLOAT:
     case SQL_DOUBLE:
       return SQL_C_DOUBLE;
+
+    case SQL_GUID:
+      return SQL_C_GUID;
 
     case SQL_DATE:
     case SQL_TYPE_DATE:
@@ -693,9 +703,9 @@ void ODBCStatement::closeCursor(bool suppressErrors) {
   m_hasReachedEndOfResult = false;
 }
 
-bool ODBCStatement::GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType,
-                            SQLPOINTER dataPtr, SQLLEN bufferLength,
-                            SQLLEN* indicatorPtr) {
+SQLRETURN ODBCStatement::GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType,
+                                 SQLPOINTER dataPtr, SQLLEN bufferLength,
+                                 SQLLEN* indicatorPtr) {
   if (recordNumber == 0) {
     throw DriverException("Bookmarks are not supported", "07009");
   } else if (recordNumber > m_ird->GetRecords().size()) {
@@ -735,6 +745,34 @@ bool ODBCStatement::GetData(SQLSMALLINT recordNumber, SQLSMALLINT cType,
 
   return m_currenResult->GetData(recordNumber, evaluatedCType, precision, scale, dataPtr,
                                  bufferLength, indicatorPtr);
+}
+
+SQLRETURN ODBCStatement::getMoreResults() {
+  // Multiple result sets are not supported.
+  if (m_currenResult) {
+    return SQL_NO_DATA;
+  } else {
+    throw DriverException("Function sequence error", "HY010");
+  }
+}
+
+void ODBCStatement::getColumnCount(SQLSMALLINT* columnCountPtr) {
+  if (!columnCountPtr) {
+    // columnCountPtr is not valid, do nothing as ODBC spec does not mention this as an
+    // error
+    return;
+  }
+  size_t columnCount = m_currentArd->GetRecords().size();
+  *columnCountPtr = static_cast<SQLSMALLINT>(columnCount);
+}
+
+void ODBCStatement::getRowCount(SQLLEN* rowCountPtr) {
+  if (!rowCountPtr) {
+    // rowCountPtr is not valid, do nothing as ODBC spec does not mention this as an error
+    return;
+  }
+  // Will always be -1 (number of rows unknown) if only SELECT is supported
+  *rowCountPtr = -1;
 }
 
 void ODBCStatement::releaseStatement() {

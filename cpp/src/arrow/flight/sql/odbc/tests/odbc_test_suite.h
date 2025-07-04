@@ -61,6 +61,8 @@ class FlightSQLODBCRemoteTestBase : public ::testing::Test {
   /// \brief Get invalid connection string based on connection string defined in
   /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
   std::string virtual getInvalidConnectionString();
+  /// \brief Return a SQL query that selects all data types
+  std::wstring virtual getQueryAllDataTypes();
 
   /** ODBC Environment. */
   SQLHENV env;
@@ -119,6 +121,8 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   std::string getConnectionString() override;
   /// \brief Get invalid connection string for mock server
   std::string getInvalidConnectionString() override;
+  /// \brief Return a SQL query that selects all data types
+  std::wstring getQueryAllDataTypes() override;
 
   int port;
 
@@ -151,8 +155,12 @@ bool compareConnPropertyMap(Connection::ConnPropertyMap map1,
 /// Get error message from ODBC driver using SQLGetDiagRec
 std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle);
 
+static constexpr std::string_view error_state_01004 = "01004";
+static constexpr std::string_view error_state_01S07 = "01S07";
 static constexpr std::string_view error_state_01S02 = "01S02";
 static constexpr std::string_view error_state_08003 = "08003";
+static constexpr std::string_view error_state_22002 = "22002";
+static constexpr std::string_view error_state_24000 = "24000";
 static constexpr std::string_view error_state_28000 = "28000";
 static constexpr std::string_view error_state_HY000 = "HY000";
 static constexpr std::string_view error_state_HY024 = "HY024";
