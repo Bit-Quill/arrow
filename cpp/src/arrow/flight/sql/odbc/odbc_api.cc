@@ -25,6 +25,7 @@
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_descriptor.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_statement.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h"
@@ -340,7 +341,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
     case SQL_DIAG_ROW_COUNT: {
       if (handleType == SQL_HANDLE_STMT) {
         if (diagInfoPtr) {
-          // Will always be 0 if only select supported
+          // Will always be 0 if only SELECT is supported
           *static_cast<SQLLEN*>(diagInfoPtr) = 0;
         }
 
@@ -904,4 +905,76 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLengt
     return SQL_SUCCESS;
   });
 }
+
+SQLRETURN SQLFetch(SQLHSTMT stmt) {
+  LOG_DEBUG("SQLFetch called with stmt: {}", stmt);
+  using ODBC::ODBCDescriptor;
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    // The SQL_ATTR_ROW_ARRAY_SIZE statement attribute specifies the number of rows in the
+    // rowset.
+    ODBCDescriptor* ard = statement->GetARD();
+    size_t rows = static_cast<size_t>(ard->GetArraySize());
+    if (statement->Fetch(rows)) {
+      return SQL_SUCCESS;
+    } else {
+      // Reached the end of rowset
+      return SQL_NO_DATA;
+    }
+  });
+}
+
+SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
+                     SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr) {
+  // GH-46979: support SQL_C_GUID data type
+  // GH-46980: support Interval data types
+  // GH-46985: return warning message instead of error on float truncation case
+  LOG_DEBUG(
+      "SQLGetData called with stmt: {}, recordNumber: {}, cType: {}, "
+      "dataPtr: {}, bufferLength: {}, indicatorPtr: {}",
+      stmt, recordNumber, cType, dataPtr, bufferLength, fmt::ptr(indicatorPtr));
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    return statement->GetData(recordNumber, cType, dataPtr, bufferLength, indicatorPtr);
+  });
+}
+
+SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
+  LOG_DEBUG("SQLMoreResults called with stmt: {}", stmt);
+  // TODO: write tests for SQLMoreResults
+  using ODBC::ODBCStatement;
+  // Multiple result sets not supported. Return SQL_NO_DATA by default.
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    return statement->getMoreResults();
+  });
+}
+
+SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
+  LOG_DEBUG("SQLNumResultCols called with stmt: {}, columnCountPtr: {}", stmt,
+            fmt::ptr(columnCountPtr));
+  // TODO: write tests for SQLNumResultCols
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    statement->getColumnCount(columnCountPtr);
+    return SQL_SUCCESS;
+  });
+}
+
+SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
+  LOG_DEBUG("SQLRowCount called with stmt: {}, columnCountPtr: {}", stmt,
+            fmt::ptr(rowCountPtr));
+  // TODO: write tests for SQLRowCount
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    statement->getRowCount(rowCountPtr);
+    return SQL_SUCCESS;
+  });
+}
+
 }  // namespace arrow

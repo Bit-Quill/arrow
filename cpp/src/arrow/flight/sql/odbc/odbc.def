@@ -47,6 +47,7 @@ EXPORTS
 	SQLGetInfoW
 	SQLGetStmtAttrW
 	SQLGetTypeInfoW
+	SQLRowCount
 	SQLMoreResults
 	SQLNativeSqlW
 	SQLNumResultCols
