@@ -784,7 +784,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
   EXPECT_EQ(val, 2);
 
   // Fetch row 3
-  ret = SQLFetch(stmt);
+  ret = SQLFetch(this->stmt);
   ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -792,7 +792,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
   EXPECT_EQ(val, 3);
 
   // Verify result set has no more data beyond row 3
-  ret = SQLFetch(stmt);
+  ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
 
   ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &bufLen);
