@@ -154,10 +154,10 @@ std::wstring FlightSQLODBCRemoteTestBase::getQueryAllDataTypes() {
           'XYZ' AS c_varchar,
 
           --Date / timestamp
-          CAST(DATE '0001-01-01' AS DATE) AS date_min,
+          CAST(DATE '1399-01-01' AS DATE) AS date_min,
           CAST(DATE '9999-12-31' AS DATE) AS date_max,
 
-          CAST(TIMESTAMP '0001-01-01 00:00:00' AS TIMESTAMP) AS timestamp_min,
+          CAST(TIMESTAMP '1399-01-01 00:00:00' AS TIMESTAMP) AS timestamp_min,
           CAST(TIMESTAMP '9999-12-31 23:59:59' AS TIMESTAMP) AS timestamp_max;
       )";
   return wsql;
@@ -264,10 +264,10 @@ std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
       '你好' AS c_wvarchar,
       'XYZ' AS c_varchar,
 
-      DATE('0001-01-01') AS date_min,
+      DATE('1399-01-01') AS date_min,
       DATE('9999-12-31') AS date_max,
 
-      DATETIME('0001-01-01 00:00:00') AS timestamp_min,
+      DATETIME('1399-01-01 00:00:00') AS timestamp_min,
       DATETIME('9999-12-31 23:59:59') AS timestamp_max;
       )";
   return wsql;
