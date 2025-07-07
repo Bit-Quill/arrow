@@ -385,10 +385,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
   ret = SQLGetData(this->stmt, 29, SQL_C_TYPE_DATE, &date_var, buf_len, &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // Check min values for date. Min valid year is 1.
+  // Check min values for date. Min valid year is 1400.
   EXPECT_EQ(date_var.day, 1);
   EXPECT_EQ(date_var.month, 1);
-  EXPECT_EQ(date_var.year, 1);
+  EXPECT_EQ(date_var.year, 1399);
 
   ret = SQLGetData(this->stmt, 30, SQL_C_TYPE_DATE, &date_var, buf_len, &ind);
 
@@ -405,10 +405,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
   ret = SQLGetData(this->stmt, 31, SQL_C_TYPE_TIMESTAMP, &timestamp_var, buf_len, &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // Check min values for date. Min valid year is 1.
+  // Check min values for date. Min valid year is 1400.
   EXPECT_EQ(timestamp_var.day, 1);
   EXPECT_EQ(timestamp_var.month, 1);
-  EXPECT_EQ(timestamp_var.year, 1);
+  EXPECT_EQ(timestamp_var.year, 1399);
   EXPECT_EQ(timestamp_var.hour, 0);
   EXPECT_EQ(timestamp_var.minute, 0);
   EXPECT_EQ(timestamp_var.second, 0);
@@ -664,10 +664,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
   ret = SQLGetData(this->stmt, 29, SQL_C_DEFAULT, &date_var, buf_len, &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // Check min values for date. Min valid year is 1.
+  // Check min values for date. Min valid year is 1400.
   EXPECT_EQ(date_var.day, 1);
   EXPECT_EQ(date_var.month, 1);
-  EXPECT_EQ(date_var.year, 1);
+  EXPECT_EQ(date_var.year, 1399);
 
   ret = SQLGetData(this->stmt, 30, SQL_C_DEFAULT, &date_var, buf_len, &ind);
 
@@ -684,10 +684,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
   ret = SQLGetData(this->stmt, 31, SQL_C_DEFAULT, &timestamp_var, buf_len, &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // Check min values for date. Min valid year is 1.
+  // Check min values for date. Min valid year is 1400.
   EXPECT_EQ(timestamp_var.day, 1);
   EXPECT_EQ(timestamp_var.month, 1);
-  EXPECT_EQ(timestamp_var.year, 1);
+  EXPECT_EQ(timestamp_var.year, 1399);
   EXPECT_EQ(timestamp_var.hour, 0);
   EXPECT_EQ(timestamp_var.minute, 0);
   EXPECT_EQ(timestamp_var.second, 0);
@@ -1508,10 +1508,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectIgnoreInvalidBufLen) {
   ret = SQLGetData(this->stmt, 29, SQL_C_TYPE_DATE, &date_var, invalid_buf_len, &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // Check min values for date. Min valid year is 1.
+  // Check min values for date. Min valid year is 1400.
   EXPECT_EQ(date_var.day, 1);
   EXPECT_EQ(date_var.month, 1);
-  EXPECT_EQ(date_var.year, 1);
+  EXPECT_EQ(date_var.year, 1399);
 
   ret = SQLGetData(this->stmt, 30, SQL_C_TYPE_DATE, &date_var, invalid_buf_len, &ind);
 
@@ -1528,10 +1528,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectIgnoreInvalidBufLen) {
                    &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // Check min values for date. Min valid year is 1.
+  // Check min values for date. Min valid year is 1400.
   EXPECT_EQ(timestamp_var.day, 1);
   EXPECT_EQ(timestamp_var.month, 1);
-  EXPECT_EQ(timestamp_var.year, 1);
+  EXPECT_EQ(timestamp_var.year, 1399);
   EXPECT_EQ(timestamp_var.hour, 0);
   EXPECT_EQ(timestamp_var.minute, 0);
   EXPECT_EQ(timestamp_var.second, 0);
