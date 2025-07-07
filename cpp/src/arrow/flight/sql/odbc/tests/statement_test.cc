@@ -1890,4 +1890,93 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowFetching) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnly) {
+  // GH-47021: implement driver to return indicator value when data pointer is null
+  GTEST_SKIP();
+  // Verify driver supports null data pointer with valid indicator pointer
+  this->connect();
+
+  // Numeric Types
+
+  // Signed Tiny Int
+  SQLLEN stiny_int_ind;
+
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_STINYINT, 0, 0, &stiny_int_ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Characters
+  SQLLEN buf_len = sizeof(SQLCHAR) * 2;
+  SQLLEN char_val_ind;
+
+  ret = SQLBindCol(this->stmt, 25, SQL_C_CHAR, 0, buf_len, &char_val_ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Execute query and fetch data once since there is only 1 row.
+  std::wstring wsql = this->getQueryAllDataTypes();
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify values for indicator pointer
+  // Signed Tiny Int
+  EXPECT_EQ(stiny_int_ind, 1);
+
+  // Char array
+  EXPECT_EQ(char_val_ind, 1);
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnlySQLUnbind) {
+  // Verify driver supports valid indicator pointer after unbinding all columns
+  this->connect();
+
+  // Numeric Types
+
+  // Signed Tiny Int
+  int8_t stiny_int_val;
+  SQLLEN stiny_int_ind;
+
+  SQLRETURN ret =
+      SQLBindCol(this->stmt, 1, SQL_C_STINYINT, &stiny_int_val, 0, &stiny_int_ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Characters
+  SQLCHAR char_val[2];
+  SQLLEN buf_len = sizeof(SQLCHAR) * 2;
+  SQLLEN char_val_ind;
+
+  ret = SQLBindCol(this->stmt, 25, SQL_C_CHAR, &char_val, buf_len, &char_val_ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Driver should still be able to execute queries after unbinding columns
+  ret = SQLFreeStmt(this->stmt, SQL_UNBIND);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Execute query and fetch data once since there is only 1 row.
+  std::wstring wsql = this->getQueryAllDataTypes();
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // GH-47021: implement driver to return indicator value when data pointer is null and
+  // uncomment the checks Verify values for indicator pointer Signed Tiny Int
+  // EXPECT_EQ(stiny_int_ind, 1);
+
+  // Char array
+  // EXPECT_EQ(char_val_ind, 1);
+
+  this->disconnect();
+}
+
+// TODO: -AL- Add tests for SQL_ATTR_ROW_ARRAY_SIZE
+// after SQLSetStmtAttr is implemented
+
 }  // namespace arrow::flight::sql::odbc

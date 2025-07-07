@@ -197,9 +197,18 @@ SQLRETURN SQLFreeStmt(SQLHSTMT handle, SQLUSMALLINT option) {
       return SQLFreeHandle(SQL_HANDLE_STMT, handle);
     }
 
-    // TODO Implement SQLBindCol
+    // TODO Implement SQLBindCol -AL-
+    // Implement SQL_UNBIND in SQLFreeStmt
     case SQL_UNBIND: {
-      return SQL_SUCCESS;
+      using ODBC::ODBCDescriptor;
+      using ODBC::ODBCStatement;
+      return ODBCStatement::ExecuteWithDiagnostics(handle, SQL_ERROR, [=]() {
+        ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(handle);
+        ODBCDescriptor* ard = statement->GetARD();
+        // Unbind columns
+        ard->SetHeaderField(SQL_DESC_COUNT, (void*)0, 0);
+        return SQL_SUCCESS;
+      });
     }
 
     // SQLBindParameter is not supported
@@ -985,6 +994,7 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
   using ODBC::ODBCDescriptor;
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    // GH-47021: implement driver to return indicator value when data pointer is null
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
     ODBCDescriptor* ard = statement->GetARD();
     ard->BindCol(recordNumber, cType, dataPtr, bufferLength, indicatorPtr);
