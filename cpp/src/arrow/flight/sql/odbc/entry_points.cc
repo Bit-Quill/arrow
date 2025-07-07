@@ -137,6 +137,11 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText,
 
 SQLRETURN SQL_API SQLFetch(SQLHSTMT stmt) { return arrow::SQLFetch(stmt); }
 
+SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT fetchOrientation,
+                                 SQLLEN fetchOffset) {
+  return arrow::SQLFetchScroll(stmt, fetchOrientation, fetchOffset);
+}
+
 SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
                              SQLPOINTER dataPtr, SQLLEN bufferLength,
                              SQLLEN* indicatorPtr) {
