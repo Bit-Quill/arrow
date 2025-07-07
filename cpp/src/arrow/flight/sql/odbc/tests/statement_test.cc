@@ -832,24 +832,28 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
   SQLLEN ind;
 
   ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
-
   EXPECT_EQ(ret, SQL_SUCCESS);
+
   // Verify 1 is returned
   EXPECT_EQ(val, 1);
 
   // Fetch row 2
   ret = SQLFetch(this->stmt);
-  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
-
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
   // Verify 2 is returned
   EXPECT_EQ(val, 2);
 
   // Fetch row 3
   ret = SQLFetch(this->stmt);
-  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
-
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
   // Verify 3 is returned
   EXPECT_EQ(val, 3);
 
@@ -858,10 +862,121 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
   EXPECT_EQ(ret, SQL_NO_DATA);
 
   ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &ind);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // Invalid cursor state
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLFetchScrollRowFetching) {
+  this->connect();
+
+  std::wstring wsql =
+      LR"(
+    SELECT 1 AS small_table
+    UNION ALL
+    SELECT 2
+    UNION ALL
+    SELECT 3;
+  )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Fetch row 1
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_NEXT, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+  SQLLEN buf_len = sizeof(val);
+  SQLLEN ind;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify 1 is returned
+  EXPECT_EQ(val, 1);
+
+  // Fetch row 2
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_NEXT, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify 2 is returned
+  EXPECT_EQ(val, 2);
+
+  // Fetch row 3
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_NEXT, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify 3 is returned
+  EXPECT_EQ(val, 3);
+
+  // Verify result set has no more data beyond row 3
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_NEXT, 0);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &ind);
 
   EXPECT_EQ(ret, SQL_ERROR);
   // Invalid cursor state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLFetchScrollUnsupportedOrientation) {
+  // SQL_FETCH_PRIOR is the only supported fetch orientation.
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_PRIOR, 0);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HYC00);
+
+  SQLLEN fetch_offset = 1;
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_RELATIVE, fetch_offset);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HYC00);
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_ABSOLUTE, fetch_offset);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HYC00);
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_FIRST, 0);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HYC00);
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_LAST, 0);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HYC00);
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_BOOKMARK, fetch_offset);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // DM returns state HY106 for SQL_FETCH_BOOKMARK
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY106);
 
   this->disconnect();
 }
