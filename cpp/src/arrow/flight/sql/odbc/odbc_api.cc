@@ -197,8 +197,6 @@ SQLRETURN SQLFreeStmt(SQLHSTMT handle, SQLUSMALLINT option) {
       return SQLFreeHandle(SQL_HANDLE_STMT, handle);
     }
 
-    // TODO Implement SQLBindCol -AL-
-    // Implement SQL_UNBIND in SQLFreeStmt
     case SQL_UNBIND: {
       using ODBC::ODBCDescriptor;
       using ODBC::ODBCStatement;
