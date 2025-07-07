@@ -43,7 +43,16 @@ int64_t GetTodayTimeFromEpoch() {
 void GetTimeForSecondsSinceEpoch(tm& date, int64_t value) {
   // Boost date-time library only support years from range 1400-9999
   // GH-46978: support years before 1400 for date, time, and timestamp types
-  date = boost::posix_time::to_tm(boost::posix_time::from_time_t(value));
+  try {
+    boost::posix_time::ptime pt =
+        boost::posix_time::from_time_t(0) + boost::posix_time::seconds(value);
+    date = boost::posix_time::to_tm(pt);
+  } catch (const std::exception&) {
+    std::memset(&date, 0, sizeof(tm));
+    date.tm_year = -1900;  // Represents year 0
+    date.tm_mon = 0;
+    date.tm_mday = 1;
+  }
 }
 }  // namespace odbcabstraction
 }  // namespace driver
