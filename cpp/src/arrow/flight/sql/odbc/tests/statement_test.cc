@@ -873,6 +873,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLFetchScrollRowFetching) {
   this->connect();
 
+  // -AL- todo uncomment out after SQLSetStmtAttr is finished
+  // SQLLEN rows_fetched;
+  // ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROWS_FETCHED_PTR, &rows_fetched, 0);
+
   std::wstring wsql =
       LR"(
     SELECT 1 AS small_table
@@ -900,6 +904,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLFetchScrollRowFetching) {
   EXPECT_EQ(ret, SQL_SUCCESS);
   // Verify 1 is returned
   EXPECT_EQ(val, 1);
+
+  // -AL- todo uncomment out after SQLSetStmtAttr is finished
+  // Verify 1 row is fetched
+  // EXPECT_EQ(rows_fetched, 1);
+
+  // TODO: -AL- for SQLFetchScroll,
+  // add tests for SQL_ATTR_ROWS_FETCHED_PTR using SQLGetStmtAttr;
+  // can also modify existing test. Value should be 1,
+  // but the value should increase as more rows are fetched
+  // -AL- I should add more checks, like = 2 and 3 after fetch is called more times.
 
   // Fetch row 2
   ret = SQLFetchScroll(this->stmt, SQL_FETCH_NEXT, 0);
