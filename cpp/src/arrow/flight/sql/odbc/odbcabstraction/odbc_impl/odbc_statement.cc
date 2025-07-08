@@ -458,7 +458,7 @@ SQLRETURN ODBCStatement::GetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER o
       return SQL_SUCCESS;
 
     case SQL_ATTR_FETCH_BOOKMARK_PTR:
-      GetAttribute(static_cast<SQLPOINTER>(NULL), output, bufferSize, strLenPtr);
+      GetAttribute(static_cast<SQLLEN>(NULL), output, bufferSize, strLenPtr);
       return SQL_SUCCESS;
 
     case SQL_ATTR_KEYSET_SIZE:
