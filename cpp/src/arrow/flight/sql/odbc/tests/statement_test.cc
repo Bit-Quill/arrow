@@ -1979,4 +1979,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnlySQLUnbind) {
 // TODO: -AL- Add tests for SQL_ATTR_ROW_ARRAY_SIZE
 // after SQLSetStmtAttr is implemented
 
+// -AL- TODO: add test for SQLExtendedFetch to validate that missing indicator results in
+// error_state_22002 state but SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO according to the spec.
+// <TestSQLBindColNullQueryNullIndicator>
+// TODO: after SQLSetStmtAttr, add tests for SQL_ROWSET_SIZE which is used by SQLExtendedFetch 
+
 }  // namespace arrow::flight::sql::odbc
