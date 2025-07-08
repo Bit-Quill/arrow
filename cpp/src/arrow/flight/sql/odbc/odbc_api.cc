@@ -1004,9 +1004,8 @@ SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
     // The SQL_ROWSET_SIZE statement attribute specifies the number of rows in the
     // rowset.
     SQLULEN rowSetSize = statement->GetRowsetSize();
-    LOG_DEBUG(
-        "SQL_ROWSET_SIZE value for SQLExtendedFetch: {}", rowSetSize);
-    if (statement->Fetch(static_cast<size_t>(rowSetSize))) {
+    LOG_DEBUG("SQL_ROWSET_SIZE value for SQLExtendedFetch: {}", rowSetSize);
+    if (statement->Fetch(static_cast<size_t>(rowSetSize), rowCountPtr, rowStatusArray)) {
       return SQL_SUCCESS;
     } else {
       // Reached the end of rowset
