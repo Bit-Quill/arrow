@@ -639,7 +639,7 @@ SQLRETURN ODBCStatement::SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER v
       CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_UB_OFF));
       return SQL_SUCCESS;
     case SQL_ATTR_RETRIEVE_DATA:
-      CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_TRUE));
+      CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_RD_ON));
       return SQL_SUCCESS;
     case SQL_ROWSET_SIZE:
       SetAttribute(value, m_rowsetSize);
