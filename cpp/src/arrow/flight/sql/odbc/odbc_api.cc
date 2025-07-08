@@ -873,12 +873,11 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
 
 SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
                          SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr) {
-  using ODBC::ODBCStatement;
-
   LOG_DEBUG(
       "SQLGetStmtAttrW called with stmt: {}, attribute: {}, valuePtr: {}, "
       "bufferLength: {}, stringLengthPtr: {}",
       stmt, attribute, valuePtr, bufferLength, fmt::ptr(stringLengthPtr));
+  using ODBC::ODBCStatement;
 
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
@@ -892,12 +891,11 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePt
 
 SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
                          SQLINTEGER stringLength) {
-  using ODBC::ODBCStatement;
-
   LOG_DEBUG(
       "SQLSetStmtAttrW called with stmt: {}, attribute: {}, valuePtr: {}, "
       "stringLength: {}",
       stmt, attribute, valuePtr, stringLength);
+  using ODBC::ODBCStatement;
 
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
