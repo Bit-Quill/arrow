@@ -33,6 +33,7 @@ EXPORTS
 	SQLErrorW
 	SQLExecDirectW
 	SQLExecute
+	SQLExtendedFetch
 	SQLFetch
 	SQLForeignKeysW
 	SQLFreeEnv
