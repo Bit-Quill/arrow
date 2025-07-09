@@ -884,8 +884,9 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePt
 
     bool isUnicode = true;
 
-    return statement->GetStmtAttr(attribute, valuePtr, bufferLength, stringLengthPtr,
-                                  isUnicode);
+    statement->GetStmtAttr(attribute, valuePtr, bufferLength, stringLengthPtr, isUnicode);
+
+    return SQL_SUCCESS;
   });
 }
 
@@ -902,7 +903,9 @@ SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePt
 
     bool isUnicode = true;
 
-    return statement->SetStmtAttr(attribute, valuePtr, stringLength, isUnicode);
+    statement->SetStmtAttr(attribute, valuePtr, stringLength, isUnicode);
+
+    return SQL_SUCCESS;
   });
 }
 
