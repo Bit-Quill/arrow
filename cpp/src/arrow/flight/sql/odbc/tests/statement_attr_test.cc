@@ -14,9 +14,9 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-#include "arrow/flight/sql/odbc/tests/odbc_test_suite.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_statement.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/statement.h"
+#include "arrow/flight/sql/odbc/tests/odbc_test_suite.h"
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -76,8 +76,7 @@ void validateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLULEN new_v
   SQLINTEGER stringLengthPtr = sizeof(SQLULEN);
 
   SQLRETURN ret = SQLSetStmtAttr(
-      statement, attribute, reinterpret_cast<SQLPOINTER>(new_value),
-                                 stringLengthPtr);
+      statement, attribute, reinterpret_cast<SQLPOINTER>(new_value), stringLengthPtr);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
@@ -85,10 +84,10 @@ void validateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLULEN new_v
 // Validate error return value and code
 void validateSetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
                                   SQLULEN new_value, std::string_view error_code) {
-  //SQLINTEGER stringLengthPtr = sizeof(SQLULEN);
+  // SQLINTEGER stringLengthPtr = sizeof(SQLULEN);
 
-  SQLRETURN ret = SQLSetStmtAttr(
-      statement, attribute, reinterpret_cast<SQLPOINTER>(new_value), 0);
+  SQLRETURN ret =
+      SQLSetStmtAttr(statement, attribute, reinterpret_cast<SQLPOINTER>(new_value), 0);
 
   EXPECT_EQ(ret, SQL_ERROR);
 
@@ -368,12 +367,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowNumber) {
   std::wstring wsql = L"SELECT 1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // TODO 24000: [Microsoft][ODBC Driver Manager] Invalid cursor state
-  //validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_NUMBER, static_cast<SQLULEN>(0));
+  // validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_NUMBER, static_cast<SQLULEN>(0));
 
   this->disconnect();
 }
@@ -477,7 +477,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAsyncEnableUnsupported) {
 }
 #endif
 
-
 #ifdef SQL_ATTR_ASYNC_STMT_EVENT
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAsyncStmtEventUnsupported) {
   this->connect();
@@ -576,7 +575,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrIMPParamDesc) {
   this->connect();
 
   // Invalid use of an automatically allocated descriptor handle
-  validateSetStmtAttrErrorCode(this->stmt, SQL_ATTR_IMP_PARAM_DESC, static_cast<SQLULEN>(0), error_state_HY017);
+  validateSetStmtAttrErrorCode(this->stmt, SQL_ATTR_IMP_PARAM_DESC,
+                               static_cast<SQLULEN>(0), error_state_HY017);
 
   this->disconnect();
 }

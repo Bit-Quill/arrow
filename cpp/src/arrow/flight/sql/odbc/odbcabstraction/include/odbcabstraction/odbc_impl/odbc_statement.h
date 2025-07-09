@@ -72,8 +72,8 @@ class ODBCStatement : public ODBCHandle<ODBCStatement> {
 
   void GetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER output,
                    SQLINTEGER bufferSize, SQLINTEGER* strLenPtr, bool isUnicode);
-  void SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value,
-                   SQLINTEGER bufferSize, bool isUnicode);
+  void SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value, SQLINTEGER bufferSize,
+                   bool isUnicode);
 
   void RevertAppDescriptor(bool isApd);
 
