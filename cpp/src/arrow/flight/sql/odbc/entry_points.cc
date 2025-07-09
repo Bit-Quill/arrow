@@ -145,15 +145,10 @@ SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLI
 }
 
 SQLRETURN SQL_API SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) {
-  LOG_DEBUG("SQLPrepareW called with stmt: {}, queryText: {}, textLength: {}", stmt,
-            fmt::ptr(queryText), textLength);
   return arrow::SQLPrepare(stmt, queryText, textLength);
 }
 
-SQLRETURN SQL_API SQLExecute(SQLHSTMT stmt) {
-  LOG_DEBUG("SQLExecute called with stmt: {}", stmt);
-  return arrow::SQLExecute(stmt);
-}
+SQLRETURN SQL_API SQLExecute(SQLHSTMT stmt) { return arrow::SQLExecute(stmt); }
 
 SQLRETURN SQL_API SQLBindCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
                              SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
