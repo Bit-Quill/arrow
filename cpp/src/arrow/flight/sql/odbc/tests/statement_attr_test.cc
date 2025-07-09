@@ -14,9 +14,10 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+#include "arrow/flight/sql/odbc/tests/odbc_test_suite.h"
+
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_statement.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/statement.h"
-#include "arrow/flight/sql/odbc/tests/odbc_test_suite.h"
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -84,10 +85,10 @@ void validateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLULEN new_v
 // Validate error return value and code
 void validateSetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
                                   SQLULEN new_value, std::string_view error_code) {
-  // SQLINTEGER stringLengthPtr = sizeof(SQLULEN);
+  SQLINTEGER stringLengthPtr = sizeof(SQLULEN);
 
-  SQLRETURN ret =
-      SQLSetStmtAttr(statement, attribute, reinterpret_cast<SQLPOINTER>(new_value), 0);
+  SQLRETURN ret = SQLSetStmtAttr(
+      statement, attribute, reinterpret_cast<SQLPOINTER>(new_value), stringLengthPtr);
 
   EXPECT_EQ(ret, SQL_ERROR);
 
@@ -361,7 +362,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowBindType) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowNumber) {
-  GTEST_SKIP();
   this->connect();
 
   std::wstring wsql = L"SELECT 1;";
@@ -372,8 +372,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowNumber) {
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  // TODO 24000: [Microsoft][ODBC Driver Manager] Invalid cursor state
-  // validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_NUMBER, static_cast<SQLULEN>(0));
+  ret = SQLFetch(this->stmt);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // TODO Returns SQL_ERROR but no ODBC Code
+  //validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_NUMBER, static_cast<SQLULEN>(0));
 
   this->disconnect();
 }
@@ -489,8 +493,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAsyncStmtEventUnsupported) {
 }
 #endif
 
-// TODO Check for windows is not necessary
-//#ifndef _WIN32
 #ifdef SQL_ATTR_ASYNC_STMT_PCALLBACK
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAsyncStmtPCCallbackUnsupported) {
   this->connect();
@@ -501,10 +503,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAsyncStmtPCCallbackUnsupport
   this->disconnect();
 }
 #endif
-//#endif
 
-// TODO Check for windows is not necessary
-// #ifndef _WIN32
 #ifdef SQL_ATTR_ASYNC_STMT_PCONTEXT
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAsyncStmtPCContextUnsupported) {
   this->connect();
@@ -516,7 +515,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAsyncStmtPCContextUnsupporte
   this->disconnect();
 }
 #endif
-//#endif
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrConcurrency) {
   this->connect();
