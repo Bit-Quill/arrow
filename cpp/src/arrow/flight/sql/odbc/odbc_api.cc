@@ -314,7 +314,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
     case SQL_DIAG_CURSOR_ROW_COUNT: {
       if (handleType == SQL_HANDLE_STMT) {
         if (diagInfoPtr) {
-          // Will always be 0 if only select supported
+          // Will always be 0 if only SELECT supported
           *static_cast<SQLLEN*>(diagInfoPtr) = 0;
         }
 
@@ -894,12 +894,40 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLengt
   LOG_DEBUG("SQLExecDirectW called with stmt: {}, queryText: {}, textLength: {}", stmt,
             fmt::ptr(queryText), textLength);
   using ODBC::ODBCStatement;
-  // The driver is built to handle select statements only.
+  // The driver is built to handle SELECT statements only.
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
     std::string query = ODBC::SqlWcharToString(queryText, textLength);
 
     statement->Prepare(query);
+    statement->ExecutePrepared();
+
+    return SQL_SUCCESS;
+  });
+}
+
+SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) {
+  LOG_DEBUG("SQLPrepareW called with stmt: {}, queryText: {}, textLength: {}", stmt,
+            fmt::ptr(queryText), textLength);
+  using ODBC::ODBCStatement;
+  // The driver is built to handle SELECT statements only.
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    std::string query = ODBC::SqlWcharToString(queryText, textLength);
+
+    statement->Prepare(query);
+
+    return SQL_SUCCESS;
+  });
+}
+
+SQLRETURN SQLExecute(SQLHSTMT stmt) {
+  LOG_DEBUG("SQLExecute called with stmt: {}", stmt);
+  using ODBC::ODBCStatement;
+  // The driver is built to handle SELECT statements only.
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
     statement->ExecutePrepared();
 
     return SQL_SUCCESS;
@@ -976,5 +1004,4 @@ SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
     return SQL_SUCCESS;
   });
 }
-
 }  // namespace arrow
