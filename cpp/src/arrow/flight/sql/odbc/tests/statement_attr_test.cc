@@ -376,8 +376,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowNumber) {
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  // TODO Returns SQL_ERROR but no ODBC Code
-  //validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_NUMBER, static_cast<SQLULEN>(0));
+  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_NUMBER, static_cast<SQLULEN>(1));
 
   this->disconnect();
 }
