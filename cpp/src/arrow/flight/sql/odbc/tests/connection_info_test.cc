@@ -240,12 +240,13 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HLIB) {
 
 // These information types are implemented by the Driver Manager alone.
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_DRIVER_HSTMT) {
-  // TODO This is failing due to no statement being created
-  // This should run after SQLGetStmtAttr is implemented
-  GTEST_SKIP();
   this->connect();
 
-  validate(this->conn, SQL_DRIVER_HSTMT, static_cast<SQLULEN>(0));
+  // Value returned from driver manager is the stmt address
+  SQLHSTMT local_stmt = this->stmt;
+  SQLRETURN ret = SQLGetInfo(this->conn, SQL_DRIVER_HSTMT, &local_stmt, 0, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_GT(local_stmt, static_cast<SQLHSTMT>(0));
 
   this->disconnect();
 }
