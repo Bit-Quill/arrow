@@ -81,6 +81,62 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectInvalidQuery) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecuteSimpleQuery) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret = SQLPrepare(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLExecute(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Fetch data
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify 1 is returned
+  EXPECT_EQ(val, 1);
+
+  ret = SQLFetch(this->stmt);
+
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // Invalid cursor state
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLPrepareInvalidQuery) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret = SQLPrepare(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // ODBC provides generic error code HY000 to all statement errors
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY000);
+
+  ret = SQLExecute(this->stmt);
+  // Verify function sequence error state is returned
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
+
+  this->disconnect();
+}
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
   this->connect();
 

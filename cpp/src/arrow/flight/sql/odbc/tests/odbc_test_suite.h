@@ -163,6 +163,7 @@ static constexpr std::string_view error_state_22002 = "22002";
 static constexpr std::string_view error_state_24000 = "24000";
 static constexpr std::string_view error_state_28000 = "28000";
 static constexpr std::string_view error_state_HY000 = "HY000";
+static constexpr std::string_view error_state_HY010 = "HY010";
 static constexpr std::string_view error_state_HY024 = "HY024";
 static constexpr std::string_view error_state_HY092 = "HY092";
 static constexpr std::string_view error_state_HYC00 = "HYC00";
