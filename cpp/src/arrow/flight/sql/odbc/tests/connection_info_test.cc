@@ -133,16 +133,16 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ACTIVE_ENVIRONMENTS) {
   this->disconnect();
 }
 
+#ifdef SQL_ASYNC_DBC_FUNCTIONS
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ASYNC_DBC_FUNCTIONS) {
   this->connect();
 
-#ifdef SQL_ASYNC_DBC_FUNCTIONS
   validate(this->conn, SQL_ASYNC_DBC_FUNCTIONS,
            static_cast<SQLUINTEGER>(SQL_ASYNC_DBC_NOT_CAPABLE));
-#endif
 
   this->disconnect();
 }
+#endif
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ASYNC_MODE) {
   this->connect();
@@ -152,16 +152,16 @@ TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ASYNC_MODE) {
   this->disconnect();
 }
 
+#ifdef SQL_ASYNC_NOTIFICATION
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_ASYNC_NOTIFICATION) {
   this->connect();
 
-#ifdef SQL_ASYNC_NOTIFICATION
   validate(this->conn, SQL_ASYNC_NOTIFICATION,
            static_cast<SQLUINTEGER>(SQL_ASYNC_NOTIFICATION_NOT_CAPABLE));
-#endif
 
   this->disconnect();
 }
+#endif
 
 TYPED_TEST(FlightSQLODBCTestBase, Test_SQL_BATCH_ROW_COUNT) {
   this->connect();
