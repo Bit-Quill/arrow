@@ -32,7 +32,22 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
   for (const auto& endpoint : flight_info->endpoints()) {
     const arrow::flight::Ticket& ticket = endpoint.ticket;
 
-    auto result = flight_sql_client.DoGet(call_options, ticket);
+    // Inside "for (const auto& endpoint : flight_info->endpoints()) {"
+    // -AL- DRAFT pseudo-code
+    // endpoint.locations.empty();
+    arrow::Result<std::unique_ptr<FlightStreamReader>> result;
+    if (endpoint.locations.empty()) {
+      // Call DoGet: `auto result = flight_sql_client.DoGet(call_options, ticket);`
+      result = flight_sql_client.DoGet(call_options, ticket);
+    } else {
+      // driver should create a FlightSqlClient to connect to one of the specified
+      // locations directly make sql client connect to
+      // endpoint.getLocations().getFirstItem then get more suppliers? Can work on this
+      // after data fetching is done
+    }
+
+    // auto result = flight_sql_client.DoGet(call_options, ticket);
+
     ThrowIfNotOK(result.status());
     std::shared_ptr<FlightStreamReader> stream_reader_ptr(std::move(result.ValueOrDie()));
 
