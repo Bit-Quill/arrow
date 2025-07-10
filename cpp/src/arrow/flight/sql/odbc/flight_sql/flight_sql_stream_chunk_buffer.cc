@@ -21,6 +21,7 @@
 namespace driver {
 namespace flight_sql {
 
+using arrow::flight::FlightClient;
 using arrow::flight::FlightEndpoint;
 
 FlightStreamChunkBuffer::FlightStreamChunkBuffer(
@@ -36,14 +37,43 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     // -AL- DRAFT pseudo-code
     // endpoint.locations.empty();
     arrow::Result<std::unique_ptr<FlightStreamReader>> result;
-    if (endpoint.locations.empty()) {
-      // Call DoGet: `auto result = flight_sql_client.DoGet(call_options, ticket);`
+    auto endpoint_locations = endpoint.locations;
+    if (endpoint_locations.empty()) {
+      // list of locations needs to be empty to proceed
       result = flight_sql_client.DoGet(call_options, ticket);
     } else {
-      // driver should create a FlightSqlClient to connect to one of the specified
-      // locations directly make sql client connect to
-      // endpoint.getLocations().getFirstItem then get more suppliers? Can work on this
-      // after data fetching is done
+      // If it is non-empty, the driver should create a FlightSqlClient to connect to one
+      // of the specified locations directly.
+      // endpoint.getLocations().getFirstItem then get more suppliers?
+
+      // -AL- TODO raise ticket to mirror JDBC ticket GH-38574,
+      // see https://github.com/apache/arrow/pull/38521/files
+      std::unique_ptr<FlightSqlClient> temp_flight_sql_client;
+
+      // -AL- next, need to get FlightClientOptions to make connection work.
+      std::unique_ptr<FlightClient> temp_flight_client;
+      ThrowIfNotOK(
+          FlightClient::Connect(endpoint_locations[0])
+                       .Value(&temp_flight_client));
+      // Alternative code, but using `ThrowIfNotOK` is better
+      //auto temp_flight_client =
+      //    FlightClient::Connect(endpoint.locations[0], call_options).ValueOrDie();
+      temp_flight_sql_client.reset(new FlightSqlClient(std::move(temp_flight_client)));
+
+      /*
+      * // -AL- code copied from flight_sql\flight_sql_connection.cc
+      std::unique_ptr<FlightClient> temp_flight_client;
+      ThrowIfNotOK(FlightClient::Connect(location, client_options).Value(&flight_client));
+      PopulateMetadataSettings(properties);
+      PopulateCallOptions(properties);
+
+      std::unique_ptr<FlightSqlAuthMethod> auth_method =
+          FlightSqlAuthMethod::FromProperties(flight_client, properties);
+      auth_method->Authenticate(*this, call_options_);
+
+      temp_flight_sql_client.reset(new FlightSqlClient(std::move(flight_client)));
+      */
+
     }
 
     // auto result = flight_sql_client.DoGet(call_options, ticket);
