@@ -26,10 +26,11 @@ using arrow::flight::FlightEndpoint;
 
 FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     FlightSqlClient& flight_sql_client,
+    const arrow::flight::FlightClientOptions& client_options,
     const arrow::flight::FlightCallOptions& call_options,
     const std::shared_ptr<FlightInfo>& flight_info, size_t queue_capacity)
     : queue_(queue_capacity) {
-  // -AL- already doing as part of this PR? FIXME: Endpoint iteration should consider endpoints may be at different hosts
+  // FIXME: Endpoint iteration should consider endpoints may be at different hosts
   for (const auto& endpoint : flight_info->endpoints()) {
     const arrow::flight::Ticket& ticket = endpoint.ticket;
 
@@ -50,31 +51,15 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
       // see https://github.com/apache/arrow/pull/38521/files
       std::unique_ptr<FlightSqlClient> temp_flight_sql_client;
 
-      // -AL- next, need to get FlightClientOptions to make connection work.
       std::unique_ptr<FlightClient> temp_flight_client;
-      ThrowIfNotOK(
-          FlightClient::Connect(endpoint_locations[0])
+      ThrowIfNotOK(FlightClient::Connect(endpoint_locations[0], client_options)
                        .Value(&temp_flight_client));
-      // Alternative code, but using `ThrowIfNotOK` is better
-      //auto temp_flight_client =
+      // Alternative code, but using `ThrowIfNotOK` is more consistent with flightsql code
+      // auto temp_flight_client =
       //    FlightClient::Connect(endpoint.locations[0], call_options).ValueOrDie();
       temp_flight_sql_client.reset(new FlightSqlClient(std::move(temp_flight_client)));
 
-      /*
-      * // -AL- code copied from flight_sql\flight_sql_connection.cc
-      std::unique_ptr<FlightClient> temp_flight_client;
-      ThrowIfNotOK(FlightClient::Connect(location, client_options).Value(&flight_client));
-      PopulateMetadataSettings(properties);
-      PopulateCallOptions(properties);
-
-      std::unique_ptr<FlightSqlAuthMethod> auth_method =
-          FlightSqlAuthMethod::FromProperties(flight_client, properties);
-      auth_method->Authenticate(*this, call_options_);
-
-      temp_flight_sql_client.reset(new FlightSqlClient(std::move(flight_client)));
-      */
-
-      // -AL- the same call_options can probably be re-used?
+      // -AL- the same call_options can probably be re-used
       result = temp_flight_sql_client->DoGet(call_options, ticket);
     }
 

@@ -36,6 +36,7 @@ class FlightStreamChunkBuffer {
 
  public:
   FlightStreamChunkBuffer(FlightSqlClient& flight_sql_client,
+                          const arrow::flight::FlightClientOptions& client_options,
                           const arrow::flight::FlightCallOptions& call_options,
                           const std::shared_ptr<FlightInfo>& flight_info,
                           size_t queue_capacity = 5);
