@@ -29,7 +29,7 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     const arrow::flight::FlightCallOptions& call_options,
     const std::shared_ptr<FlightInfo>& flight_info, size_t queue_capacity)
     : queue_(queue_capacity) {
-  // FIXME: Endpoint iteration should consider endpoints may be at different hosts
+  // -AL- already doing as part of this PR? FIXME: Endpoint iteration should consider endpoints may be at different hosts
   for (const auto& endpoint : flight_info->endpoints()) {
     const arrow::flight::Ticket& ticket = endpoint.ticket;
 
@@ -74,8 +74,11 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
       temp_flight_sql_client.reset(new FlightSqlClient(std::move(flight_client)));
       */
 
+      // -AL- the same call_options can probably be re-used?
+      result = temp_flight_sql_client->DoGet(call_options, ticket);
     }
 
+    // -AL- original line
     // auto result = flight_sql_client.DoGet(call_options, ticket);
 
     ThrowIfNotOK(result.status());
