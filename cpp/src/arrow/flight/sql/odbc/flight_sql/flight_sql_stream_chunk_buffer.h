@@ -32,7 +32,8 @@ using arrow::flight::sql::FlightSqlClient;
 using driver::odbcabstraction::BlockingQueue;
 
 class FlightStreamChunkBuffer {
-  BlockingQueue<Result<FlightStreamChunk>> queue_;
+  BlockingQueue <
+      std::pair<Result<FlightStreamChunk>, std::shared_ptr<FlightSqlClient>>> queue_;
 
  public:
   FlightStreamChunkBuffer(FlightSqlClient& flight_sql_client,

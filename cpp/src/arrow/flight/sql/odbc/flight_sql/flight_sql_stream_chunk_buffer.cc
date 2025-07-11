@@ -38,6 +38,7 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     // -AL- DRAFT pseudo-code
     // endpoint.locations.empty();
     arrow::Result<std::unique_ptr<FlightStreamReader>> result;
+    std::shared_ptr<FlightSqlClient> temp_flight_sql_client;
     auto endpoint_locations = endpoint.locations;
     if (endpoint_locations.empty()) {
       // list of locations needs to be empty to proceed
@@ -49,7 +50,6 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
 
       // -AL- TODO raise ticket to mirror JDBC ticket GH-38574,
       // see https://github.com/apache/arrow/pull/38521/files
-      std::unique_ptr<FlightSqlClient> temp_flight_sql_client;
 
       std::unique_ptr<FlightClient> temp_flight_client;
       ThrowIfNotOK(FlightClient::Connect(endpoint_locations[0], client_options)
@@ -69,29 +69,39 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     ThrowIfNotOK(result.status());
     std::shared_ptr<FlightStreamReader> stream_reader_ptr(std::move(result.ValueOrDie()));
 
-    BlockingQueue<Result<FlightStreamChunk>>::Supplier supplier = [=] {
+    BlockingQueue<std::pair<Result<FlightStreamChunk>,
+                            std::shared_ptr<FlightSqlClient>>>::Supplier supplier = [=] {
       auto result = stream_reader_ptr->Next();
       bool isNotOk = !result.ok();
       bool isNotEmpty = result.ok() && (result.ValueOrDie().data != nullptr);
 
-      return boost::make_optional(isNotOk || isNotEmpty, std::move(result));
+      // If result is valid, save the temp Flight SQL Client for future stream reader
+      // call. temp_flight_sql_client is intentionally null if the list of endpoint
+      // locations is empty.
+      return boost::make_optional(
+          isNotOk || isNotEmpty,
+          std::make_pair(std::move(result), temp_flight_sql_client));
     };
     queue_.AddProducer(std::move(supplier));
   }
 }
 
 bool FlightStreamChunkBuffer::GetNext(FlightStreamChunk* chunk) {
-  Result<FlightStreamChunk> result;
-  if (!queue_.Pop(&result)) {
+  std::pair<Result<FlightStreamChunk>, std::shared_ptr<FlightSqlClient>>
+      closeableEndpointStreamPair;
+  if (!queue_.Pop(&closeableEndpointStreamPair)) {
     return false;
   }
 
+  Result<FlightStreamChunk> result = closeableEndpointStreamPair.first;
   if (!result.status().ok()) {
     Close();
     throw odbcabstraction::DriverException(result.status().message());
   }
   *chunk = std::move(result.ValueOrDie());
   return chunk->data != nullptr;
+  // If the result set comes with a temporary Flight SQL Client, it
+  // will be closed automatically
 }
 
 void FlightStreamChunkBuffer::Close() { queue_.Close(); }
