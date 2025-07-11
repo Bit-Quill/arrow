@@ -728,12 +728,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamStatusPtr) {
   SQLUSMALLINT param_status[param_status_size] = {SQL_PARAM_PROCEED, SQL_PARAM_IGNORE,
                                                   SQL_PARAM_PROCEED, SQL_PARAM_IGNORE};
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR, param_status);
+  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_STATUS_PTR, param_status);
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR, param_status);
-
-  // Driver does not support parameters, so just check that array can be saved and
-  // retrieved
+  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_STATUS_PTR, param_status);
 
   this->disconnect();
 }
