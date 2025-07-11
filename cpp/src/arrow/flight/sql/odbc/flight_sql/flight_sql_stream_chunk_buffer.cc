@@ -34,9 +34,6 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
   for (const auto& endpoint : flight_info->endpoints()) {
     const arrow::flight::Ticket& ticket = endpoint.ticket;
 
-    // Inside "for (const auto& endpoint : flight_info->endpoints()) {"
-    // -AL- DRAFT pseudo-code
-    // endpoint.locations.empty();
     arrow::Result<std::unique_ptr<FlightStreamReader>> result;
     std::shared_ptr<FlightSqlClient> temp_flight_sql_client;
     auto endpoint_locations = endpoint.locations;
@@ -54,17 +51,11 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
       std::unique_ptr<FlightClient> temp_flight_client;
       ThrowIfNotOK(FlightClient::Connect(endpoint_locations[0], client_options)
                        .Value(&temp_flight_client));
-      // Alternative code, but using `ThrowIfNotOK` is more consistent with flightsql code
-      // auto temp_flight_client =
-      //    FlightClient::Connect(endpoint.locations[0], call_options).ValueOrDie();
       temp_flight_sql_client.reset(new FlightSqlClient(std::move(temp_flight_client)));
 
       // -AL- the same call_options can probably be re-used
       result = temp_flight_sql_client->DoGet(call_options, ticket);
     }
-
-    // -AL- original line
-    // auto result = flight_sql_client.DoGet(call_options, ticket);
 
     ThrowIfNotOK(result.status());
     std::shared_ptr<FlightStreamReader> stream_reader_ptr(std::move(result.ValueOrDie()));
@@ -78,6 +69,7 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
       // If result is valid, save the temp Flight SQL Client for future stream reader
       // call. temp_flight_sql_client is intentionally null if the list of endpoint
       // locations is empty.
+      // After all data is fetched from reader, the temp client is closed.
       return boost::make_optional(
           isNotOk || isNotEmpty,
           std::make_pair(std::move(result), temp_flight_sql_client));
@@ -100,8 +92,6 @@ bool FlightStreamChunkBuffer::GetNext(FlightStreamChunk* chunk) {
   }
   *chunk = std::move(result.ValueOrDie());
   return chunk->data != nullptr;
-  // If the result set comes with a temporary Flight SQL Client, it
-  // will be closed automatically
 }
 
 void FlightStreamChunkBuffer::Close() { queue_.Close(); }
