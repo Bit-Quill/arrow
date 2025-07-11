@@ -740,9 +740,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamsProcessedPtr) {
 
   SQLULEN processed_count = 0;
 
-  validateSetStmtAttr(stmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &processed_count);
+  validateSetStmtAttr(stmt, SQL_ATTR_PARAMS_PROCESSED_PTR,
+                      static_cast<SQLPOINTER>(&processed_count));
 
-  validateGetStmtAttr(stmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &processed_count);
+  validateGetStmtAttr(stmt, SQL_ATTR_PARAMS_PROCESSED_PTR,
+                      static_cast<SQLPOINTER>(&processed_count));
 
   this->disconnect();
 }
@@ -819,9 +821,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrRowOperationPtr) {
   SQLUSMALLINT row_operations[param_set_size] = {SQL_ROW_PROCEED, SQL_ROW_IGNORE,
                                                  SQL_ROW_PROCEED, SQL_ROW_IGNORE};
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_ROW_OPERATION_PTR, row_operations);
+  validateSetStmtAttr(this->stmt, SQL_ATTR_ROW_OPERATION_PTR,
+                      static_cast<SQLPOINTER>(row_operations));
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_OPERATION_PTR, row_operations);
+  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_OPERATION_PTR,
+                      static_cast<SQLPOINTER>(row_operations));
 
   this->disconnect();
 }
@@ -833,10 +837,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrRowStatusPtr) {
   SQLUSMALLINT values[4] = {0, 0, 0, 0};
 
   validateSetStmtAttr(this->stmt, SQL_ATTR_ROW_STATUS_PTR,
-                      static_cast<SQLPOINTER>(&values));
+                      static_cast<SQLPOINTER>(values));
 
   validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_STATUS_PTR,
-                      static_cast<SQLPOINTER>(&values));
+                      static_cast<SQLPOINTER>(values));
 
   this->disconnect();
 }
