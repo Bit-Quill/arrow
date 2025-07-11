@@ -230,17 +230,17 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
                           SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr) {
   // TODO: Implement additional fields types
   // https://github.com/apache/arrow/issues/46573
-  using driver::odbcabstraction::Diagnostics;
-  using ODBC::GetStringAttribute;
-  using ODBC::ODBCConnection;
-  using ODBC::ODBCEnvironment;
-  using ODBC::ODBCStatement;
-
   LOG_DEBUG(
       "SQLGetDiagFieldW called with handleType: {}, handle: {}, recNumber: {}, "
       "diagIdentifier: {}, diagInfoPtr: {}, bufferLength: {}, stringLengthPtr: {}",
       handleType, handle, recNumber, diagIdentifier, diagInfoPtr, bufferLength,
       fmt::ptr(stringLengthPtr));
+
+  using driver::odbcabstraction::Diagnostics;
+  using ODBC::GetStringAttribute;
+  using ODBC::ODBCConnection;
+  using ODBC::ODBCEnvironment;
+  using ODBC::ODBCStatement;
 
   if (!handle) {
     return SQL_INVALID_HANDLE;
@@ -482,18 +482,18 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT re
                         SQLWCHAR* sqlState, SQLINTEGER* nativeErrorPtr,
                         SQLWCHAR* messageText, SQLSMALLINT bufferLength,
                         SQLSMALLINT* textLengthPtr) {
-  using driver::odbcabstraction::Diagnostics;
-  using ODBC::GetStringAttribute;
-  using ODBC::ODBCConnection;
-  using ODBC::ODBCEnvironment;
-  using ODBC::ODBCStatement;
-
   LOG_DEBUG(
       "SQLGetDiagRecW called with handleType: {}, handle: {}, recNumber: {}, "
       "sqlState: {}, nativeErrorPtr: {}, messageText: {}, bufferLength: {}, "
       "textLengthPtr: {}",
       handleType, handle, recNumber, fmt::ptr(sqlState), fmt::ptr(nativeErrorPtr),
       fmt::ptr(messageText), bufferLength, fmt::ptr(textLengthPtr));
+
+  using driver::odbcabstraction::Diagnostics;
+  using ODBC::GetStringAttribute;
+  using ODBC::ODBCConnection;
+  using ODBC::ODBCEnvironment;
+  using ODBC::ODBCStatement;
 
   if (!handle) {
     return SQL_INVALID_HANDLE;
@@ -567,13 +567,13 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT re
 
 SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                         SQLINTEGER bufferLength, SQLINTEGER* strLenPtr) {
-  using driver::odbcabstraction::DriverException;
-  using ODBC::ODBCEnvironment;
-
   LOG_DEBUG(
       "SQLGetEnvAttr called with env: {}, attr: {}, valuePtr: {}, "
       "bufferLength: {}, strLenPtr: {}",
       env, attr, valuePtr, bufferLength, fmt::ptr(strLenPtr));
+
+  using driver::odbcabstraction::DriverException;
+  using ODBC::ODBCEnvironment;
 
   ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
 
@@ -628,13 +628,13 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
 
 SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                         SQLINTEGER strLen) {
-  using driver::odbcabstraction::DriverException;
-  using ODBC::ODBCEnvironment;
-
   LOG_DEBUG(
       "SQLSetEnvAttr called with env: {}, attr: {}, valuePtr: {}, "
       "strLen: {}",
       env, attr, valuePtr, strLen);
+
+  using driver::odbcabstraction::DriverException;
+  using ODBC::ODBCEnvironment;
 
   ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
 
@@ -680,13 +680,13 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
 
 SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attribute, SQLPOINTER valuePtr,
                             SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr) {
-  using driver::odbcabstraction::Connection;
-  using ODBC::ODBCConnection;
-
   LOG_DEBUG(
       "SQLGetConnectAttrW called with conn: {}, attribute: {}, valuePtr: {}, "
       "bufferLength: {}, stringLengthPtr: {}",
       conn, attribute, valuePtr, bufferLength, fmt::ptr(stringLengthPtr));
+
+  using driver::odbcabstraction::Connection;
+  using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     const bool isUnicode = true;
@@ -698,12 +698,12 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attribute, SQLPOINTER value
 
 SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER valuePtr,
                             SQLINTEGER valueLen) {
-  using driver::odbcabstraction::Connection;
-  using ODBC::ODBCConnection;
-
   LOG_DEBUG(
       "SQLSetConnectAttrW called with conn: {}, attr: {}, valuePtr: {}, valueLen: {}",
       conn, attr, valuePtr, valueLen);
+
+  using driver::odbcabstraction::Connection;
+  using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     const bool isUnicode = true;
@@ -720,6 +720,14 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
                            SQLSMALLINT outConnectionStringBufferLen,
                            SQLSMALLINT* outConnectionStringLen,
                            SQLUSMALLINT driverCompletion) {
+  LOG_DEBUG(
+      "SQLDriverConnectW called with conn: {}, windowHandle: {}, inConnectionString: {}, "
+      "inConnectionStringLen: {}, outConnectionString: {}, outConnectionStringBufferLen: "
+      "{}, outConnectionStringLen: {}, driverCompletion: {}",
+      conn, fmt::ptr(windowHandle), fmt::ptr(inConnectionString), inConnectionStringLen,
+      fmt::ptr(outConnectionString), outConnectionStringBufferLen,
+      fmt::ptr(outConnectionStringLen), driverCompletion);
+
   // TODO: Implement FILEDSN and SAVEFILE keywords according to the spec
   // https://github.com/apache/arrow/issues/46449
 
@@ -729,14 +737,6 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
   using driver::odbcabstraction::Connection;
   using driver::odbcabstraction::DriverException;
   using ODBC::ODBCConnection;
-
-  LOG_DEBUG(
-      "SQLDriverConnectW called with conn: {}, windowHandle: {}, inConnectionString: {}, "
-      "inConnectionStringLen: {}, outConnectionString: {}, outConnectionStringBufferLen: "
-      "{}, outConnectionStringLen: {}, driverCompletion: {}",
-      conn, fmt::ptr(windowHandle), fmt::ptr(inConnectionString), inConnectionStringLen,
-      fmt::ptr(outConnectionString), outConnectionStringBufferLen,
-      fmt::ptr(outConnectionStringLen), driverCompletion);
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
@@ -796,17 +796,17 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
 SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* dsnName, SQLSMALLINT dsnNameLen,
                      SQLWCHAR* userName, SQLSMALLINT userNameLen, SQLWCHAR* password,
                      SQLSMALLINT passwordLen) {
-  using driver::flight_sql::FlightSqlConnection;
-  using driver::flight_sql::config::Configuration;
-  using ODBC::ODBCConnection;
-
-  using ODBC::SqlWcharToString;
-
   LOG_DEBUG(
       "SQLConnectW called with conn: {}, dsnName: {}, dsnNameLen: {}, userName: {}, "
       "userNameLen: {}, password: {}, passwordLen: {}",
       conn, fmt::ptr(dsnName), dsnNameLen, fmt::ptr(userName), userNameLen,
       fmt::ptr(password), passwordLen);
+
+  using driver::flight_sql::FlightSqlConnection;
+  using driver::flight_sql::config::Configuration;
+  using ODBC::ODBCConnection;
+
+  using ODBC::SqlWcharToString;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
@@ -834,9 +834,9 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* dsnName, SQLSMALLINT dsnNameLen,
 }
 
 SQLRETURN SQLDisconnect(SQLHDBC conn) {
-  using ODBC::ODBCConnection;
-
   LOG_DEBUG("SQLDisconnect called with conn: {}", conn);
+
+  using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
@@ -849,12 +849,12 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
 
 SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePtr,
                      SQLSMALLINT bufLen, SQLSMALLINT* stringLengthPtr) {
-  using ODBC::ODBCConnection;
-
   LOG_DEBUG(
       "SQLGetInfo called with conn: {}, infoType: {}, infoValuePtr: {}, bufLen: {}, "
       "stringLengthPtr: {}",
       conn, infoType, infoValuePtr, bufLen, fmt::ptr(stringLengthPtr));
+
+  using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
@@ -942,6 +942,7 @@ SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) 
 
 SQLRETURN SQLExecute(SQLHSTMT stmt) {
   LOG_DEBUG("SQLExecute called with stmt: {}", stmt);
+
   using ODBC::ODBCStatement;
   // The driver is built to handle SELECT statements only.
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -955,8 +956,10 @@ SQLRETURN SQLExecute(SQLHSTMT stmt) {
 
 SQLRETURN SQLFetch(SQLHSTMT stmt) {
   LOG_DEBUG("SQLFetch called with stmt: {}", stmt);
+
   using ODBC::ODBCDescriptor;
   using ODBC::ODBCStatement;
+
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
 
@@ -982,7 +985,9 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
       "SQLGetData called with stmt: {}, recordNumber: {}, cType: {}, "
       "dataPtr: {}, bufferLength: {}, indicatorPtr: {}",
       stmt, recordNumber, cType, dataPtr, bufferLength, fmt::ptr(indicatorPtr));
+
   using ODBC::ODBCStatement;
+
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
     return statement->GetData(recordNumber, cType, dataPtr, bufferLength, indicatorPtr);
