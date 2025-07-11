@@ -33,13 +33,42 @@ namespace arrow::flight::sql::odbc {
 
 // Helper Functions
 
-// Validate unsigned length SQLULEN return value
+// Validate SQLULEN return value
 void validateGetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute,
                          SQLULEN expected_value) {
   SQLULEN value = 0;
-  SQLINTEGER stringLengthPtr;
+  SQLINTEGER stringLength = 0;
 
-  SQLRETURN ret = SQLGetStmtAttr(statement, attribute, &value, 0, &stringLengthPtr);
+  SQLRETURN ret =
+      SQLGetStmtAttr(statement, attribute, &value, sizeof(value), &stringLength);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(value, expected_value);
+}
+
+// Validate SQLLEN return value
+void validateGetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute,
+                         SQLLEN expected_value) {
+  SQLLEN value = 0;
+  SQLINTEGER stringLength = 0;
+
+  SQLRETURN ret =
+      SQLGetStmtAttr(statement, attribute, &value, sizeof(value), &stringLength);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(value, expected_value);
+}
+
+// Validate SQLPOINTER return value
+void validateGetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute,
+                         SQLPOINTER expected_value) {
+  SQLPOINTER value = nullptr;
+  SQLINTEGER stringLength = 0;
+
+  SQLRETURN ret =
+      SQLGetStmtAttr(statement, attribute, &value, sizeof(value), &stringLength);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -72,12 +101,29 @@ void validateGetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
   VerifyOdbcErrorState(SQL_HANDLE_STMT, statement, error_code);
 }
 
-// Validate unsigned length SQLULEN return value
+// Validate return value for call to SQLSetStmtAttr with SQLULEN
 void validateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLULEN new_value) {
   SQLINTEGER stringLengthPtr = sizeof(SQLULEN);
 
   SQLRETURN ret = SQLSetStmtAttr(
       statement, attribute, reinterpret_cast<SQLPOINTER>(new_value), stringLengthPtr);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+}
+
+// Validate return value for call to SQLSetStmtAttr with SQLLEN
+void validateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLLEN new_value) {
+  SQLINTEGER stringLengthPtr = sizeof(SQLLEN);
+
+  SQLRETURN ret = SQLSetStmtAttr(
+      statement, attribute, reinterpret_cast<SQLPOINTER>(new_value), stringLengthPtr);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+}
+
+// Validate return value for call to SQLSetStmtAttr with SQLPOINTER
+void validateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLPOINTER value) {
+  SQLRETURN ret = SQLSetStmtAttr(statement, attribute, value, 0);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
@@ -274,7 +320,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrParamBindOffsetPtr) {
   this->connect();
 
   validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_BIND_OFFSET_PTR,
-                      static_cast<SQLULEN>(0));
+                      static_cast<SQLPOINTER>(nullptr));
 
   this->disconnect();
 }
@@ -291,7 +337,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrParamBindType) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrParamOperationPtr) {
   this->connect();
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR, static_cast<SQLULEN>(0));
+  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR,
+                      static_cast<SQLPOINTER>(nullptr));
 
   this->disconnect();
 }
@@ -299,7 +346,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrParamOperationPtr) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrParamStatusPtr) {
   this->connect();
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_STATUS_PTR, static_cast<SQLULEN>(0));
+  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_STATUS_PTR,
+                      static_cast<SQLPOINTER>(nullptr));
 
   this->disconnect();
 }
@@ -307,7 +355,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrParamStatusPtr) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrParamsProcessedPtr) {
   this->connect();
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAMS_PROCESSED_PTR, static_cast<SQLULEN>(0));
+  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAMS_PROCESSED_PTR,
+                      static_cast<SQLPOINTER>(nullptr));
 
   this->disconnect();
 }
@@ -348,7 +397,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowArraySize) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowBindOffsetPtr) {
   this->connect();
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_BIND_OFFSET_PTR, static_cast<SQLULEN>(0));
+  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_BIND_OFFSET_PTR,
+                      static_cast<SQLPOINTER>(nullptr));
 
   this->disconnect();
 }
@@ -384,7 +434,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowNumber) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowOperationPtr) {
   this->connect();
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_OPERATION_PTR, static_cast<SQLULEN>(0));
+  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_OPERATION_PTR,
+                      static_cast<SQLPOINTER>(nullptr));
 
   this->disconnect();
 }
@@ -392,7 +443,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowOperationPtr) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowStatusPtr) {
   this->connect();
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_STATUS_PTR, static_cast<SQLULEN>(0));
+  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_STATUS_PTR,
+                      static_cast<SQLPOINTER>(nullptr));
 
   this->disconnect();
 }
@@ -400,7 +452,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowStatusPtr) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowsFetchedPtr) {
   this->connect();
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_ROWS_FETCHED_PTR, static_cast<SQLULEN>(0));
+  validateGetStmtAttr(this->stmt, SQL_ATTR_ROWS_FETCHED_PTR,
+                      static_cast<SQLPOINTER>(nullptr));
 
   this->disconnect();
 }
@@ -589,11 +642,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrIMPRowDesc) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrKeysetSizeUnsupported) {
-  GTEST_SKIP();
   this->connect();
 
-  // Optional feature not implemented
-  validateSetStmtAttrErrorCode(this->stmt, SQL_ATTR_KEYSET_SIZE, 0, error_state_HYC00);
+  validateSetStmtAttr(this->stmt, SQL_ATTR_KEYSET_SIZE, static_cast<SQLULEN>(0));
 
   this->disconnect();
 }
@@ -635,8 +686,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrNoscan) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamBindOffsetPtr) {
   this->connect();
 
+  SQLULEN offset = 1000;
+
   validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_BIND_OFFSET_PTR,
-                      static_cast<SQLULEN>(1));
+                      static_cast<SQLPOINTER>(&offset));
+
+  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_BIND_OFFSET_PTR,
+                      static_cast<SQLPOINTER>(&offset));
 
   this->disconnect();
 }
@@ -653,7 +709,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamBindType) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamOperationPtr) {
   this->connect();
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR, static_cast<SQLULEN>(0));
+  constexpr SQLULEN param_set_size = 4;
+  SQLUSMALLINT param_operations[param_set_size] = {SQL_PARAM_PROCEED, SQL_PARAM_IGNORE,
+                                                   SQL_PARAM_PROCEED, SQL_PARAM_IGNORE};
+
+  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR, param_operations);
+
+  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR, param_operations);
 
   this->disconnect();
 }
@@ -661,7 +723,17 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamOperationPtr) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamStatusPtr) {
   this->connect();
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_STATUS_PTR, static_cast<SQLULEN>(0));
+  // Driver does not support parameters, so just check array can be saved/retrieved
+  constexpr SQLULEN param_status_size = 4;
+  SQLUSMALLINT param_status[param_status_size] = {SQL_PARAM_PROCEED, SQL_PARAM_IGNORE,
+                                                  SQL_PARAM_PROCEED, SQL_PARAM_IGNORE};
+
+  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR, param_status);
+
+  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR, param_status);
+
+  // Driver does not support parameters, so just check that array can be saved and
+  // retrieved
 
   this->disconnect();
 }
@@ -669,7 +741,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamStatusPtr) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamsProcessedPtr) {
   this->connect();
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAMS_PROCESSED_PTR, static_cast<SQLULEN>(0));
+  SQLULEN processed_count = 0;
+
+  validateSetStmtAttr(stmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &processed_count);
+
+  validateGetStmtAttr(stmt, SQL_ATTR_PARAMS_PROCESSED_PTR, &processed_count);
 
   this->disconnect();
 }
@@ -710,7 +786,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrRowArraySize) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrRowBindOffsetPtr) {
   this->connect();
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_ROW_BIND_OFFSET_PTR, static_cast<SQLULEN>(0));
+  SQLULEN offset = 1000;
+
+  validateSetStmtAttr(this->stmt, SQL_ATTR_ROW_BIND_OFFSET_PTR,
+                      static_cast<SQLPOINTER>(&offset));
+
+  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_BIND_OFFSET_PTR,
+                      static_cast<SQLPOINTER>(&offset));
 
   this->disconnect();
 }
@@ -736,7 +818,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrRowNumber) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrRowOperationPtr) {
   this->connect();
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_ROW_OPERATION_PTR, static_cast<SQLULEN>(0));
+  constexpr SQLULEN param_set_size = 4;
+  SQLUSMALLINT row_operations[param_set_size] = {SQL_ROW_PROCEED, SQL_ROW_IGNORE,
+                                                 SQL_ROW_PROCEED, SQL_ROW_IGNORE};
+
+  validateSetStmtAttr(this->stmt, SQL_ATTR_ROW_OPERATION_PTR, row_operations);
+
+  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_OPERATION_PTR, row_operations);
 
   this->disconnect();
 }
@@ -744,7 +832,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrRowOperationPtr) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrRowStatusPtr) {
   this->connect();
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_ROW_STATUS_PTR, static_cast<SQLULEN>(0));
+  constexpr SQLULEN row_status_size = 4;
+  SQLUSMALLINT values[4] = {0, 0, 0, 0};
+
+  validateSetStmtAttr(this->stmt, SQL_ATTR_ROW_STATUS_PTR,
+                      static_cast<SQLPOINTER>(&values));
+
+  validateGetStmtAttr(this->stmt, SQL_ATTR_ROW_STATUS_PTR,
+                      static_cast<SQLPOINTER>(&values));
 
   this->disconnect();
 }
@@ -752,7 +847,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrRowStatusPtr) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrRowsFetchedPtr) {
   this->connect();
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_ROWS_FETCHED_PTR, static_cast<SQLULEN>(0));
+  SQLULEN rows_fetched = 1;
+
+  validateSetStmtAttr(this->stmt, SQL_ATTR_ROWS_FETCHED_PTR,
+                      static_cast<SQLPOINTER>(&rows_fetched));
+
+  validateGetStmtAttr(this->stmt, SQL_ATTR_ROWS_FETCHED_PTR,
+                      static_cast<SQLPOINTER>(&rows_fetched));
 
   this->disconnect();
 }
