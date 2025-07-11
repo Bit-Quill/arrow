@@ -713,9 +713,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamOperationPtr) {
   SQLUSMALLINT param_operations[param_set_size] = {SQL_PARAM_PROCEED, SQL_PARAM_IGNORE,
                                                    SQL_PARAM_PROCEED, SQL_PARAM_IGNORE};
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR, param_operations);
+  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR,
+                      static_cast<SQLPOINTER>(param_operations));
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR, param_operations);
+  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_OPERATION_PTR,
+                      static_cast<SQLPOINTER>(param_operations));
 
   this->disconnect();
 }
@@ -728,9 +730,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamStatusPtr) {
   SQLUSMALLINT param_status[param_status_size] = {SQL_PARAM_PROCEED, SQL_PARAM_IGNORE,
                                                   SQL_PARAM_PROCEED, SQL_PARAM_IGNORE};
 
-  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_STATUS_PTR, param_status);
+  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAM_STATUS_PTR,
+                      static_cast<SQLPOINTER>(param_status));
 
-  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_STATUS_PTR, param_status);
+  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAM_STATUS_PTR,
+                      static_cast<SQLPOINTER>(param_status));
 
   this->disconnect();
 }
