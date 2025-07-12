@@ -64,11 +64,12 @@ void ClosePreparedStatementIfAny(
 
 FlightSqlStatement::FlightSqlStatement(
     const odbcabstraction::Diagnostics& diagnostics, FlightSqlClient& sql_client,
-    FlightCallOptions call_options,
+    arrow::flight::FlightClientOptions client_options, FlightCallOptions call_options,
     const odbcabstraction::MetadataSettings& metadata_settings)
     : diagnostics_("Apache Arrow", diagnostics.GetDataSourceComponent(),
                    diagnostics.GetOdbcVersion()),
       sql_client_(sql_client),
+      client_options_(std::move(client_options)),
       call_options_(std::move(call_options)),
       metadata_settings_(metadata_settings) {
   attribute_[METADATA_ID] = static_cast<size_t>(SQL_FALSE);
@@ -135,8 +136,8 @@ bool FlightSqlStatement::ExecutePrepared() {
   ThrowIfNotOK(result.status());
 
   current_result_set_ = std::make_shared<FlightSqlResultSet>(
-      sql_client_, call_options_, result.ValueOrDie(), nullptr, diagnostics_,
-      metadata_settings_);
+      sql_client_, client_options_, call_options_, result.ValueOrDie(), nullptr,
+      diagnostics_, metadata_settings_);
 
   return true;
 }
@@ -148,8 +149,8 @@ bool FlightSqlStatement::Execute(const std::string& query) {
   ThrowIfNotOK(result.status());
 
   current_result_set_ = std::make_shared<FlightSqlResultSet>(
-      sql_client_, call_options_, result.ValueOrDie(), nullptr, diagnostics_,
-      metadata_settings_);
+      sql_client_, client_options_, call_options_, result.ValueOrDie(), nullptr,
+      diagnostics_, metadata_settings_);
 
   return true;
 }
@@ -170,27 +171,29 @@ std::shared_ptr<odbcabstraction::ResultSet> FlightSqlStatement::GetTables(
 
   if ((catalog_name && *catalog_name == "%") && (schema_name && schema_name->empty()) &&
       (table_name && table_name->empty())) {
-    current_result_set_ = GetTablesForSQLAllCatalogs(
-        column_names, call_options_, sql_client_, diagnostics_, metadata_settings_);
+    current_result_set_ =
+        GetTablesForSQLAllCatalogs(column_names, client_options_, call_options_,
+                                   sql_client_, diagnostics_, metadata_settings_);
   } else if ((catalog_name && catalog_name->empty()) &&
              (schema_name && *schema_name == "%") &&
              (table_name && table_name->empty())) {
-    current_result_set_ =
-        GetTablesForSQLAllDbSchemas(column_names, call_options_, sql_client_, schema_name,
-                                    diagnostics_, metadata_settings_);
+    current_result_set_ = GetTablesForSQLAllDbSchemas(
+        column_names, client_options_, call_options_, sql_client_, schema_name,
+        diagnostics_, metadata_settings_);
   } else if ((catalog_name && catalog_name->empty()) &&
              (schema_name && schema_name->empty()) &&
              (table_name && table_name->empty()) && (table_type && *table_type == "%")) {
-    current_result_set_ = GetTablesForSQLAllTableTypes(
-        column_names, call_options_, sql_client_, diagnostics_, metadata_settings_);
+    current_result_set_ =
+        GetTablesForSQLAllTableTypes(column_names, client_options_, call_options_,
+                                     sql_client_, diagnostics_, metadata_settings_);
   } else {
     if (table_type) {
       ParseTableTypes(*table_type, table_types);
     }
 
     current_result_set_ = GetTablesForGenericUse(
-        column_names, call_options_, sql_client_, catalog_name, schema_name, table_name,
-        table_types, diagnostics_, metadata_settings_);
+        column_names, client_options_, call_options_, sql_client_, catalog_name,
+        schema_name, table_name, table_types, diagnostics_, metadata_settings_);
   }
 
   return current_result_set_;
@@ -228,9 +231,9 @@ std::shared_ptr<ResultSet> FlightSqlStatement::GetColumns_V2(
   auto transformer = std::make_shared<GetColumns_Transformer>(
       metadata_settings_, odbcabstraction::V_2, column_name);
 
-  current_result_set_ =
-      std::make_shared<FlightSqlResultSet>(sql_client_, call_options_, flight_info,
-                                           transformer, diagnostics_, metadata_settings_);
+  current_result_set_ = std::make_shared<FlightSqlResultSet>(
+      sql_client_, client_options_, call_options_, flight_info, transformer, diagnostics_,
+      metadata_settings_);
 
   return current_result_set_;
 }
@@ -249,9 +252,9 @@ std::shared_ptr<ResultSet> FlightSqlStatement::GetColumns_V3(
   auto transformer = std::make_shared<GetColumns_Transformer>(
       metadata_settings_, odbcabstraction::V_3, column_name);
 
-  current_result_set_ =
-      std::make_shared<FlightSqlResultSet>(sql_client_, call_options_, flight_info,
-                                           transformer, diagnostics_, metadata_settings_);
+  current_result_set_ = std::make_shared<FlightSqlResultSet>(
+      sql_client_, client_options_, call_options_, flight_info, transformer, diagnostics_,
+      metadata_settings_);
 
   return current_result_set_;
 }
@@ -267,9 +270,9 @@ std::shared_ptr<ResultSet> FlightSqlStatement::GetTypeInfo_V2(int16_t data_type)
   auto transformer = std::make_shared<GetTypeInfo_Transformer>(
       metadata_settings_, odbcabstraction::V_2, data_type);
 
-  current_result_set_ =
-      std::make_shared<FlightSqlResultSet>(sql_client_, call_options_, flight_info,
-                                           transformer, diagnostics_, metadata_settings_);
+  current_result_set_ = std::make_shared<FlightSqlResultSet>(
+      sql_client_, client_options_, call_options_, flight_info, transformer, diagnostics_,
+      metadata_settings_);
 
   return current_result_set_;
 }
@@ -285,9 +288,9 @@ std::shared_ptr<ResultSet> FlightSqlStatement::GetTypeInfo_V3(int16_t data_type)
   auto transformer = std::make_shared<GetTypeInfo_Transformer>(
       metadata_settings_, odbcabstraction::V_3, data_type);
 
-  current_result_set_ =
-      std::make_shared<FlightSqlResultSet>(sql_client_, call_options_, flight_info,
-                                           transformer, diagnostics_, metadata_settings_);
+  current_result_set_ = std::make_shared<FlightSqlResultSet>(
+      sql_client_, client_options_, call_options_, flight_info, transformer, diagnostics_,
+      metadata_settings_);
 
   return current_result_set_;
 }

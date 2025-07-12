@@ -21,6 +21,13 @@ include_directories(${ODBC_INCLUDE_DIRS})
 
 find_package(SQLite3Alt REQUIRED)
 
+# -AL- TODO Jul-14 add test_integration.cc to use `OrderedServer`,
+# or just copy OrderedServer definition if needed.
+#set(ARROW_FLIGHT_SQL_PARTITION_MOCK_SERVER_SRCS
+    #../../../integration_tests/test_integration_client.cc
+    #../../../integration_tests/test_integration_server.cc
+   # ../../../integration_tests/test_integration.cc)
+
 set(ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS
     ../../example/sqlite_sql_info.cc
     ../../example/sqlite_type_info.cc
@@ -42,6 +49,8 @@ add_arrow_test(flight_sql_odbc_test
                # GH-46889: move protobuf_test_util to a more common location
                ../../../../engine/substrait/protobuf_test_util.cc
                ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
+               #-AL- todo can remove if we copy `OrderedServer` directly?
+               #${ARROW_FLIGHT_SQL_PARTITION_MOCK_SERVER_SRCS}
                EXTRA_LINK_LIBS
                ${ODBC_LIBRARIES}
                ${ODBCINST}
