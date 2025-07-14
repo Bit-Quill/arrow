@@ -1068,7 +1068,7 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
   });
 }
 
-SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
+SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
   LOG_DEBUG("SQLRowCount called with stmt: {}, columnCountPtr: {}", stmt,
             fmt::ptr(rowCountPtr));
   // TODO: write tests for SQLRowCount
