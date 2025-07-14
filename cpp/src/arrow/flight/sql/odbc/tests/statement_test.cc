@@ -2028,8 +2028,4 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnlySQLUnbind) {
 
   this->disconnect();
 }
-
-// TODO: -AL- Add tests for SQL_ATTR_ROW_ARRAY_SIZE
-// after SQLSetStmtAttr is implemented
-
 }  // namespace arrow::flight::sql::odbc
