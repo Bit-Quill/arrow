@@ -986,6 +986,8 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
 SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
                            SQLLEN fetchOffset, SQLULEN* rowCountPtr,
                            SQLUSMALLINT* rowStatusArray) {
+  // GH-47110: SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for certain diag
+  // states
   LOG_DEBUG(
       "SQLExtendedFetch called with stmt: {}, fetchOrientation: {}, fetchOffset: {}, "
       "rowCountPtr: {}, rowStatusArray: {}",

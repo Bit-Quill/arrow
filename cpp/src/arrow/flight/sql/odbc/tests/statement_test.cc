@@ -1979,18 +1979,20 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnlySQLUnbind) {
 // TODO: -AL- Add tests for SQL_ATTR_ROW_ARRAY_SIZE
 // after SQLSetStmtAttr is implemented
 
-// -AL- TODO: after SQLSetStmtAttr, add tests for SQL_ROWSET_SIZE which is used by
-// SQLExtendedFetch and fetch all 3 rows at once <TestSQLExtendedFetchRowFetching> 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExtendedFetchRowFetching) {
+  // Set SQL_ROWSET_SIZE to fetch 3 rows at once
   this->connect();
 
-  SQLINTEGER val;
+  constexpr SQLULEN rows = 3;
+  SQLINTEGER val[rows];
   SQLLEN buf_len = sizeof(val);
-  SQLLEN ind;
+  SQLLEN ind[rows];
 
   // Same variable will be used for column 1, the value of `val`
   // should be updated after every SQLFetch call.
-  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, val, buf_len, ind);
+
+  ret = SQLSetStmtAttr(this->stmt, SQL_ROWSET_SIZE, reinterpret_cast<SQLPOINTER>(rows), 0);
 
   std::wstring wsql =
       LR"(
@@ -2005,53 +2007,36 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExtendedFetchRowFetching) {
   ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  // Fetch row 1.
-  // row_count* and row_status* returns information on the SQLExtendedFetch call
-  SQLULEN row_count1;
-  SQLUSMALLINT row_status1[1];
+  // Fetch row 1-3.
+  SQLULEN row_count;
+  SQLUSMALLINT row_status[rows];
 
-  ret = SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, &row_count1, row_status1);
+  ret = SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, &row_count, row_status);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  EXPECT_EQ(row_status1[0], SQL_SUCCESS);
+  EXPECT_EQ(row_count, 3);
 
-  // Verify 1 is returned
-  EXPECT_EQ(val, 1);
-  EXPECT_EQ(row_count1, 1);
+  for (int i = 0; i < rows; i++) {
+    EXPECT_EQ(row_status[i], SQL_SUCCESS);
+  }
 
-  // Fetch row 2
-  SQLULEN row_count2;
-  SQLUSMALLINT row_status2[1];
-  ret = SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, &row_count2, row_status2);
-  EXPECT_EQ(ret, SQL_SUCCESS);
-  EXPECT_EQ(row_status2[0], SQL_SUCCESS);
-
-  // Verify 2 is returned
-  EXPECT_EQ(val, 2);
-  EXPECT_EQ(row_count2, 1);
-
-  // Fetch row 3
-  SQLULEN row_count3;
-  SQLUSMALLINT row_status3[1];
-  ret = SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, &row_count3, row_status3);
-  EXPECT_EQ(ret, SQL_SUCCESS);
-  EXPECT_EQ(row_status3[0], SQL_SUCCESS);
-
-  // Verify 3 is returned
-  EXPECT_EQ(val, 3);
-  EXPECT_EQ(row_count3, 1);
+  // Verify 1 is returned for row 1
+  EXPECT_EQ(val[0], 1);
+  // Verify 2 is returned for row 2
+  EXPECT_EQ(val[1], 2);
+  // Verify 3 is returned for row 3
+  EXPECT_EQ(val[2], 3);
 
   // Verify result set has no more data beyond row 3
-  ret = SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, &row_count3, row_status3);
+  SQLULEN row_count2;
+  SQLUSMALLINT row_status2[rows];
+  ret = SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, &row_count2, row_status2);
   EXPECT_EQ(ret, SQL_NO_DATA);
 
   this->disconnect();
 }
 
-// -AL- TODO: added test for SQLExtendedFetch to validate that missing indicator results in
-// error_state_22002 state but SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO
-// according to the spec. <TestSQLBindColNullQueryNullIndicator>. But this doesn't work,
-// need to ask James if we should raise an issue for this.
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExtendedFetchQueryNullIndicator) {
+  // GH-47110: SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for 22002
   // Limitation on mock test server prevents null from working properly, so use remote
   // server instead. Mock server has type `DENSE_UNION` for null column data.
   GTEST_SKIP();
@@ -2072,8 +2057,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExtendedFetchQueryNullIndicator) {
 
   // SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for 22002 state
   ret = SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, &row_count1, row_status1);
-  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO); //-AL- driver is currently returning SQL_ERROR
-  // Verify invalid null indicator is reported, as it is required
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_22002);
 
   this->disconnect();
