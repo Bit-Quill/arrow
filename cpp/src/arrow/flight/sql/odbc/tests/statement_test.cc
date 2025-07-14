@@ -1890,6 +1890,52 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowFetching) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowArraySize) {
+  this->connect();
+
+  constexpr SQLULEN rows = 3;
+  SQLINTEGER val[rows];
+  SQLLEN buf_len = sizeof(val);
+  SQLLEN ind[rows];
+
+  // Same variable will be used for column 1, the value of `val`
+  // should be updated after every SQLFetch call.
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, val, buf_len, ind);
+
+  std::wstring wsql =
+      LR"(
+    SELECT 1 AS small_table
+    UNION ALL
+    SELECT 2
+    UNION ALL
+    SELECT 3;
+  )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, reinterpret_cast<SQLPOINTER>(rows),
+                       0);
+
+  // Fetch 3 rows at once
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify 1 is returned
+  EXPECT_EQ(val[0], 1);
+  // Verify 2 is returned
+  EXPECT_EQ(val[1], 2);
+  // Verify 3 is returned
+  EXPECT_EQ(val[2], 3);
+
+  // Verify result set has no more data beyond row 3
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnly) {
   // GH-47021: implement driver to return indicator value when data pointer is null
   GTEST_SKIP();
