@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+#include <iostream>
+
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_stream_chunk_buffer.h"
 #include "arrow/flight/sql/odbc/flight_sql/utils.h"
 
@@ -38,6 +40,7 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     std::shared_ptr<FlightSqlClient> temp_flight_sql_client;
     auto endpoint_locations = endpoint.locations;
     if (endpoint_locations.empty()) {
+      std::cout << "-AL- endpoint_locations IS empty" << std::endl;
       // list of locations needs to be empty to proceed
       result = flight_sql_client.DoGet(call_options, ticket);
     } else {
@@ -47,6 +50,7 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
 
       // -AL- TODO raise ticket to mirror JDBC ticket GH-38574,
       // see https://github.com/apache/arrow/pull/38521/files
+      std::cout << "-AL- endpoint_locations not empty" << std::endl;
 
       std::unique_ptr<FlightClient> temp_flight_client;
       ThrowIfNotOK(FlightClient::Connect(endpoint_locations[0], client_options)

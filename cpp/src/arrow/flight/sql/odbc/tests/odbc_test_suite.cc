@@ -308,7 +308,7 @@ void FlightSQLODBCMockEndpointTestBase::SetUp() {
   ASSERT_OK(server->Init(options));
   ASSERT_GT(server->port(), 0);
 
-  */
+  */ //-AL- remove comments after confirming they work.
 
   server = std::make_shared<TestFlightServer>();
   ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));

@@ -20,7 +20,7 @@
 #include "arrow/util/utf8.h"
 
 #include "arrow/flight/server_middleware.h"
-#include "arrow/flight/test_flight_server.h"
+#include "arrow/flight/test_flight_server.h" //-AL- todo remove after I write my own test class
 #include "arrow/flight/sql/client.h"
 #include "arrow/flight/sql/example/sqlite_server.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h"

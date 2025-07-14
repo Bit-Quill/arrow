@@ -1432,4 +1432,32 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectIgnoreInvalidBufLen) {
   this->disconnect();
 }
 
+TEST_F(FlightSQLODBCMockEndpointTestBase, TestSQLGetDataMultipleEndpoints) {
+  //-AL- todo test multiple iterations
+  this->connect();
+
+  //std::wstring wsql = L"SELECT 1;";
+  //std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  //SQLRETURN ret =
+  //    SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  //if (ret != SQL_SUCCESS) {
+  //  std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  //}
+  //EXPECT_EQ(ret, SQL_SUCCESS);
+
+  //ret = SQLFetch(this->stmt);
+  //EXPECT_EQ(ret, SQL_SUCCESS);
+
+  //SQLINTEGER val;
+
+  //ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  //EXPECT_EQ(ret, SQL_SUCCESS);
+  //// Verify 1 is returned
+  //EXPECT_EQ(val, 1);
+
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc
