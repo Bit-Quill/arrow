@@ -744,10 +744,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrParamsProcessedPtr) {
 
   SQLULEN processed_count = 0;
 
-  validateSetStmtAttr(stmt, SQL_ATTR_PARAMS_PROCESSED_PTR,
+  validateSetStmtAttr(this->stmt, SQL_ATTR_PARAMS_PROCESSED_PTR,
                       static_cast<SQLPOINTER>(&processed_count));
 
-  validateGetStmtAttr(stmt, SQL_ATTR_PARAMS_PROCESSED_PTR,
+  validateGetStmtAttr(this->stmt, SQL_ATTR_PARAMS_PROCESSED_PTR,
                       static_cast<SQLPOINTER>(&processed_count));
 
   this->disconnect();
