@@ -20,6 +20,7 @@
 #include "arrow/util/utf8.h"
 
 #include "arrow/flight/server_middleware.h"
+#include "arrow/flight/test_flight_server.h"
 #include "arrow/flight/sql/client.h"
 #include "arrow/flight/sql/example/sqlite_server.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h"
@@ -135,65 +136,21 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server;
 };
 
-// -AL- copied from Arrow integration tests
-/// \brief The server used for testing FlightInfo.ordered.
-///
-/// If the given command is "ordered", the server sets
-/// FlightInfo.ordered. The client that supports FlightInfo.ordered
-/// must read data from endpoints from front to back. The client that
-/// doesn't support FlightInfo.ordered may read data from endpoints in
-/// random order.
-///
-/// This scenario is passed only when the client supports
-/// FlightInfo.ordered.
-class OrderedServerForODBC : public FlightServerBase {
-// -AL- SQLiteFlightSqlServer is base FlightSqlServerBase, so can't use that as base class to OrderedServerForODBC
-// class OrderedServerForODBC : public arrow::flight::sql::example::SQLiteFlightSqlServer {
-  Status GetFlightInfo(const ServerCallContext& context,
-                       const FlightDescriptor& descriptor,
-                       std::unique_ptr<FlightInfo>* result) override {
-    const auto ordered = (descriptor.type == FlightDescriptor::DescriptorType::CMD &&
-                          descriptor.cmd == "ordered");
-    auto schema = BuildSchema();
-    std::vector<FlightEndpoint> endpoints;
-    if (ordered) {
-      endpoints.push_back(FlightEndpoint{{"1"}, {}, std::nullopt, ""});
-      endpoints.push_back(FlightEndpoint{{"2"}, {}, std::nullopt, ""});
-      endpoints.push_back(FlightEndpoint{{"3"}, {}, std::nullopt, ""});
-    } else {
-      endpoints.push_back(FlightEndpoint{{"1"}, {}, std::nullopt, ""});
-      endpoints.push_back(FlightEndpoint{{"3"}, {}, std::nullopt, ""});
-      endpoints.push_back(FlightEndpoint{{"2"}, {}, std::nullopt, ""});
-    }
-    ARROW_ASSIGN_OR_RAISE(
-        auto info, FlightInfo::Make(*schema, descriptor, endpoints, -1, -1, ordered));
-    *result = std::make_unique<FlightInfo>(info);
-    return Status::OK();
-  }
+class FlightSQLODBCMockEndpointTestBase : public FlightSQLODBCRemoteTestBase {
+  // Sets up a mock server for each test case. This is for testing endpoint iteration only.
+ public:
+  /// \brief Get connection string for mock server
+  std::string getConnectionString() override;
 
-  Status DoGet(const ServerCallContext& context, const Ticket& request,
-               std::unique_ptr<FlightDataStream>* stream) override {
-    std::shared_ptr<RecordBatch> record_batch;
-    if (request.ticket == "1") {
-      record_batch = RecordBatchFromJSON(BuildSchema(), "[[1], [2], [3]]");
-    } else if (request.ticket == "2") {
-      record_batch = RecordBatchFromJSON(BuildSchema(), "[[10], [20], [30]]");
-    } else if (request.ticket == "3") {
-      record_batch = RecordBatchFromJSON(BuildSchema(), "[[100], [200], [300]]");
-    } else {
-      return Status::KeyError("Could not find flight: ", request.ticket);
-    }
-    std::vector<std::shared_ptr<RecordBatch>> record_batches{record_batch};
-    ARROW_ASSIGN_OR_RAISE(auto record_batch_reader,
-                          RecordBatchReader::Make(record_batches));
-    *stream = std::make_unique<RecordBatchStream>(record_batch_reader);
-    return Status::OK();
-  }
+  int port;
+
+ protected:
+  void SetUp() override;
+
+  void TearDown() override;
 
  private:
-  std::shared_ptr<Schema> BuildSchema() {
-    return arrow::schema({arrow::field("number", arrow::int32(), false)});
-  }
+  std::shared_ptr<arrow::flight::TestFlightServer> server;
 };
 
 template <typename T>

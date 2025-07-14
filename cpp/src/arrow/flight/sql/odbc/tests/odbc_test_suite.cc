@@ -290,6 +290,52 @@ void FlightSQLODBCMockTestBase::SetUp() {
 
 void FlightSQLODBCMockTestBase::TearDown() { ASSERT_OK(server->Shutdown()); }
 
+std::string FlightSQLODBCMockEndpointTestBase::getConnectionString() {
+  std::string connect_str(
+      "driver={Apache Arrow Flight SQL ODBC Driver};HOST=localhost;port=" +
+      std::to_string(port) +
+      ";useEncryption=false;");
+  return connect_str;
+}
+
+void FlightSQLODBCMockEndpointTestBase::SetUp() {
+  /*
+
+    std::unique_ptr<FlightServerBase> server = TestFlightServer::Make();
+
+  ASSERT_OK_AND_ASSIGN(auto location, Location::ForScheme(transport(), "127.0.0.1", 0));
+  FlightServerOptions options(location);
+  ASSERT_OK(server->Init(options));
+  ASSERT_GT(server->port(), 0);
+
+  */
+
+  server = std::make_shared<TestFlightServer>();
+  ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
+  FlightServerOptions options(location);
+  ASSERT_OK(server->Init(options));
+  port = server->port();
+  ASSERT_OK_AND_ASSIGN(location, Location::ForGrpcTcp("localhost", port));
+  ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
+
+  /*
+  ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
+  arrow::flight::FlightServerOptions options(location);
+  options.auth_handler = std::make_unique<NoOpAuthHandler>();
+  options.middleware.push_back(
+      {"bearer-auth-server", std::make_shared<MockServerMiddlewareFactory>()});
+  ASSERT_OK_AND_ASSIGN(server,
+                       arrow::flight::sql::example::SQLiteFlightSqlServer::Create());
+  ASSERT_OK(server->Init(options));
+
+  port = server->port();
+  ASSERT_OK_AND_ASSIGN(location, Location::ForGrpcTcp("localhost", port));
+  ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
+  */
+}
+
+void FlightSQLODBCMockEndpointTestBase::TearDown() { ASSERT_OK(server->Shutdown()); }
+
 bool compareConnPropertyMap(Connection::ConnPropertyMap map1,
                             Connection::ConnPropertyMap map2) {
   if (map1.size() != map2.size()) return false;
