@@ -873,19 +873,38 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
 
 SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
                          SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr) {
-  using ODBC::ODBCStatement;
-  // TODO: complete implementation of SQLGetStmtAttrW and write tests
   LOG_DEBUG(
       "SQLGetStmtAttrW called with stmt: {}, attribute: {}, valuePtr: {}, "
       "bufferLength: {}, stringLengthPtr: {}",
       stmt, attribute, valuePtr, bufferLength, fmt::ptr(stringLengthPtr));
+  using ODBC::ODBCStatement;
 
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
     bool isUnicode = true;
+
     statement->GetStmtAttr(attribute, valuePtr, bufferLength, stringLengthPtr, isUnicode);
-    // TODO: change GetStmtAttr to return SQLRETURN instead of void,
-    // and return value from GetStmtAttr instead
+
+    return SQL_SUCCESS;
+  });
+}
+
+SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
+                         SQLINTEGER stringLength) {
+  LOG_DEBUG(
+      "SQLSetStmtAttrW called with stmt: {}, attribute: {}, valuePtr: {}, "
+      "stringLength: {}",
+      stmt, attribute, valuePtr, stringLength);
+  using ODBC::ODBCStatement;
+
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    bool isUnicode = true;
+
+    statement->SetStmtAttr(attribute, valuePtr, stringLength, isUnicode);
+
     return SQL_SUCCESS;
   });
 }
