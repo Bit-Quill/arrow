@@ -1904,7 +1904,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowArraySize) {
   SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, val, buf_len, ind);
 
   SQLLEN rows_fetched;
-  ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROWS_FETCHED_PTR, &rows_fetched, 0);
+  ret = SQLSetStmtAttr(this->stmt, SQL_ATTR_ROWS_FETCHED_PTR, &rows_fetched, 0);
 
   std::wstring wsql =
       LR"(
@@ -1919,8 +1919,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowArraySize) {
   ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE, reinterpret_cast<SQLPOINTER>(rows),
-                       0);
+  ret = SQLSetStmtAttr(this->stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                       reinterpret_cast<SQLPOINTER>(rows), 0);
 
   // Fetch 3 rows at once
   ret = SQLFetch(this->stmt);
