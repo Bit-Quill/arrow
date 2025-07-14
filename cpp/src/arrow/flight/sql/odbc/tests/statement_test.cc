@@ -1891,6 +1891,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowFetching) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowArraySize) {
+  // Set SQL_ATTR_ROW_ARRAY_SIZE to fetch 3 rows at once
   this->connect();
 
   constexpr SQLULEN rows = 3;
@@ -1901,6 +1902,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowArraySize) {
   // Same variable will be used for column 1, the value of `val`
   // should be updated after every SQLFetch call.
   SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, val, buf_len, ind);
+
+  SQLLEN rows_fetched;
+  ret = SQLSetStmtAttr(stmt, SQL_ATTR_ROWS_FETCHED_PTR, &rows_fetched, 0);
 
   std::wstring wsql =
       LR"(
@@ -1921,6 +1925,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowArraySize) {
   // Fetch 3 rows at once
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify 3 rows are fetched
+  EXPECT_EQ(rows_fetched, 3);
 
   // Verify 1 is returned
   EXPECT_EQ(val[0], 1);
