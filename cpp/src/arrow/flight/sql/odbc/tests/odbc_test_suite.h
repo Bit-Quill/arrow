@@ -20,7 +20,6 @@
 #include "arrow/util/utf8.h"
 
 #include "arrow/flight/server_middleware.h"
-#include "arrow/flight/test_flight_server.h" //-AL- todo remove after I write my own test class
 #include "arrow/flight/sql/client.h"
 #include "arrow/flight/sql/example/sqlite_server.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h"
@@ -134,23 +133,6 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
 
  private:
   std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server;
-};
-
-class FlightSQLODBCMockEndpointTestBase : public FlightSQLODBCRemoteTestBase {
-  // Sets up a mock server for each test case. This is for testing endpoint iteration only.
- public:
-  /// \brief Get connection string for mock server
-  std::string getConnectionString() override;
-
-  int port;
-
- protected:
-  void SetUp() override;
-
-  void TearDown() override;
-
- private:
-  std::shared_ptr<arrow::flight::TestFlightServer> server;
 };
 
 template <typename T>

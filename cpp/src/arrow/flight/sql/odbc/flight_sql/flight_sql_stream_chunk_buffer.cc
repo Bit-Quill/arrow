@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include <iostream>
-
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_stream_chunk_buffer.h"
 #include "arrow/flight/sql/odbc/flight_sql/utils.h"
 
@@ -32,7 +30,6 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     const arrow::flight::FlightCallOptions& call_options,
     const std::shared_ptr<FlightInfo>& flight_info, size_t queue_capacity)
     : queue_(queue_capacity) {
-  // FIXME: Endpoint iteration should consider endpoints may be at different hosts
   for (const auto& endpoint : flight_info->endpoints()) {
     const arrow::flight::Ticket& ticket = endpoint.ticket;
 
@@ -40,24 +37,23 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     std::shared_ptr<FlightSqlClient> temp_flight_sql_client;
     auto endpoint_locations = endpoint.locations;
     if (endpoint_locations.empty()) {
-      std::cout << "-AL- endpoint_locations IS empty" << std::endl;
       // list of locations needs to be empty to proceed
       result = flight_sql_client.DoGet(call_options, ticket);
     } else {
       // If it is non-empty, the driver should create a FlightSqlClient to connect to one
       // of the specified locations directly.
-      // endpoint.getLocations().getFirstItem then get more suppliers?
 
-      // -AL- TODO raise ticket to mirror JDBC ticket GH-38574,
-      // see https://github.com/apache/arrow/pull/38521/files
-      std::cout << "-AL- endpoint_locations not empty" << std::endl;
+      // GH-47117: Currently a new FlightClient will be made for each partition that
+      // returns a non-empty Location then disposed of. It may be better to cache clients
+      // because a server may report the same Locations. It would also be good to identify
+      // when the reported location is the same as the original connection's Location and
+      // skip creating a FlightClient in that scenario.
 
       std::unique_ptr<FlightClient> temp_flight_client;
       ThrowIfNotOK(FlightClient::Connect(endpoint_locations[0], client_options)
                        .Value(&temp_flight_client));
       temp_flight_sql_client.reset(new FlightSqlClient(std::move(temp_flight_client)));
 
-      // -AL- the same call_options can probably be re-used
       result = temp_flight_sql_client->DoGet(call_options, ticket);
     }
 

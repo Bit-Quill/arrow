@@ -122,7 +122,7 @@ TEST_F(FlightStreamChunkBufferTest, TestMultipleEndpointsInt) {
 
     for (int i = 0; i < num_cols; i++) {
       auto array = current_chunk.data->column(i);
-      // Each array has random length and may contain nulls
+      // Each array has random length
       EXPECT_GT(array->length(), 0);
 
       verifyArraysContainIntsOnly(array);
