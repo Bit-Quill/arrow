@@ -31,6 +31,69 @@
 
 namespace arrow::flight::sql::odbc {
 
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectSimpleQuerySQLConnect) {
+  this->allocEnvConnHandles();
+
+    std::string uid(""), pwd("");
+  std::string dsn("InfluxDB-trial");
+  ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
+  ASSERT_OK_AND_ASSIGN(std::wstring wuid, arrow::util::UTF8ToWideString(uid));
+  ASSERT_OK_AND_ASSIGN(std::wstring wpwd, arrow::util::UTF8ToWideString(pwd));
+  std::vector<SQLWCHAR> dsn0(wdsn.begin(), wdsn.end());
+  std::vector<SQLWCHAR> uid0(wuid.begin(), wuid.end());
+  std::vector<SQLWCHAR> pwd0(wpwd.begin(), wpwd.end());
+
+  // Connecting to ODBC server. Empty uid and pwd should be ignored.
+  SQLRETURN ret = SQLConnect(this->conn, dsn0.data(), static_cast<SQLSMALLINT>(dsn0.size()),
+                            uid0.data(),
+                   static_cast<SQLSMALLINT>(uid0.size()), pwd0.data(),
+                   static_cast<SQLSMALLINT>(pwd0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, this->conn) << std::endl;
+  }
+
+  // Allocate a statement using alloc handle
+  ret = SQLAllocHandle(SQL_HANDLE_STMT, this->conn, &this->stmt);
+
+  ASSERT_TRUE(ret == SQL_SUCCESS);
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- remove later
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify 1 is returned
+  EXPECT_EQ(val, 1);
+
+  ret = SQLFetch(this->stmt);
+
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // Invalid cursor state
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
+
+  this->disconnect();
+}
+
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   this->connect();
 
@@ -40,6 +103,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   SQLRETURN ret =
       SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
   EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- remove later
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
 
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);

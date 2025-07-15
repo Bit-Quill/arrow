@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+#include <iostream> //-AL- TEMP
 
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_stream_chunk_buffer.h"
 #include "arrow/flight/sql/odbc/flight_sql/utils.h"
@@ -37,9 +38,11 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     std::shared_ptr<FlightSqlClient> temp_flight_sql_client;
     auto endpoint_locations = endpoint.locations;
     if (endpoint_locations.empty()) {
+      std::cout << "-AL- endpoint_locations IS empty" << std::endl;
       // list of locations needs to be empty to proceed
       result = flight_sql_client.DoGet(call_options, ticket);
     } else {
+      std::cout << "-AL- endpoint_locations is NOT empty" << std::endl;
       // If it is non-empty, the driver should create a FlightSqlClient to connect to one
       // of the specified locations directly.
 

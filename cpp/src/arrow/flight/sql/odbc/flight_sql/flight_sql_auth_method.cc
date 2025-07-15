@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+#include <iostream> //-AL- TEMP
+
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_auth_method.h"
 
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
@@ -137,9 +139,19 @@ class TokenAuthMethod : public FlightSqlAuthMethod {
                                                            "Bearer " + token_);
     call_options.headers.insert(call_options.headers.begin(), token_header);
 
+    //const std::pair<std::string, std::string> useragent_header("User-Agent",
+    //                                                       "Apache-ODBC/1.0");
+    //call_options.headers.insert(call_options.headers.end(), token_header);
+    ////User-Agent: influxdb3-java/version //-AL- tried add to see if it makes a difference????
+    // But it won't work properly so nah
+
     const arrow::Status status = client_.Authenticate(
         call_options,
         std::unique_ptr<arrow::flight::ClientAuthHandler>(new NoOpClientAuthHandler()));
+
+    //-AL- Influx DB Cloud returns null status???
+    std::cout << "-AL- status.message(): " << status.message() << std::endl;
+
     if (!status.ok()) {
       const auto& flightStatus = arrow::flight::FlightStatusDetail::UnwrapStatus(status);
       if (flightStatus != nullptr) {

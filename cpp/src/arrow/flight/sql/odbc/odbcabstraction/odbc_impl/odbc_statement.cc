@@ -285,7 +285,7 @@ bool ODBCStatement::isPrepared() const { return m_isPrepared; }
 
 void ODBCStatement::Prepare(const std::string& query) {
   boost::optional<std::shared_ptr<ResultSetMetadata> > metadata =
-      m_spiStatement->Prepare(query);
+      m_spiStatement->Prepare(query); //-AL- unauthenticated error from InfluxDB is thrown here.
 
   if (metadata) {
     m_ird->PopulateFromResultSetMetadata(metadata->get());

@@ -117,7 +117,7 @@ boost::optional<std::shared_ptr<ResultSetMetadata>> FlightSqlStatement::Prepare(
   ClosePreparedStatementIfAny(prepared_statement_, call_options_);
 
   Result<std::shared_ptr<PreparedStatement>> result =
-      sql_client_.Prepare(call_options_, query);
+      sql_client_.Prepare(call_options_, query); //-AL- InfluxDB returns unauthenticated error here.
   ThrowIfNotOK(result.status());
 
   prepared_statement_ = *result;
