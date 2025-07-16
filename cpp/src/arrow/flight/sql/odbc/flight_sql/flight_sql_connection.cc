@@ -112,6 +112,8 @@ inline std::string GetCerts() { return ""; }
 #endif
 
 const std::set<std::string_view, CaseInsensitiveComparatorStrView> BUILT_IN_PROPERTIES = {
+    FlightSqlConnection::DRIVER,
+    FlightSqlConnection::DSN,
     FlightSqlConnection::HOST,
     FlightSqlConnection::PORT,
     FlightSqlConnection::USER,
