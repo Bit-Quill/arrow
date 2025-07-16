@@ -150,15 +150,11 @@ SQLRETURN SQL_API SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER text
 
 SQLRETURN SQL_API SQLExecute(SQLHSTMT stmt) { return arrow::SQLExecute(stmt); }
 
-SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT columnNumber,
-                             SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
-                             SQLLEN bufferLength, SQLLEN* strLen_or_IndPtr) {
-  LOG_DEBUG(
-      "SQLBindCol called with stmt: {}, columnNumber: {}, targetType: {}, "
-      "targetValuePtr: {}, bufferLength: {}, strLen_or_IndPtr: {}",
-      stmt, columnNumber, targetType, targetValuePtr, bufferLength,
-      fmt::ptr(strLen_or_IndPtr));
-  return SQL_ERROR;
+SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
+                             SQLPOINTER dataPtr, SQLLEN bufferLength,
+                             SQLLEN* indicatorPtr) {
+  return arrow::SQLBindCol(stmt, recordNumber, cType, dataPtr, bufferLength,
+                           indicatorPtr);
 }
 
 SQLRETURN SQL_API SQLCancel(SQLHSTMT stmt) {
