@@ -1187,7 +1187,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectFloatTruncation) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   int16_t ssmall_int_val;
-  SQLLEN buf_len = sizeof(ssmall_int_val);
 
   ret = SQLGetData(this->stmt, 1, SQL_C_SSHORT, &ssmall_int_val, 0, 0);
   EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
@@ -2151,4 +2150,90 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnlySQLUnbind) {
 
   this->disconnect();
 }
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExtendedFetchRowFetching) {
+  // Set SQL_ROWSET_SIZE to fetch 3 rows at once
+  this->connect();
+
+  constexpr SQLULEN rows = 3;
+  SQLINTEGER val[rows];
+  SQLLEN buf_len = sizeof(val);
+  SQLLEN ind[rows];
+
+  // Same variable will be used for column 1, the value of `val`
+  // should be updated after every SQLFetch call.
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, val, buf_len, ind);
+
+  ret =
+      SQLSetStmtAttr(this->stmt, SQL_ROWSET_SIZE, reinterpret_cast<SQLPOINTER>(rows), 0);
+
+  std::wstring wsql =
+      LR"(
+    SELECT 1 AS small_table
+    UNION ALL
+    SELECT 2
+    UNION ALL
+    SELECT 3;
+  )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Fetch row 1-3.
+  SQLULEN row_count;
+  SQLUSMALLINT row_status[rows];
+
+  ret = SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count, row_status);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(row_count, 3);
+
+  for (int i = 0; i < rows; i++) {
+    EXPECT_EQ(row_status[i], SQL_SUCCESS);
+  }
+
+  // Verify 1 is returned for row 1
+  EXPECT_EQ(val[0], 1);
+  // Verify 2 is returned for row 2
+  EXPECT_EQ(val[1], 2);
+  // Verify 3 is returned for row 3
+  EXPECT_EQ(val[2], 3);
+
+  // Verify result set has no more data beyond row 3
+  SQLULEN row_count2;
+  SQLUSMALLINT row_status2[rows];
+  ret = SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count2, row_status2);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExtendedFetchQueryNullIndicator) {
+  // GH-47110: SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for 22002
+  // Limitation on mock test server prevents null from working properly, so use remote
+  // server instead. Mock server has type `DENSE_UNION` for null column data.
+  GTEST_SKIP();
+  this->connect();
+
+  SQLINTEGER val;
+
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  std::wstring wsql = L"SELECT null as null_col;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLULEN row_count1;
+  SQLUSMALLINT row_status1[1];
+
+  // SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for 22002 state
+  ret = SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count1, row_status1);
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_22002);
+
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc
