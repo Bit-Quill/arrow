@@ -351,17 +351,17 @@ bool ODBCStatement::Fetch(size_t rows, SQLULEN* rowCountPtr,
     m_currentArd->NotifyBindingsHavePropagated();
   }
 
-  uint16_t* row_status_array = 0;
+  uint16_t* arrayStatusPtr;
   if (rowStatusArray) {
     // For SQLExtendedFetch only
-    row_status_array = rowStatusArray;
+    arrayStatusPtr = rowStatusArray;
   } else {
-    row_status_array = m_ird->GetArrayStatusPtr();
+    arrayStatusPtr = m_ird->GetArrayStatusPtr();
   }
 
   size_t rowsFetched =
       m_currenResult->Move(rows, m_currentArd->GetBindOffset(),
-                           m_currentArd->GetBoundStructOffset(), row_status_array);
+                           m_currentArd->GetBoundStructOffset(), arrayStatusPtr);
   m_ird->SetRowsProcessed(static_cast<SQLULEN>(rowsFetched));
 
   if (rowCountPtr) {
