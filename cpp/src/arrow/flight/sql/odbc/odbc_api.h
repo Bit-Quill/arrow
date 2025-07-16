@@ -80,4 +80,8 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNam
                     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
                     SQLWCHAR* tableName, SQLSMALLINT tableNameLength, SQLWCHAR* tableType,
                     SQLSMALLINT tableTypeLength);
+SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLength,
+                     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
+                     SQLWCHAR* tableName, SQLSMALLINT tableNameLength,
+                     SQLWCHAR* columnName, SQLSMALLINT columnNameLength);
 }  // namespace arrow
