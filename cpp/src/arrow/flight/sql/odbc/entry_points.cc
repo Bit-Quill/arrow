@@ -144,6 +144,11 @@ SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
                                  rowStatusArray);
 }
 
+SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT fetchOrientation,
+                                 SQLLEN fetchOffset) {
+  return arrow::SQLFetchScroll(stmt, fetchOrientation, fetchOffset);
+}
+
 SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
                              SQLPOINTER dataPtr, SQLLEN bufferLength,
                              SQLLEN* indicatorPtr) {

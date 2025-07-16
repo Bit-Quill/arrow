@@ -35,6 +35,7 @@ EXPORTS
 	SQLExecute
 	SQLExtendedFetch
 	SQLFetch
+	SQLFetchScroll
 	SQLForeignKeysW
 	SQLFreeEnv
 	SQLFreeConnect
