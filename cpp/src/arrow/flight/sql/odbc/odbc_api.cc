@@ -738,6 +738,8 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
       fmt::ptr(outConnectionString), outConnectionStringBufferLen,
       fmt::ptr(outConnectionStringLen), driverCompletion);
 
+  /*
+
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
     std::string connection_string =
@@ -745,6 +747,9 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     Connection::ConnPropertyMap properties;
     std::string dsn =
         ODBCConnection::getPropertiesFromConnString(connection_string, properties);
+    //if (dsn.empty()) {
+    //  dsn = "ODBCDSN"; //-AL- not sure if works.
+    //}
 
     std::vector<std::string_view> missing_properties;
 
@@ -790,6 +795,21 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     return ODBC::GetStringAttribute(true, connection_string, false, outConnectionString,
                                     outConnectionStringBufferLen, outConnectionStringLen,
                                     connection->GetDiagnostics());
+  });
+  */ //-AL- check if it is DriverManager issue
+
+  return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
+    std::string dsn = "InfluxDB-trial";
+
+    Configuration config;
+    config.LoadDsn(dsn);
+
+    std::vector<std::string_view> missing_properties;
+
+    connection->connect(dsn, config.GetProperties(), missing_properties);
+
+    return SQL_SUCCESS;
   });
 }
 
