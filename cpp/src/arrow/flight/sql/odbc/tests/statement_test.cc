@@ -2151,4 +2151,66 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnlySQLUnbind) {
 
   this->disconnect();
 }
+
+//-AL- temp
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLTables) {
+  //GTEST_SKIP();
+  //TEST_F(FlightSQLODBCMockTestBase, TestSQLTables) {
+  this->connect();
+
+  // Attempt to get all tables
+    SQLWCHAR catalogPattern[] = L"%";
+  SQLWCHAR schemaPattern[] = L"%";
+  SQLWCHAR tablePattern[] = L"%";
+  SQLWCHAR tableTypePattern[] = L"TABLE";
+
+  SQLRETURN ret = SQLTables(this->stmt, catalogPattern, SQL_NTS, schemaPattern, SQL_NTS, tablePattern,
+                  SQL_NTS, tableTypePattern, SQL_NTS);
+
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  ret = SQLFetch(stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  this->disconnect();
+}
+
+//TYPED_TEST(FlightSQLODBCTestBase, TestSQLTablesNullptr) {
+//TEST_F(FlightSQLODBCRemoteTestBase, TestSQLTablesNullptr) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLTablesNullptr) {
+  this->connect();
+
+  // Attempt to get all tables
+  SQLWCHAR tableTypePattern[] = L"TABLE";
+
+  SQLRETURN ret = SQLTables(this->stmt, 0, SQL_NTS, 0, SQL_NTS,
+                            0, SQL_NTS, tableTypePattern, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  ret = SQLFetch(stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  SQLCHAR char_val[1204];
+  SQLLEN buf_len = sizeof(SQLCHAR) * 1204;
+  SQLLEN ind;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val, buf_len, &ind);
+  EXPECT_EQ(ODBC::SqlStringToString(char_val), std::string("STAGING"));
+  
+  this->disconnect();
+}
 }  // namespace arrow::flight::sql::odbc
