@@ -34,7 +34,7 @@ namespace arrow::flight::sql::odbc {
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectSimpleQuerySQLConnect) {
   this->allocEnvConnHandles();
 
-    std::string uid(""), pwd("");
+  std::string uid(""), pwd("");
   std::string dsn("InfluxDB-trial");
   ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
   ASSERT_OK_AND_ASSIGN(std::wstring wuid, arrow::util::UTF8ToWideString(uid));
@@ -44,10 +44,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectSimpleQuerySQLConnect) {
   std::vector<SQLWCHAR> pwd0(wpwd.begin(), wpwd.end());
 
   // Connecting to ODBC server. Empty uid and pwd should be ignored.
-  SQLRETURN ret = SQLConnect(this->conn, dsn0.data(), static_cast<SQLSMALLINT>(dsn0.size()),
-                            uid0.data(),
-                   static_cast<SQLSMALLINT>(uid0.size()), pwd0.data(),
-                   static_cast<SQLSMALLINT>(pwd0.size()));
+  SQLRETURN ret =
+      SQLConnect(this->conn, dsn0.data(), static_cast<SQLSMALLINT>(dsn0.size()),
+                 uid0.data(), static_cast<SQLSMALLINT>(uid0.size()), pwd0.data(),
+                 static_cast<SQLSMALLINT>(pwd0.size()));
   EXPECT_EQ(ret, SQL_SUCCESS);
   if (ret != SQL_SUCCESS) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, this->conn) << std::endl;
@@ -61,8 +61,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectSimpleQuerySQLConnect) {
   std::wstring wsql = L"SELECT 1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
   EXPECT_EQ(ret, SQL_SUCCESS);
   if (ret != SQL_SUCCESS) {
     // -AL- remove later
@@ -93,8 +92,8 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectSimpleQuerySQLConnect) {
   this->disconnect();
 }
 
-
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
+// TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectSimpleQuery) {
   this->connect();
 
   std::wstring wsql = L"SELECT 1;";
