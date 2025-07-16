@@ -1064,7 +1064,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectFloatTruncation) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   int16_t ssmall_int_val;
-  SQLLEN buf_len = sizeof(ssmall_int_val);
 
   ret = SQLGetData(this->stmt, 1, SQL_C_SSHORT, &ssmall_int_val, 0, 0);
   EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
@@ -2042,7 +2041,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExtendedFetchRowFetching) {
   // should be updated after every SQLFetch call.
   SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, val, buf_len, ind);
 
-  ret = SQLSetStmtAttr(this->stmt, SQL_ROWSET_SIZE, reinterpret_cast<SQLPOINTER>(rows), 0);
+  ret =
+      SQLSetStmtAttr(this->stmt, SQL_ROWSET_SIZE, reinterpret_cast<SQLPOINTER>(rows), 0);
 
   std::wstring wsql =
       LR"(
@@ -2061,7 +2061,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExtendedFetchRowFetching) {
   SQLULEN row_count;
   SQLUSMALLINT row_status[rows];
 
-  ret = SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, &row_count, row_status);
+  ret = SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count, row_status);
   EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(row_count, 3);
 
@@ -2079,7 +2079,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExtendedFetchRowFetching) {
   // Verify result set has no more data beyond row 3
   SQLULEN row_count2;
   SQLUSMALLINT row_status2[rows];
-  ret = SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, &row_count2, row_status2);
+  ret = SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count2, row_status2);
   EXPECT_EQ(ret, SQL_NO_DATA);
 
   this->disconnect();
@@ -2106,7 +2106,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExtendedFetchQueryNullIndicator) {
   SQLUSMALLINT row_status1[1];
 
   // SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for 22002 state
-  ret = SQLExtendedFetch(stmt, SQL_FETCH_NEXT, 0, &row_count1, row_status1);
+  ret = SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count1, row_status1);
   EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_22002);
 
