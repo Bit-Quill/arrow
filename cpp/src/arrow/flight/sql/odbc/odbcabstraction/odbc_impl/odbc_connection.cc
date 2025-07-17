@@ -52,7 +52,7 @@ namespace {
 // characters such as semi-colons and equals signs. NOTE: This can be optimized to be
 // built statically.
 const boost::xpressive::sregex CONNECTION_STR_REGEX(
-    boost::xpressive::sregex::compile("([^=;]+)=({.+}|[^=;]+|[^;])"));
+    boost::xpressive::sregex::compile("([^=;]+)=({.+}|[^;]+|[^;])"));
 
 // Load properties from the given DSN. The properties loaded do _not_ overwrite existing
 // entries in the properties.
