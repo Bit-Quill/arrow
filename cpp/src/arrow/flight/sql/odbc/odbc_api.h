@@ -62,10 +62,18 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
                      SQLSMALLINT bufLen, SQLSMALLINT* length);
 SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
                          SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr);
+SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
+                         SQLINTEGER stringLength);
 SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength);
 SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength);
 SQLRETURN SQLExecute(SQLHSTMT stmt);
 SQLRETURN SQLFetch(SQLHSTMT stmt);
+SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
+                           SQLLEN fetchOffset, SQLULEN* rowCountPtr,
+                           SQLUSMALLINT* rowStatusArray);
+SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT fetchOrientation, SQLLEN fetchOffset);
+SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
+                     SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr);
 SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
                      SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr);
 SQLRETURN SQLMoreResults(SQLHSTMT stmt);

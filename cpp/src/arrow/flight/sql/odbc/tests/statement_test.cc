@@ -832,24 +832,28 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
   SQLLEN ind;
 
   ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
-
   EXPECT_EQ(ret, SQL_SUCCESS);
+
   // Verify 1 is returned
   EXPECT_EQ(val, 1);
 
   // Fetch row 2
   ret = SQLFetch(this->stmt);
-  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
-
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
   // Verify 2 is returned
   EXPECT_EQ(val, 2);
 
   // Fetch row 3
   ret = SQLFetch(this->stmt);
-  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
-
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
   // Verify 3 is returned
   EXPECT_EQ(val, 3);
 
@@ -858,10 +862,129 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
   EXPECT_EQ(ret, SQL_NO_DATA);
 
   ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &ind);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // Invalid cursor state
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLFetchScrollRowFetching) {
+  this->connect();
+
+  SQLLEN rows_fetched;
+  SQLRETURN ret = SQLSetStmtAttr(this->stmt, SQL_ATTR_ROWS_FETCHED_PTR, &rows_fetched, 0);
+
+  std::wstring wsql =
+      LR"(
+    SELECT 1 AS small_table
+    UNION ALL
+    SELECT 2
+    UNION ALL
+    SELECT 3;
+  )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Fetch row 1
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_NEXT, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+  SQLLEN buf_len = sizeof(val);
+  SQLLEN ind;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify 1 is returned
+  EXPECT_EQ(val, 1);
+  // Verify 1 row is fetched
+  EXPECT_EQ(rows_fetched, 1);
+
+  // Fetch row 2
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_NEXT, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify 2 is returned
+  EXPECT_EQ(val, 2);
+  // Verify 1 row is fetched in the last SQLFetchScroll call
+  EXPECT_EQ(rows_fetched, 1);
+
+  // Fetch row 3
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_NEXT, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify 3 is returned
+  EXPECT_EQ(val, 3);
+  // Verify 1 row is fetched in the last SQLFetchScroll call
+  EXPECT_EQ(rows_fetched, 1);
+
+  // Verify result set has no more data beyond row 3
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_NEXT, 0);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &ind);
 
   EXPECT_EQ(ret, SQL_ERROR);
   // Invalid cursor state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLFetchScrollUnsupportedOrientation) {
+  // SQL_FETCH_PRIOR is the only supported fetch orientation.
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_PRIOR, 0);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HYC00);
+
+  SQLLEN fetch_offset = 1;
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_RELATIVE, fetch_offset);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HYC00);
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_ABSOLUTE, fetch_offset);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HYC00);
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_FIRST, 0);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HYC00);
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_LAST, 0);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HYC00);
+
+  ret = SQLFetchScroll(this->stmt, SQL_FETCH_BOOKMARK, fetch_offset);
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // DM returns state HY106 for SQL_FETCH_BOOKMARK
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY106);
 
   this->disconnect();
 }
@@ -1064,7 +1187,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectFloatTruncation) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   int16_t ssmall_int_val;
-  SQLLEN buf_len = sizeof(ssmall_int_val);
 
   ret = SQLGetData(this->stmt, 1, SQL_C_SSHORT, &ssmall_int_val, 0, 0);
   EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
@@ -1077,8 +1199,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectFloatTruncation) {
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectNullQuery) {
-  // Limitation on mock test server prevents null from working properly.
-  // Mock server has type `DENSE_UNION` for null column data.
+  // Limitation on mock test server prevents null from working properly, so use remote
+  // server instead. Mock server has type `DENSE_UNION` for null column data.
   this->connect();
 
   std::wstring wsql = L"SELECT null as null_col;";
@@ -1166,8 +1288,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectTruncationQueryNullIndicator)
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectNullQueryNullIndicator) {
-  // Limitation on mock test server prevents null from working properly.
-  // Mock server has type `DENSE_UNION` for null column data.
+  // Limitation on mock test server prevents null from working properly, so use remote
+  // server instead. Mock server has type `DENSE_UNION` for null column data.
   this->connect();
 
   std::wstring wsql = L"SELECT null as null_col;";
@@ -1431,4 +1553,687 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectIgnoreInvalidBufLen) {
 
   this->disconnect();
 }
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColDataQuery) {
+  this->connect();
+
+  // Numeric Types
+
+  // Signed Tiny Int
+  int8_t stiny_int_val_min;
+  int8_t stiny_int_val_max;
+  SQLLEN buf_len = 0;
+  SQLLEN ind;
+
+  SQLRETURN ret =
+      SQLBindCol(this->stmt, 1, SQL_C_STINYINT, &stiny_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 2, SQL_C_STINYINT, &stiny_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Unsigned Tiny Int
+  uint8_t utiny_int_val_min;
+  uint8_t utiny_int_val_max;
+
+  ret = SQLBindCol(this->stmt, 3, SQL_C_UTINYINT, &utiny_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 4, SQL_C_UTINYINT, &utiny_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Signed Small Int
+  int16_t ssmall_int_val_min;
+  int16_t ssmall_int_val_max;
+
+  ret = SQLBindCol(this->stmt, 5, SQL_C_SSHORT, &ssmall_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 6, SQL_C_SSHORT, &ssmall_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Unsigned Small Int
+  uint16_t usmall_int_val_min;
+  uint16_t usmall_int_val_max;
+
+  ret = SQLBindCol(this->stmt, 7, SQL_C_USHORT, &usmall_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 8, SQL_C_USHORT, &usmall_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Signed Integer
+  SQLINTEGER slong_val_min;
+  SQLINTEGER slong_val_max;
+
+  ret = SQLBindCol(this->stmt, 9, SQL_C_SLONG, &slong_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 10, SQL_C_SLONG, &slong_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Unsigned Integer
+  SQLUINTEGER ulong_val_min;
+  SQLUINTEGER ulong_val_max;
+
+  ret = SQLBindCol(this->stmt, 11, SQL_C_ULONG, &ulong_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 12, SQL_C_ULONG, &ulong_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Signed Big Int
+  SQLBIGINT sbig_int_val_min;
+  SQLBIGINT sbig_int_val_max;
+
+  ret = SQLBindCol(this->stmt, 13, SQL_C_SBIGINT, &sbig_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 14, SQL_C_SBIGINT, &sbig_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Unsigned Big Int
+  SQLUBIGINT ubig_int_val_min;
+  SQLUBIGINT ubig_int_val_max;
+
+  ret = SQLBindCol(this->stmt, 15, SQL_C_UBIGINT, &ubig_int_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 16, SQL_C_UBIGINT, &ubig_int_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Decimal
+  SQL_NUMERIC_STRUCT decimal_val_neg;
+  SQL_NUMERIC_STRUCT decimal_val_pos;
+  memset(&decimal_val_neg, 0, sizeof(decimal_val_neg));
+  memset(&decimal_val_pos, 0, sizeof(decimal_val_pos));
+
+  ret = SQLBindCol(this->stmt, 17, SQL_C_NUMERIC, &decimal_val_neg, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 18, SQL_C_NUMERIC, &decimal_val_pos, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Float
+  float float_val_min;
+  float float_val_max;
+
+  ret = SQLBindCol(this->stmt, 19, SQL_C_FLOAT, &float_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 20, SQL_C_FLOAT, &float_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Double
+  SQLDOUBLE double_val_min;
+  SQLDOUBLE double_val_max;
+
+  ret = SQLBindCol(this->stmt, 21, SQL_C_DOUBLE, &double_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 22, SQL_C_DOUBLE, &double_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Bit
+  bool bit_val_false;
+  bool bit_val_true;
+
+  ret = SQLBindCol(this->stmt, 23, SQL_C_BIT, &bit_val_false, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 24, SQL_C_BIT, &bit_val_true, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Characters
+  SQLCHAR char_val[2];
+  buf_len = sizeof(SQLCHAR) * 2;
+
+  ret = SQLBindCol(this->stmt, 25, SQL_C_CHAR, &char_val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLWCHAR wchar_val[2];
+  constexpr size_t wchar_size = driver::odbcabstraction::GetSqlWCharSize();
+  buf_len = wchar_size * 2;
+
+  ret = SQLBindCol(this->stmt, 26, SQL_C_WCHAR, &wchar_val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLWCHAR wvarchar_val[3];
+  buf_len = wchar_size * 3;
+
+  ret = SQLBindCol(this->stmt, 27, SQL_C_WCHAR, &wvarchar_val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLCHAR varchar_val[4];
+  buf_len = sizeof(SQLCHAR) * 4;
+
+  ret = SQLBindCol(this->stmt, 28, SQL_C_CHAR, &varchar_val, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Date and Timestamp
+  SQL_DATE_STRUCT date_val_min{}, date_val_max{};
+  buf_len = 0;
+
+  ret = SQLBindCol(this->stmt, 29, SQL_C_TYPE_DATE, &date_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 30, SQL_C_TYPE_DATE, &date_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQL_TIMESTAMP_STRUCT timestamp_val_min{}, timestamp_val_max{};
+
+  ret =
+      SQLBindCol(this->stmt, 31, SQL_C_TYPE_TIMESTAMP, &timestamp_val_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret =
+      SQLBindCol(this->stmt, 32, SQL_C_TYPE_TIMESTAMP, &timestamp_val_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Execute query and fetch data once since there is only 1 row.
+  std::wstring wsql = this->getQueryAllDataTypes();
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Data verification
+
+  // Signed Tiny Int
+  EXPECT_EQ(stiny_int_val_min, std::numeric_limits<int8_t>::min());
+  EXPECT_EQ(stiny_int_val_max, std::numeric_limits<int8_t>::max());
+
+  // Unsigned Tiny Int
+  EXPECT_EQ(utiny_int_val_min, std::numeric_limits<uint8_t>::min());
+  EXPECT_EQ(utiny_int_val_max, std::numeric_limits<uint8_t>::max());
+
+  // Signed Small Int
+  EXPECT_EQ(ssmall_int_val_min, std::numeric_limits<int16_t>::min());
+  EXPECT_EQ(ssmall_int_val_max, std::numeric_limits<int16_t>::max());
+
+  // Unsigned Small Int
+  EXPECT_EQ(usmall_int_val_min, std::numeric_limits<uint16_t>::min());
+  EXPECT_EQ(usmall_int_val_max, std::numeric_limits<uint16_t>::max());
+
+  // Signed Long
+  EXPECT_EQ(slong_val_min, std::numeric_limits<SQLINTEGER>::min());
+  EXPECT_EQ(slong_val_max, std::numeric_limits<SQLINTEGER>::max());
+
+  // Unsigned Long
+  EXPECT_EQ(ulong_val_min, std::numeric_limits<SQLUINTEGER>::min());
+  EXPECT_EQ(ulong_val_max, std::numeric_limits<SQLUINTEGER>::max());
+
+  // Signed Big Int
+  EXPECT_EQ(sbig_int_val_min, std::numeric_limits<SQLBIGINT>::min());
+  EXPECT_EQ(sbig_int_val_max, std::numeric_limits<SQLBIGINT>::max());
+
+  // Unsigned Big Int
+  EXPECT_EQ(ubig_int_val_min, std::numeric_limits<SQLUBIGINT>::min());
+  EXPECT_EQ(ubig_int_val_max, std::numeric_limits<SQLUBIGINT>::max());
+
+  // Decimal
+  EXPECT_EQ(decimal_val_neg.sign, 0);
+  EXPECT_EQ(decimal_val_neg.scale, 0);
+  EXPECT_EQ(decimal_val_neg.precision, 38);
+  EXPECT_THAT(decimal_val_neg.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0,
+                                                          0, 0, 0, 0, 0, 0, 0, 0, 0));
+
+  EXPECT_EQ(decimal_val_pos.sign, 1);
+  EXPECT_EQ(decimal_val_pos.scale, 0);
+  EXPECT_EQ(decimal_val_pos.precision, 38);
+  EXPECT_THAT(decimal_val_pos.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0,
+                                                          0, 0, 0, 0, 0, 0, 0, 0, 0));
+
+  // Float
+  EXPECT_EQ(float_val_min, -std::numeric_limits<float>::max());
+  EXPECT_EQ(float_val_max, std::numeric_limits<float>::max());
+
+  // Double
+  EXPECT_EQ(double_val_min, -std::numeric_limits<SQLDOUBLE>::max());
+  EXPECT_EQ(double_val_max, std::numeric_limits<SQLDOUBLE>::max());
+
+  // Bit
+  EXPECT_EQ(bit_val_false, false);
+  EXPECT_EQ(bit_val_true, true);
+
+  // Characters
+  EXPECT_EQ(char_val[0], 'Z');
+  EXPECT_EQ(wchar_val[0], L'你');
+  EXPECT_EQ(wvarchar_val[0], L'你');
+  EXPECT_EQ(wvarchar_val[1], L'好');
+
+  EXPECT_EQ(varchar_val[0], 'X');
+  EXPECT_EQ(varchar_val[1], 'Y');
+  EXPECT_EQ(varchar_val[2], 'Z');
+
+  // Date
+  EXPECT_EQ(date_val_min.day, 1);
+  EXPECT_EQ(date_val_min.month, 1);
+  EXPECT_EQ(date_val_min.year, 1400);
+
+  EXPECT_EQ(date_val_max.day, 31);
+  EXPECT_EQ(date_val_max.month, 12);
+  EXPECT_EQ(date_val_max.year, 9999);
+
+  // Timestamp
+  EXPECT_EQ(timestamp_val_min.day, 1);
+  EXPECT_EQ(timestamp_val_min.month, 1);
+  EXPECT_EQ(timestamp_val_min.year, 1400);
+  EXPECT_EQ(timestamp_val_min.hour, 0);
+  EXPECT_EQ(timestamp_val_min.minute, 0);
+  EXPECT_EQ(timestamp_val_min.second, 0);
+  EXPECT_EQ(timestamp_val_min.fraction, 0);
+
+  EXPECT_EQ(timestamp_val_max.day, 31);
+  EXPECT_EQ(timestamp_val_max.month, 12);
+  EXPECT_EQ(timestamp_val_max.year, 9999);
+  EXPECT_EQ(timestamp_val_max.hour, 23);
+  EXPECT_EQ(timestamp_val_max.minute, 59);
+  EXPECT_EQ(timestamp_val_max.second, 59);
+  EXPECT_EQ(timestamp_val_max.fraction, 0);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLBindColTimeQuery) {
+  // Mock server test is skipped due to limitation on the mock server.
+  // Time type from mock server does not include the fraction
+  this->connect();
+
+  SQL_TIME_STRUCT time_var_min{};
+  SQL_TIME_STRUCT time_var_max{};
+  SQLLEN buf_len = sizeof(time_var_min);
+  SQLLEN ind;
+
+  SQLRETURN ret =
+      SQLBindCol(this->stmt, 1, SQL_C_TYPE_TIME, &time_var_min, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLBindCol(this->stmt, 2, SQL_C_TYPE_TIME, &time_var_max, buf_len, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::wstring wsql =
+      LR"(
+    SELECT CAST(TIME '00:00:00' AS TIME) AS time_min,
+           CAST(TIME '23:59:59' AS TIME) AS time_max;
+    )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Check min values for time.
+  EXPECT_EQ(time_var_min.hour, 0);
+  EXPECT_EQ(time_var_min.minute, 0);
+  EXPECT_EQ(time_var_min.second, 0);
+
+  // Check max values for time.
+  EXPECT_EQ(time_var_max.hour, 23);
+  EXPECT_EQ(time_var_max.minute, 59);
+  EXPECT_EQ(time_var_max.second, 59);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLBindColVarbinaryQuery) {
+  // Have binary test on mock test base as remote test servers tend to have different
+  // formats for binary data
+  this->connect();
+
+  // varbinary
+  std::vector<int8_t> varbinary_val(3);
+  SQLLEN buf_len = varbinary_val.size();
+  SQLLEN ind;
+  SQLRETURN ret =
+      SQLBindCol(this->stmt, 1, SQL_C_BINARY, &varbinary_val[0], buf_len, &ind);
+
+  std::wstring wsql = L"SELECT X'ABCDEF' AS c_varbinary;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Check varbinary values
+  EXPECT_EQ(varbinary_val[0], '\xAB');
+  EXPECT_EQ(varbinary_val[1], '\xCD');
+  EXPECT_EQ(varbinary_val[2], '\xEF');
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLBindColNullQuery) {
+  // Limitation on mock test server prevents null from working properly, so use remote
+  // server instead. Mock server has type `DENSE_UNION` for null column data.
+  this->connect();
+
+  SQLINTEGER val;
+  SQLLEN ind;
+
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, &val, 0, &ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::wstring wsql = L"SELECT null as null_col;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify SQL_NULL_DATA is returned for indicator
+  EXPECT_EQ(ind, SQL_NULL_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLBindColNullQueryNullIndicator) {
+  // Limitation on mock test server prevents null from working properly, so use remote
+  // server instead. Mock server has type `DENSE_UNION` for null column data.
+  this->connect();
+
+  SQLINTEGER val;
+
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  std::wstring wsql = L"SELECT null as null_col;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // Verify invalid null indicator is reported, as it is required
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_22002);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowFetching) {
+  this->connect();
+
+  SQLINTEGER val;
+  SQLLEN buf_len = sizeof(val);
+  SQLLEN ind;
+
+  // Same variable will be used for column 1, the value of `val`
+  // should be updated after every SQLFetch call.
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, &val, buf_len, &ind);
+
+  std::wstring wsql =
+      LR"(
+    SELECT 1 AS small_table
+    UNION ALL
+    SELECT 2
+    UNION ALL
+    SELECT 3;
+  )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Fetch row 1
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify 1 is returned
+  EXPECT_EQ(val, 1);
+
+  // Fetch row 2
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify 2 is returned
+  EXPECT_EQ(val, 2);
+
+  // Fetch row 3
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify 3 is returned
+  EXPECT_EQ(val, 3);
+
+  // Verify result set has no more data beyond row 3
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowArraySize) {
+  // Set SQL_ATTR_ROW_ARRAY_SIZE to fetch 3 rows at once
+  this->connect();
+
+  constexpr SQLULEN rows = 3;
+  SQLINTEGER val[rows];
+  SQLLEN buf_len = sizeof(val);
+  SQLLEN ind[rows];
+
+  // Same variable will be used for column 1, the value of `val`
+  // should be updated after every SQLFetch call.
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, val, buf_len, ind);
+
+  SQLLEN rows_fetched;
+  ret = SQLSetStmtAttr(this->stmt, SQL_ATTR_ROWS_FETCHED_PTR, &rows_fetched, 0);
+
+  std::wstring wsql =
+      LR"(
+    SELECT 1 AS small_table
+    UNION ALL
+    SELECT 2
+    UNION ALL
+    SELECT 3;
+  )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLSetStmtAttr(this->stmt, SQL_ATTR_ROW_ARRAY_SIZE,
+                       reinterpret_cast<SQLPOINTER>(rows), 0);
+
+  // Fetch 3 rows at once
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify 3 rows are fetched
+  EXPECT_EQ(rows_fetched, 3);
+
+  // Verify 1 is returned
+  EXPECT_EQ(val[0], 1);
+  // Verify 2 is returned
+  EXPECT_EQ(val[1], 2);
+  // Verify 3 is returned
+  EXPECT_EQ(val[2], 3);
+
+  // Verify result set has no more data beyond row 3
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnly) {
+  // GH-47021: implement driver to return indicator value when data pointer is null
+  GTEST_SKIP();
+  // Verify driver supports null data pointer with valid indicator pointer
+  this->connect();
+
+  // Numeric Types
+
+  // Signed Tiny Int
+  SQLLEN stiny_int_ind;
+
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_STINYINT, 0, 0, &stiny_int_ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Characters
+  SQLLEN buf_len = sizeof(SQLCHAR) * 2;
+  SQLLEN char_val_ind;
+
+  ret = SQLBindCol(this->stmt, 25, SQL_C_CHAR, 0, buf_len, &char_val_ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Execute query and fetch data once since there is only 1 row.
+  std::wstring wsql = this->getQueryAllDataTypes();
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify values for indicator pointer
+  // Signed Tiny Int
+  EXPECT_EQ(stiny_int_ind, 1);
+
+  // Char array
+  EXPECT_EQ(char_val_ind, 1);
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnlySQLUnbind) {
+  // Verify driver supports valid indicator pointer after unbinding all columns
+  this->connect();
+
+  // Numeric Types
+
+  // Signed Tiny Int
+  int8_t stiny_int_val;
+  SQLLEN stiny_int_ind;
+
+  SQLRETURN ret =
+      SQLBindCol(this->stmt, 1, SQL_C_STINYINT, &stiny_int_val, 0, &stiny_int_ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Characters
+  SQLCHAR char_val[2];
+  SQLLEN buf_len = sizeof(SQLCHAR) * 2;
+  SQLLEN char_val_ind;
+
+  ret = SQLBindCol(this->stmt, 25, SQL_C_CHAR, &char_val, buf_len, &char_val_ind);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Driver should still be able to execute queries after unbinding columns
+  ret = SQLFreeStmt(this->stmt, SQL_UNBIND);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Execute query and fetch data once since there is only 1 row.
+  std::wstring wsql = this->getQueryAllDataTypes();
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // GH-47021: implement driver to return indicator value when data pointer is null and
+  // uncomment the checks Verify values for indicator pointer Signed Tiny Int
+  // EXPECT_EQ(stiny_int_ind, 1);
+
+  // Char array
+  // EXPECT_EQ(char_val_ind, 1);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLExtendedFetchRowFetching) {
+  // Set SQL_ROWSET_SIZE to fetch 3 rows at once
+  this->connect();
+
+  constexpr SQLULEN rows = 3;
+  SQLINTEGER val[rows];
+  SQLLEN buf_len = sizeof(val);
+  SQLLEN ind[rows];
+
+  // Same variable will be used for column 1, the value of `val`
+  // should be updated after every SQLFetch call.
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, val, buf_len, ind);
+
+  ret =
+      SQLSetStmtAttr(this->stmt, SQL_ROWSET_SIZE, reinterpret_cast<SQLPOINTER>(rows), 0);
+
+  std::wstring wsql =
+      LR"(
+    SELECT 1 AS small_table
+    UNION ALL
+    SELECT 2
+    UNION ALL
+    SELECT 3;
+  )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Fetch row 1-3.
+  SQLULEN row_count;
+  SQLUSMALLINT row_status[rows];
+
+  ret = SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count, row_status);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(row_count, 3);
+
+  for (int i = 0; i < rows; i++) {
+    EXPECT_EQ(row_status[i], SQL_SUCCESS);
+  }
+
+  // Verify 1 is returned for row 1
+  EXPECT_EQ(val[0], 1);
+  // Verify 2 is returned for row 2
+  EXPECT_EQ(val[1], 2);
+  // Verify 3 is returned for row 3
+  EXPECT_EQ(val[2], 3);
+
+  // Verify result set has no more data beyond row 3
+  SQLULEN row_count2;
+  SQLUSMALLINT row_status2[rows];
+  ret = SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count2, row_status2);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExtendedFetchQueryNullIndicator) {
+  // GH-47110: SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for 22002
+  // Limitation on mock test server prevents null from working properly, so use remote
+  // server instead. Mock server has type `DENSE_UNION` for null column data.
+  GTEST_SKIP();
+  this->connect();
+
+  SQLINTEGER val;
+
+  SQLRETURN ret = SQLBindCol(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  std::wstring wsql = L"SELECT null as null_col;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  ret = SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLULEN row_count1;
+  SQLUSMALLINT row_status1[1];
+
+  // SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for 22002 state
+  ret = SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count1, row_status1);
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_22002);
+
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc

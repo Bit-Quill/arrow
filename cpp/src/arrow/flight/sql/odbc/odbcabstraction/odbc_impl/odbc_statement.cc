@@ -317,7 +317,8 @@ void ODBCStatement::ExecuteDirect(const std::string& query) {
   m_isPrepared = false;
 }
 
-bool ODBCStatement::Fetch(size_t rows) {
+bool ODBCStatement::Fetch(size_t rows, SQLULEN* rowCountPtr,
+                          SQLUSMALLINT* rowStatusArray) {
   if (m_hasReachedEndOfResult) {
     m_ird->SetRowsProcessed(0);
     return false;
@@ -350,10 +351,23 @@ bool ODBCStatement::Fetch(size_t rows) {
     m_currentArd->NotifyBindingsHavePropagated();
   }
 
-  size_t rowsFetched = m_currenResult->Move(rows, m_currentArd->GetBindOffset(),
-                                            m_currentArd->GetBoundStructOffset(),
-                                            m_ird->GetArrayStatusPtr());
+  uint16_t* arrayStatusPtr;
+  if (rowStatusArray) {
+    // For SQLExtendedFetch only
+    arrayStatusPtr = rowStatusArray;
+  } else {
+    arrayStatusPtr = m_ird->GetArrayStatusPtr();
+  }
+
+  size_t rowsFetched =
+      m_currenResult->Move(rows, m_currentArd->GetBindOffset(),
+                           m_currentArd->GetBoundStructOffset(), arrayStatusPtr);
   m_ird->SetRowsProcessed(static_cast<SQLULEN>(rowsFetched));
+
+  if (rowCountPtr) {
+    // For SQLExtendedFetch only
+    *rowCountPtr = rowsFetched;
+  }
 
   m_rowNumber += rowsFetched;
   m_hasReachedEndOfResult = rowsFetched != rows;
@@ -639,7 +653,7 @@ void ODBCStatement::SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value,
       CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_UB_OFF));
       return;
     case SQL_ATTR_RETRIEVE_DATA:
-      CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_TRUE));
+      CheckIfAttributeIsSetToOnlyValidValue(value, static_cast<SQLULEN>(SQL_RD_ON));
       return;
     case SQL_ROWSET_SIZE:
       SetAttribute(value, m_rowsetSize);
