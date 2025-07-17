@@ -286,6 +286,28 @@ void FlightSQLODBCMockTestBase::CreateTestTables() {
   )"));
 }
 
+void FlightSQLODBCMockTestBase::CreateTableAllDataType() {
+  // Limitation on mock SQLite server:
+  // Only int64, float64, binary, and utf8 Arrow Types are supported by
+  // SQLiteFlightSqlServer::Impl::DoGetTables
+  ASSERT_OK(server->ExecuteSql(R"(
+    CREATE TABLE AllTypesTable(
+    bigint_col INTEGER PRIMARY KEY AUTOINCREMENT,
+    char_col varchar(100),
+    varbinary_col BLOB,
+    double_col REAL);
+
+    INSERT INTO AllTypesTable (
+    char_col,
+    varbinary_col,
+    double_col) VALUES (
+        '1st Row',
+        X'31737420726F77',
+        3.14159
+    );
+  )"));
+}
+
 void FlightSQLODBCMockTestBase::SetUp() {
   ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
   arrow::flight::FlightServerOptions options(location);

@@ -59,7 +59,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumns) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
   }
 
-  ret = SQLFetch(stmt);
+  ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
   if (ret != SQL_SUCCESS) {
     // -AL- temp
@@ -101,6 +101,160 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumns) {
                  1);  // oridinal position
 
   CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
+  // Limitation: Mock server returns incorrect values for column size for some columns.
+  // For character and binary type columns, the driver calculates buffer length and char
+  // octet length from column size.
+  this->connect();
+  this->CreateTableAllDataType();
+
+  // Attempt to get all columns
+  SQLWCHAR tablePattern[] = L"AllTypesTable";
+  SQLWCHAR columnPattern[] = L"%";
+
+  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, tablePattern,
+                             SQL_NTS, columnPattern, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Fetch SQLColumn data for 1st column in AllTypesTable
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::string empty = std::string("");
+
+  CheckStringColumn(this->stmt, 1, std::string("main"));           // catalog
+  CheckStringColumn(this->stmt, 2, empty);                         // schema
+  CheckStringColumn(this->stmt, 3, std::string("AllTypesTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("bigint_col"));     // column name
+
+  CheckIntColumn(this->stmt, 5, SQL_BIGINT);  // data type
+
+  CheckStringColumn(this->stmt, 6, std::string("BIGINT"));  // type name
+
+  // mock limitation: SQLite mock server returns 10 for bigint column size when spec
+  // indicates should be 19
+  CheckIntColumn(this->stmt, 7, 10);  // column size
+  CheckIntColumn(this->stmt, 8, 8);   // buffer length
+
+  // DECIMAL_DIGITS should be 0 for bigint type since it is exact
+  // mock limitation: SQLite mock server returns 10 for bigint decimal digits when spec
+  // indicates should be 0
+  CheckSmallIntColumn(this->stmt, 9, 15);   // decimal digits
+  CheckSmallIntColumn(this->stmt, 10, 10);  // num prec radix
+  CheckSmallIntColumn(this->stmt, 11,
+                      SQL_NULLABLE);  // nullable
+
+  CheckStringColumn(this->stmt, 12, empty);  // remarks
+  CheckStringColumn(this->stmt, 13, empty);  // column def
+
+  CheckSmallIntColumn(this->stmt, 14, SQL_BIGINT);  // sql data type  not NULL
+  CheckSmallIntColumn(this->stmt, 15, NULL);        // sql date type sub
+  CheckIntColumn(this->stmt, 16, 8);                // char octet length
+  CheckIntColumn(this->stmt, 17, 1);                // oridinal position
+
+  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+
+  // Check SQLColumn data for 2nd column in AllTypesTable
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  CheckStringColumn(this->stmt, 1, std::string("main"));           // catalog
+  CheckStringColumn(this->stmt, 2, empty);                         // schema
+  CheckStringColumn(this->stmt, 3, std::string("AllTypesTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("char_col"));       // column name
+
+  CheckIntColumn(this->stmt, 5, SQL_WVARCHAR);  // data type
+
+  CheckStringColumn(this->stmt, 6, std::string("WVARCHAR"));  // type name
+
+  // mock limitation: SQLite mock server returns 0 for varchar(100) column size when spec
+  // indicates should be 100.
+  CheckIntColumn(this->stmt, 7, 0);  // column size
+  CheckIntColumn(this->stmt, 8, 0);  // buffer length
+
+  CheckSmallIntColumn(this->stmt, 9, 15);  // decimal digits
+  CheckSmallIntColumn(this->stmt, 10, 0);  // num prec radix
+  CheckSmallIntColumn(this->stmt, 11,
+                      SQL_NULLABLE);  // nullable
+
+  CheckStringColumn(this->stmt, 12, empty);  // remarks
+  CheckStringColumn(this->stmt, 13, empty);  // column def
+
+  CheckSmallIntColumn(this->stmt, 14, SQL_WVARCHAR);  // sql data type  not NULL
+  CheckSmallIntColumn(this->stmt, 15, NULL);          // sql date type sub
+  CheckIntColumn(this->stmt, 16, 0);                  // char octet length
+  CheckIntColumn(this->stmt, 17, 2);                  // oridinal position
+
+  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+
+  // Check SQLColumn data for 3rd column in AllTypesTable
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  CheckStringColumn(this->stmt, 1, std::string("main"));           // catalog
+  CheckStringColumn(this->stmt, 2, empty);                         // schema
+  CheckStringColumn(this->stmt, 3, std::string("AllTypesTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("varbinary_col"));  // column name
+
+  CheckIntColumn(this->stmt, 5, SQL_BINARY);  // data type
+
+  CheckStringColumn(this->stmt, 6, std::string("BINARY"));  // type name
+
+  // mock limitation: SQLite mock server returns 0 for BLOB column size when spec
+  // indicates should be binary data limit.
+  CheckIntColumn(this->stmt, 7, 0);  // column size
+  CheckIntColumn(this->stmt, 8, 0);  // buffer length
+
+  CheckSmallIntColumn(this->stmt, 9, 15);  // decimal digits
+  CheckSmallIntColumn(this->stmt, 10, 0);  // num prec radix
+  CheckSmallIntColumn(this->stmt, 11,
+                      SQL_NULLABLE);  // nullable
+
+  CheckStringColumn(this->stmt, 12, empty);  // remarks
+  CheckStringColumn(this->stmt, 13, empty);  // column def
+
+  CheckSmallIntColumn(this->stmt, 14, SQL_BINARY);  // sql data type  not NULL
+  CheckSmallIntColumn(this->stmt, 15, NULL);        // sql date type sub
+  CheckIntColumn(this->stmt, 16, 0);                // char octet length
+  CheckIntColumn(this->stmt, 17, 3);                // oridinal position
+
+  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+
+  // Check SQLColumn data for 4th column in AllTypesTable
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  CheckStringColumn(this->stmt, 1, std::string("main"));           // catalog
+  CheckStringColumn(this->stmt, 2, empty);                         // schema
+  CheckStringColumn(this->stmt, 3, std::string("AllTypesTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("double_col"));     // column name
+
+  CheckIntColumn(this->stmt, 5, SQL_DOUBLE);  // data type
+
+  CheckStringColumn(this->stmt, 6, std::string("DOUBLE"));  // type name
+
+  CheckIntColumn(this->stmt, 7, 15);  // column size
+  CheckIntColumn(this->stmt, 8, 8);   // buffer length
+
+  CheckSmallIntColumn(this->stmt, 9, 15);  // decimal digits
+  CheckSmallIntColumn(this->stmt, 10, 2);  // num prec radix
+  CheckSmallIntColumn(this->stmt, 11,
+                      SQL_NULLABLE);  // nullable
+
+  CheckStringColumn(this->stmt, 12, empty);  // remarks
+  CheckStringColumn(this->stmt, 13, empty);  // column def
+
+  CheckSmallIntColumn(this->stmt, 14, SQL_DOUBLE);  // sql data type  not NULL
+  CheckSmallIntColumn(this->stmt, 15, NULL);        // sql date type sub
+  CheckIntColumn(this->stmt, 16, 8);                // char octet length
+  CheckIntColumn(this->stmt, 17, 4);                // oridinal position
+
+  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+
   this->disconnect();
 }
 
