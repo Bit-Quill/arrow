@@ -37,17 +37,17 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     std::shared_ptr<FlightSqlClient> temp_flight_sql_client;
     auto endpoint_locations = endpoint.locations;
     if (endpoint_locations.empty()) {
-      // list of locations needs to be empty to proceed
+      // list of Locations needs to be empty to proceed
       result = flight_sql_client.DoGet(call_options, ticket);
     } else {
       // If it is non-empty, the driver should create a FlightSqlClient to connect to one
-      // of the specified locations directly.
+      // of the specified Locations directly.
 
       // GH-47117: Currently a new FlightClient will be made for each partition that
-      // returns a non-empty Location then disposed of. It may be better to cache clients
-      // because a server may report the same Locations. It would also be good to identify
-      // when the reported location is the same as the original connection's Location and
-      // skip creating a FlightClient in that scenario.
+      // returns a non-empty Location, which is then disposed of. It may be better to
+      // cache clients because a server may report the same Locations. It would also be
+      // good to identify when the reported Location is the same as the original
+      // connection's Location and skip creating a FlightClient in that scenario.
 
       std::unique_ptr<FlightClient> temp_flight_client;
       ThrowIfNotOK(FlightClient::Connect(endpoint_locations[0], client_options)
@@ -68,7 +68,7 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
 
       // If result is valid, save the temp Flight SQL Client for future stream reader
       // call. temp_flight_sql_client is intentionally null if the list of endpoint
-      // locations is empty.
+      // Locations is empty.
       // After all data is fetched from reader, the temp client is closed.
       return boost::make_optional(
           isNotOk || isNotEmpty,
