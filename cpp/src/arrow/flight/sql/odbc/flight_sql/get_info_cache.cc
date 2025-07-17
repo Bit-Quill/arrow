@@ -204,15 +204,20 @@ inline void SetDefaultIfMissing(
 namespace driver {
 namespace flight_sql {
 using arrow::flight::FlightCallOptions;
+using arrow::flight::FlightClientOptions;
 using arrow::flight::sql::FlightSqlClient;
 using arrow::flight::sql::SqlInfoOptions;
 using driver::odbcabstraction::Connection;
 using driver::odbcabstraction::DriverException;
 
-GetInfoCache::GetInfoCache(FlightCallOptions& call_options,
+GetInfoCache::GetInfoCache(FlightClientOptions& client_options,
+                           FlightCallOptions& call_options,
                            std::unique_ptr<FlightSqlClient>& client,
                            const std::string& driver_version)
-    : call_options_(call_options), sql_client_(client), has_server_info_(false) {
+    : client_options_(client_options),
+      call_options_(call_options),
+      sql_client_(client),
+      has_server_info_(false) {
   info_[SQL_DRIVER_NAME] = "Arrow Flight ODBC Driver";
   info_[SQL_DRIVER_VER] = ConvertToDBMSVer(driver_version);
 
@@ -294,7 +299,8 @@ bool GetInfoCache::LoadInfoFromServer() {
     arrow::Result<std::shared_ptr<FlightInfo>> result =
         sql_client_->GetSqlInfo(call_options_, {});
     ThrowIfNotOK(result.status());
-    FlightStreamChunkBuffer chunk_iter(*sql_client_, call_options_, result.ValueOrDie());
+    FlightStreamChunkBuffer chunk_iter(*sql_client_, client_options_, call_options_,
+                                       result.ValueOrDie());
 
     FlightStreamChunk chunk;
     bool supports_correlation_name = false;

@@ -983,6 +983,39 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
   });
 }
 
+SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
+                           SQLLEN fetchOffset, SQLULEN* rowCountPtr,
+                           SQLUSMALLINT* rowStatusArray) {
+  // GH-47110: SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for certain diag
+  // states
+  LOG_DEBUG(
+      "SQLExtendedFetch called with stmt: {}, fetchOrientation: {}, fetchOffset: {}, "
+      "rowCountPtr: {}, rowStatusArray: {}",
+      stmt, fetchOrientation, fetchOffset, fmt::ptr(rowCountPtr),
+      fmt::ptr(rowStatusArray));
+  using ODBC::ODBCDescriptor;
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    if (fetchOrientation != SQL_FETCH_NEXT) {
+      throw DriverException("Optional feature not supported.", "HYC00");
+    }
+    // fetchOffset is ignored as only SQL_FETCH_NEXT is supported
+
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    // The SQL_ROWSET_SIZE statement attribute specifies the number of rows in the
+    // rowset.
+    SQLULEN rowSetSize = statement->GetRowsetSize();
+    LOG_DEBUG("SQL_ROWSET_SIZE value for SQLExtendedFetch: {}", rowSetSize);
+    if (statement->Fetch(static_cast<size_t>(rowSetSize), rowCountPtr, rowStatusArray)) {
+      return SQL_SUCCESS;
+    } else {
+      // Reached the end of rowset
+      return SQL_NO_DATA;
+    }
+  });
+}
+
 SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT fetchOrientation,
                          SQLLEN fetchOffset) {
   LOG_DEBUG("SQLFetchScroll called with stmt: {}, fetchOrientation: {}, fetchOffset: {}",
