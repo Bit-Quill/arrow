@@ -46,6 +46,5 @@ add_arrow_test(flight_sql_odbc_test
                ${ODBC_LIBRARIES}
                ${ODBCINST}
                ${SQLite3_LIBRARIES}
-               arrow_flight_testing_shared
                arrow_odbc_spi_impl
                odbcabstraction)
