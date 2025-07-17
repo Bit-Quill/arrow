@@ -127,6 +127,8 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   void CreateTestTables();
   /// \brief run a SQL query to create a table with all data types
   void CreateTableAllDataType();
+  /// \brief run a SQL query to create a table with unicode name
+  void CreateUnicodeTable();
 
   int port;
 
@@ -195,6 +197,12 @@ bool writeDSN(Connection::ConnPropertyMap properties);
 /// \param[in] colId Column ID to check.
 /// \param[in] value Expected value.
 void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& value);
+
+/// \brief Check wide string column.
+/// \param[in] stmt Statement.
+/// \param[in] colId Column ID to check.
+/// \param[in] value Expected value.
+void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& value);
 
 /// \brief Check int column.
 /// \param[in] stmt Statement.

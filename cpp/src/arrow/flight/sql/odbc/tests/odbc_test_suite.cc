@@ -308,6 +308,21 @@ void FlightSQLODBCMockTestBase::CreateTableAllDataType() {
   )"));
 }
 
+void FlightSQLODBCMockTestBase::CreateUnicodeTable() {
+  std::string unicodeSql = arrow::util::WideStringToUTF8(
+                               LR"(
+    CREATE TABLE 数据(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    资料 varchar(100));
+
+    INSERT INTO 数据 (资料) VALUES ('第一行');
+    INSERT INTO 数据 (资料) VALUES ('二行');
+    INSERT INTO 数据 (资料) VALUES ('3rd Row');
+  )")
+                               .ValueOr("");
+  ASSERT_OK(server->ExecuteSql(unicodeSql));
+}
+
 void FlightSQLODBCMockTestBase::SetUp() {
   ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
   arrow::flight::FlightServerOptions options(location);
@@ -421,6 +436,23 @@ void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& value) {
     EXPECT_TRUE(value.empty());
   else
     EXPECT_EQ(std::string(buf, static_cast<size_t>(bufLen)), value);
+}
+
+void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& value) {
+  SQLWCHAR buf[1024];
+  SQLLEN bufLen = sizeof(buf) * ODBC::GetSqlWCharSize();
+
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, sizeof(buf), &bufLen);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- temp
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
+  }
+
+  if (bufLen <= 0)
+    EXPECT_TRUE(value.empty());
+  else
+    EXPECT_EQ(std::wstring(buf), value);
 }
 
 void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& value) {

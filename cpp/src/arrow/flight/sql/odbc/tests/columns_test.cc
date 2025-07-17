@@ -258,4 +258,61 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
   this->disconnect();
 }
 
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsUnicode) {
+  // Limitation: Mock server returns incorrect values for column size for some columns.
+  // For character and binary type columns, the driver calculates buffer length and char
+  // octet length from column size.
+  this->connect();
+  this->CreateUnicodeTable();
+
+  // Attempt to get all columns
+  SQLWCHAR tablePattern[] = L"数据";
+  SQLWCHAR columnPattern[] = L"%";
+
+  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, tablePattern,
+                             SQL_NTS, columnPattern, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Skip the check for 1st column in unicode table 数据
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::string empty = std::string("");
+
+  // Check SQLColumn data for 2nd column in AllTypesTable
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  CheckStringColumn(this->stmt, 1, std::string("main"));           // catalog
+  CheckStringColumn(this->stmt, 2, empty);                         // schema
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"数据"));        // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"资料"));         // column name
+
+  CheckIntColumn(this->stmt, 5, SQL_WVARCHAR);  // data type
+
+  CheckStringColumn(this->stmt, 6, std::string("WVARCHAR"));  // type name
+
+  // mock limitation: SQLite mock server returns 0 for varchar(100) column size when spec
+  // indicates should be 100.
+  CheckIntColumn(this->stmt, 7, 0);  // column size
+  CheckIntColumn(this->stmt, 8, 0);  // buffer length
+
+  CheckSmallIntColumn(this->stmt, 9, 15);  // decimal digits
+  CheckSmallIntColumn(this->stmt, 10, 0);  // num prec radix
+  CheckSmallIntColumn(this->stmt, 11,
+                      SQL_NULLABLE);  // nullable
+
+  CheckStringColumn(this->stmt, 12, empty);  // remarks
+  CheckStringColumn(this->stmt, 13, empty);  // column def
+
+  CheckSmallIntColumn(this->stmt, 14, SQL_WVARCHAR);  // sql data type  not NULL
+  CheckSmallIntColumn(this->stmt, 15, NULL);          // sql date type sub
+  CheckIntColumn(this->stmt, 16, 0);                  // char octet length
+  CheckIntColumn(this->stmt, 17, 2);                  // oridinal position
+
+  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+
+  this->disconnect();
+}
 }  // namespace arrow::flight::sql::odbc
