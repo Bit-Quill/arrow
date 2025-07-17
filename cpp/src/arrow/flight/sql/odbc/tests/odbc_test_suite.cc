@@ -384,4 +384,49 @@ bool writeDSN(Connection::ConnPropertyMap properties) {
   return RegisterDsn(config, wDriver.c_str());
 }
 
+void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& value) {
+  char buf[1024];
+  SQLLEN bufLen = sizeof(buf);
+
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- temp
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
+  }
+
+  if (bufLen <= 0)
+    EXPECT_TRUE(value.empty());
+  else
+    EXPECT_EQ(std::string(buf, static_cast<size_t>(bufLen)), value);
+}
+
+void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& value) {
+  SQLINTEGER buf;
+  SQLLEN bufLen = sizeof(buf);
+
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_LONG, &buf, sizeof(buf), &bufLen);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- temp
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
+  }
+
+  EXPECT_EQ(buf, value);
+}
+
+void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& value) {
+  SQLSMALLINT buf;
+  SQLLEN bufLen = sizeof(buf);
+
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_SSHORT, &buf, sizeof(buf), &bufLen);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- temp
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
+  }
+
+  EXPECT_EQ(buf, value);
+}
+
 }  // namespace arrow::flight::sql::odbc

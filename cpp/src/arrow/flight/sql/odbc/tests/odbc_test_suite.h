@@ -187,4 +187,22 @@ bool writeDSN(std::string connection_str);
 /// \param[in] properties map.
 /// \return true on success
 bool writeDSN(Connection::ConnPropertyMap properties);
+
+/// \brief Check string column.
+/// \param[in] stmt Statement.
+/// \param[in] colId Column ID to check.
+/// \param[in] value Expected value.
+void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& value);
+
+/// \brief Check int column.
+/// \param[in] stmt Statement.
+/// \param[in] colId Column ID to check.
+/// \param[in] value Expected value.
+void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& value);
+
+/// \brief Check smallint column.
+/// \param[in] stmt Statement.
+/// \param[in] colId Column ID to check.
+/// \param[in] value Expected value.
+void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& value);
 }  // namespace arrow::flight::sql::odbc
