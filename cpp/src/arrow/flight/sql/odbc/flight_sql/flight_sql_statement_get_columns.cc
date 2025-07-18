@@ -83,7 +83,6 @@ Result<std::shared_ptr<RecordBatch>> Transform_inner(
     const std::shared_ptr<RecordBatch>& original,
     const optional<std::string>& column_name_pattern,
     const MetadataSettings& metadata_settings) {
-  //-AL- this is where SQLColumn items are retrieved
   GetColumns_RecordBatchBuilder builder(odbc_version);
   GetColumns_RecordBatchBuilder::Data data;
 

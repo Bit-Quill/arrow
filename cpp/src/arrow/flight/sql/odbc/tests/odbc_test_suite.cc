@@ -427,10 +427,6 @@ void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& value) {
 
   SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
-  }
 
   if (bufLen <= 0)
     EXPECT_TRUE(value.empty());
@@ -444,10 +440,6 @@ void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& value) {
 
   SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, sizeof(buf), &bufLen);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
-  }
 
   if (bufLen <= 0)
     EXPECT_TRUE(value.empty());
@@ -461,10 +453,6 @@ void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& value) {
 
   SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_LONG, &buf, sizeof(buf), &bufLen);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
-  }
 
   EXPECT_EQ(buf, value);
 }
@@ -475,10 +463,6 @@ void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& value) {
 
   SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_SSHORT, &buf, sizeof(buf), &bufLen);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
-  }
 
   EXPECT_EQ(buf, value);
 }

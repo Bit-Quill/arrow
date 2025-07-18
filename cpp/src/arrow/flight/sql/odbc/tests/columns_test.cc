@@ -40,17 +40,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
                              SQL_NTS, columnPattern, SQL_NTS);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
 
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
 
   std::string empty = std::string("");
 
@@ -91,10 +83,6 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   // Check 2nd Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
 
   CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
   CheckStringColumn(this->stmt, 4, std::string("foreignName"));   // column name
@@ -102,10 +90,6 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   // Check 3rd Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
 
   CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
   CheckStringColumn(this->stmt, 4, std::string("value"));         // column name
@@ -113,10 +97,6 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   // Check 4th Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
 
   CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
   CheckStringColumn(this->stmt, 4, std::string("id"));        // column name
@@ -124,10 +104,6 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   // Check 5th Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
 
   CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
   CheckStringColumn(this->stmt, 4, std::string("keyName"));   // column name
@@ -135,10 +111,6 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   // Check 6th Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
 
   CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
   CheckStringColumn(this->stmt, 4, std::string("value"));     // column name
@@ -146,10 +118,6 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   // Check 7th Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
-  if (ret != SQL_SUCCESS) {
-    // -AL- temp
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
-  }
 
   CheckStringColumn(this->stmt, 3, std::string("intTable"));   // table name
   CheckStringColumn(this->stmt, 4, std::string("foreignId"));  // column name
