@@ -1113,36 +1113,6 @@ SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
   });
 }
 
-SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLength,
-                    SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
-                    SQLWCHAR* tableName, SQLSMALLINT tableNameLength, SQLWCHAR* tableType,
-                    SQLSMALLINT tableTypeLength) {
-  LOG_DEBUG(
-      "SQLTables called with stmt: {}, catalogName: {}, catalogNameLength: "
-      "{}, "
-      "schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}, "
-      "tableType: {}, "
-      "tableTypeLength: {}",
-      stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
-      schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(tableType),
-      tableTypeLength);
-  using namespace ODBC;
-
-  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
-    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
-
-    std::string catalog = SqlWcharToString(catalogName, catalogNameLength);
-    std::string schema = SqlWcharToString(schemaName, schemaNameLength);
-    std::string table = SqlWcharToString(tableName, tableNameLength);
-    std::string type = SqlWcharToString(tableType, tableTypeLength);
-
-    statement->GetTables(catalogName ? &catalog : nullptr, schemaName ? &schema : nullptr,
-                         tableName ? &table : nullptr, tableType ? &type : nullptr);
-
-    return SQL_SUCCESS;
-  });
-}
-
 SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLength,
                      SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
                      SQLWCHAR* tableName, SQLSMALLINT tableNameLength,
@@ -1175,5 +1145,4 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNa
     return SQL_SUCCESS;
   });
 }
-
 }  // namespace arrow

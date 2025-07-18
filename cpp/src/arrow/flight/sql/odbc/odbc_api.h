@@ -79,10 +79,6 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
 SQLRETURN SQLMoreResults(SQLHSTMT stmt);
 SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr);
 SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr);
-SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLength,
-                    SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
-                    SQLWCHAR* tableName, SQLSMALLINT tableNameLength, SQLWCHAR* tableType,
-                    SQLSMALLINT tableTypeLength);
 SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLength,
                      SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
                      SQLWCHAR* tableName, SQLSMALLINT tableNameLength,

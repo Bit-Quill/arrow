@@ -288,7 +288,14 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
                             SQLSMALLINT schemaNameLength, SQLWCHAR* tableName,
                             SQLSMALLINT tableNameLength, SQLWCHAR* tableType,
                             SQLSMALLINT tableTypeLength) {
-  return arrow::SQLTables(stmt, catalogName, catalogNameLength, schemaName,
-                          schemaNameLength, tableName, tableNameLength, tableType,
-                          tableTypeLength);
+  LOG_DEBUG(
+      "SQLTablesW called with stmt: {}, catalogName: {}, catalogNameLength: "
+      "{}, "
+      "schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}, "
+      "tableType: {}, "
+      "tableTypeLength: {}",
+      stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
+      schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(tableType),
+      tableTypeLength);
+  return SQL_ERROR;
 }
