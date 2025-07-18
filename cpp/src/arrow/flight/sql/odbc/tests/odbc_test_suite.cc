@@ -273,6 +273,19 @@ std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
   return wsql;
 }
 
+void FlightSQLODBCMockTestBase::CreateTestTables() {
+  ASSERT_OK(server->ExecuteSql(R"(
+    CREATE TABLE TestTable (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    keyName varchar(100),
+    value int);
+
+    INSERT INTO TestTable (keyName, value) VALUES ('One', 1);
+    INSERT INTO TestTable (keyName, value) VALUES ('Two', 0);
+    INSERT INTO TestTable (keyName, value) VALUES ('Three', -1);
+  )"));
+}
+
 void FlightSQLODBCMockTestBase::SetUp() {
   ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
   arrow::flight::FlightServerOptions options(location);

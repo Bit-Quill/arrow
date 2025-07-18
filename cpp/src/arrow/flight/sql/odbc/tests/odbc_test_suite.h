@@ -124,6 +124,8 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   /// \brief Return a SQL query that selects all data types
   std::wstring getQueryAllDataTypes() override;
 
+  void CreateTestTables();
+
   int port;
 
  protected:
