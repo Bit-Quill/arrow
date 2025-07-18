@@ -28,22 +28,8 @@
 
 namespace arrow::flight::sql::odbc {
 
-// -AL- TODO: work on fetching all columns. The plan is to use this test as example,
-// -AL- next TODO: create table that supports all SQLite data types,
-// and change table pattern to match that one table. Use a new test to verify all types.
-
-//  if (boost::iequals(sqlite_type, "int") || boost::iequals(sqlite_type, "integer")) {
-//  return int64();
-//} else if (boost::iequals(sqlite_type, "REAL")) {
-//  return float64();
-//} else if (boost::iequals(sqlite_type, "BLOB")) {
-//  return binary();
-//} else if (boost::iequals(sqlite_type, "TEXT") || boost::iequals(sqlite_type, "DATE") ||
-//           boost::istarts_with(sqlite_type, "char") ||
-//           boost::istarts_with(sqlite_type, "varchar")) {
-//  return utf8();
-//}
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColumns) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
+  // Check table pattern and column pattern returns all columns
   this->connect();
 
   // Attempt to get all columns
@@ -68,7 +54,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumns) {
 
   std::string empty = std::string("");
 
-  // 18 columns are returned by SQLColumns
+  // 18 columns are returned by SQLColumns, check first column thoroughly
   CheckStringColumn(this->stmt, 1, std::string("main"));          // catalog
   CheckStringColumn(this->stmt, 2, empty);                        // schema
   CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
@@ -101,6 +87,73 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumns) {
                  1);  // oridinal position
 
   CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+
+  // Check 2nd Column, only check table and column name
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- temp
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("foreignName"));   // column name
+
+  // Check 3rd Column, only check table and column name
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- temp
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("value"));         // column name
+
+  // Check 4th Column, only check table and column name
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- temp
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("id"));        // column name
+
+  // Check 5th Column, only check table and column name
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- temp
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("keyName"));   // column name
+
+  // Check 6th Column, only check table and column name
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- temp
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("value"));     // column name
+
+  // Check 7th Column, only check table and column name
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  if (ret != SQL_SUCCESS) {
+    // -AL- temp
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  CheckStringColumn(this->stmt, 3, std::string("intTable"));   // table name
+  CheckStringColumn(this->stmt, 4, std::string("foreignId"));  // column name
+
   this->disconnect();
 }
 
@@ -108,6 +161,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
   // Limitation: Mock server returns incorrect values for column size for some columns.
   // For character and binary type columns, the driver calculates buffer length and char
   // octet length from column size.
+
+  // Checks filtering table with table name pattern
   this->connect();
   this->CreateTableAllDataType();
 
@@ -284,10 +339,10 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsUnicode) {
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 1, std::string("main"));           // catalog
-  CheckStringColumn(this->stmt, 2, empty);                         // schema
-  CheckStringColumnW(this->stmt, 3, std::wstring(L"数据"));        // table name
-  CheckStringColumnW(this->stmt, 4, std::wstring(L"资料"));         // column name
+  CheckStringColumn(this->stmt, 1, std::string("main"));     // catalog
+  CheckStringColumn(this->stmt, 2, empty);                   // schema
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"数据"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"资料"));  // column name
 
   CheckIntColumn(this->stmt, 5, SQL_WVARCHAR);  // data type
 
@@ -315,4 +370,84 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsUnicode) {
 
   this->disconnect();
 }
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsColumnPattern) {
+  // Checks filtering table with column name pattern.
+  // Only check table and column name
+  this->connect();
+
+  SQLWCHAR tablePattern[] = L"%";
+  SQLWCHAR columnPattern[] = L"id";
+
+  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, tablePattern,
+                             SQL_NTS, columnPattern, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Check 1st Column
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::string empty = std::string("");
+
+  CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("id"));            // column name
+
+  // Check 2nd Column
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("id"));        // column name
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsTableColumnPattern) {
+  // Checks filtering table with table and column name pattern.
+  // Only check table and column name
+  this->connect();
+
+  SQLWCHAR tablePattern[] = L"foreignTable";
+  SQLWCHAR columnPattern[] = L"id";
+
+  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, tablePattern,
+                             SQL_NTS, columnPattern, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Check 1st Column
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::string empty = std::string("");
+
+  CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
+  CheckStringColumn(this->stmt, 4, std::string("id"));            // column name
+
+  // There is no more column
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsInvalidTablePattern) {
+  this->connect();
+
+  SQLWCHAR tablePattern[] = L"non-existent-table";
+  SQLWCHAR columnPattern[] = L"%";
+
+  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, tablePattern,
+                             SQL_NTS, columnPattern, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // There is no column from filter
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc
