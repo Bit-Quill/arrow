@@ -134,7 +134,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
   this->connect();
   this->CreateTableAllDataType();
 
-  // Attempt to get all columns
+  // Attempt to get all columns from AllTypesTable
   SQLWCHAR tablePattern[] = L"AllTypesTable";
   SQLWCHAR columnPattern[] = L"%";
 
