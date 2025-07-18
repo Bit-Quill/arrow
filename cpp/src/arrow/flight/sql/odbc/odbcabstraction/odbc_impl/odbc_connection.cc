@@ -20,6 +20,7 @@
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
 
+#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/configuration.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_descriptor.h"
@@ -58,47 +59,13 @@ const boost::xpressive::sregex CONNECTION_STR_REGEX(
 // entries in the properties.
 void loadPropertiesFromDSN(const std::string& dsn,
                            Connection::ConnPropertyMap& properties) {
-  const size_t BUFFER_SIZE = 1024 * 10;
-  std::vector<wchar_t> outputBuffer;
-  outputBuffer.resize(BUFFER_SIZE, '\0');
-  SQLSetConfigMode(ODBC_BOTH_DSN);
-
-  std::wstring wDsn = arrow::util::UTF8ToWideString(dsn).ValueOr(L"");
-
-  SQLGetPrivateProfileString(wDsn.c_str(), NULL, L"", &outputBuffer[0], BUFFER_SIZE,
-                             L"odbc.ini");
-
-  // The output buffer holds the list of keys in a series of NUL-terminated strings.
-  // The series is terminated with an empty string (eg a NUL-terminator terminating the
-  // last key followed by a NUL terminator after).
-  std::vector<std::wstring_view> keys;
-  size_t pos = 0;
-  while (pos < BUFFER_SIZE) {
-    std::wstring wKey(&outputBuffer[pos]);
-    if (wKey.empty()) {
-      break;
-    }
-    size_t len = wKey.size();
-
-    // Skip over Driver or DSN keys.
-    if (!boost::iequals(wKey, L"DSN") && !boost::iequals(wKey, L"Driver")) {
-      keys.emplace_back(std::move(wKey));
-    }
-    pos += len + 1;
-  }
-
-  for (auto& wKey : keys) {
-    outputBuffer.clear();
-    outputBuffer.resize(BUFFER_SIZE, '\0');
-    SQLGetPrivateProfileString(wDsn.c_str(), wKey.data(), L"", &outputBuffer[0],
-                               BUFFER_SIZE, L"odbc.ini");
-
-    std::wstring wValue = std::wstring(&outputBuffer[0]);
-    std::string value = arrow::util::WideStringToUTF8(wValue).ValueOr("");
-    std::string key = arrow::util::WideStringToUTF8(std::wstring(wKey)).ValueOr("");
+  driver::flight_sql::config::Configuration config;
+  config.LoadDsn(dsn);
+  Connection::ConnPropertyMap dsnProperties = config.GetProperties();
+  for (const auto& [key, value] : dsnProperties) {
     auto propIter = properties.find(key);
     if (propIter == properties.end()) {
-      properties.emplace(std::make_pair(std::move(key), std::move(value)));
+      properties.emplace(std::make_pair(key, value));
     }
   }
 }
