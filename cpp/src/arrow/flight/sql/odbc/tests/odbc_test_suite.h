@@ -194,24 +194,24 @@ bool writeDSN(Connection::ConnPropertyMap properties);
 /// \brief Check string column.
 /// \param[in] stmt Statement.
 /// \param[in] colId Column ID to check.
-/// \param[in] value Expected value.
-void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& value);
+/// \param[in] expected Expected value.
+void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& expected);
 
 /// \brief Check wide string column.
 /// \param[in] stmt Statement.
 /// \param[in] colId Column ID to check.
-/// \param[in] value Expected value.
-void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& value);
+/// \param[in] expected Expected value.
+void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected);
 
 /// \brief Check int column.
 /// \param[in] stmt Statement.
 /// \param[in] colId Column ID to check.
-/// \param[in] value Expected value.
-void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& value);
+/// \param[in] expected Expected value.
+void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& expected);
 
 /// \brief Check smallint column.
 /// \param[in] stmt Statement.
 /// \param[in] colId Column ID to check.
-/// \param[in] value Expected value.
-void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& value);
+/// \param[in] expected Expected value.
+void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& expected);
 }  // namespace arrow::flight::sql::odbc

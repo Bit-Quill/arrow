@@ -408,7 +408,7 @@ bool writeDSN(Connection::ConnPropertyMap properties) {
   return RegisterDsn(config, wDriver.c_str());
 }
 
-void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& value) {
+void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& expected) {
   char buf[1024];
   SQLLEN bufLen = sizeof(buf);
 
@@ -416,42 +416,55 @@ void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& value) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   if (bufLen <= 0)
-    EXPECT_TRUE(value.empty());
+    EXPECT_TRUE(expected.empty());
   else
-    EXPECT_EQ(std::string(buf, static_cast<size_t>(bufLen)), value);
+    EXPECT_EQ(std::string(buf, static_cast<size_t>(bufLen)), expected);
 }
 
-void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& value) {
+void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected) {
   SQLWCHAR buf[1024];
-  SQLLEN bufLen = sizeof(buf) * ODBC::GetSqlWCharSize();
+  SQLLEN bufLen = sizeof(buf);
 
-  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, sizeof(buf), &bufLen);
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
+
   EXPECT_EQ(ret, SQL_SUCCESS);
+  // TODO REMOVE -AL-
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
+  }
 
-  if (bufLen <= 0)
-    EXPECT_TRUE(value.empty());
-  else
-    EXPECT_EQ(std::wstring(buf), value);
+  if (bufLen > 0) {
+    // returned bufLen is in bytes so convert to length in characters
+    size_t charCount = static_cast<size_t>(bufLen) / ODBC::GetSqlWCharSize();
+    std::wstring returned(buf, buf + charCount);
+
+    std::wcerr << L"Comparing returned string:'" << returned << L"' to expected string:"
+               << expected << std::endl;
+
+    EXPECT_EQ(returned, expected);
+  } else {
+    EXPECT_TRUE(expected.empty());
+  }
 }
 
-void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& value) {
+void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& expected) {
   SQLINTEGER buf;
   SQLLEN bufLen = sizeof(buf);
 
   SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_LONG, &buf, sizeof(buf), &bufLen);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  EXPECT_EQ(buf, value);
+  EXPECT_EQ(buf, expected);
 }
 
-void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& value) {
+void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& expected) {
   SQLSMALLINT buf;
   SQLLEN bufLen = sizeof(buf);
 
   SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_SSHORT, &buf, sizeof(buf), &bufLen);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  EXPECT_EQ(buf, value);
+  EXPECT_EQ(buf, expected);
 }
 
 }  // namespace arrow::flight::sql::odbc
