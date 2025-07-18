@@ -361,6 +361,79 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnectDsn) {
+  // ODBC Environment
+  SQLHENV env;
+  SQLHDBC conn;
+
+  // Allocate an environment handle
+  SQLRETURN ret = SQLAllocEnv(&env);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Allocate a connection using alloc handle
+  ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Connect string
+  std::string connect_str = this->getConnectionString();
+
+  // Write connection string content into a DSN,
+  // must succeed before continuing
+  ASSERT_TRUE(writeDSN(connect_str));
+
+  std::string dsn(TEST_DSN);
+  ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
+
+  // Update connection string to use DSN to connect
+  connect_str = std::string("DSN=") + std::string(TEST_DSN) +
+                std::string(";driver={Apache Arrow Flight SQL ODBC Driver};");
+  ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
+                       arrow::util::UTF8ToWideString(connect_str));
+  std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE] = L"";
+  SQLSMALLINT outstrlen;
+
+  // Connecting to ODBC server.
+  ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
+                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
+                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
+  }
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Remove DSN
+  EXPECT_TRUE(UnregisterDsn(wdsn));
+
+  // Disconnect from ODBC
+  ret = SQLDisconnect(conn);
+
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
+  }
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Free connection handle
+  ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Free environment handle
+  ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+}
+
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
   // ODBC Environment
   SQLHENV env;
