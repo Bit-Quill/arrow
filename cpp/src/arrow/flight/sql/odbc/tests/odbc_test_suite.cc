@@ -423,6 +423,30 @@ void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& expected) {
 
 void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected) {
   SQLWCHAR buf[1024];
+  SQLLEN bufLen = sizeof(buf) * ODBC::GetSqlWCharSize();
+
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // TODO REMOVE -AL-
+  if (ret != SQL_SUCCESS) {
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
+  }
+
+  EXPECT_GT(bufLen, 0);
+
+  // returned bufLen is in bytes so convert to length in characters
+  size_t charCount = static_cast<size_t>(bufLen) / ODBC::GetSqlWCharSize();
+  std::wstring returned(buf, buf + charCount);
+
+  std::wcerr << L"Comparing returned string:'" << returned << L"' to expected string:"
+             << expected << std::endl;
+
+  EXPECT_EQ(returned, expected);
+}
+
+void CheckNullColumnW(SQLHSTMT stmt, int colId) {
+  SQLWCHAR buf[1024];
   SQLLEN bufLen = sizeof(buf);
 
   SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
@@ -433,18 +457,7 @@ void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected) 
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
   }
 
-  if (bufLen > 0) {
-    // returned bufLen is in bytes so convert to length in characters
-    size_t charCount = static_cast<size_t>(bufLen) / ODBC::GetSqlWCharSize();
-    std::wstring returned(buf, buf + charCount);
-
-    std::wcerr << L"Comparing returned string:'" << returned << L"' to expected string:"
-               << expected << std::endl;
-
-    EXPECT_EQ(returned, expected);
-  } else {
-    EXPECT_TRUE(expected.empty());
-  }
+  EXPECT_EQ(bufLen, SQL_NULL_DATA);
 }
 
 void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& expected) {

@@ -44,17 +44,17 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  std::string empty = std::string("");
+  std::wstring empty = std::wstring(L"");
 
   // 18 columns are returned by SQLColumns, check first column thoroughly
-  CheckStringColumn(this->stmt, 1, std::string("main"));          // catalog
-  CheckStringColumn(this->stmt, 2, empty);                        // schema
-  CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("id"));            // column name
+  CheckStringColumnW(this->stmt, 1, std::wstring(L"main"));          // catalog
+  CheckNullColumnW(this->stmt, 2);                                // schema
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"foreignTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"id"));            // column name
 
   CheckIntColumn(this->stmt, 5, SQL_BIGINT);  // data type
 
-  CheckStringColumn(this->stmt, 6, std::string("BIGINT"));  // type name
+  CheckStringColumnW(this->stmt, 6, std::wstring(L"BIGINT"));  // type name
 
   // mock limitation: SQLite mock server returns 10 for bigint size when spec indicates
   // should be 19
@@ -69,8 +69,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   CheckSmallIntColumn(this->stmt, 11,
                       SQL_NULLABLE);  // nullable
 
-  CheckStringColumn(this->stmt, 12, empty);  // remarks
-  CheckStringColumn(this->stmt, 13, empty);  // column def
+  CheckNullColumnW(this->stmt, 12);            // remarks
+  CheckNullColumnW(this->stmt, 13);  // column def
 
   CheckSmallIntColumn(this->stmt, 14, SQL_BIGINT);  // sql data type  not NULL
   CheckSmallIntColumn(this->stmt, 15, NULL);        // sql date type sub
@@ -78,49 +78,49 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   CheckIntColumn(this->stmt, 17,
                  1);  // oridinal position
 
-  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+  CheckStringColumnW(this->stmt, 18, std::wstring(L"YES"));  // is nullable
 
   // Check 2nd Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("foreignName"));   // column name
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"foreignTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"foreignName"));   // column name
 
   // Check 3rd Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("value"));         // column name
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"foreignTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"value"));         // column name
 
   // Check 4th Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("id"));        // column name
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"intTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"id"));        // column name
 
   // Check 5th Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("keyName"));   // column name
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"intTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"keyName"));   // column name
 
   // Check 6th Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("value"));     // column name
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"intTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"value"));     // column name
 
   // Check 7th Column, only check table and column name
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 3, std::string("intTable"));   // table name
-  CheckStringColumn(this->stmt, 4, std::string("foreignId"));  // column name
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"intTable"));   // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"foreignId"));  // column name
 
   this->disconnect();
 }
@@ -147,16 +147,16 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  std::string empty = std::string("");
+  std::wstring empty = std::wstring(L"");
 
-  CheckStringColumn(this->stmt, 1, std::string("main"));           // catalog
-  CheckStringColumn(this->stmt, 2, empty);                         // schema
-  CheckStringColumn(this->stmt, 3, std::string("AllTypesTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("bigint_col"));     // column name
+  CheckStringColumnW(this->stmt, 1, std::wstring(L"main"));           // catalog
+  CheckNullColumnW(this->stmt, 2);                                 // schema
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"AllTypesTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"bigint_col"));     // column name
 
   CheckIntColumn(this->stmt, 5, SQL_BIGINT);  // data type
 
-  CheckStringColumn(this->stmt, 6, std::string("BIGINT"));  // type name
+  CheckStringColumnW(this->stmt, 6, std::wstring(L"BIGINT"));  // type name
 
   // mock limitation: SQLite mock server returns 10 for bigint column size when spec
   // indicates should be 19
@@ -171,28 +171,28 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
   CheckSmallIntColumn(this->stmt, 11,
                       SQL_NULLABLE);  // nullable
 
-  CheckStringColumn(this->stmt, 12, empty);  // remarks
-  CheckStringColumn(this->stmt, 13, empty);  // column def
+  CheckNullColumnW(this->stmt, 12);  // remarks
+  CheckNullColumnW(this->stmt, 13);  // column def
 
   CheckSmallIntColumn(this->stmt, 14, SQL_BIGINT);  // sql data type  not NULL
   CheckSmallIntColumn(this->stmt, 15, NULL);        // sql date type sub
   CheckIntColumn(this->stmt, 16, 8);                // char octet length
   CheckIntColumn(this->stmt, 17, 1);                // oridinal position
 
-  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+  CheckStringColumnW(this->stmt, 18, std::wstring(L"YES"));  // is nullable
 
   // Check SQLColumn data for 2nd column in AllTypesTable
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 1, std::string("main"));           // catalog
-  CheckStringColumn(this->stmt, 2, empty);                         // schema
-  CheckStringColumn(this->stmt, 3, std::string("AllTypesTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("char_col"));       // column name
+  CheckStringColumnW(this->stmt, 1, std::wstring(L"main"));           // catalog
+  CheckNullColumnW(this->stmt, 2);                                 // schema
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"AllTypesTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"char_col"));       // column name
 
   CheckIntColumn(this->stmt, 5, SQL_WVARCHAR);  // data type
 
-  CheckStringColumn(this->stmt, 6, std::string("WVARCHAR"));  // type name
+  CheckStringColumnW(this->stmt, 6, std::wstring(L"WVARCHAR"));  // type name
 
   // mock limitation: SQLite mock server returns 0 for varchar(100) column size when spec
   // indicates should be 100.
@@ -204,28 +204,28 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
   CheckSmallIntColumn(this->stmt, 11,
                       SQL_NULLABLE);  // nullable
 
-  CheckStringColumn(this->stmt, 12, empty);  // remarks
-  CheckStringColumn(this->stmt, 13, empty);  // column def
+  CheckNullColumnW(this->stmt, 12);  // remarks
+  CheckNullColumnW(this->stmt, 13);  // column def
 
   CheckSmallIntColumn(this->stmt, 14, SQL_WVARCHAR);  // sql data type  not NULL
   CheckSmallIntColumn(this->stmt, 15, NULL);          // sql date type sub
   CheckIntColumn(this->stmt, 16, 0);                  // char octet length
   CheckIntColumn(this->stmt, 17, 2);                  // oridinal position
 
-  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+  CheckStringColumnW(this->stmt, 18, std::wstring(L"YES"));  // is nullable
 
   // Check SQLColumn data for 3rd column in AllTypesTable
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 1, std::string("main"));           // catalog
-  CheckStringColumn(this->stmt, 2, empty);                         // schema
-  CheckStringColumn(this->stmt, 3, std::string("AllTypesTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("varbinary_col"));  // column name
+  CheckStringColumnW(this->stmt, 1, std::wstring(L"main"));           // catalog
+  CheckNullColumnW(this->stmt, 2);                                 // schema
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"AllTypesTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"varbinary_col"));  // column name
 
   CheckIntColumn(this->stmt, 5, SQL_BINARY);  // data type
 
-  CheckStringColumn(this->stmt, 6, std::string("BINARY"));  // type name
+  CheckStringColumnW(this->stmt, 6, std::wstring(L"BINARY"));  // type name
 
   // mock limitation: SQLite mock server returns 0 for BLOB column size when spec
   // indicates should be binary data limit.
@@ -237,28 +237,28 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
   CheckSmallIntColumn(this->stmt, 11,
                       SQL_NULLABLE);  // nullable
 
-  CheckStringColumn(this->stmt, 12, empty);  // remarks
-  CheckStringColumn(this->stmt, 13, empty);  // column def
+  CheckNullColumnW(this->stmt, 12);  // remarks
+  CheckNullColumnW(this->stmt, 13);  // column def
 
   CheckSmallIntColumn(this->stmt, 14, SQL_BINARY);  // sql data type  not NULL
   CheckSmallIntColumn(this->stmt, 15, NULL);        // sql date type sub
   CheckIntColumn(this->stmt, 16, 0);                // char octet length
   CheckIntColumn(this->stmt, 17, 3);                // oridinal position
 
-  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+  CheckStringColumnW(this->stmt, 18, std::wstring(L"YES"));  // is nullable
 
   // Check SQLColumn data for 4th column in AllTypesTable
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 1, std::string("main"));           // catalog
-  CheckStringColumn(this->stmt, 2, empty);                         // schema
-  CheckStringColumn(this->stmt, 3, std::string("AllTypesTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("double_col"));     // column name
+  CheckStringColumnW(this->stmt, 1, std::wstring(L"main"));           // catalog
+  CheckNullColumnW(this->stmt, 2);                                 // schema
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"AllTypesTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"double_col"));     // column name
 
   CheckIntColumn(this->stmt, 5, SQL_DOUBLE);  // data type
 
-  CheckStringColumn(this->stmt, 6, std::string("DOUBLE"));  // type name
+  CheckStringColumnW(this->stmt, 6, std::wstring(L"DOUBLE"));  // type name
 
   CheckIntColumn(this->stmt, 7, 15);  // column size
   CheckIntColumn(this->stmt, 8, 8);   // buffer length
@@ -268,15 +268,15 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
   CheckSmallIntColumn(this->stmt, 11,
                       SQL_NULLABLE);  // nullable
 
-  CheckStringColumn(this->stmt, 12, empty);  // remarks
-  CheckStringColumn(this->stmt, 13, empty);  // column def
+  CheckNullColumnW(this->stmt, 12);  // remarks
+  CheckNullColumnW(this->stmt, 13);  // column def
 
   CheckSmallIntColumn(this->stmt, 14, SQL_DOUBLE);  // sql data type  not NULL
   CheckSmallIntColumn(this->stmt, 15, NULL);        // sql date type sub
   CheckIntColumn(this->stmt, 16, 8);                // char octet length
   CheckIntColumn(this->stmt, 17, 4);                // oridinal position
 
-  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+  CheckStringColumnW(this->stmt, 18, std::wstring(L"YES"));  // is nullable
 
   this->disconnect();
 }
@@ -301,20 +301,20 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsUnicode) {
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  std::string empty = std::string("");
+  std::wstring empty = std::wstring(L"");
 
   // Check SQLColumn data for 2nd column in AllTypesTable
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 1, std::string("main"));     // catalog
-  CheckStringColumn(this->stmt, 2, empty);                   // schema
+  CheckStringColumnW(this->stmt, 1, std::wstring(L"main"));     // catalog
+  CheckNullColumnW(this->stmt, 2);                           // schema
   CheckStringColumnW(this->stmt, 3, std::wstring(L"数据"));  // table name
   CheckStringColumnW(this->stmt, 4, std::wstring(L"资料"));  // column name
 
   CheckIntColumn(this->stmt, 5, SQL_WVARCHAR);  // data type
 
-  CheckStringColumn(this->stmt, 6, std::string("WVARCHAR"));  // type name
+  CheckStringColumnW(this->stmt, 6, std::wstring(L"WVARCHAR"));  // type name
 
   // mock limitation: SQLite mock server returns 0 for varchar(100) column size when spec
   // indicates should be 100.
@@ -326,15 +326,15 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsUnicode) {
   CheckSmallIntColumn(this->stmt, 11,
                       SQL_NULLABLE);  // nullable
 
-  CheckStringColumn(this->stmt, 12, empty);  // remarks
-  CheckStringColumn(this->stmt, 13, empty);  // column def
+  CheckNullColumnW(this->stmt, 12);  // remarks
+  CheckNullColumnW(this->stmt, 13);  // column def
 
   CheckSmallIntColumn(this->stmt, 14, SQL_WVARCHAR);  // sql data type  not NULL
   CheckSmallIntColumn(this->stmt, 15, NULL);          // sql date type sub
   CheckIntColumn(this->stmt, 16, 0);                  // char octet length
   CheckIntColumn(this->stmt, 17, 2);                  // oridinal position
 
-  CheckStringColumn(this->stmt, 18, std::string("YES"));  // is nullable
+  CheckStringColumnW(this->stmt, 18, std::wstring(L"YES"));  // is nullable
 
   this->disconnect();
 }
@@ -356,17 +356,17 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsColumnPattern) {
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  std::string empty = std::string("");
+  std::wstring empty = std::wstring(L"");
 
-  CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("id"));            // column name
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"foreignTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"id"));            // column name
 
   // Check 2nd Column
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  CheckStringColumn(this->stmt, 3, std::string("intTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("id"));        // column name
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"intTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"id"));        // column name
 
   this->disconnect();
 }
@@ -388,10 +388,10 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsTableColumnPattern) {
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  std::string empty = std::string("");
+  std::wstring empty = std::wstring(L"");
 
-  CheckStringColumn(this->stmt, 3, std::string("foreignTable"));  // table name
-  CheckStringColumn(this->stmt, 4, std::string("id"));            // column name
+  CheckStringColumnW(this->stmt, 3, std::wstring(L"foreignTable"));  // table name
+  CheckStringColumnW(this->stmt, 4, std::wstring(L"id"));            // column name
 
   // There is no more column
   ret = SQLFetch(this->stmt);

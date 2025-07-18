@@ -203,6 +203,11 @@ void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& expected);
 /// \param[in] expected Expected value.
 void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected);
 
+/// \brief Check wide string column value is null.
+/// \param[in] stmt Statement.
+/// \param[in] colId Column ID to check.
+void CheckNullColumnW(SQLHSTMT stmt, int colId);
+
 /// \brief Check int column.
 /// \param[in] stmt Statement.
 /// \param[in] colId Column ID to check.
