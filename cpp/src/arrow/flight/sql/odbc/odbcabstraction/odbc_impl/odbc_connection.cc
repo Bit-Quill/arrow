@@ -62,10 +62,10 @@ void loadPropertiesFromDSN(const std::string& dsn,
   driver::flight_sql::config::Configuration config;
   config.LoadDsn(dsn);
   Connection::ConnPropertyMap dsnProperties = config.GetProperties();
-  for (const auto& [key, value] : dsnProperties) {
+  for (auto& [key, value] : dsnProperties) {
     auto propIter = properties.find(key);
     if (propIter == properties.end()) {
-      properties.emplace(std::make_pair(key, value));
+      properties.emplace(std::make_pair(std::move(key), std::move(value)));
     }
   }
 }
