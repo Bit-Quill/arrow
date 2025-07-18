@@ -191,12 +191,6 @@ bool writeDSN(std::string connection_str);
 /// \return true on success
 bool writeDSN(Connection::ConnPropertyMap properties);
 
-/// \brief Check string column.
-/// \param[in] stmt Statement.
-/// \param[in] colId Column ID to check.
-/// \param[in] expected Expected value.
-void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& expected);
-
 /// \brief Check wide string column.
 /// \param[in] stmt Statement.
 /// \param[in] colId Column ID to check.

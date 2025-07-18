@@ -299,7 +299,6 @@ void FlightSQLODBCMockTestBase::CreateUnicodeTable() {
   std::string unicodeSql = arrow::util::WideStringToUTF8(
                                LR"(
     CREATE TABLE 数据(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
     资料 varchar(100));
 
     INSERT INTO 数据 (资料) VALUES ('第一行');
@@ -408,39 +407,18 @@ bool writeDSN(Connection::ConnPropertyMap properties) {
   return RegisterDsn(config, wDriver.c_str());
 }
 
-void CheckStringColumn(SQLHSTMT stmt, int colId, const std::string& expected) {
-  char buf[1024];
-  SQLLEN bufLen = sizeof(buf);
-
-  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_CHAR, buf, sizeof(buf), &bufLen);
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  if (bufLen <= 0)
-    EXPECT_TRUE(expected.empty());
-  else
-    EXPECT_EQ(std::string(buf, static_cast<size_t>(bufLen)), expected);
-}
-
 void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected) {
   SQLWCHAR buf[1024];
   SQLLEN bufLen = sizeof(buf) * ODBC::GetSqlWCharSize();
 
   SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
-
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // TODO REMOVE -AL-
-  if (ret != SQL_SUCCESS) {
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
-  }
 
   EXPECT_GT(bufLen, 0);
 
   // returned bufLen is in bytes so convert to length in characters
   size_t charCount = static_cast<size_t>(bufLen) / ODBC::GetSqlWCharSize();
   std::wstring returned(buf, buf + charCount);
-
-  std::wcerr << L"Comparing returned string:'" << returned << L"' to expected string:"
-             << expected << std::endl;
 
   EXPECT_EQ(returned, expected);
 }
@@ -450,12 +428,7 @@ void CheckNullColumnW(SQLHSTMT stmt, int colId) {
   SQLLEN bufLen = sizeof(buf);
 
   SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
-
   EXPECT_EQ(ret, SQL_SUCCESS);
-  // TODO REMOVE -AL-
-  if (ret != SQL_SUCCESS) {
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
-  }
 
   EXPECT_EQ(bufLen, SQL_NULL_DATA);
 }
