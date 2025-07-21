@@ -1042,7 +1042,8 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNam
       stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
       schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(tableType),
       tableTypeLength);
-  using namespace ODBC;
+  using ODBC::ODBCStatement;
+  using ODBC::SqlWcharToString;
 
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);

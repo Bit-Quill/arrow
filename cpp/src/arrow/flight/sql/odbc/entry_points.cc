@@ -185,6 +185,16 @@ SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNumber,
   return SQL_ERROR;
 }
 
+SQLRETURN SQL_API SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
+                            SQLSMALLINT catalogNameLength, SQLWCHAR* schemaName,
+                            SQLSMALLINT schemaNameLength, SQLWCHAR* tableName,
+                            SQLSMALLINT tableNameLength, SQLWCHAR* tableType,
+                            SQLSMALLINT tableTypeLength) {
+  return arrow::SQLTables(stmt, catalogName, catalogNameLength, schemaName,
+                          schemaNameLength, tableName, tableNameLength, tableType,
+                          tableTypeLength);
+}
+
 SQLRETURN SQL_API SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
                              SQLSMALLINT catalogNameLength, SQLWCHAR* schemaName,
                              SQLSMALLINT schemaNameLength, SQLWCHAR* tableName,
@@ -282,12 +292,3 @@ SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER
   return arrow::SQLSetStmtAttr(stmt, attribute, valuePtr, stringLength);
 }
 
-SQLRETURN SQL_API SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
-                            SQLSMALLINT catalogNameLength, SQLWCHAR* schemaName,
-                            SQLSMALLINT schemaNameLength, SQLWCHAR* tableName,
-                            SQLSMALLINT tableNameLength, SQLWCHAR* tableType,
-                            SQLSMALLINT tableTypeLength) {
-  return arrow::SQLTables(stmt, catalogName, catalogNameLength, schemaName,
-                          schemaNameLength, tableName, tableNameLength, tableType,
-                          tableTypeLength);
-}
