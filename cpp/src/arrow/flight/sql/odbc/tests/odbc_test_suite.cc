@@ -27,13 +27,14 @@
 
 namespace arrow::flight::sql::odbc {
 
-void FlightSQLODBCRemoteTestBase::allocEnvConnHandles() {
+void FlightSQLODBCRemoteTestBase::allocEnvConnHandles(SQLINTEGER odbc_ver) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
+  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION,
+                      reinterpret_cast<SQLPOINTER>(static_cast<intptr_t>(odbc_ver)), 0);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -43,8 +44,8 @@ void FlightSQLODBCRemoteTestBase::allocEnvConnHandles() {
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
-void FlightSQLODBCRemoteTestBase::connect() {
-  allocEnvConnHandles();
+void FlightSQLODBCRemoteTestBase::connect(SQLINTEGER odbc_ver) {
+  allocEnvConnHandles(odbc_ver);
   std::string connect_str = getConnectionString();
   connectWithString(connect_str);
 }

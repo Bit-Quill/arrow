@@ -1117,6 +1117,8 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNa
                      SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
                      SQLWCHAR* tableName, SQLSMALLINT tableNameLength,
                      SQLWCHAR* columnName, SQLSMALLINT columnNameLength) {
+  // GH-47159: Return NUM_PREC_RADIX based on whether COLUMN_SIZE contains number of
+  // digits or bits
   LOG_DEBUG(
       "SQLColumnsW called with stmt: {}, catalogName: {}, catalogNameLength: "
       "{}, "
