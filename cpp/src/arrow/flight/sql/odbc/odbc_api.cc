@@ -1112,4 +1112,39 @@ SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
     return SQL_SUCCESS;
   });
 }
+
+SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLength,
+                     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
+                     SQLWCHAR* tableName, SQLSMALLINT tableNameLength,
+                     SQLWCHAR* columnName, SQLSMALLINT columnNameLength) {
+  // GH-47159: Return NUM_PREC_RADIX based on whether COLUMN_SIZE contains number of
+  // digits or bits
+  LOG_DEBUG(
+      "SQLColumnsW called with stmt: {}, catalogName: {}, catalogNameLength: "
+      "{}, "
+      "schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}, "
+      "columnName: {}, "
+      "columnNameLength: {}",
+      stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
+      schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(columnName),
+      columnNameLength);
+
+  using ODBC::ODBCStatement;
+  using ODBC::SqlWcharToString;
+
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    std::string catalog = SqlWcharToString(catalogName, catalogNameLength);
+    std::string schema = SqlWcharToString(schemaName, schemaNameLength);
+    std::string table = SqlWcharToString(tableName, tableNameLength);
+    std::string column = SqlWcharToString(columnName, columnNameLength);
+
+    statement->GetColumns(catalogName ? &catalog : nullptr,
+                          schemaName ? &schema : nullptr, tableName ? &table : nullptr,
+                          columnName ? &column : nullptr);
+
+    return SQL_SUCCESS;
+  });
+}
 }  // namespace arrow

@@ -198,16 +198,9 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
                              SQLSMALLINT schemaNameLength, SQLWCHAR* tableName,
                              SQLSMALLINT tableNameLength, SQLWCHAR* columnName,
                              SQLSMALLINT columnNameLength) {
-  LOG_DEBUG(
-      "SQLColumnsW called with stmt: {}, catalogName: {}, catalogNameLength: "
-      "{}, "
-      "schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}, "
-      "columnName: {}, "
-      "columnNameLength: {}",
-      stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
-      schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(columnName),
-      columnNameLength);
-  return SQL_ERROR;
+  return arrow::SQLColumns(stmt, catalogName, catalogNameLength, schemaName,
+                           schemaNameLength, tableName, tableNameLength, columnName,
+                           columnNameLength);
 }
 
 SQLRETURN SQL_API SQLError(SQLHENV handleType, SQLHDBC handle, SQLHSTMT hstmt,
