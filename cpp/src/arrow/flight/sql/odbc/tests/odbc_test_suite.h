@@ -48,10 +48,11 @@ using driver::odbcabstraction::Connection;
 class FlightSQLODBCRemoteTestBase : public ::testing::Test {
  public:
   /// \brief Allocate environment and connection handles
-  void allocEnvConnHandles();
+  void allocEnvConnHandles(SQLINTEGER odbc_ver = SQL_OV_ODBC3);
   /// \brief Connect to Arrow Flight SQL server using connection string defined in
-  /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN", allocate statement handle
-  void connect();
+  /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN", allocate statement handle.
+  /// Connects using ODBC Ver 3 by default
+  void connect(SQLINTEGER odbc_ver = SQL_OV_ODBC3);
   /// \brief Connect to Arrow Flight SQL server using connection string
   void connectWithString(std::string connection_str);
   /// \brief Disconnect from server
@@ -124,6 +125,11 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   /// \brief Return a SQL query that selects all data types
   std::wstring getQueryAllDataTypes() override;
 
+  /// \brief run a SQL query to create a table with all data types
+  void CreateTableAllDataType();
+  /// \brief run a SQL query to create a table with unicode name
+  void CreateUnicodeTable();
+
   int port;
 
  protected:
@@ -185,4 +191,27 @@ bool writeDSN(std::string connection_str);
 /// \param[in] properties map.
 /// \return true on success
 bool writeDSN(Connection::ConnPropertyMap properties);
+
+/// \brief Check wide string column.
+/// \param[in] stmt Statement.
+/// \param[in] colId Column ID to check.
+/// \param[in] expected Expected value.
+void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected);
+
+/// \brief Check wide string column value is null.
+/// \param[in] stmt Statement.
+/// \param[in] colId Column ID to check.
+void CheckNullColumnW(SQLHSTMT stmt, int colId);
+
+/// \brief Check int column.
+/// \param[in] stmt Statement.
+/// \param[in] colId Column ID to check.
+/// \param[in] expected Expected value.
+void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& expected);
+
+/// \brief Check smallint column.
+/// \param[in] stmt Statement.
+/// \param[in] colId Column ID to check.
+/// \param[in] expected Expected value.
+void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& expected);
 }  // namespace arrow::flight::sql::odbc
