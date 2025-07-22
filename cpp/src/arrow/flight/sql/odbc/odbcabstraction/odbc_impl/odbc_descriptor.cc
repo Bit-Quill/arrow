@@ -311,6 +311,7 @@ void ODBCDescriptor::GetField(SQLSMALLINT recordNumber, SQLSMALLINT fieldIdentif
 
   // TODO: Restrict fields based on AppDescriptor IPD, and IRD.
 
+  //-AL- should also swicth to GetAttributeSQLWCHAR from GetAttributeUTF8
   SQLSMALLINT zeroBasedRecord = recordNumber - 1;
   const DescriptorRecord& record = m_records[zeroBasedRecord];
   switch (fieldIdentifier) {

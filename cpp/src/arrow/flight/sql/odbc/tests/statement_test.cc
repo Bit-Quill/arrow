@@ -30,7 +30,7 @@
 #include "gtest/gtest.h"
 
 namespace arrow::flight::sql::odbc {
-
+// -AL- I could add SQLColAttribute checks in here.
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   this->connect();
 
