@@ -311,53 +311,54 @@ void ODBCDescriptor::GetField(SQLSMALLINT recordNumber, SQLSMALLINT fieldIdentif
 
   // TODO: Restrict fields based on AppDescriptor IPD, and IRD.
 
-  //-AL- should also swicth to GetAttributeSQLWCHAR from GetAttributeUTF8
+  //-AL- I swicthed to GetAttributeSQLWCHAR from GetAttributeUTF8
+  bool lengthInBytes = true;
   SQLSMALLINT zeroBasedRecord = recordNumber - 1;
   const DescriptorRecord& record = m_records[zeroBasedRecord];
   switch (fieldIdentifier) {
     case SQL_DESC_BASE_COLUMN_NAME:
-      GetAttributeUTF8(record.m_baseColumnName, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_baseColumnName, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
     case SQL_DESC_BASE_TABLE_NAME:
-      GetAttributeUTF8(record.m_baseTableName, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_baseTableName, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
     case SQL_DESC_CATALOG_NAME:
-      GetAttributeUTF8(record.m_catalogName, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_catalogName, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
     case SQL_DESC_LABEL:
-      GetAttributeUTF8(record.m_label, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_label, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
     case SQL_DESC_LITERAL_PREFIX:
-      GetAttributeUTF8(record.m_literalPrefix, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_literalPrefix, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
     case SQL_DESC_LITERAL_SUFFIX:
-      GetAttributeUTF8(record.m_literalSuffix, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_literalSuffix, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
     case SQL_DESC_LOCAL_TYPE_NAME:
-      GetAttributeUTF8(record.m_localTypeName, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_localTypeName, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
     case SQL_DESC_NAME:
-      GetAttributeUTF8(record.m_name, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_name, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
     case SQL_DESC_SCHEMA_NAME:
-      GetAttributeUTF8(record.m_schemaName, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_schemaName, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
     case SQL_DESC_TABLE_NAME:
-      GetAttributeUTF8(record.m_tableName, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_tableName, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
     case SQL_DESC_TYPE_NAME:
-      GetAttributeUTF8(record.m_typeName, value, bufferLength, outputLength,
-                       GetDiagnostics());
+      GetAttributeSQLWCHAR(record.m_typeName, lengthInBytes, value, bufferLength,
+                           outputLength, GetDiagnostics());
       break;
 
     case SQL_DESC_DATA_PTR:
