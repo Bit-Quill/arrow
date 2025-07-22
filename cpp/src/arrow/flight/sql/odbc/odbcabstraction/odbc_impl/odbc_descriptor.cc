@@ -275,7 +275,9 @@ void ODBCDescriptor::GetHeaderField(SQLSMALLINT fieldIdentifier, SQLPOINTER valu
       GetAttribute(m_rowsProccessedPtr, value, bufferLength, outputLength);
       break;
     case SQL_DESC_COUNT: {
-      GetAttribute(m_highestOneBasedBoundRecord, value, bufferLength, outputLength);
+      // m_highestOneBasedBoundRecord equals number of records + 1
+      GetAttribute(static_cast<SQLSMALLINT>(m_highestOneBasedBoundRecord - 1), value,
+                   bufferLength, outputLength);
       break;
     }
     default:
@@ -311,7 +313,6 @@ void ODBCDescriptor::GetField(SQLSMALLINT recordNumber, SQLSMALLINT fieldIdentif
 
   // TODO: Restrict fields based on AppDescriptor IPD, and IRD.
 
-  //-AL- I swicthed to GetAttributeSQLWCHAR from GetAttributeUTF8
   bool lengthInBytes = true;
   SQLSMALLINT zeroBasedRecord = recordNumber - 1;
   const DescriptorRecord& record = m_records[zeroBasedRecord];
@@ -502,7 +503,8 @@ void ODBCDescriptor::PopulateFromResultSetMetadata(ResultSetMetadata* rsmd) {
     m_records[i].m_caseSensitive =
         rsmd->IsCaseSensitive(oneBasedIndex) ? SQL_TRUE : SQL_FALSE;
     m_records[i].m_datetimeIntervalPrecision;  // TODO - update when rsmd adds this
-    m_records[i].m_numPrecRadix = rsmd->GetNumPrecRadix(oneBasedIndex);
+    SQLINTEGER numPrecRadix = rsmd->GetNumPrecRadix(oneBasedIndex);
+    m_records[i].m_numPrecRadix = numPrecRadix > 0 ? numPrecRadix : 0;
     m_records[i].m_datetimeIntervalCode;  // TODO
     m_records[i].m_fixedPrecScale =
         rsmd->IsFixedPrecScale(oneBasedIndex) ? SQL_TRUE : SQL_FALSE;
@@ -512,8 +514,7 @@ void ODBCDescriptor::PopulateFromResultSetMetadata(ResultSetMetadata* rsmd) {
     m_records[i].m_rowVer = SQL_FALSE;
     m_records[i].m_scale = rsmd->GetScale(oneBasedIndex);
     m_records[i].m_searchable = rsmd->IsSearchable(oneBasedIndex);
-    m_records[i].m_type =
-        GetSqlTypeForODBCVersion(rsmd->GetDataType(oneBasedIndex), m_is2xConnection);
+    m_records[i].m_type = rsmd->GetDataType(oneBasedIndex);
     m_records[i].m_unnamed = m_records[i].m_name.empty() ? SQL_TRUE : SQL_FALSE;
     m_records[i].m_unsigned = rsmd->IsUnsigned(oneBasedIndex) ? SQL_TRUE : SQL_FALSE;
     m_records[i].m_updatable = rsmd->GetUpdatable(oneBasedIndex);

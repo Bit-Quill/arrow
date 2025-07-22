@@ -1166,26 +1166,49 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
     SQLINTEGER outputLengthInt;
     switch (fieldIdentifier) {
       // Numeric attributes
-      case SQL_DESC_AUTO_UNIQUE_VALUE:
-      case SQL_DESC_CASE_SENSITIVE:
-      case SQL_DESC_CONCISE_TYPE:
-      case SQL_DESC_COUNT:
+      // internal is SQLLEN, no conversion is needed
       case SQL_DESC_DISPLAY_SIZE:
-      case SQL_DESC_FIXED_PREC_SCALE:
-      case SQL_DESC_LENGTH:
-      case SQL_DESC_NULLABLE:
-      case SQL_DESC_NUM_PREC_RADIX:
-      case SQL_DESC_OCTET_LENGTH:
-      case SQL_DESC_PRECISION:
-      case SQL_DESC_SCALE:
-      case SQL_DESC_SEARCHABLE:
-      case SQL_DESC_TYPE:
-      case SQL_DESC_UNNAMED:
-      case SQL_DESC_UNSIGNED:
-      case SQL_DESC_UPDATABLE:
+      case SQL_DESC_OCTET_LENGTH: {
         ird->GetField(recordNumber, fieldIdentifier, numericAttributePtr, bufferLength,
                       &outputLengthInt);
         break;
+      }
+      // internal is SQLULEN, conversion is needed.
+      case SQL_DESC_LENGTH: {
+        SQLULEN temp;
+        ird->GetField(recordNumber, fieldIdentifier, &temp, bufferLength,
+                      &outputLengthInt);
+        *numericAttributePtr = static_cast<SQLLEN>(temp);
+        break;
+      }
+      // internal is SQLINTEGER, conversion is needed.
+      case SQL_DESC_AUTO_UNIQUE_VALUE:
+      case SQL_DESC_CASE_SENSITIVE:
+      case SQL_DESC_NUM_PREC_RADIX: {
+        SQLINTEGER temp;
+        ird->GetField(recordNumber, fieldIdentifier, &temp, bufferLength,
+                      &outputLengthInt);
+        *numericAttributePtr = static_cast<SQLLEN>(temp);
+        break;
+      }
+      // internal is SQLSMALLINT, conversion is needed.
+      case SQL_DESC_CONCISE_TYPE:
+      case SQL_DESC_COUNT:
+      case SQL_DESC_FIXED_PREC_SCALE:
+      case SQL_DESC_TYPE:
+      case SQL_DESC_NULLABLE:
+      case SQL_DESC_PRECISION:
+      case SQL_DESC_SCALE:
+      case SQL_DESC_SEARCHABLE:
+      case SQL_DESC_UNNAMED:
+      case SQL_DESC_UNSIGNED:
+      case SQL_DESC_UPDATABLE: {
+        SQLSMALLINT temp;
+        ird->GetField(recordNumber, fieldIdentifier, &temp, bufferLength,
+                      &outputLengthInt);
+        *numericAttributePtr = static_cast<SQLLEN>(temp);
+        break;
+      }
       // Character attributes
       case SQL_DESC_BASE_COLUMN_NAME:
       case SQL_DESC_BASE_TABLE_NAME:

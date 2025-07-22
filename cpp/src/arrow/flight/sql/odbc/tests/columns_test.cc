@@ -30,6 +30,7 @@
 // ODBC 3.
 
 namespace arrow::flight::sql::odbc {
+// Helper functions
 void checkSQLColumns(
     SQLHSTMT stmt, const std::wstring& expectedTable, const std::wstring& expectedColumn,
     const SQLINTEGER& expectedDataType, const std::wstring& expectedTypeName,
@@ -100,6 +101,159 @@ void checkRemoteSQLColumns(
                   expectedNumPrecRadix, expectedNullable, expectedSqlDataType,
                   expectedDateTimeSub, expectedOctetCharLength, expectedOrdinalPosition,
                   expectedIsNullable);
+}
+
+void checkSQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT idx,
+                          const std::wstring& expectedColmnName, SQLLEN expectedDataType,
+                          SQLLEN expectedConciseType, SQLLEN expectedDisplaySize,
+                          SQLLEN expectedPrecScale, SQLLEN expectedLength,
+                          const std::wstring& expectedLiteralPrefix,
+                          const std::wstring& expectedLiteralSuffix,
+                          SQLLEN expectedColumnSize, SQLLEN expectedColumnScale,
+                          SQLLEN expectedColumnNullability, SQLLEN expectedNumPrecRadix,
+                          SQLLEN expectedOctetLength, SQLLEN expectedSearchable,
+                          SQLLEN expectedUnsignedColumn) {
+  std::vector<SQLWCHAR> name(ODBC_BUFFER_SIZE);
+  SQLSMALLINT nameLen = 0;
+  std::vector<SQLWCHAR> baseColumnName(ODBC_BUFFER_SIZE);
+  SQLSMALLINT columnNameLen = 0;
+  std::vector<SQLWCHAR> label(ODBC_BUFFER_SIZE);
+  SQLSMALLINT labelLen = 0;
+  std::vector<SQLWCHAR> prefix(ODBC_BUFFER_SIZE);
+  SQLSMALLINT prefixLen = 0;
+  std::vector<SQLWCHAR> suffix(ODBC_BUFFER_SIZE);
+  SQLSMALLINT suffixLen = 0;
+  SQLLEN dataType = 0;
+  SQLLEN conciseType = 0;
+  SQLLEN displaySize = 0;
+  SQLLEN precScale = 0;
+  SQLLEN length = 0;
+  SQLLEN size = 0;
+  SQLLEN scale = 0;
+  SQLLEN nullability = 0;
+  SQLLEN numPrecRadix = 0;
+  SQLLEN octetLength = 0;
+  SQLLEN searchable = 0;
+  SQLLEN unsignedCol = 0;
+
+  SQLRETURN ret = SQLColAttribute(stmt, idx, SQL_DESC_NAME, &name[0],
+                                  (SQLSMALLINT)name.size(), &nameLen, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_BASE_COLUMN_NAME, &baseColumnName[0],
+                        (SQLSMALLINT)baseColumnName.size(), &columnNameLen, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_LABEL, &label[0], (SQLSMALLINT)label.size(),
+                        &labelLen, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_TYPE, 0, 0, 0, &dataType);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_CONCISE_TYPE, 0, 0, 0, &conciseType);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_DISPLAY_SIZE, 0, 0, 0, &displaySize);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_FIXED_PREC_SCALE, 0, 0, 0, &precScale);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_LENGTH, 0, 0, 0, &length);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_LITERAL_PREFIX, &prefix[0],
+                        (SQLSMALLINT)prefix.size(), &prefixLen, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_LITERAL_SUFFIX, &suffix[0],
+                        (SQLSMALLINT)suffix.size(), &suffixLen, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_PRECISION, 0, 0, 0, &size);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_SCALE, 0, 0, 0, &scale);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_NULLABLE, 0, 0, 0, &nullability);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_NUM_PREC_RADIX, 0, 0, 0, &numPrecRadix);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_OCTET_LENGTH, 0, 0, 0, &octetLength);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_SEARCHABLE, 0, 0, 0, &searchable);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_DESC_UNSIGNED, 0, 0, 0, &unsignedCol);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::wstring nameStr = ConvertToWString(name, nameLen);
+  std::wstring baseColumnNameStr = ConvertToWString(baseColumnName, columnNameLen);
+  std::wstring labelStr = ConvertToWString(label, labelLen);
+  std::wstring prefixStr = ConvertToWString(prefix, prefixLen);
+
+  // Assume column name, base column name, and label are equivalent in the result set
+  EXPECT_EQ(nameStr, expectedColmnName);
+  EXPECT_EQ(baseColumnNameStr, expectedColmnName);
+  EXPECT_EQ(labelStr, expectedColmnName);
+  EXPECT_EQ(dataType, expectedDataType);
+  EXPECT_EQ(conciseType, expectedConciseType);
+  EXPECT_EQ(displaySize, expectedDisplaySize);
+  EXPECT_EQ(precScale, expectedPrecScale);
+  EXPECT_EQ(length, expectedLength);
+  EXPECT_EQ(prefixStr, expectedLiteralPrefix);
+  EXPECT_EQ(size, expectedColumnSize);
+  EXPECT_EQ(scale, expectedColumnScale);
+  EXPECT_EQ(nullability, expectedColumnNullability);
+  EXPECT_EQ(numPrecRadix, expectedNumPrecRadix);
+  EXPECT_EQ(octetLength, expectedOctetLength);
+  EXPECT_EQ(searchable, expectedSearchable);
+  EXPECT_EQ(unsignedCol, expectedUnsignedColumn);
+}
+
+void checkSQLColAttributeString(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
+                                SQLUSMALLINT fieldIdentifier,
+                                const std::wstring& expectedAttrString) {
+  // Execute query and check SQLColAttribute string attribute
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+  SQLRETURN ret = SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::vector<SQLWCHAR> strVal(ODBC_BUFFER_SIZE);
+  SQLSMALLINT strLen = 0;
+
+  ret = SQLColAttribute(stmt, idx, fieldIdentifier, &strVal[0],
+                        (SQLSMALLINT)strVal.size(), &strLen, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::wstring attrStr = ConvertToWString(strVal, strLen);
+  EXPECT_EQ(attrStr, expectedAttrString);
+}
+
+void checkSQLColAttributeNumeric(SQLHSTMT stmt, const std::wstring& wsql,
+                                 SQLUSMALLINT idx, SQLUSMALLINT fieldIdentifier,
+                                 SQLLEN expectedAttrNumeric) {
+  // Execute query and check SQLColAttribute numeric attribute
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+  SQLRETURN ret = SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLLEN numVal = 0;
+  ret = SQLColAttribute(stmt, idx, fieldIdentifier, 0, 0, 0, &numVal);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(numVal, expectedAttrNumeric);
 }
 
 TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
@@ -981,4 +1135,552 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsInvalidTablePattern) {
   this->disconnect();
 }
 
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeAllTypes) {
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLColAttribute(this->stmt, 1,
+                       std::wstring(L"bigint_col"),  // expectedColmnName
+                       SQL_BIGINT,                   // expectedDataType
+                       SQL_BIGINT,                   // expectedConciseType
+                       20,                           // expectedDisplaySize
+                       SQL_FALSE,                    // expectedPrecScale
+                       8,                            // expectedLength
+                       std::wstring(L""),            // expectedLiteralPrefix
+                       std::wstring(L""),            // expectedLiteralSuffix
+                       8,                            // expectedColumnSize
+                       0,                            // expectedColumnScale
+                       SQL_NULLABLE,                 // expectedColumnNullability
+                       10,                           // expectedNumPrecRadix
+                       8,                            // expectedOctetLength
+                       SQL_PRED_NONE,                // expectedSearchable
+                       SQL_FALSE);                   // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 2,
+                       std::wstring(L"char_col"),  // expectedColmnName
+                       SQL_WVARCHAR,               // expectedDataType
+                       SQL_WVARCHAR,               // expectedConciseType
+                       0,                          // expectedDisplaySize
+                       SQL_FALSE,                  // expectedPrecScale
+                       0,                          // expectedLength
+                       std::wstring(L""),          // expectedLiteralPrefix
+                       std::wstring(L""),          // expectedLiteralSuffix
+                       0,                          // expectedColumnSize
+                       0,                          // expectedColumnScale
+                       SQL_NULLABLE,               // expectedColumnNullability
+                       0,                          // expectedNumPrecRadix
+                       0,                          // expectedOctetLength
+                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 3,
+                       std::wstring(L"varbinary_col"),  // expectedColmnName
+                       SQL_BINARY,                      // expectedDataType
+                       SQL_BINARY,                      // expectedConciseType
+                       0,                               // expectedDisplaySize
+                       SQL_FALSE,                       // expectedPrecScale
+                       0,                               // expectedLength
+                       std::wstring(L""),               // expectedLiteralPrefix
+                       std::wstring(L""),               // expectedLiteralSuffix
+                       0,                               // expectedColumnSize
+                       0,                               // expectedColumnScale
+                       SQL_NULLABLE,                    // expectedColumnNullability
+                       0,                               // expectedNumPrecRadix
+                       0,                               // expectedOctetLength
+                       SQL_PRED_NONE,                   // expectedSearchable
+                       SQL_TRUE);                       // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 4,
+                       std::wstring(L"double_col"),  // expectedColmnName
+                       SQL_DOUBLE,                   // expectedDataType
+                       SQL_DOUBLE,                   // expectedConciseType
+                       24,                           // expectedDisplaySize
+                       SQL_FALSE,                    // expectedPrecScale
+                       8,                            // expectedLength
+                       std::wstring(L""),            // expectedLiteralPrefix
+                       std::wstring(L""),            // expectedLiteralSuffix
+                       8,                            // expectedColumnSize
+                       0,                            // expectedColumnScale
+                       SQL_NULLABLE,                 // expectedColumnNullability
+                       2,                            // expectedNumPrecRadix
+                       8,                            // expectedOctetLength
+                       SQL_PRED_NONE,                // expectedSearchable
+                       SQL_FALSE);                   // expectedUnsignedColumn
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
+  // Test assumes there is a table $scratch.ODBCTest in remote server
+  this->connect();
+
+  std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLColAttribute(this->stmt, 1,
+                       std::wstring(L"sinteger_max"),  // expectedColmnName
+                       SQL_INTEGER,                    // expectedDataType
+                       SQL_INTEGER,                    // expectedConciseType
+                       11,                             // expectedDisplaySize
+                       SQL_FALSE,                      // expectedPrecScale
+                       4,                              // expectedLength
+                       std::wstring(L""),              // expectedLiteralPrefix
+                       std::wstring(L""),              // expectedLiteralSuffix
+                       4,                              // expectedColumnSize
+                       0,                              // expectedColumnScale
+                       SQL_NULLABLE,                   // expectedColumnNullability
+                       10,                             // expectedNumPrecRadix
+                       4,                              // expectedOctetLength
+                       SQL_PRED_NONE,                  // expectedSearchable
+                       SQL_FALSE);                     // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 2,
+                       std::wstring(L"sbigint_max"),  // expectedColmnName
+                       SQL_BIGINT,                    // expectedDataType
+                       SQL_BIGINT,                    // expectedConciseType
+                       20,                            // expectedDisplaySize
+                       SQL_FALSE,                     // expectedPrecScale
+                       8,                             // expectedLength
+                       std::wstring(L""),             // expectedLiteralPrefix
+                       std::wstring(L""),             // expectedLiteralSuffix
+                       8,                             // expectedColumnSize
+                       0,                             // expectedColumnScale
+                       SQL_NULLABLE,                  // expectedColumnNullability
+                       10,                            // expectedNumPrecRadix
+                       8,                             // expectedOctetLength
+                       SQL_PRED_NONE,                 // expectedSearchable
+                       SQL_FALSE);                    // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 3,
+                       std::wstring(L"decimal_positive"),  // expectedColmnName
+                       SQL_DECIMAL,                        // expectedDataType
+                       SQL_DECIMAL,                        // expectedConciseType
+                       40,                                 // expectedDisplaySize
+                       SQL_FALSE,                          // expectedPrecScale
+                       19,                                 // expectedLength
+                       std::wstring(L""),                  // expectedLiteralPrefix
+                       std::wstring(L""),                  // expectedLiteralSuffix
+                       19,                                 // expectedColumnSize
+                       0,                                  // expectedColumnScale
+                       SQL_NULLABLE,                       // expectedColumnNullability
+                       10,                                 // expectedNumPrecRadix
+                       40,                                 // expectedOctetLength
+                       SQL_PRED_NONE,                      // expectedSearchable
+                       SQL_FALSE);                         // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 4,
+                       std::wstring(L"float_max"),  // expectedColmnName
+                       SQL_FLOAT,                   // expectedDataType
+                       SQL_FLOAT,                   // expectedConciseType
+                       24,                          // expectedDisplaySize
+                       SQL_FALSE,                   // expectedPrecScale
+                       8,                           // expectedLength
+                       std::wstring(L""),           // expectedLiteralPrefix
+                       std::wstring(L""),           // expectedLiteralSuffix
+                       8,                           // expectedColumnSize
+                       0,                           // expectedColumnScale
+                       SQL_NULLABLE,                // expectedColumnNullability
+                       2,                           // expectedNumPrecRadix
+                       8,                           // expectedOctetLength
+                       SQL_PRED_NONE,               // expectedSearchable
+                       SQL_FALSE);                  // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 5,
+                       std::wstring(L"double_max"),  // expectedColmnName
+                       SQL_DOUBLE,                   // expectedDataType
+                       SQL_DOUBLE,                   // expectedConciseType
+                       24,                           // expectedDisplaySize
+                       SQL_FALSE,                    // expectedPrecScale
+                       8,                            // expectedLength
+                       std::wstring(L""),            // expectedLiteralPrefix
+                       std::wstring(L""),            // expectedLiteralSuffix
+                       8,                            // expectedColumnSize
+                       0,                            // expectedColumnScale
+                       SQL_NULLABLE,                 // expectedColumnNullability
+                       2,                            // expectedNumPrecRadix
+                       8,                            // expectedOctetLength
+                       SQL_PRED_NONE,                // expectedSearchable
+                       SQL_FALSE);                   // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 6,
+                       std::wstring(L"bit_true"),  // expectedColmnName
+                       SQL_BIT,                    // expectedDataType
+                       SQL_BIT,                    // expectedConciseType
+                       1,                          // expectedDisplaySize
+                       SQL_FALSE,                  // expectedPrecScale
+                       1,                          // expectedLength
+                       std::wstring(L""),          // expectedLiteralPrefix
+                       std::wstring(L""),          // expectedLiteralSuffix
+                       1,                          // expectedColumnSize
+                       0,                          // expectedColumnScale
+                       SQL_NULLABLE,               // expectedColumnNullability
+                       0,                          // expectedNumPrecRadix
+                       1,                          // expectedOctetLength
+                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 7,
+                       std::wstring(L"date_max"),  // expectedColmnName
+                       SQL_DATETIME,               // expectedDataType
+                       SQL_TYPE_DATE,              // expectedConciseType
+                       10,                         // expectedDisplaySize
+                       SQL_FALSE,                  // expectedPrecScale
+                       10,                         // expectedLength
+                       std::wstring(L""),          // expectedLiteralPrefix
+                       std::wstring(L""),          // expectedLiteralSuffix
+                       10,                         // expectedColumnSize
+                       0,                          // expectedColumnScale
+                       SQL_NULLABLE,               // expectedColumnNullability
+                       0,                          // expectedNumPrecRadix
+                       6,                          // expectedOctetLength
+                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 8,
+                       std::wstring(L"time_max"),  // expectedColmnName
+                       SQL_DATETIME,               // expectedDataType
+                       SQL_TYPE_TIME,              // expectedConciseType
+                       12,                         // expectedDisplaySize
+                       SQL_FALSE,                  // expectedPrecScale
+                       12,                         // expectedLength
+                       std::wstring(L""),          // expectedLiteralPrefix
+                       std::wstring(L""),          // expectedLiteralSuffix
+                       12,                         // expectedColumnSize
+                       3,                          // expectedColumnScale
+                       SQL_NULLABLE,               // expectedColumnNullability
+                       0,                          // expectedNumPrecRadix
+                       6,                          // expectedOctetLength
+                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 9,
+                       std::wstring(L"timestamp_max"),  // expectedColmnName
+                       SQL_DATETIME,                    // expectedDataType
+                       SQL_TYPE_TIMESTAMP,              // expectedConciseType
+                       23,                              // expectedDisplaySize
+                       SQL_FALSE,                       // expectedPrecScale
+                       23,                              // expectedLength
+                       std::wstring(L""),               // expectedLiteralPrefix
+                       std::wstring(L""),               // expectedLiteralSuffix
+                       23,                              // expectedColumnSize
+                       3,                               // expectedColumnScale
+                       SQL_NULLABLE,                    // expectedColumnNullability
+                       0,                               // expectedNumPrecRadix
+                       16,                              // expectedOctetLength
+                       SQL_PRED_NONE,                   // expectedSearchable
+                       SQL_TRUE);                       // expectedUnsignedColumn
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
+  // Test assumes there is a table $scratch.ODBCTest in remote server
+  this->connect(SQL_OV_ODBC2);
+
+  std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLColAttribute(this->stmt, 1,
+                       std::wstring(L"sinteger_max"),  // expectedColmnName
+                       SQL_INTEGER,                    // expectedDataType
+                       SQL_INTEGER,                    // expectedConciseType
+                       11,                             // expectedDisplaySize
+                       SQL_FALSE,                      // expectedPrecScale
+                       4,                              // expectedLength
+                       std::wstring(L""),              // expectedLiteralPrefix
+                       std::wstring(L""),              // expectedLiteralSuffix
+                       4,                              // expectedColumnSize
+                       0,                              // expectedColumnScale
+                       SQL_NULLABLE,                   // expectedColumnNullability
+                       10,                             // expectedNumPrecRadix
+                       4,                              // expectedOctetLength
+                       SQL_PRED_NONE,                  // expectedSearchable
+                       SQL_FALSE);                     // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 2,
+                       std::wstring(L"sbigint_max"),  // expectedColmnName
+                       SQL_BIGINT,                    // expectedDataType
+                       SQL_BIGINT,                    // expectedConciseType
+                       20,                            // expectedDisplaySize
+                       SQL_FALSE,                     // expectedPrecScale
+                       8,                             // expectedLength
+                       std::wstring(L""),             // expectedLiteralPrefix
+                       std::wstring(L""),             // expectedLiteralSuffix
+                       8,                             // expectedColumnSize
+                       0,                             // expectedColumnScale
+                       SQL_NULLABLE,                  // expectedColumnNullability
+                       10,                            // expectedNumPrecRadix
+                       8,                             // expectedOctetLength
+                       SQL_PRED_NONE,                 // expectedSearchable
+                       SQL_FALSE);                    // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 3,
+                       std::wstring(L"decimal_positive"),  // expectedColmnName
+                       SQL_DECIMAL,                        // expectedDataType
+                       SQL_DECIMAL,                        // expectedConciseType
+                       40,                                 // expectedDisplaySize
+                       SQL_FALSE,                          // expectedPrecScale
+                       19,                                 // expectedLength
+                       std::wstring(L""),                  // expectedLiteralPrefix
+                       std::wstring(L""),                  // expectedLiteralSuffix
+                       19,                                 // expectedColumnSize
+                       0,                                  // expectedColumnScale
+                       SQL_NULLABLE,                       // expectedColumnNullability
+                       10,                                 // expectedNumPrecRadix
+                       40,                                 // expectedOctetLength
+                       SQL_PRED_NONE,                      // expectedSearchable
+                       SQL_FALSE);                         // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 4,
+                       std::wstring(L"float_max"),  // expectedColmnName
+                       SQL_FLOAT,                   // expectedDataType
+                       SQL_FLOAT,                   // expectedConciseType
+                       24,                          // expectedDisplaySize
+                       SQL_FALSE,                   // expectedPrecScale
+                       8,                           // expectedLength
+                       std::wstring(L""),           // expectedLiteralPrefix
+                       std::wstring(L""),           // expectedLiteralSuffix
+                       8,                           // expectedColumnSize
+                       0,                           // expectedColumnScale
+                       SQL_NULLABLE,                // expectedColumnNullability
+                       2,                           // expectedNumPrecRadix
+                       8,                           // expectedOctetLength
+                       SQL_PRED_NONE,               // expectedSearchable
+                       SQL_FALSE);                  // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 5,
+                       std::wstring(L"double_max"),  // expectedColmnName
+                       SQL_DOUBLE,                   // expectedDataType
+                       SQL_DOUBLE,                   // expectedConciseType
+                       24,                           // expectedDisplaySize
+                       SQL_FALSE,                    // expectedPrecScale
+                       8,                            // expectedLength
+                       std::wstring(L""),            // expectedLiteralPrefix
+                       std::wstring(L""),            // expectedLiteralSuffix
+                       8,                            // expectedColumnSize
+                       0,                            // expectedColumnScale
+                       SQL_NULLABLE,                 // expectedColumnNullability
+                       2,                            // expectedNumPrecRadix
+                       8,                            // expectedOctetLength
+                       SQL_PRED_NONE,                // expectedSearchable
+                       SQL_FALSE);                   // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 6,
+                       std::wstring(L"bit_true"),  // expectedColmnName
+                       SQL_BIT,                    // expectedDataType
+                       SQL_BIT,                    // expectedConciseType
+                       1,                          // expectedDisplaySize
+                       SQL_FALSE,                  // expectedPrecScale
+                       1,                          // expectedLength
+                       std::wstring(L""),          // expectedLiteralPrefix
+                       std::wstring(L""),          // expectedLiteralSuffix
+                       1,                          // expectedColumnSize
+                       0,                          // expectedColumnScale
+                       SQL_NULLABLE,               // expectedColumnNullability
+                       0,                          // expectedNumPrecRadix
+                       1,                          // expectedOctetLength
+                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 7,
+                       std::wstring(L"date_max"),  // expectedColmnName
+                       SQL_DATETIME,               // expectedDataType
+                       SQL_DATE,                   // expectedConciseType
+                       10,                         // expectedDisplaySize
+                       SQL_FALSE,                  // expectedPrecScale
+                       10,                         // expectedLength
+                       std::wstring(L""),          // expectedLiteralPrefix
+                       std::wstring(L""),          // expectedLiteralSuffix
+                       10,                         // expectedColumnSize
+                       0,                          // expectedColumnScale
+                       SQL_NULLABLE,               // expectedColumnNullability
+                       0,                          // expectedNumPrecRadix
+                       6,                          // expectedOctetLength
+                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 8,
+                       std::wstring(L"time_max"),  // expectedColmnName
+                       SQL_DATETIME,               // expectedDataType
+                       SQL_TIME,                   // expectedConciseType
+                       12,                         // expectedDisplaySize
+                       SQL_FALSE,                  // expectedPrecScale
+                       12,                         // expectedLength
+                       std::wstring(L""),          // expectedLiteralPrefix
+                       std::wstring(L""),          // expectedLiteralSuffix
+                       12,                         // expectedColumnSize
+                       3,                          // expectedColumnScale
+                       SQL_NULLABLE,               // expectedColumnNullability
+                       0,                          // expectedNumPrecRadix
+                       6,                          // expectedOctetLength
+                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttribute(this->stmt, 9,
+                       std::wstring(L"timestamp_max"),  // expectedColmnName
+                       SQL_DATETIME,                    // expectedDataType
+                       SQL_TIMESTAMP,                   // expectedConciseType
+                       23,                              // expectedDisplaySize
+                       SQL_FALSE,                       // expectedPrecScale
+                       23,                              // expectedLength
+                       std::wstring(L""),               // expectedLiteralPrefix
+                       std::wstring(L""),               // expectedLiteralSuffix
+                       23,                              // expectedColumnSize
+                       3,                               // expectedColumnScale
+                       SQL_NULLABLE,                    // expectedColumnNullability
+                       0,                               // expectedNumPrecRadix
+                       16,                              // expectedOctetLength
+                       SQL_PRED_NONE,                   // expectedSearchable
+                       SQL_TRUE);                       // expectedUnsignedColumn
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeUniqueValue) {
+  // Mock server limitation: returns false for auto-increment column
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  checkSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_AUTO_UNIQUE_VALUE, SQL_FALSE);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeBaseTableName) {
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_BASE_TABLE_NAME,
+                             std::wstring(L"AllTypesTable"));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeCatalogName) {
+  // Mock server limitattion: mock doesn't return catalog for result metadata,
+  // and the defautl catalog should be 'main'
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_CATALOG_NAME,
+                             std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeCount) {
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  // Pass 0 as column number, driver should ignore it
+  checkSQLColAttributeNumeric(this->stmt, wsql, 0, SQL_DESC_COUNT, 4);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeLocalTypeName) {
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  // Mock server doesn't have local type name
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_LOCAL_TYPE_NAME,
+                             std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeSchemaName) {
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  // Mock server doesn't have schemas
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_SCHEMA_NAME,
+                             std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeTableName) {
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TABLE_NAME,
+                             std::wstring(L"AllTypesTable"));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeTypeName) {
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  // Mock server doesn't return data source-dependent data type name
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TYPE_NAME, std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeTypeName) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TYPE_NAME,
+                             std::wstring(L"INTEGER"));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeUnnamed) {
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  checkSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_UNNAMED, SQL_NAMED);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeUpdatable) {
+  this->connect();
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  // Mock server does not return updatable information
+  checkSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_UPDATABLE,
+                              SQL_ATTR_READWRITE_UNKNOWN);
+
+  this->disconnect();
+}
 }  // namespace arrow::flight::sql::odbc
