@@ -292,4 +292,3 @@ SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER
                                  SQLINTEGER stringLength) {
   return arrow::SQLSetStmtAttr(stmt, attribute, valuePtr, stringLength);
 }
-
