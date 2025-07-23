@@ -1139,7 +1139,7 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNam
 
     statement->GetTables(catalogName ? &catalog : nullptr, schemaName ? &schema : nullptr,
                          tableName ? &table : nullptr, tableType ? &type : nullptr);
-  
+
     return SQL_SUCCESS;
   });
 }
@@ -1159,7 +1159,7 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNa
       stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
       schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(columnName),
       columnNameLength);
-  
+
   using ODBC::ODBCStatement;
   using ODBC::SqlWcharToString;
 
@@ -1174,7 +1174,7 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNa
     statement->GetColumns(catalogName ? &catalog : nullptr,
                           schemaName ? &schema : nullptr, tableName ? &table : nullptr,
                           columnName ? &column : nullptr);
-    
+
     return SQL_SUCCESS;
   });
 }
