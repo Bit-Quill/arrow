@@ -197,9 +197,16 @@ SQLRETURN SQLFreeStmt(SQLHSTMT handle, SQLUSMALLINT option) {
       return SQLFreeHandle(SQL_HANDLE_STMT, handle);
     }
 
-    // TODO Implement SQLBindCol
     case SQL_UNBIND: {
-      return SQL_SUCCESS;
+      using ODBC::ODBCDescriptor;
+      using ODBC::ODBCStatement;
+      return ODBCStatement::ExecuteWithDiagnostics(handle, SQL_ERROR, [=]() {
+        ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(handle);
+        ODBCDescriptor* ard = statement->GetARD();
+        // Unbind columns
+        ard->SetHeaderField(SQL_DESC_COUNT, (void*)0, 0);
+        return SQL_SUCCESS;
+      });
     }
 
     // SQLBindParameter is not supported
@@ -976,6 +983,83 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
   });
 }
 
+SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
+                           SQLLEN fetchOffset, SQLULEN* rowCountPtr,
+                           SQLUSMALLINT* rowStatusArray) {
+  // GH-47110: SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for certain diag
+  // states
+  LOG_DEBUG(
+      "SQLExtendedFetch called with stmt: {}, fetchOrientation: {}, fetchOffset: {}, "
+      "rowCountPtr: {}, rowStatusArray: {}",
+      stmt, fetchOrientation, fetchOffset, fmt::ptr(rowCountPtr),
+      fmt::ptr(rowStatusArray));
+  using ODBC::ODBCDescriptor;
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    if (fetchOrientation != SQL_FETCH_NEXT) {
+      throw DriverException("Optional feature not supported.", "HYC00");
+    }
+    // fetchOffset is ignored as only SQL_FETCH_NEXT is supported
+
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    // The SQL_ROWSET_SIZE statement attribute specifies the number of rows in the
+    // rowset.
+    SQLULEN rowSetSize = statement->GetRowsetSize();
+    LOG_DEBUG("SQL_ROWSET_SIZE value for SQLExtendedFetch: {}", rowSetSize);
+    if (statement->Fetch(static_cast<size_t>(rowSetSize), rowCountPtr, rowStatusArray)) {
+      return SQL_SUCCESS;
+    } else {
+      // Reached the end of rowset
+      return SQL_NO_DATA;
+    }
+  });
+}
+
+SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT fetchOrientation,
+                         SQLLEN fetchOffset) {
+  LOG_DEBUG("SQLFetchScroll called with stmt: {}, fetchOrientation: {}, fetchOffset: {}",
+            stmt, fetchOrientation, fetchOffset);
+  using ODBC::ODBCDescriptor;
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    if (fetchOrientation != SQL_FETCH_NEXT) {
+      throw DriverException("Optional feature not supported.", "HYC00");
+    }
+    // fetchOffset is ignored as only SQL_FETCH_NEXT is supported
+
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    // The SQL_ATTR_ROW_ARRAY_SIZE statement attribute specifies the number of rows in the
+    // rowset.
+    ODBCDescriptor* ard = statement->GetARD();
+    size_t rows = static_cast<size_t>(ard->GetArraySize());
+    if (statement->Fetch(rows)) {
+      return SQL_SUCCESS;
+    } else {
+      // Reached the end of rowset
+      return SQL_NO_DATA;
+    }
+  });
+}
+
+SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
+                     SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr) {
+  LOG_DEBUG(
+      "SQLBindCol called with stmt: {}, recordNumber: {}, cType: {}, "
+      "dataPtr: {}, bufferLength: {}, strLen_or_IndPtr: {}",
+      stmt, recordNumber, cType, dataPtr, bufferLength, fmt::ptr(indicatorPtr));
+  using ODBC::ODBCDescriptor;
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    // GH-47021: implement driver to return indicator value when data pointer is null
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    ODBCDescriptor* ard = statement->GetARD();
+    ard->BindCol(recordNumber, cType, dataPtr, bufferLength, indicatorPtr);
+    return SQL_SUCCESS;
+  });
+}
+
 SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
                      SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr) {
   // GH-46979: support SQL_C_GUID data type
@@ -1017,7 +1101,7 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
   });
 }
 
-SQLRETURN SQL_API SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
+SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
   LOG_DEBUG("SQLRowCount called with stmt: {}, columnCountPtr: {}", stmt,
             fmt::ptr(rowCountPtr));
   // TODO: write tests for SQLRowCount
@@ -1055,9 +1139,43 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNam
 
     statement->GetTables(catalogName ? &catalog : nullptr, schemaName ? &schema : nullptr,
                          tableName ? &table : nullptr, tableType ? &type : nullptr);
-
+  
     return SQL_SUCCESS;
   });
 }
 
+SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLength,
+                     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
+                     SQLWCHAR* tableName, SQLSMALLINT tableNameLength,
+                     SQLWCHAR* columnName, SQLSMALLINT columnNameLength) {
+  // GH-47159: Return NUM_PREC_RADIX based on whether COLUMN_SIZE contains number of
+  // digits or bits
+  LOG_DEBUG(
+      "SQLColumnsW called with stmt: {}, catalogName: {}, catalogNameLength: "
+      "{}, "
+      "schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}, "
+      "columnName: {}, "
+      "columnNameLength: {}",
+      stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
+      schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(columnName),
+      columnNameLength);
+  
+  using ODBC::ODBCStatement;
+  using ODBC::SqlWcharToString;
+
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    std::string catalog = SqlWcharToString(catalogName, catalogNameLength);
+    std::string schema = SqlWcharToString(schemaName, schemaNameLength);
+    std::string table = SqlWcharToString(tableName, tableNameLength);
+    std::string column = SqlWcharToString(columnName, columnNameLength);
+
+    statement->GetColumns(catalogName ? &catalog : nullptr,
+                          schemaName ? &schema : nullptr, tableName ? &table : nullptr,
+                          columnName ? &column : nullptr);
+    
+    return SQL_SUCCESS;
+  });
+}
 }  // namespace arrow

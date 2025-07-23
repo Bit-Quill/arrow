@@ -68,6 +68,12 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLengt
 SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength);
 SQLRETURN SQLExecute(SQLHSTMT stmt);
 SQLRETURN SQLFetch(SQLHSTMT stmt);
+SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
+                           SQLLEN fetchOffset, SQLULEN* rowCountPtr,
+                           SQLUSMALLINT* rowStatusArray);
+SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT fetchOrientation, SQLLEN fetchOffset);
+SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
+                     SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr);
 SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
                      SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr);
 SQLRETURN SQLMoreResults(SQLHSTMT stmt);
@@ -77,4 +83,8 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNam
                     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
                     SQLWCHAR* tableName, SQLSMALLINT tableNameLength, SQLWCHAR* tableType,
                     SQLSMALLINT tableTypeLength);
+SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNameLength,
+                     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
+                     SQLWCHAR* tableName, SQLSMALLINT tableNameLength,
+                     SQLWCHAR* columnName, SQLSMALLINT columnNameLength);
 }  // namespace arrow

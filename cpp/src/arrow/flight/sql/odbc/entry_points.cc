@@ -137,6 +137,18 @@ SQLRETURN SQL_API SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText,
 
 SQLRETURN SQL_API SQLFetch(SQLHSTMT stmt) { return arrow::SQLFetch(stmt); }
 
+SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
+                                   SQLLEN fetchOffset, SQLULEN* rowCountPtr,
+                                   SQLUSMALLINT* rowStatusArray) {
+  return arrow::SQLExtendedFetch(stmt, fetchOrientation, fetchOffset, rowCountPtr,
+                                 rowStatusArray);
+}
+
+SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT fetchOrientation,
+                                 SQLLEN fetchOffset) {
+  return arrow::SQLFetchScroll(stmt, fetchOrientation, fetchOffset);
+}
+
 SQLRETURN SQL_API SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
                              SQLPOINTER dataPtr, SQLLEN bufferLength,
                              SQLLEN* indicatorPtr) {
@@ -150,15 +162,11 @@ SQLRETURN SQL_API SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER text
 
 SQLRETURN SQL_API SQLExecute(SQLHSTMT stmt) { return arrow::SQLExecute(stmt); }
 
-SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT columnNumber,
-                             SQLSMALLINT targetType, SQLPOINTER targetValuePtr,
-                             SQLLEN bufferLength, SQLLEN* strLen_or_IndPtr) {
-  LOG_DEBUG(
-      "SQLBindCol called with stmt: {}, columnNumber: {}, targetType: {}, "
-      "targetValuePtr: {}, bufferLength: {}, strLen_or_IndPtr: {}",
-      stmt, columnNumber, targetType, targetValuePtr, bufferLength,
-      fmt::ptr(strLen_or_IndPtr));
-  return SQL_ERROR;
+SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
+                             SQLPOINTER dataPtr, SQLLEN bufferLength,
+                             SQLLEN* indicatorPtr) {
+  return arrow::SQLBindCol(stmt, recordNumber, cType, dataPtr, bufferLength,
+                           indicatorPtr);
 }
 
 SQLRETURN SQL_API SQLCancel(SQLHSTMT stmt) {
@@ -200,16 +208,9 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
                              SQLSMALLINT schemaNameLength, SQLWCHAR* tableName,
                              SQLSMALLINT tableNameLength, SQLWCHAR* columnName,
                              SQLSMALLINT columnNameLength) {
-  LOG_DEBUG(
-      "SQLColumnsW called with stmt: {}, catalogName: {}, catalogNameLength: "
-      "{}, "
-      "schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}, "
-      "columnName: {}, "
-      "columnNameLength: {}",
-      stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
-      schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(columnName),
-      columnNameLength);
-  return SQL_ERROR;
+  return arrow::SQLColumns(stmt, catalogName, catalogNameLength, schemaName,
+                           schemaNameLength, tableName, tableNameLength, columnName,
+                           columnNameLength);
 }
 
 SQLRETURN SQL_API SQLError(SQLHENV handleType, SQLHDBC handle, SQLHSTMT hstmt,

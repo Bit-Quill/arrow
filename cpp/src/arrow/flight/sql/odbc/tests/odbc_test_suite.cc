@@ -27,13 +27,14 @@
 
 namespace arrow::flight::sql::odbc {
 
-void FlightSQLODBCRemoteTestBase::allocEnvConnHandles() {
+void FlightSQLODBCRemoteTestBase::allocEnvConnHandles(SQLINTEGER odbc_ver) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
+  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION,
+                      reinterpret_cast<SQLPOINTER>(static_cast<intptr_t>(odbc_ver)), 0);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -43,8 +44,8 @@ void FlightSQLODBCRemoteTestBase::allocEnvConnHandles() {
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
-void FlightSQLODBCRemoteTestBase::connect() {
-  allocEnvConnHandles();
+void FlightSQLODBCRemoteTestBase::connect(SQLINTEGER odbc_ver) {
+  allocEnvConnHandles(odbc_ver);
   std::string connect_str = getConnectionString();
   connectWithString(connect_str);
 }
@@ -286,6 +287,42 @@ void FlightSQLODBCMockTestBase::CreateTestTables() {
   )"));
 }
 
+void FlightSQLODBCMockTestBase::CreateTableAllDataType() {
+  // Limitation on mock SQLite server:
+  // Only int64, float64, binary, and utf8 Arrow Types are supported by
+  // SQLiteFlightSqlServer::Impl::DoGetTables
+  ASSERT_OK(server->ExecuteSql(R"(
+    CREATE TABLE AllTypesTable(
+    bigint_col INTEGER PRIMARY KEY AUTOINCREMENT,
+    char_col varchar(100),
+    varbinary_col BLOB,
+    double_col REAL);
+
+    INSERT INTO AllTypesTable (
+    char_col,
+    varbinary_col,
+    double_col) VALUES (
+        '1st Row',
+        X'31737420726F77',
+        3.14159
+    );
+  )"));
+}
+
+void FlightSQLODBCMockTestBase::CreateUnicodeTable() {
+  std::string unicodeSql = arrow::util::WideStringToUTF8(
+                               LR"(
+    CREATE TABLE 数据(
+    资料 varchar(100));
+
+    INSERT INTO 数据 (资料) VALUES ('第一行');
+    INSERT INTO 数据 (资料) VALUES ('二行');
+    INSERT INTO 数据 (资料) VALUES ('3rd Row');
+  )")
+                               .ValueOr("");
+  ASSERT_OK(server->ExecuteSql(unicodeSql));
+}
+
 void FlightSQLODBCMockTestBase::SetUp() {
   ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
   arrow::flight::FlightServerOptions options(location);
@@ -382,6 +419,52 @@ bool writeDSN(Connection::ConnPropertyMap properties) {
   std::string driver = config.Get(FlightSqlConnection::DRIVER);
   std::wstring wDriver = arrow::util::UTF8ToWideString(driver).ValueOr(L"");
   return RegisterDsn(config, wDriver.c_str());
+}
+
+void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected) {
+  SQLWCHAR buf[1024];
+  SQLLEN bufLen = sizeof(buf) * ODBC::GetSqlWCharSize();
+
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_GT(bufLen, 0);
+
+  // returned bufLen is in bytes so convert to length in characters
+  size_t charCount = static_cast<size_t>(bufLen) / ODBC::GetSqlWCharSize();
+  std::wstring returned(buf, buf + charCount);
+
+  EXPECT_EQ(returned, expected);
+}
+
+void CheckNullColumnW(SQLHSTMT stmt, int colId) {
+  SQLWCHAR buf[1024];
+  SQLLEN bufLen = sizeof(buf);
+
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(bufLen, SQL_NULL_DATA);
+}
+
+void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& expected) {
+  SQLINTEGER buf;
+  SQLLEN bufLen = sizeof(buf);
+
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_LONG, &buf, sizeof(buf), &bufLen);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(buf, expected);
+}
+
+void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& expected) {
+  SQLSMALLINT buf;
+  SQLLEN bufLen = sizeof(buf);
+
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_SSHORT, &buf, sizeof(buf), &bufLen);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(buf, expected);
 }
 
 }  // namespace arrow::flight::sql::odbc
