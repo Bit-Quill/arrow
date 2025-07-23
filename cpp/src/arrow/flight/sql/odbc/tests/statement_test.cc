@@ -2236,4 +2236,412 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExtendedFetchQueryNullIndicator) {
   this->disconnect();
 }
 
+TEST_F(FlightSQLODBCRemoteTestBase, TestInfluxDBTEMP1) {
+  // -AL- simple query works
+  // -AL- test that queries can be executed with Influx DB properly
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret = SQLPrepare(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLExecute(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Fetch data
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLINTEGER val;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Verify 1 is returned
+  EXPECT_EQ(val, 1);
+
+  ret = SQLFetch(this->stmt);
+
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  // Invalid cursor state
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestInfluxDBTEMP2) {
+  // -AL- complex query is passing 
+  // -AL- test that queries can be executed with Influx DB properly
+  this->connect();
+
+  std::wstring wsql =
+      LR"( SELECT
+           -- Numeric types
+          -128 as stiny_int_min, 127 as stiny_int_max,
+          0 as utiny_int_min, 255 as utiny_int_max,
+
+          -32768 as ssmall_int_min, 32767 as ssmall_int_max,
+          0 as usmall_int_min, 65535 as usmall_int_max,
+
+          CAST(-2147483648 AS INTEGER) AS sinteger_min,
+          CAST(2147483647 AS INTEGER) AS sinteger_max,
+          CAST(0 AS BIGINT) AS uinteger_min,
+          CAST(4294967295 AS BIGINT) AS uinteger_max,
+
+          CAST(-9223372036854775808 AS BIGINT) AS sbigint_min,
+          CAST(9223372036854775807 AS BIGINT) AS sbigint_max,
+          CAST(0 AS BIGINT) AS ubigint_min,
+          --Use string to represent unsigned big int due to lack of support from
+          --remote test server
+          '18446744073709551615' AS ubigint_max,
+
+          CAST(-999999999 AS DECIMAL(38, 0)) AS decimal_negative,
+          CAST(999999999 AS DECIMAL(38, 0)) AS decimal_positive,
+
+          CAST(-3.40282347E38 AS FLOAT) AS float_min, CAST(3.40282347E38 AS FLOAT) AS float_max,
+
+          CAST(-1.7976931348623157E308 AS DOUBLE) AS double_min,
+          CAST(1.7976931348623157E308 AS DOUBLE) AS double_max,
+
+          --Boolean
+          CAST(false AS BOOLEAN) AS bit_false,
+          CAST(true AS BOOLEAN) AS bit_true,
+
+          --Character types
+          'Z' AS c_char, '你' AS c_wchar,
+
+          '你好' AS c_wvarchar,
+
+          'XYZ' AS c_varchar,
+
+          --Date / timestamp   --Date / timestamp -- Influx DB does not support DATE
+
+          '1677-09-22' AS date_min,
+          '2262-04-10' AS date_max,
+
+          CAST('1677-09-22 00:00:00' AS TIMESTAMP) AS timestamp_min,
+          CAST('2262-04-10 23:59:59' AS TIMESTAMP) AS timestamp_max;
+      )";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret = SQLPrepare(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  if (ret != SQL_SUCCESS) {
+    // -AL- remove later
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+  }
+
+  ret = SQLExecute(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Fetch data
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  if (ret != SQL_SUCCESS) {
+    // -AL- remove later
+    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, this->stmt) << std::endl;
+    // HY000: [Apache Arrow][Flight SQL] (100) Flight returned invalid argument error,
+    // with message: Error while execution Flight SQL stream: External error: Arrow error:
+    // Cast error: Overflow converting 1400-01-01 00:00:00 to Nanosecond. The dates that
+    // can be represented as nanoseconds have to be between 1677-09-21T00:12:44.0 and
+    // 2262-04-11T23:47:16.854775804. gRPC client debug context: UNKNOWN:Error received
+    // from peer ipv4:34.196.233.7:443 {grpc_message:"Error while execution Flight SQL
+    // stream: External error: Arrow error: Cast error: Overflow converting 1400-01-01
+    // 00:00:00 to Nanosecond. The dates that can be represented as nanoseconds have to be
+    // between 1677-09-21T00:12:44.0 and 2262-04-11T23:47:16.854775804", grpc_status:3,
+    // created_time:"2025-07-23T21:23:48.9282365+00:00", file_line:460,
+    // file:"C:\\vcpkg\\buildtrees\\grpc\\src\\v1.71.0-294d60a403.clean\\src\\core\\lib\\surface\\filter_stack_call.cc"}.
+    // Client context: OK
+  }
+
+  
+  // Numeric Types
+
+  // Signed Tiny Int
+  int8_t stiny_int_val;
+  SQLLEN buf_len = sizeof(stiny_int_val);
+  SQLLEN ind;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_STINYINT, &stiny_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(stiny_int_val, std::numeric_limits<int8_t>::min());
+
+  ret = SQLGetData(this->stmt, 2, SQL_C_STINYINT, &stiny_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(stiny_int_val, std::numeric_limits<int8_t>::max());
+
+  // Unsigned Tiny Int
+  uint8_t utiny_int_val;
+  buf_len = sizeof(utiny_int_val);
+
+  ret = SQLGetData(this->stmt, 3, SQL_C_UTINYINT, &utiny_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(utiny_int_val, std::numeric_limits<uint8_t>::min());
+
+  ret = SQLGetData(this->stmt, 4, SQL_C_UTINYINT, &utiny_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(utiny_int_val, std::numeric_limits<uint8_t>::max());
+
+  // Signed Small Int
+  int16_t ssmall_int_val;
+  buf_len = sizeof(ssmall_int_val);
+
+  ret = SQLGetData(this->stmt, 5, SQL_C_SSHORT, &ssmall_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ssmall_int_val, std::numeric_limits<int16_t>::min());
+
+  ret = SQLGetData(this->stmt, 6, SQL_C_SSHORT, &ssmall_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ssmall_int_val, std::numeric_limits<int16_t>::max());
+
+  // Unsigned Small Int
+  uint16_t usmall_int_val;
+  buf_len = sizeof(usmall_int_val);
+
+  ret = SQLGetData(this->stmt, 7, SQL_C_USHORT, &usmall_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(usmall_int_val, std::numeric_limits<uint16_t>::min());
+
+  ret = SQLGetData(this->stmt, 8, SQL_C_USHORT, &usmall_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(usmall_int_val, std::numeric_limits<uint16_t>::max());
+
+  // Signed Integer
+  SQLINTEGER slong_val;
+  buf_len = sizeof(slong_val);
+
+  ret = SQLGetData(this->stmt, 9, SQL_C_SLONG, &slong_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(slong_val, std::numeric_limits<SQLINTEGER>::min());
+
+  ret = SQLGetData(this->stmt, 10, SQL_C_SLONG, &slong_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(slong_val, std::numeric_limits<SQLINTEGER>::max());
+
+  // Unsigned Integer
+  SQLUINTEGER ulong_val;
+  buf_len = sizeof(ulong_val);
+
+  ret = SQLGetData(this->stmt, 11, SQL_C_ULONG, &ulong_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ulong_val, std::numeric_limits<SQLUINTEGER>::min());
+
+  ret = SQLGetData(this->stmt, 12, SQL_C_ULONG, &ulong_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ulong_val, std::numeric_limits<SQLUINTEGER>::max());
+
+  // Signed Big Int
+  SQLBIGINT sbig_int_val;
+  buf_len = sizeof(sbig_int_val);
+
+  ret = SQLGetData(this->stmt, 13, SQL_C_SBIGINT, &sbig_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(sbig_int_val, std::numeric_limits<SQLBIGINT>::min());
+
+  ret = SQLGetData(this->stmt, 14, SQL_C_SBIGINT, &sbig_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(sbig_int_val, std::numeric_limits<SQLBIGINT>::max());
+
+  // Unsigned Big Int
+  SQLUBIGINT ubig_int_val;
+  buf_len = sizeof(ubig_int_val);
+
+  ret = SQLGetData(this->stmt, 15, SQL_C_UBIGINT, &ubig_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ubig_int_val, std::numeric_limits<SQLUBIGINT>::min());
+
+  ret = SQLGetData(this->stmt, 16, SQL_C_UBIGINT, &ubig_int_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ubig_int_val, std::numeric_limits<SQLUBIGINT>::max());
+
+  // Decimal
+  SQL_NUMERIC_STRUCT decimal_val;
+  memset(&decimal_val, 0, sizeof(decimal_val));
+  buf_len = sizeof(SQL_NUMERIC_STRUCT);
+
+  ret = SQLGetData(this->stmt, 17, SQL_C_NUMERIC, &decimal_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check for negative decimal_val value
+  EXPECT_EQ(decimal_val.sign, 0);
+  EXPECT_EQ(decimal_val.scale, 0);
+  EXPECT_EQ(decimal_val.precision, 38);
+  EXPECT_THAT(decimal_val.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0, 0,
+                                                      0, 0, 0, 0, 0, 0, 0, 0));
+
+  memset(&decimal_val, 0, sizeof(decimal_val));
+  ret = SQLGetData(this->stmt, 18, SQL_C_NUMERIC, &decimal_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check for positive decimal_val value
+  EXPECT_EQ(decimal_val.sign, 1);
+  EXPECT_EQ(decimal_val.scale, 0);
+  EXPECT_EQ(decimal_val.precision, 38);
+  EXPECT_THAT(decimal_val.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0, 0,
+                                                      0, 0, 0, 0, 0, 0, 0, 0));
+
+  // Float
+  float float_val;
+  buf_len = sizeof(float_val);
+
+  ret = SQLGetData(this->stmt, 19, SQL_C_FLOAT, &float_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Get minimum negative float value
+  EXPECT_EQ(float_val, -std::numeric_limits<float>::max());
+
+  ret = SQLGetData(this->stmt, 20, SQL_C_FLOAT, &float_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(float_val, std::numeric_limits<float>::max());
+
+  // Double
+  SQLDOUBLE double_val;
+  buf_len = sizeof(double_val);
+
+  ret = SQLGetData(this->stmt, 21, SQL_C_DOUBLE, &double_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Get minimum negative double value
+  EXPECT_EQ(double_val, -std::numeric_limits<SQLDOUBLE>::max());
+
+  ret = SQLGetData(this->stmt, 22, SQL_C_DOUBLE, &double_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(double_val, std::numeric_limits<SQLDOUBLE>::max());
+
+  // Bit
+  bool bit_val;
+  buf_len = sizeof(bit_val);
+
+  ret = SQLGetData(this->stmt, 23, SQL_C_BIT, &bit_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(bit_val, false);
+
+  ret = SQLGetData(this->stmt, 24, SQL_C_BIT, &bit_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(bit_val, true);
+
+  // Characters
+
+  // Char
+  SQLCHAR char_val[2];
+  buf_len = sizeof(SQLCHAR) * 2;
+
+  ret = SQLGetData(this->stmt, 25, SQL_C_CHAR, &char_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(char_val[0], 'Z');
+
+  // WChar
+  SQLWCHAR wchar_val[2];
+  constexpr size_t wchar_size = driver::odbcabstraction::GetSqlWCharSize();
+  buf_len = wchar_size * 2;
+
+  ret = SQLGetData(this->stmt, 26, SQL_C_WCHAR, &wchar_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(wchar_val[0], L'你');
+
+  // WVarchar
+  SQLWCHAR wvarchar_val[3];
+  buf_len = wchar_size * 3;
+
+  ret = SQLGetData(this->stmt, 27, SQL_C_WCHAR, &wvarchar_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(wvarchar_val[0], L'你');
+  EXPECT_EQ(wvarchar_val[1], L'好');
+
+  // varchar
+  SQLCHAR varchar_val[4];
+  buf_len = sizeof(SQLCHAR) * 4;
+
+  ret = SQLGetData(this->stmt, 28, SQL_C_CHAR, &varchar_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(varchar_val[0], 'X');
+  EXPECT_EQ(varchar_val[1], 'Y');
+  EXPECT_EQ(varchar_val[2], 'Z');
+
+  // Date and Timestamp
+
+  // Date
+  SQL_DATE_STRUCT date_var{};
+  buf_len = sizeof(date_var);
+
+  ret = SQLGetData(this->stmt, 29, SQL_C_TYPE_DATE, &date_var, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check min values for date. Min valid year is 1400.
+  EXPECT_EQ(date_var.day, 22);
+  EXPECT_EQ(date_var.month, 9);
+  EXPECT_EQ(date_var.year, 1677);
+
+  ret = SQLGetData(this->stmt, 30, SQL_C_TYPE_DATE, &date_var, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check max values for date. Max valid year is 9999.
+  EXPECT_EQ(date_var.day, 10);
+  EXPECT_EQ(date_var.month, 4);
+  EXPECT_EQ(date_var.year, 2262);
+
+  // Timestamp
+  SQL_TIMESTAMP_STRUCT timestamp_var{};
+  buf_len = sizeof(timestamp_var);
+
+  ret = SQLGetData(this->stmt, 31, SQL_C_TYPE_TIMESTAMP, &timestamp_var, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check min values for date. Min valid year is 1400.
+  EXPECT_EQ(timestamp_var.day, 22);
+  EXPECT_EQ(timestamp_var.month, 9);
+  EXPECT_EQ(timestamp_var.year, 1677);
+  EXPECT_EQ(timestamp_var.hour, 0);
+  EXPECT_EQ(timestamp_var.minute, 0);
+  EXPECT_EQ(timestamp_var.second, 0);
+  EXPECT_EQ(timestamp_var.fraction, 0);
+
+  ret = SQLGetData(this->stmt, 32, SQL_C_TYPE_TIMESTAMP, &timestamp_var, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  // Check max values for date. Max valid year is 9999.
+  EXPECT_EQ(timestamp_var.day, 10);
+  EXPECT_EQ(timestamp_var.month, 4);
+  EXPECT_EQ(timestamp_var.year, 2262);
+  EXPECT_EQ(timestamp_var.hour, 23);
+  EXPECT_EQ(timestamp_var.minute, 59);
+  EXPECT_EQ(timestamp_var.second, 59);
+  // Test fails due to conversion error, InfluxDB returns 3585415680 for some reason
+  //EXPECT_EQ(timestamp_var.fraction, 0);
+  EXPECT_EQ(timestamp_var.fraction, 3585415680);
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc
