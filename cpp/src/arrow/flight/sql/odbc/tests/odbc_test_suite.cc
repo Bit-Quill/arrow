@@ -467,4 +467,10 @@ void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& expected) 
   EXPECT_EQ(buf, expected);
 }
 
+void ValidateFetch(SQLHSTMT stmt, SQLRETURN expectedReturn) {
+  SQLRETURN ret = SQLFetch(stmt);
+
+  EXPECT_EQ(ret, expectedReturn);
+}
+
 }  // namespace arrow::flight::sql::odbc

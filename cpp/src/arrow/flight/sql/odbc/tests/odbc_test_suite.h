@@ -217,4 +217,9 @@ void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& expected);
 /// \param[in] colId Column ID to check.
 /// \param[in] expected Expected value.
 void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& expected);
+
+/// \brief Check sql return against expected.
+/// \param[in] stmt Statement.
+/// \param[in] expected Expected return.
+void ValidateFetch(SQLHSTMT stmt, SQLRETURN expected);
 }  // namespace arrow::flight::sql::odbc

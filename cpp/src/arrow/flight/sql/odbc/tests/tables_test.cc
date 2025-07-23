@@ -34,72 +34,14 @@ namespace arrow::flight::sql::odbc {
 // TODO: Add tests with SQLDescribeCol to check metadata of SQLColumns for ODBC 2 and
 // ODBC 3.
 
-// Helper Functions
-
-void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected) {
-  SQLWCHAR buf[1024];
-  SQLLEN bufLen = sizeof(buf);
-
-  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-  // TODO REMOVE
-  if (ret != SQL_SUCCESS) {
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
-  }
-
-  if (bufLen > 0) {
-    // returned bufLen is in bytes so convert to length in characters
-    size_t charCount = static_cast<size_t>(bufLen) / ODBC::GetSqlWCharSize();
-    std::wstring returned(buf, buf + charCount);
-
-    std::wcerr << L"Comparing returned string:'" << returned << L"' to expected string:"
-               << expected << std::endl;
-
-    EXPECT_EQ(returned, expected);
-  } else {
-    EXPECT_TRUE(expected.empty());
-  }
-}
-
-void CheckNullColumnW(SQLHSTMT stmt, int colId) {
-  SQLWCHAR buf[1024];
-  SQLLEN bufLen = sizeof(buf);
-
-  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-  // TODO REMOVE
-  if (ret != SQL_SUCCESS) {
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
-  }
-
-  EXPECT_EQ(bufLen, SQL_NULL_DATA);
-}
-
-bool ValidateFetch(SQLHSTMT stmt, SQLRETURN expectedReturn) {
-  SQLRETURN ret = SQLFetch(stmt);
-
-  EXPECT_EQ(ret, expectedReturn);
-  if (ret != SQL_SUCCESS) {
-    // TODO REMOVE
-    std::cerr << GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) << std::endl;
-    return false;
-  }
-
-  return true;
-}
-
-// Test Cases
-
 TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestInputData) {
   this->connect();
-  this->CreateTestTables();
 
   SQLWCHAR catalogName[] = L"";
   SQLWCHAR schemaName[] = L"";
   SQLWCHAR tableName[] = L"";
   SQLWCHAR tableType[] = L"";
+  std::wstring expectedCatalogName = std::wstring(L"main");
 
   // All values populated
   SQLRETURN ret = SQLTables(this->stmt, catalogName, sizeof(catalogName), schemaName,
@@ -108,10 +50,14 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestInputData) {
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
+  ValidateFetch(this->stmt, SQL_NO_DATA);
+
   // Sizes are nulls
   ret = SQLTables(this->stmt, catalogName, 0, schemaName, 0, tableName, 0, tableType, 0);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_NO_DATA);
 
   // Values are nulls
   ret = SQLTables(this->stmt, 0, sizeof(catalogName), 0, sizeof(schemaName), 0,
@@ -119,22 +65,26 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestInputData) {
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
+  ValidateFetch(this->stmt, SQL_SUCCESS);
+  // Close statement cursor to avoid leaving in an invalid state
+  SQLFreeStmt(stmt, SQL_CLOSE);
+
   // All values and sizes are nulls
   ret = SQLTables(this->stmt, 0, 0, 0, 0, 0, 0, 0, 0);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_SUCCESS);
 
   this->disconnect();
 }
 
 TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForAllCatalogs) {
   this->connect();
-  this->CreateTestTables();
 
   SQLWCHAR empty[] = L"";
   SQLWCHAR SQL_ALL_CATALOGS_W[] = L"%";
-
-  std::wstring expectedName = std::wstring(L"main");
+  std::wstring expectedCatalogName = std::wstring(L"main");
 
   // Get Catalog metadata
   SQLRETURN ret = SQLTables(this->stmt, SQL_ALL_CATALOGS_W, SQL_NTS, empty, SQL_NTS,
@@ -144,7 +94,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForAllCatalogs) {
 
   ValidateFetch(this->stmt, SQL_SUCCESS);
 
-  CheckStringColumnW(this->stmt, 1, expectedName);
+  CheckStringColumnW(this->stmt, 1, expectedCatalogName);
   CheckNullColumnW(this->stmt, 2);
   CheckNullColumnW(this->stmt, 3);
   CheckNullColumnW(this->stmt, 4);
@@ -162,7 +112,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForNamedCatalog) {
   SQLWCHAR catalogName[] = L"main";
   SQLWCHAR* tableNames[] = {(SQLWCHAR*)L"TestTable", (SQLWCHAR*)L"foreignTable",
                             (SQLWCHAR*)L"intTable", (SQLWCHAR*)L"sqlite_sequence"};
-  std::wstring expectedCatalogName = std::wstring(L"main");
+  std::wstring expectedCatalogName = std::wstring(catalogName);
   std::wstring expectedTableType = std::wstring(L"table");
 
   // Get named Catalog metadata - Mock server returns the system table sqlite_sequence as
@@ -190,7 +140,6 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForNamedCatalog) {
 
 TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetSchemaHasNoData) {
   this->connect();
-  this->CreateTestTables();
 
   SQLWCHAR SQL_ALL_SCHEMAS_W[] = L"%";
 
@@ -199,6 +148,99 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetSchemaHasNoData) {
                             nullptr, SQL_NTS, nullptr, SQL_NTS);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestGetAllSchema) {
+  // Requires creation of user table named ODBCTest using schema $scratch in remote server
+  this->connect();
+
+  SQLWCHAR SQL_ALL_SCHEMAS_W[] = L"%";
+  SQLWCHAR* schemaNames[] = {(SQLWCHAR*)L"INFORMATION_SCHEMA",
+                             (SQLWCHAR*)L"INFORMATION_SCHEMA",
+                             (SQLWCHAR*)L"INFORMATION_SCHEMA",
+                             (SQLWCHAR*)L"INFORMATION_SCHEMA",
+                             (SQLWCHAR*)L"INFORMATION_SCHEMA",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys",
+                             (SQLWCHAR*)L"sys.cache",
+                             (SQLWCHAR*)L"sys.cache",
+                             (SQLWCHAR*)L"sys.cache",
+                             (SQLWCHAR*)L"sys.cache",
+                             (SQLWCHAR*)L"$scratch"};
+  std::wstring expectedSystemTableType = std::wstring(L"SYSTEM_TABLE");
+  std::wstring expectedUserTableType = std::wstring(L"TABLE");
+
+  SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, SQL_ALL_SCHEMAS_W, SQL_NTS,
+                            nullptr, SQL_NTS, nullptr, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  for (size_t i = 0; i < sizeof(schemaNames) / sizeof(*schemaNames); ++i) {
+    ValidateFetch(this->stmt, SQL_SUCCESS);
+
+    const std::wstring& expectedTableType =
+        (std::wstring(schemaNames[i]).rfind(L"sys", 0) == 0 ||
+         std::wstring(schemaNames[i]) == L"INFORMATION_SCHEMA")
+            ? expectedSystemTableType
+            : expectedUserTableType;
+
+    CheckNullColumnW(this->stmt, 1);
+    CheckStringColumnW(this->stmt, 2, schemaNames[i]);
+    // Ignore table name
+    CheckStringColumnW(this->stmt, 4, expectedTableType);
+    CheckNullColumnW(this->stmt, 5);
+  }
+
+  ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForNamedSchema) {
+  // Requires creation of user table named ODBCTest using schema $scratch in remote server
+  this->connect();
+
+  SQLWCHAR schemaName[] = L"$scratch";
+  std::wstring expectedSchemaName = std::wstring(schemaName);
+  std::wstring expectedTableName = std::wstring(L"ODBCTest");
+  std::wstring expectedTableType = std::wstring(L"TABLE");
+
+  SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, schemaName, SQL_NTS, nullptr,
+                            SQL_NTS, nullptr, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_SUCCESS);
+
+  CheckNullColumnW(this->stmt, 1);
+  CheckStringColumnW(this->stmt, 2, expectedSchemaName);
+  // Ignore table name
+  CheckStringColumnW(this->stmt, 4, expectedTableType);
+  CheckNullColumnW(this->stmt, 5);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
@@ -238,86 +280,10 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForAllTables) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestGetMetadataForSystemTables) {
-  this->connect();
-
-  SQLWCHAR SQL_ALL_TABLES_W[] = L"%";
-  SQLWCHAR* schemaNames[] = {(SQLWCHAR*)L"INFORMATION_SCHEMA",
-                             (SQLWCHAR*)L"INFORMATION_SCHEMA",
-                             (SQLWCHAR*)L"INFORMATION_SCHEMA",
-                             (SQLWCHAR*)L"INFORMATION_SCHEMA",
-                             (SQLWCHAR*)L"INFORMATION_SCHEMA",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys",
-                             (SQLWCHAR*)L"sys.cache",
-                             (SQLWCHAR*)L"sys.cache",
-                             (SQLWCHAR*)L"sys.cache",
-                             (SQLWCHAR*)L"sys.cache"};
-  SQLWCHAR* tableNames[] = {
-      (SQLWCHAR*)L"CATALOGS",        (SQLWCHAR*)L"COLUMNS",
-      (SQLWCHAR*)L"SCHEMATA",        (SQLWCHAR*)L"TABLES",
-      (SQLWCHAR*)L"VIEWS",           (SQLWCHAR*)L"boot",
-      (SQLWCHAR*)L"fragments",       (SQLWCHAR*)L"jobs",
-      (SQLWCHAR*)L"jobs_recent",     (SQLWCHAR*)L"materializations",
-      (SQLWCHAR*)L"membership",      (SQLWCHAR*)L"memory",
-      (SQLWCHAR*)L"nodes",           (SQLWCHAR*)L"options",
-      (SQLWCHAR*)L"privileges",      (SQLWCHAR*)L"reflection_dependencies",
-      (SQLWCHAR*)L"reflections",     (SQLWCHAR*)L"refreshes",
-      (SQLWCHAR*)L"roles",           (SQLWCHAR*)L"services",
-      (SQLWCHAR*)L"slicing_threads", (SQLWCHAR*)L"table_statistics",
-      (SQLWCHAR*)L"threads",         (SQLWCHAR*)L"timezone_abbrevs",
-      (SQLWCHAR*)L"timezone_names",  (SQLWCHAR*)L"user_defined_functions",
-      (SQLWCHAR*)L"version",         (SQLWCHAR*)L"datasets",
-      (SQLWCHAR*)L"mount_points",    (SQLWCHAR*)L"objects",
-      (SQLWCHAR*)L"storage_plugins"};
-  std::wstring expectedTableType = std::wstring(L"SYSTEM_TABLE");
-
-  //  Get all Table metadata including System tables
-  SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                            SQL_ALL_TABLES_W, SQL_NTS, nullptr, SQL_NTS);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  for (size_t i = 0; i < sizeof(tableNames) / sizeof(*tableNames); ++i) {
-    ValidateFetch(this->stmt, SQL_SUCCESS);
-
-    CheckNullColumnW(this->stmt, 1);
-    CheckStringColumnW(this->stmt, 2, schemaNames[i]);
-    CheckStringColumnW(this->stmt, 3, tableNames[i]);
-    CheckStringColumnW(this->stmt, 4, expectedTableType);
-    CheckNullColumnW(this->stmt, 5);
-  }
-
-  ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->disconnect();
-}
-
 TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForTableName) {
   this->connect();
   this->CreateTestTables();
 
-  SQLWCHAR SQL_ALL_TABLES_W[] = L"%";
   SQLWCHAR* tableNames[] = {(SQLWCHAR*)L"TestTable", (SQLWCHAR*)L"foreignTable",
                             (SQLWCHAR*)L"intTable", (SQLWCHAR*)L"sqlite_sequence"};
   std::wstring expectedCatalogName = std::wstring(L"main");
@@ -345,15 +311,44 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForTableName) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForBadTableNameNoData) {
+TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForUnicodeTableByTableName) {
   this->connect();
-  this->CreateTestTables();
+  this->CreateUnicodeTable();
 
-  SQLWCHAR BAD_TABLE_NAME[] = L"bad_table_name";
+  SQLWCHAR unicodeTableName[] = L"数据";
+  std::wstring expectedCatalogName = std::wstring(L"main");
+  std::wstring expectedTableName = std::wstring(unicodeTableName);
+  std::wstring expectedTableType = std::wstring(L"table");
 
-  //  Try to get metadata for invalid table name
+  //  Get specific Table metadata
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                            BAD_TABLE_NAME, SQL_NTS, nullptr, SQL_NTS);
+                            unicodeTableName, SQL_NTS, nullptr, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_SUCCESS);
+
+  CheckStringColumnW(this->stmt, 1, expectedCatalogName);
+  // Mock server does not support table schema
+  CheckNullColumnW(this->stmt, 2);
+  CheckStringColumnW(this->stmt, 3, expectedTableName);
+  CheckStringColumnW(this->stmt, 4, expectedTableType);
+  CheckNullColumnW(this->stmt, 5);
+
+  ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForInvalidTableNameNoData) {
+  this->connect();
+  this->CreateTestTables();
+
+  SQLWCHAR invalidTableName[] = L"NonExistantTableName";
+
+  //  Try to get metadata for a non-existant table name
+  SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                            invalidTableName, SQL_NTS, nullptr, SQL_NTS);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -362,42 +357,88 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForBadTableNameNoData)
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetMetadataForSpecificTableTypeHasNoData) {
+TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetMetadataForTableType) {
+  // Mock server only supports table type "table" in lowercase
   this->connect();
   this->CreateTestTables();
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"TestTable";
-  SQLWCHAR type[] = L"table";
+  SQLWCHAR tableTypeTableLowercase[] = L"table";
+  SQLWCHAR tableTypeTableUppercase[] = L"TABLE";
+  SQLWCHAR tableTypeView[] = L"VIEW";
+  SQLWCHAR tableTypeTableView[] = L"TABLE,VIEW";
+  SQLWCHAR* tableNames[] = {(SQLWCHAR*)L"TestTable", (SQLWCHAR*)L"foreignTable",
+                            (SQLWCHAR*)L"intTable", (SQLWCHAR*)L"sqlite_sequence"};
+  std::wstring expectedCatalogName = std::wstring(L"main");
+  std::wstring expectedTableName = std::wstring(L"TestTable");
+  std::wstring expectedTableType = std::wstring(tableTypeTableLowercase);
   SQLRETURN ret = SQL_SUCCESS;
 
-  // TODO Mock server doess not support filtering by table type
-  ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, empty, SQL_NTS, table,
-                  SQL_NTS);
+  ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                  tableTypeTableUppercase, SQL_NTS);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                  tableTypeView, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                  tableTypeTableView, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  // Returns user table as well as system tables, even though only type table requested
+  ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                  tableTypeTableLowercase, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  for (size_t i = 0; i < sizeof(tableNames) / sizeof(*tableNames); ++i) {
+    ValidateFetch(this->stmt, SQL_SUCCESS);
+
+    CheckStringColumnW(this->stmt, 1, expectedCatalogName);
+    // Mock server does not support table schema
+    CheckNullColumnW(this->stmt, 2);
+    CheckStringColumnW(this->stmt, 3, tableNames[i]);
+    CheckStringColumnW(this->stmt, 4, expectedTableType);
+    CheckNullColumnW(this->stmt, 5);
+  }
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetMetadataForTableTypeHasNoData) {
+TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForTableTypeTable) {
+  // Requires creation of user table named ODBCTest using schema $scratch in remote server
   this->connect();
-  this->CreateTestTables();
 
-  SQLWCHAR empty[] = L"";
-  SQLWCHAR table[] = L"TestTable";
-  SQLWCHAR* typeLists[] = {(SQLWCHAR*)L"table", (SQLWCHAR*)L"'TABLE'",
-                           (SQLWCHAR*)L"TABLE,VIEW"};
+  SQLWCHAR* typeList[] = {(SQLWCHAR*)L"TABLE", (SQLWCHAR*)L"TABLE,VIEW"};
+  std::wstring expectedSchemaName = std::wstring(L"$scratch");
+  std::wstring expectedTableName = std::wstring(L"ODBCTest");
+  std::wstring expectedTableType = std::wstring(L"TABLE");
   SQLRETURN ret = SQL_SUCCESS;
 
-  for (size_t i = 0; i < sizeof(typeLists) / sizeof(*typeLists); ++i) {
-    // TODO Mock server doess not support filtering by table type
-    ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, empty, SQL_NTS,
-                    typeLists[i], SQL_NTS);
+  for (size_t i = 0; i < sizeof(typeList) / sizeof(*typeList); ++i) {
+    ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                    typeList[i], SQL_NTS);
 
     EXPECT_EQ(ret, SQL_SUCCESS);
+
+    ValidateFetch(this->stmt, SQL_SUCCESS);
+
+    CheckNullColumnW(this->stmt, 1);
+    CheckStringColumnW(this->stmt, 2, expectedSchemaName);
+    CheckStringColumnW(this->stmt, 3, expectedTableName);
+    CheckStringColumnW(this->stmt, 4, expectedTableType);
+    CheckNullColumnW(this->stmt, 5);
 
     ValidateFetch(this->stmt, SQL_NO_DATA);
   }
@@ -405,24 +446,25 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetMetadataForTableTypeHasNoData) {
   this->disconnect();
 }
 
-// TODO Will work once we have query to create remote table
-TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForTableType) {
-  GTEST_SKIP();
+TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForTableTypeViewHasNoData) {
   this->connect();
 
   SQLWCHAR empty[] = L"";
-  SQLWCHAR* typeLists[] = {(SQLWCHAR*)L"TABLE", (SQLWCHAR*)L"SYSTEM_TABLE",
-                           (SQLWCHAR*)L"VIEW", (SQLWCHAR*)L"TABLE,VIEW"};
-  SQLRETURN ret = SQL_SUCCESS;
+  SQLWCHAR typeView[] = L"VIEW";
 
-  for (size_t i = 0; i < sizeof(typeLists) / sizeof(*typeLists); ++i) {
-    ret = SQLTables(this->stmt, nullptr, SQL_NTS, empty, SQL_NTS, empty, SQL_NTS,
-                    typeLists[i], SQL_NTS);
+  SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, empty,
+                            SQL_NTS, typeView, SQL_NTS);
 
-    EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(ret, SQL_SUCCESS);
 
-    ValidateFetch(this->stmt, SQL_SUCCESS);
-  }
+  ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                  typeView, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_NO_DATA);
 
   this->disconnect();
 }
@@ -434,7 +476,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetSupportedTableTypes) {
   SQLWCHAR SQL_ALL_TABLE_TYPES_W[] = L"%";
   std::wstring expectedTableType = std::wstring(L"table");
 
-  // Mock returns lower case for supported type of "table"
+  // Mock server returns lower case for supported type of "table"
   SQLRETURN ret = SQLTables(this->stmt, empty, SQL_NTS, empty, SQL_NTS, empty, SQL_NTS,
                             SQL_ALL_TABLE_TYPES_W, SQL_NTS);
 
