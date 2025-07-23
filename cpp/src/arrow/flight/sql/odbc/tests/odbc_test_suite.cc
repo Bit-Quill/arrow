@@ -408,7 +408,7 @@ bool writeDSN(Connection::ConnPropertyMap properties) {
   return RegisterDsn(config, wDriver.c_str());
 }
 
-std::wstring ConvertToWString(std::vector<SQLWCHAR> strVal, SQLSMALLINT strLen) {
+std::wstring ConvertToWString(const std::vector<SQLWCHAR>& strVal, SQLSMALLINT strLen) {
   std::wstring attrStr;
   if (strLen == 0) {
     attrStr = std::wstring(&strVal[0]);

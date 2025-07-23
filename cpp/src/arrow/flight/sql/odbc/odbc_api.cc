@@ -1174,11 +1174,14 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
         break;
       }
       // internal is SQLULEN, conversion is needed.
+      case SQL_COLUMN_LENGTH:  // ODBC 2.0
       case SQL_DESC_LENGTH: {
         SQLULEN temp;
         ird->GetField(recordNumber, fieldIdentifier, &temp, bufferLength,
                       &outputLengthInt);
-        *numericAttributePtr = static_cast<SQLLEN>(temp);
+        if (numericAttributePtr) {
+          *numericAttributePtr = static_cast<SQLLEN>(temp);
+        }
         break;
       }
       // internal is SQLINTEGER, conversion is needed.
@@ -1188,7 +1191,9 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
         SQLINTEGER temp;
         ird->GetField(recordNumber, fieldIdentifier, &temp, bufferLength,
                       &outputLengthInt);
-        *numericAttributePtr = static_cast<SQLLEN>(temp);
+        if (numericAttributePtr) {
+          *numericAttributePtr = static_cast<SQLLEN>(temp);
+        }
         break;
       }
       // internal is SQLSMALLINT, conversion is needed.
@@ -1197,7 +1202,9 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
       case SQL_DESC_FIXED_PREC_SCALE:
       case SQL_DESC_TYPE:
       case SQL_DESC_NULLABLE:
+      case SQL_COLUMN_PRECISION:  // ODBC 2.0
       case SQL_DESC_PRECISION:
+      case SQL_COLUMN_SCALE:  // ODBC 2.0
       case SQL_DESC_SCALE:
       case SQL_DESC_SEARCHABLE:
       case SQL_DESC_UNNAMED:
@@ -1206,7 +1213,9 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
         SQLSMALLINT temp;
         ird->GetField(recordNumber, fieldIdentifier, &temp, bufferLength,
                       &outputLengthInt);
-        *numericAttributePtr = static_cast<SQLLEN>(temp);
+        if (numericAttributePtr) {
+          *numericAttributePtr = static_cast<SQLLEN>(temp);
+        }
         break;
       }
       // Character attributes
@@ -1227,7 +1236,9 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
       default:
         throw DriverException("Invalid descriptor field", "HY091");
     }
-    *outputLength = static_cast<SQLSMALLINT>(outputLengthInt);
+    if (outputLength) {
+      *outputLength = static_cast<SQLSMALLINT>(outputLengthInt);
+    }
     return SQL_SUCCESS;
   });
 }

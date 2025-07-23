@@ -282,7 +282,7 @@ bool FlightSqlResultSetMetadata::IsUnsigned(int column_position) {
 }
 
 bool FlightSqlResultSetMetadata::IsFixedPrecScale(int column_position) {
-  // TODO: Flight SQL column metadata does not have this, should we add to the spec?
+  // Arrow doesn't have data types with fixed precision that user cannot modify
   return false;
 }
 

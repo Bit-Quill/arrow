@@ -196,7 +196,7 @@ bool writeDSN(Connection::ConnPropertyMap properties);
 /// \param[in] strVal Vector of SQLWCHAR.
 /// \param[in] strLen length of string, in bytes.
 /// \return wstring
-std::wstring ConvertToWString(std::vector<SQLWCHAR> strVal, SQLSMALLINT strLen);
+std::wstring ConvertToWString(const std::vector<SQLWCHAR>& strVal, SQLSMALLINT strLen);
 
 /// \brief Check wide string column.
 /// \param[in] stmt Statement.

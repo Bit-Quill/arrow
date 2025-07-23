@@ -369,7 +369,7 @@ void ODBCDescriptor::GetField(SQLSMALLINT recordNumber, SQLSMALLINT fieldIdentif
     case SQL_DESC_OCTET_LENGTH_PTR:
       GetAttribute(record.m_indicatorPtr, value, bufferLength, outputLength);
       break;
-
+    case SQL_COLUMN_LENGTH:  // ODBC 2.0
     case SQL_DESC_LENGTH:
       GetAttribute(record.m_length, value, bufferLength, outputLength);
       break;
@@ -408,12 +408,14 @@ void ODBCDescriptor::GetField(SQLSMALLINT recordNumber, SQLSMALLINT fieldIdentif
     case SQL_DESC_PARAMETER_TYPE:
       GetAttribute(record.m_paramType, value, bufferLength, outputLength);
       break;
+    case SQL_COLUMN_PRECISION:  // ODBC 2.0
     case SQL_DESC_PRECISION:
       GetAttribute(record.m_precision, value, bufferLength, outputLength);
       break;
     case SQL_DESC_ROWVER:
       GetAttribute(record.m_rowVer, value, bufferLength, outputLength);
       break;
+    case SQL_COLUMN_SCALE:  // ODBC 2.0
     case SQL_DESC_SCALE:
       GetAttribute(record.m_scale, value, bufferLength, outputLength);
       break;

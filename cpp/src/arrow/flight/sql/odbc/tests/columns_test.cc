@@ -216,6 +216,76 @@ void checkSQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT idx,
   EXPECT_EQ(unsignedCol, expectedUnsignedColumn);
 }
 
+void checkSQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT idx,
+                           const std::wstring& expectedColmnName, SQLLEN expectedDataType,
+                           SQLLEN expectedDisplaySize, SQLLEN expectedPrecScale,
+                           SQLLEN expectedLength, SQLLEN expectedColumnSize,
+                           SQLLEN expectedColumnScale, SQLLEN expectedColumnNullability,
+                           SQLLEN expectedSearchable, SQLLEN expectedUnsignedColumn) {
+  std::vector<SQLWCHAR> name(ODBC_BUFFER_SIZE);
+  SQLSMALLINT nameLen = 0;
+  std::vector<SQLWCHAR> label(ODBC_BUFFER_SIZE);
+  SQLSMALLINT labelLen = 0;
+  SQLLEN dataType = 0;
+  SQLLEN displaySize = 0;
+  SQLLEN precScale = 0;
+  SQLLEN length = 0;
+  SQLLEN size = 0;
+  SQLLEN scale = 0;
+  SQLLEN nullability = 0;
+  SQLLEN searchable = 0;
+  SQLLEN unsignedCol = 0;
+
+  SQLRETURN ret = SQLColAttributes(stmt, idx, SQL_COLUMN_NAME, &name[0],
+                                   (SQLSMALLINT)name.size(), &nameLen, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_LABEL, &label[0],
+                         (SQLSMALLINT)label.size(), &labelLen, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_TYPE, 0, 0, 0, &dataType);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_DISPLAY_SIZE, 0, 0, 0, &displaySize);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(stmt, idx, SQL_COLUMN_MONEY, 0, 0, 0, &precScale);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_LENGTH, 0, 0, 0, &length);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_PRECISION, 0, 0, 0, &size);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_SCALE, 0, 0, 0, &scale);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_NULLABLE, 0, 0, 0, &nullability);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_SEARCHABLE, 0, 0, 0, &searchable);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_UNSIGNED, 0, 0, 0, &unsignedCol);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::wstring nameStr = ConvertToWString(name, nameLen);
+  std::wstring labelStr = ConvertToWString(label, labelLen);
+
+  EXPECT_EQ(nameStr, expectedColmnName);
+  EXPECT_EQ(labelStr, expectedColmnName);
+  EXPECT_EQ(dataType, expectedDataType);
+  EXPECT_EQ(displaySize, expectedDisplaySize);
+  EXPECT_EQ(length, expectedLength);
+  EXPECT_EQ(size, expectedColumnSize);
+  EXPECT_EQ(scale, expectedColumnScale);
+  EXPECT_EQ(nullability, expectedColumnNullability);
+  EXPECT_EQ(searchable, expectedSearchable);
+  EXPECT_EQ(unsignedCol, expectedUnsignedColumn);
+}
+
 void checkSQLColAttributeString(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
                                 SQLUSMALLINT fieldIdentifier,
                                 const std::wstring& expectedAttrString) {
@@ -251,6 +321,46 @@ void checkSQLColAttributeNumeric(SQLHSTMT stmt, const std::wstring& wsql,
 
   SQLLEN numVal = 0;
   ret = SQLColAttribute(stmt, idx, fieldIdentifier, 0, 0, 0, &numVal);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(numVal, expectedAttrNumeric);
+}
+
+void checkSQLColAttributesString(SQLHSTMT stmt, const std::wstring& wsql,
+                                 SQLUSMALLINT idx, SQLUSMALLINT fieldIdentifier,
+                                 const std::wstring& expectedAttrString) {
+  // Execute query and check ODBC 2.0 API SQLColAttributes string attribute
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+  SQLRETURN ret = SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::vector<SQLWCHAR> strVal(ODBC_BUFFER_SIZE);
+  SQLSMALLINT strLen = 0;
+
+  ret = SQLColAttributes(stmt, idx, fieldIdentifier, &strVal[0],
+                         (SQLSMALLINT)strVal.size(), &strLen, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  std::wstring attrStr = ConvertToWString(strVal, strLen);
+  EXPECT_EQ(attrStr, expectedAttrString);
+}
+
+void checkSQLColAttributesNumeric(SQLHSTMT stmt, const std::wstring& wsql,
+                                  SQLUSMALLINT idx, SQLUSMALLINT fieldIdentifier,
+                                  SQLLEN expectedAttrNumeric) {
+  // Execute query and check ODBC 2.0 API SQLColAttributes numeric attribute
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+  SQLRETURN ret = SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLLEN numVal = 0;
+  ret = SQLColAttributes(stmt, idx, fieldIdentifier, 0, 0, 0, &numVal);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_EQ(numVal, expectedAttrNumeric);
@@ -1220,6 +1330,71 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeAllTypes) {
   this->disconnect();
 }
 
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesAllTypesODBCVer2) {
+  // Tests ODBC 2.0 API SQLColAttributes
+  this->connect(SQL_OV_ODBC2);
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+  checkSQLColAttributes(this->stmt, 1,
+                        std::wstring(L"bigint_col"),  // expectedColmnName
+                        SQL_BIGINT,                   // expectedDataType
+                        20,                           // expectedDisplaySize
+                        SQL_FALSE,                    // expectedPrecScale
+                        8,                            // expectedLength
+                        8,                            // expectedColumnSize
+                        0,                            // expectedColumnScale
+                        SQL_NULLABLE,                 // expectedColumnNullability
+                        SQL_PRED_NONE,                // expectedSearchable
+                        SQL_FALSE);                   // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 2,
+                        std::wstring(L"char_col"),  // expectedColmnName
+                        SQL_WVARCHAR,               // expectedDataType
+                        0,                          // expectedDisplaySize
+                        SQL_FALSE,                  // expectedPrecScale
+                        0,                          // expectedLength
+                        0,                          // expectedColumnSize
+                        0,                          // expectedColumnScale
+                        SQL_NULLABLE,               // expectedColumnNullability
+                        SQL_PRED_NONE,              // expectedSearchable
+                        SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 3,
+                        std::wstring(L"varbinary_col"),  // expectedColmnName
+                        SQL_BINARY,                      // expectedDataType
+                        0,                               // expectedDisplaySize
+                        SQL_FALSE,                       // expectedPrecScale
+                        0,                               // expectedLength
+                        0,                               // expectedColumnSize
+                        0,                               // expectedColumnScale
+                        SQL_NULLABLE,                    // expectedColumnNullability
+                        SQL_PRED_NONE,                   // expectedSearchable
+                        SQL_TRUE);                       // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 4,
+                        std::wstring(L"double_col"),  // expectedColmnName
+                        SQL_DOUBLE,                   // expectedDataType
+                        24,                           // expectedDisplaySize
+                        SQL_FALSE,                    // expectedPrecScale
+                        8,                            // expectedLength
+                        8,                            // expectedColumnSize
+                        0,                            // expectedColumnScale
+                        SQL_NULLABLE,                 // expectedColumnNullability
+                        SQL_PRED_NONE,                // expectedSearchable
+                        SQL_FALSE);                   // expectedUnsignedColumn
+
+  this->disconnect();
+}
+
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
   this->connect();
@@ -1560,6 +1735,162 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
   this->disconnect();
 }
 
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
+  // Tests ODBC 2.0 API SQLColAttributes
+  // Test assumes there is a table $scratch.ODBCTest in remote server
+  this->connect(SQL_OV_ODBC2);
+
+  std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLColAttributes(this->stmt, 1,
+                        std::wstring(L"sinteger_max"),  // expectedColmnName
+                        SQL_INTEGER,                    // expectedDataType
+                        11,                             // expectedDisplaySize
+                        SQL_FALSE,                      // expectedPrecScale
+                        4,                              // expectedLength
+                        4,                              // expectedColumnSize
+                        0,                              // expectedColumnScale
+                        SQL_NULLABLE,                   // expectedColumnNullability
+                        SQL_PRED_NONE,                  // expectedSearchable
+                        SQL_FALSE);                     // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 2,
+                        std::wstring(L"sbigint_max"),  // expectedColmnName
+                        SQL_BIGINT,                    // expectedDataType
+                        20,                            // expectedDisplaySize
+                        SQL_FALSE,                     // expectedPrecScale
+                        8,                             // expectedLength
+                        8,                             // expectedColumnSize
+                        0,                             // expectedColumnScale
+                        SQL_NULLABLE,                  // expectedColumnNullability
+                        SQL_PRED_NONE,                 // expectedSearchable
+                        SQL_FALSE);                    // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 3,
+                        std::wstring(L"decimal_positive"),  // expectedColmnName
+                        SQL_DECIMAL,                        // expectedDataType
+                        40,                                 // expectedDisplaySize
+                        SQL_FALSE,                          // expectedPrecScale
+                        19,                                 // expectedLength
+                        19,                                 // expectedColumnSize
+                        0,                                  // expectedColumnScale
+                        SQL_NULLABLE,                       // expectedColumnNullability
+                        SQL_PRED_NONE,                      // expectedSearchable
+                        SQL_FALSE);                         // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 4,
+                        std::wstring(L"float_max"),  // expectedColmnName
+                        SQL_FLOAT,                   // expectedDataType
+                        24,                          // expectedDisplaySize
+                        SQL_FALSE,                   // expectedPrecScale
+                        8,                           // expectedLength
+                        8,                           // expectedColumnSize
+                        0,                           // expectedColumnScale
+                        SQL_NULLABLE,                // expectedColumnNullability
+                        SQL_PRED_NONE,               // expectedSearchable
+                        SQL_FALSE);                  // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 5,
+                        std::wstring(L"double_max"),  // expectedColmnName
+                        SQL_DOUBLE,                   // expectedDataType
+                        24,                           // expectedDisplaySize
+                        SQL_FALSE,                    // expectedPrecScale
+                        8,                            // expectedLength
+                        8,                            // expectedColumnSize
+                        0,                            // expectedColumnScale
+                        SQL_NULLABLE,                 // expectedColumnNullability
+                        SQL_PRED_NONE,                // expectedSearchable
+                        SQL_FALSE);                   // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 6,
+                        std::wstring(L"bit_true"),  // expectedColmnName
+                        SQL_BIT,                    // expectedDataType
+                        1,                          // expectedDisplaySize
+                        SQL_FALSE,                  // expectedPrecScale
+                        1,                          // expectedLength
+                        1,                          // expectedColumnSize
+                        0,                          // expectedColumnScale
+                        SQL_NULLABLE,               // expectedColumnNullability
+                        SQL_PRED_NONE,              // expectedSearchable
+                        SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 7,
+                        std::wstring(L"date_max"),  // expectedColmnName
+                        SQL_DATE,                   // expectedDataType
+                        10,                         // expectedDisplaySize
+                        SQL_FALSE,                  // expectedPrecScale
+                        10,                         // expectedLength
+                        10,                         // expectedColumnSize
+                        0,                          // expectedColumnScale
+                        SQL_NULLABLE,               // expectedColumnNullability
+                        SQL_PRED_NONE,              // expectedSearchable
+                        SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 8,
+                        std::wstring(L"time_max"),  // expectedColmnName
+                        SQL_TIME,                   // expectedDataType
+                        12,                         // expectedDisplaySize
+                        SQL_FALSE,                  // expectedPrecScale
+                        12,                         // expectedLength
+                        12,                         // expectedColumnSize
+                        3,                          // expectedColumnScale
+                        SQL_NULLABLE,               // expectedColumnNullability
+                        SQL_PRED_NONE,              // expectedSearchable
+                        SQL_TRUE);                  // expectedUnsignedColumn
+
+  checkSQLColAttributes(this->stmt, 9,
+                        std::wstring(L"timestamp_max"),  // expectedColmnName
+                        SQL_TIMESTAMP,                   // expectedDataType
+                        23,                              // expectedDisplaySize
+                        SQL_FALSE,                       // expectedPrecScale
+                        23,                              // expectedLength
+                        23,                              // expectedColumnSize
+                        3,                               // expectedColumnScale
+                        SQL_NULLABLE,                    // expectedColumnNullability
+                        SQL_PRED_NONE,                   // expectedSearchable
+                        SQL_TRUE);                       // expectedUnsignedColumn
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeCaseSensitive) {
+  // Arrow limitation: returns SQL_FALSE for case sensitive column
+  this->connect();
+
+  std::wstring wsql = this->getQueryAllDataTypes();
+  // Int column
+  checkSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_CASE_SENSITIVE, SQL_FALSE);
+  SQLFreeStmt(this->stmt, SQL_CLOSE);
+  // Varchar column
+  checkSQLColAttributeNumeric(this->stmt, wsql, 28, SQL_DESC_CASE_SENSITIVE, SQL_FALSE);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributesCaseSensitive) {
+  // Arrow limitation: returns SQL_FALSE for case sensitive column
+  // Tests ODBC 2.0 API SQLColAttributes
+  this->connect(SQL_OV_ODBC2);
+
+  std::wstring wsql = this->getQueryAllDataTypes();
+  // Int column
+  checkSQLColAttributesNumeric(this->stmt, wsql, 1, SQL_COLUMN_CASE_SENSITIVE, SQL_FALSE);
+  SQLFreeStmt(this->stmt, SQL_CLOSE);
+  // Varchar column
+  checkSQLColAttributesNumeric(this->stmt, wsql, 28, SQL_COLUMN_CASE_SENSITIVE,
+                               SQL_FALSE);
+
+  this->disconnect();
+}
+
 TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeUniqueValue) {
   // Mock server limitation: returns false for auto-increment column
   this->connect();
@@ -1571,6 +1902,18 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeUniqueValue) {
   this->disconnect();
 }
 
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesAutoIncrement) {
+  // Tests ODBC 2.0 API SQLColAttributes
+  // Mock server limitation: returns false for auto-increment column
+  this->connect(SQL_OV_ODBC2);
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  checkSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_COLUMN_AUTO_INCREMENT, SQL_FALSE);
+
+  this->disconnect();
+}
+
 TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeBaseTableName) {
   this->connect();
   this->CreateTableAllDataType();
@@ -1578,6 +1921,18 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeBaseTableName) {
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_BASE_TABLE_NAME,
                              std::wstring(L"AllTypesTable"));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesTableName) {
+  // Tests ODBC 2.0 API SQLColAttributes
+  this->connect(SQL_OV_ODBC2);
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  checkSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TABLE_NAME,
+                              std::wstring(L"AllTypesTable"));
 
   this->disconnect();
 }
@@ -1595,25 +1950,70 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeCatalogName) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeCount) {
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeCatalogName) {
+  // Remote server does not have catalogs
   this->connect();
+
+  std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_CATALOG_NAME,
+                             std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesQualifierName) {
+  // Mock server limitattion: mock doesn't return catalog for result metadata,
+  // and the defautl catalog should be 'main'
+  // Tests ODBC 2.0 API SQLColAttributes
+  this->connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_COLUMN_QUALIFIER_NAME,
+                             std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesQualifierName) {
+  // Remote server does not have catalogs
+  // Tests ODBC 2.0 API SQLColAttributes
+  this->connect(SQL_OV_ODBC2);
+
+  std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_COLUMN_QUALIFIER_NAME,
+                             std::wstring(L""));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeCount) {
+  this->connect();
+
+  std::wstring wsql = this->getQueryAllDataTypes();
   // Pass 0 as column number, driver should ignore it
-  checkSQLColAttributeNumeric(this->stmt, wsql, 0, SQL_DESC_COUNT, 4);
+  checkSQLColAttributeNumeric(this->stmt, wsql, 0, SQL_DESC_COUNT, 32);
 
   this->disconnect();
 }
 
 TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeLocalTypeName) {
   this->connect();
-  this->CreateTableAllDataType();
 
-  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  std::wstring wsql = this->getQueryAllDataTypes();
   // Mock server doesn't have local type name
   checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_LOCAL_TYPE_NAME,
                              std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeLocalTypeName) {
+  this->connect();
+
+  std::wstring wsql = this->getQueryAllDataTypes();
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_LOCAL_TYPE_NAME,
+                             std::wstring(L"INTEGER"));
 
   this->disconnect();
 }
@@ -1626,6 +2026,46 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeSchemaName) {
   // Mock server doesn't have schemas
   checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_SCHEMA_NAME,
                              std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeSchemaName) {
+  // Test assumes there is a table $scratch.ODBCTest in remote server
+  this->connect();
+
+  std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
+  // Remote server limitation: doesn't return schema name, expected schema name is
+  // $scratch
+  checkSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_SCHEMA_NAME,
+                             std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesOwnerName) {
+  // Tests ODBC 2.0 API SQLColAttributes
+  this->connect(SQL_OV_ODBC2);
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  // Mock server doesn't have schemas
+  checkSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_OWNER_NAME,
+                              std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesOwnerName) {
+  // Test assumes there is a table $scratch.ODBCTest in remote server
+  // Tests ODBC 2.0 API SQLColAttributes
+  this->connect(SQL_OV_ODBC2);
+
+  std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
+  // Remote server limitation: doesn't return schema name, expected schema name is
+  // $scratch
+  checkSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_OWNER_NAME,
+                              std::wstring(L""));
 
   this->disconnect();
 }
@@ -1662,24 +2102,58 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeTypeName) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeUnnamed) {
-  this->connect();
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesTypeName) {
+  // Tests ODBC 2.0 API SQLColAttributes
+  this->connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
+  // Mock server doesn't return data source-dependent data type name
+  checkSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TYPE_NAME,
+                              std::wstring(L""));
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesTypeName) {
+  // Tests ODBC 2.0 API SQLColAttributes
+  this->connect(SQL_OV_ODBC2);
+
+  std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
+  checkSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TYPE_NAME,
+                              std::wstring(L"INTEGER"));
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeUnnamed) {
+  this->connect();
+
+  std::wstring wsql = this->getQueryAllDataTypes();
   checkSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_UNNAMED, SQL_NAMED);
 
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeUpdatable) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeUpdatable) {
   this->connect();
-  this->CreateTableAllDataType();
 
-  std::wstring wsql = L"SELECT * from AllTypesTable;";
-  // Mock server does not return updatable information
+  std::wstring wsql = this->getQueryAllDataTypes();
+  // Mock server and remote server do not return updatable information
   checkSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_UPDATABLE,
                               SQL_ATTR_READWRITE_UNKNOWN);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributesUpdatable) {
+  // Tests ODBC 2.0 API SQLColAttributes
+  this->connect(SQL_OV_ODBC2);
+
+  std::wstring wsql = this->getQueryAllDataTypes();
+  // Mock server and remote server do not return updatable information
+  checkSQLColAttributesNumeric(this->stmt, wsql, 1, SQL_COLUMN_UPDATABLE,
+                               SQL_ATTR_READWRITE_UNKNOWN);
 
   this->disconnect();
 }
