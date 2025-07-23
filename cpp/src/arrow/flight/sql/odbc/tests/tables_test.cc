@@ -181,10 +181,13 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestGetMetadataForAllSchemas) {
   SQLWCHAR empty[] = L"";
   SQLWCHAR SQL_ALL_SCHEMAS_W[] = L"%";
   std::set<std::wstring> actualSchemas;
-  std::set<std::wstring> expectedSchemas = {L"$scratch", L"INFORMATION_SCHEMA", L"sys", L"sys.cache"};
+  std::set<std::wstring> expectedSchemas = {L"$scratch", L"INFORMATION_SCHEMA", L"sys",
+                                            L"sys.cache"};
 
-  // Return is unordered and contains user specific schemas, so collect schema names for comparison
-  SQLRETURN ret = SQLTables(this->stmt, empty, SQL_NTS, SQL_ALL_SCHEMAS_W, SQL_NTS, empty, SQL_NTS, empty, SQL_NTS);
+  // Return is unordered and contains user specific schemas, so collect schema names for
+  // comparison with a known list
+  SQLRETURN ret = SQLTables(this->stmt, empty, SQL_NTS, SQL_ALL_SCHEMAS_W, SQL_NTS, empty,
+                            SQL_NTS, empty, SQL_NTS);
 
   ASSERT_EQ(ret, SQL_SUCCESS);
 
