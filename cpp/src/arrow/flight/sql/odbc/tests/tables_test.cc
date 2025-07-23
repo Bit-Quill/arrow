@@ -34,6 +34,27 @@ namespace arrow::flight::sql::odbc {
 // TODO: Add tests with SQLDescribeCol to check metadata of SQLColumns for ODBC 2 and
 // ODBC 3.
 
+// Helper Functions
+
+std::wstring GetStringColumnW(SQLHSTMT stmt, int colId) {
+  SQLWCHAR buf[1024];
+  SQLLEN lenIndicator = 0;
+
+  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, sizeof(buf), &lenIndicator);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  if (lenIndicator == SQL_NULL_DATA) {
+    return L"";
+  }
+
+  // indicator is in bytes, so convert to character count
+  size_t charCount = static_cast<size_t>(lenIndicator) / ODBC::GetSqlWCharSize();
+  return std::wstring(buf, buf + charCount);
+}
+
+// Test Cases
+
 TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestInputData) {
   this->connect();
 
@@ -154,7 +175,42 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetSchemaHasNoData) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestGetAllSchema) {
+TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestGetMetadataForAllSchemas) {
+  this->connect();
+
+  SQLWCHAR empty[] = L"";
+  SQLWCHAR SQL_ALL_SCHEMAS_W[] = L"%";
+  std::set<std::wstring> actualSchemas;
+  std::set<std::wstring> expectedSchemas = {L"$scratch", L"INFORMATION_SCHEMA", L"sys", L"sys.cache"};
+
+  // Return is unordered and contains user specific schemas, so collect schema names for comparison
+  SQLRETURN ret = SQLTables(this->stmt, empty, SQL_NTS, SQL_ALL_SCHEMAS_W, SQL_NTS, empty, SQL_NTS, empty, SQL_NTS);
+
+  ASSERT_EQ(ret, SQL_SUCCESS);
+
+  while (true) {
+    ret = SQLFetch(this->stmt);
+    if (ret == SQL_NO_DATA) break;
+    ASSERT_EQ(ret, SQL_SUCCESS);
+
+    CheckNullColumnW(this->stmt, 1);
+    std::wstring schema = GetStringColumnW(this->stmt, 2);
+    CheckNullColumnW(this->stmt, 3);
+    CheckNullColumnW(this->stmt, 4);
+    CheckNullColumnW(this->stmt, 5);
+
+    // Skip user-specific schemas like "@UserName"
+    if (!schema.empty() && schema[0] != L'@') {
+      actualSchemas.insert(schema);
+    }
+  }
+
+  EXPECT_EQ(actualSchemas, expectedSchemas);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestFilterByAllSchema) {
   // Requires creation of user table named ODBCTest using schema $scratch in remote server
   this->connect();
 
