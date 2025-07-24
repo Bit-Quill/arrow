@@ -282,7 +282,7 @@ bool FlightSqlResultSetMetadata::IsUnsigned(int column_position) {
 }
 
 bool FlightSqlResultSetMetadata::IsFixedPrecScale(int column_position) {
-  // Arrow doesn't have data types with fixed precision that user cannot modify
+  // Precision for Arrow data types are modifiable by the user
   return false;
 }
 
