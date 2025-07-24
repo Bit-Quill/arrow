@@ -179,18 +179,14 @@ SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT stmt) {
   return SQL_ERROR;
 }
 
-SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT columnNumber,
+SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
                                   SQLUSMALLINT fieldIdentifier,
                                   SQLPOINTER characterAttributePtr,
-                                  SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr,
+                                  SQLSMALLINT bufferLength, SQLSMALLINT* outputLength,
                                   SQLLEN* numericAttributePtr) {
-  LOG_DEBUG(
-      "SQLColAttributeW called with stmt: {}, columnNumber: {}, "
-      "fieldIdentifier: {}, characterAttributePtr: {}, bufferLength: {}, "
-      "stringLengthPtr: {}, numericAttributePtr: {}",
-      stmt, columnNumber, fieldIdentifier, characterAttributePtr, bufferLength,
-      fmt::ptr(stringLengthPtr), fmt::ptr(numericAttributePtr));
-  return SQL_ERROR;
+  return arrow::SQLColAttribute(stmt, recordNumber, fieldIdentifier,
+                                characterAttributePtr, bufferLength, outputLength,
+                                numericAttributePtr);
 }
 
 SQLRETURN SQL_API SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
