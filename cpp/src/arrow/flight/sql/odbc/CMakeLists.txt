@@ -41,7 +41,7 @@ add_definitions(-DUNICODE=1)
 
 include(FetchContent)
 fetchcontent_declare(spdlog
-                     URL https://github.com/gabime/spdlog/archive/76fb40d95455f249bd70824ecfcae7a8f0930fa3.zip
+                     URL https://github.com/gabime/spdlog/archive/refs/tags/v1.15.3.zip
                          CONFIGURE_COMMAND
                          ""
                          BUILD_COMMAND
