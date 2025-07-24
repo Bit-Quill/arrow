@@ -83,4 +83,8 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNa
                      SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
                      SQLWCHAR* tableName, SQLSMALLINT tableNameLength,
                      SQLWCHAR* columnName, SQLSMALLINT columnNameLength);
+SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
+                          SQLUSMALLINT fieldIdentifier, SQLPOINTER characterAttributePtr,
+                          SQLSMALLINT bufferLength, SQLSMALLINT* outputLength,
+                          SQLLEN* numericAttributePtr);
 }  // namespace arrow

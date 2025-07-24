@@ -408,6 +408,19 @@ bool writeDSN(Connection::ConnPropertyMap properties) {
   return RegisterDsn(config, wDriver.c_str());
 }
 
+std::wstring ConvertToWString(const std::vector<SQLWCHAR>& strVal, SQLSMALLINT strLen) {
+  std::wstring attrStr;
+  if (strLen == 0) {
+    attrStr = std::wstring(&strVal[0]);
+  } else {
+    EXPECT_GT(strLen, 0);
+    EXPECT_LE(strLen, static_cast<SQLSMALLINT>(ODBC_BUFFER_SIZE));
+    attrStr =
+        std::wstring(strVal.begin(), strVal.begin() + strLen / ODBC::GetSqlWCharSize());
+  }
+  return attrStr;
+}
+
 void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected) {
   SQLWCHAR buf[1024];
   SQLLEN bufLen = sizeof(buf) * ODBC::GetSqlWCharSize();
