@@ -30,7 +30,6 @@
 #include "gtest/gtest.h"
 
 namespace arrow::flight::sql::odbc {
-
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   this->connect();
 
@@ -2235,5 +2234,4 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExtendedFetchQueryNullIndicator) {
 
   this->disconnect();
 }
-
 }  // namespace arrow::flight::sql::odbc

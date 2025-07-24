@@ -1147,4 +1147,99 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNa
     return SQL_SUCCESS;
   });
 }
+
+SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
+                          SQLUSMALLINT fieldIdentifier, SQLPOINTER characterAttributePtr,
+                          SQLSMALLINT bufferLength, SQLSMALLINT* outputLength,
+                          SQLLEN* numericAttributePtr) {
+  LOG_DEBUG(
+      "SQLColAttributeW called with stmt: {}, recordNumber: {}, "
+      "fieldIdentifier: {}, characterAttributePtr: {}, bufferLength: {}, "
+      "outputLength: {}, numericAttributePtr: {}",
+      stmt, recordNumber, fieldIdentifier, characterAttributePtr, bufferLength,
+      fmt::ptr(outputLength), fmt::ptr(numericAttributePtr));
+  using ODBC::ODBCDescriptor;
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    ODBCDescriptor* ird = statement->GetIRD();
+    SQLINTEGER outputLengthInt;
+    switch (fieldIdentifier) {
+      // Numeric attributes
+      // internal is SQLLEN, no conversion is needed
+      case SQL_DESC_DISPLAY_SIZE:
+      case SQL_DESC_OCTET_LENGTH: {
+        ird->GetField(recordNumber, fieldIdentifier, numericAttributePtr, bufferLength,
+                      &outputLengthInt);
+        break;
+      }
+      // internal is SQLULEN, conversion is needed.
+      case SQL_COLUMN_LENGTH:  // ODBC 2.0
+      case SQL_DESC_LENGTH: {
+        SQLULEN temp;
+        ird->GetField(recordNumber, fieldIdentifier, &temp, bufferLength,
+                      &outputLengthInt);
+        if (numericAttributePtr) {
+          *numericAttributePtr = static_cast<SQLLEN>(temp);
+        }
+        break;
+      }
+      // internal is SQLINTEGER, conversion is needed.
+      case SQL_DESC_AUTO_UNIQUE_VALUE:
+      case SQL_DESC_CASE_SENSITIVE:
+      case SQL_DESC_NUM_PREC_RADIX: {
+        SQLINTEGER temp;
+        ird->GetField(recordNumber, fieldIdentifier, &temp, bufferLength,
+                      &outputLengthInt);
+        if (numericAttributePtr) {
+          *numericAttributePtr = static_cast<SQLLEN>(temp);
+        }
+        break;
+      }
+      // internal is SQLSMALLINT, conversion is needed.
+      case SQL_DESC_CONCISE_TYPE:
+      case SQL_DESC_COUNT:
+      case SQL_DESC_FIXED_PREC_SCALE:
+      case SQL_DESC_TYPE:
+      case SQL_DESC_NULLABLE:
+      case SQL_COLUMN_PRECISION:  // ODBC 2.0
+      case SQL_DESC_PRECISION:
+      case SQL_COLUMN_SCALE:  // ODBC 2.0
+      case SQL_DESC_SCALE:
+      case SQL_DESC_SEARCHABLE:
+      case SQL_DESC_UNNAMED:
+      case SQL_DESC_UNSIGNED:
+      case SQL_DESC_UPDATABLE: {
+        SQLSMALLINT temp;
+        ird->GetField(recordNumber, fieldIdentifier, &temp, bufferLength,
+                      &outputLengthInt);
+        if (numericAttributePtr) {
+          *numericAttributePtr = static_cast<SQLLEN>(temp);
+        }
+        break;
+      }
+      // Character attributes
+      case SQL_DESC_BASE_COLUMN_NAME:
+      case SQL_DESC_BASE_TABLE_NAME:
+      case SQL_DESC_CATALOG_NAME:
+      case SQL_DESC_LABEL:
+      case SQL_DESC_LITERAL_PREFIX:
+      case SQL_DESC_LITERAL_SUFFIX:
+      case SQL_DESC_LOCAL_TYPE_NAME:
+      case SQL_DESC_NAME:
+      case SQL_DESC_SCHEMA_NAME:
+      case SQL_DESC_TABLE_NAME:
+      case SQL_DESC_TYPE_NAME:
+        ird->GetField(recordNumber, fieldIdentifier, characterAttributePtr, bufferLength,
+                      &outputLengthInt);
+        break;
+      default:
+        throw DriverException("Invalid descriptor field", "HY091");
+    }
+    if (outputLength) {
+      *outputLength = static_cast<SQLSMALLINT>(outputLengthInt);
+    }
+    return SQL_SUCCESS;
+  });
+}
 }  // namespace arrow
