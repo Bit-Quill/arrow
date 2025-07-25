@@ -1286,8 +1286,8 @@ SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
 
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetAttributeSQLWCHAR;
-  using ODBC::SqlWcharToString;
   using ODBC::ODBCConnection;
+  using ODBC::SqlWcharToString;
 
   return ODBCConnection::ExecuteWithDiagnostics(connectionHandle, SQL_ERROR, [=]() {
     const bool isLengthInBytes = false;
@@ -1302,7 +1302,7 @@ SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
     if (inStatementTextLength > 0) {
       inputCharLen = inStatementTextLength;
     } else if (inStatementTextLength == SQL_NTS) {
-    while (inStatementText[inputCharLen] != 0) ++inputCharLen;
+      while (inStatementText[inputCharLen] != 0) ++inputCharLen;
     } else {
       throw DriverException("Invalid string or buffer length", "HY090");
     }
@@ -1313,8 +1313,7 @@ SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
     std::string inStatementStr = SqlWcharToString(inStatementText, inputCharLen);
 
     return GetAttributeSQLWCHAR(inStatementStr, isLengthInBytes, outStatementText,
-                                bufferLength,
-                                outStatementTextLength, diagnostics);
+                                bufferLength, outStatementTextLength, diagnostics);
   });
 }
 

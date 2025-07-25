@@ -30,7 +30,6 @@
 #include "gtest/gtest.h"
 
 namespace arrow::flight::sql::odbc {
-
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   this->connect();
 
@@ -2247,8 +2246,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputString) {
   std::wstring expectedString = std::wstring(inputStr);
 
   SQLRETURN ret =
-      SQLNativeSql(conn, inputStr, inputCharLen, buf, bufCharLen,
-                                       &outputCharLen);
+      SQLNativeSql(conn, inputStr, inputCharLen, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
