@@ -125,6 +125,9 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   /// \brief Return a SQL query that selects all data types
   std::wstring getQueryAllDataTypes() override;
 
+  /// \brief Run a SQL query to create default table for table test cases
+  void CreateTestTables();
+
   /// \brief run a SQL query to create a table with all data types
   void CreateTableAllDataType();
   /// \brief run a SQL query to create a table with unicode name
@@ -220,4 +223,9 @@ void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& expected);
 /// \param[in] colId Column ID to check.
 /// \param[in] expected Expected value.
 void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& expected);
+
+/// \brief Check sql return against expected.
+/// \param[in] stmt Statement.
+/// \param[in] expected Expected return.
+void ValidateFetch(SQLHSTMT stmt, SQLRETURN expected);
 }  // namespace arrow::flight::sql::odbc
