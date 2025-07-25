@@ -36,6 +36,7 @@ add_arrow_test(flight_sql_odbc_test
                connection_info_test.cc
                statement_attr_test.cc
                statement_test.cc
+               tables_test.cc
                # Connection test needs to be put last to resolve segfault issue
                connection_test.cc
                odbc_test_suite.cc
