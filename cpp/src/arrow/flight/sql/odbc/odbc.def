@@ -30,7 +30,6 @@ EXPORTS
 	SQLConnectW
 	SQLDisconnect
 	SQLDriverConnectW
-	SQLErrorW
 	SQLExecDirectW
 	SQLExecute
 	SQLExtendedFetch
