@@ -274,6 +274,19 @@ std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
   return wsql;
 }
 
+void FlightSQLODBCMockTestBase::CreateTestTables() {
+  ASSERT_OK(server->ExecuteSql(R"(
+    CREATE TABLE TestTable (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    keyName varchar(100),
+    value int);
+
+    INSERT INTO TestTable (keyName, value) VALUES ('One', 1);
+    INSERT INTO TestTable (keyName, value) VALUES ('Two', 0);
+    INSERT INTO TestTable (keyName, value) VALUES ('Three', -1);
+  )"));
+}
+
 void FlightSQLODBCMockTestBase::CreateTableAllDataType() {
   // Limitation on mock SQLite server:
   // Only int64, float64, binary, and utf8 Arrow Types are supported by
@@ -465,6 +478,12 @@ void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& expected) 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_EQ(buf, expected);
+}
+
+void ValidateFetch(SQLHSTMT stmt, SQLRETURN expectedReturn) {
+  SQLRETURN ret = SQLFetch(stmt);
+
+  EXPECT_EQ(ret, expectedReturn);
 }
 
 }  // namespace arrow::flight::sql::odbc
