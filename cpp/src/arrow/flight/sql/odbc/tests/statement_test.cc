@@ -2305,6 +2305,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsTruncatedString) {
                                &outputCharLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_01004);
 
   // Returned text length represents full string char length regardless of truncation
   EXPECT_EQ(outputCharLen, inputCharLen);
@@ -2329,14 +2330,17 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsErrorOnBadInputs) {
       SQLNativeSql(conn, nullptr, inputCharLen, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_ERROR);
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY009);
 
   ret = SQLNativeSql(conn, nullptr, SQL_NTS, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_ERROR);
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY009);
 
   ret = SQLNativeSql(conn, inputStr, -100, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_ERROR);
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY090);
 
   this->disconnect();
 }
