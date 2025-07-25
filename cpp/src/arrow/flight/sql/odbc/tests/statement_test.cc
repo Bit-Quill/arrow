@@ -30,6 +30,7 @@
 #include "gtest/gtest.h"
 
 namespace arrow::flight::sql::odbc {
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   this->connect();
 
@@ -2234,4 +2235,110 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExtendedFetchQueryNullIndicator) {
 
   this->disconnect();
 }
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputString) {
+  this->connect();
+
+  SQLWCHAR buf[1024];
+  constexpr SQLINTEGER bufCharLen = sizeof(buf) / ODBC::GetSqlWCharSize();
+  SQLWCHAR inputStr[] = L"SELECT * FROM mytable WHERE id == 1";
+  SQLINTEGER inputCharLen = static_cast<SQLINTEGER>(wcslen(inputStr));
+  SQLINTEGER outputCharLen = 0;
+  std::wstring expectedString = std::wstring(inputStr);
+
+  SQLRETURN ret =
+      SQLNativeSql(conn, inputStr, inputCharLen, buf, bufCharLen,
+                                       &outputCharLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(outputCharLen, inputCharLen);
+
+  // returned length is in characters
+  std::wstring returnedString(buf, buf + outputCharLen);
+
+  EXPECT_EQ(returnedString, expectedString);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputStringLength) {
+  this->connect();
+
+  SQLWCHAR inputStr[] = L"SELECT * FROM mytable WHERE id == 1";
+  SQLINTEGER inputCharLen = static_cast<SQLINTEGER>(wcslen(inputStr));
+  SQLINTEGER outputCharLen = 0;
+  std::wstring expectedString = std::wstring(inputStr);
+
+  SQLRETURN ret = SQLNativeSql(conn, inputStr, inputCharLen, nullptr, 0, &outputCharLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(outputCharLen, inputCharLen);
+
+  ret = SQLNativeSql(conn, inputStr, SQL_NTS, nullptr, 0, &outputCharLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(outputCharLen, inputCharLen);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsTruncatedString) {
+  this->connect();
+
+  const SQLINTEGER smallBufSizeInChar = 11;
+  SQLWCHAR smallBuf[smallBufSizeInChar];
+  constexpr SQLINTEGER smallBufCharLen = sizeof(smallBuf) / ODBC::GetSqlWCharSize();
+  SQLWCHAR inputStr[] = L"SELECT * FROM mytable WHERE id == 1";
+  SQLINTEGER inputCharLen = static_cast<SQLINTEGER>(wcslen(inputStr));
+  SQLINTEGER outputCharLen = 0;
+
+  // Create expected return string based on buf size
+  SQLWCHAR expectedStringBuf[smallBufSizeInChar];
+  wcsncpy(expectedStringBuf, inputStr, 10);
+  expectedStringBuf[10] = L'\0';
+  std::wstring expectedString(expectedStringBuf, expectedStringBuf + smallBufSizeInChar);
+
+  SQLRETURN ret = SQLNativeSql(conn, inputStr, inputCharLen, smallBuf, smallBufCharLen,
+                               &outputCharLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+
+  // Returned text length represents full string char length regardless of truncation
+  EXPECT_EQ(outputCharLen, inputCharLen);
+
+  std::wstring returnedString(smallBuf, smallBuf + smallBufCharLen);
+
+  EXPECT_EQ(returnedString, expectedString);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsErrorOnBadInputs) {
+  this->connect();
+
+  SQLWCHAR buf[1024];
+  constexpr SQLINTEGER bufCharLen = sizeof(buf) / ODBC::GetSqlWCharSize();
+  SQLWCHAR inputStr[] = L"SELECT * FROM mytable WHERE id == 1";
+  SQLINTEGER inputCharLen = static_cast<SQLINTEGER>(wcslen(inputStr));
+  SQLINTEGER outputCharLen = 0;
+
+  SQLRETURN ret =
+      SQLNativeSql(conn, nullptr, inputCharLen, buf, bufCharLen, &outputCharLen);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  ret = SQLNativeSql(conn, nullptr, SQL_NTS, buf, bufCharLen, &outputCharLen);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  ret = SQLNativeSql(conn, inputStr, -100, buf, bufCharLen, &outputCharLen);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc

@@ -1273,4 +1273,54 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
     return SQL_SUCCESS;
   });
 }
+
+SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
+                       SQLINTEGER inStatementTextLength, SQLWCHAR* outStatementText,
+                       SQLINTEGER bufferLength, SQLINTEGER* outStatementTextLength) {
+  LOG_DEBUG(
+      "SQLNativeSqlW called with connectionHandle: {}, inStatementText: {}, "
+      "inStatementTextLength: "
+      "{}, outStatementText: {}, bufferLength: {}, outStatementTextLength: {}",
+      connectionHandle, fmt::ptr(inStatementText), inStatementTextLength,
+      fmt::ptr(outStatementText), bufferLength, fmt::ptr(outStatementTextLength));
+  using ODBC::ODBCConnection;
+
+  return ODBCConnection::ExecuteWithDiagnostics(connectionHandle, SQL_ERROR, [=]() {
+    SQLINTEGER inputCharLen = 0;
+
+    if (!inStatementText) {
+      return SQL_ERROR;
+    }
+
+    // Set the input string character length
+    if (inStatementTextLength > 0) {
+      inputCharLen = inStatementTextLength;
+    } else if (inStatementTextLength == SQL_NTS) {
+      while (inStatementText[inputCharLen] != 0) ++inputCharLen;
+    } else {
+      return SQL_ERROR;
+    }
+
+    if (outStatementTextLength) {
+      *outStatementTextLength = inputCharLen;
+    }
+
+    // If only output string char length needed, then return
+    if (!outStatementText || bufferLength == 0) {
+      return SQL_SUCCESS;
+    }
+
+    SQLINTEGER charsToCopy = inputCharLen;
+    if (charsToCopy >= bufferLength) {
+      // Reserve space for null terminator
+      charsToCopy = bufferLength - 1;
+    }
+
+    // Copy characters to output buffer and terminate with null
+    std::wmemcpy(outStatementText, inStatementText, charsToCopy);
+    outStatementText[charsToCopy] = L'\0';
+
+    return (charsToCopy < inputCharLen) ? SQL_SUCCESS_WITH_INFO : SQL_SUCCESS;
+  });
+}
 }  // namespace arrow
