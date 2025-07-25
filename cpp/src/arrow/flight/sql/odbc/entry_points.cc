@@ -189,6 +189,16 @@ SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
                                 numericAttributePtr);
 }
 
+SQLRETURN SQL_API SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
+                            SQLSMALLINT catalogNameLength, SQLWCHAR* schemaName,
+                            SQLSMALLINT schemaNameLength, SQLWCHAR* tableName,
+                            SQLSMALLINT tableNameLength, SQLWCHAR* tableType,
+                            SQLSMALLINT tableTypeLength) {
+  return arrow::SQLTables(stmt, catalogName, catalogNameLength, schemaName,
+                          schemaNameLength, tableName, tableNameLength, tableType,
+                          tableTypeLength);
+}
+
 SQLRETURN SQL_API SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
                              SQLSMALLINT catalogNameLength, SQLWCHAR* schemaName,
                              SQLSMALLINT schemaNameLength, SQLWCHAR* tableName,
@@ -277,21 +287,4 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
 SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
                                  SQLINTEGER stringLength) {
   return arrow::SQLSetStmtAttr(stmt, attribute, valuePtr, stringLength);
-}
-
-SQLRETURN SQL_API SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName,
-                            SQLSMALLINT catalogNameLength, SQLWCHAR* schemaName,
-                            SQLSMALLINT schemaNameLength, SQLWCHAR* tableName,
-                            SQLSMALLINT tableNameLength, SQLWCHAR* tableType,
-                            SQLSMALLINT tableTypeLength) {
-  LOG_DEBUG(
-      "SQLTablesW called with stmt: {}, catalogName: {}, catalogNameLength: "
-      "{}, "
-      "schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}, "
-      "tableType: {}, "
-      "tableTypeLength: {}",
-      stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
-      schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(tableType),
-      tableTypeLength);
-  return SQL_ERROR;
 }
