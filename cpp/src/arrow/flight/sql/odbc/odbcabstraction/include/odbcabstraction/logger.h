@@ -18,6 +18,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <string>
 
 #include <spdlog/fmt/fmt.h>
