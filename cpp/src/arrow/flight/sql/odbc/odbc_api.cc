@@ -1291,26 +1291,11 @@ SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
 
   return ODBCConnection::ExecuteWithDiagnostics(connectionHandle, SQL_ERROR, [=]() {
     const bool isLengthInBytes = false;
-    SQLINTEGER inputCharLen = 0;
-
-    if (!inStatementText) {
-      // Normally caught by driver manager
-      throw DriverException("Invalid use of null pointer", "HY009");
-    }
-
-    // Set the input string character length
-    if (inStatementTextLength > 0) {
-      inputCharLen = inStatementTextLength;
-    } else if (inStatementTextLength == SQL_NTS) {
-      while (inStatementText[inputCharLen] != 0) ++inputCharLen;
-    } else {
-      throw DriverException("Invalid string or buffer length", "HY090");
-    }
 
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(connectionHandle);
     Diagnostics& diagnostics = connection->GetDiagnostics();
 
-    std::string inStatementStr = SqlWcharToString(inStatementText, inputCharLen);
+    std::string inStatementStr = SqlWcharToString(inStatementText, inStatementTextLength);
 
     return GetAttributeSQLWCHAR(inStatementStr, isLengthInBytes, outStatementText,
                                 bufferLength, outStatementTextLength, diagnostics);

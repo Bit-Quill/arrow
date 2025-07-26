@@ -2260,6 +2260,31 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputString) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsNTSInputString) {
+  this->connect();
+
+  SQLWCHAR buf[1024];
+  constexpr SQLINTEGER bufCharLen = sizeof(buf) / ODBC::GetSqlWCharSize();
+  SQLWCHAR inputStr[] = L"SELECT * FROM mytable WHERE id == 1";
+  SQLINTEGER inputCharLen = static_cast<SQLINTEGER>(wcslen(inputStr));
+  SQLINTEGER outputCharLen = 0;
+  std::wstring expectedString = std::wstring(inputStr);
+
+  SQLRETURN ret =
+      SQLNativeSql(conn, inputStr, SQL_NTS, buf, bufCharLen, &outputCharLen);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(outputCharLen, inputCharLen);
+
+  // returned length is in characters
+  std::wstring returnedString(buf, buf + outputCharLen);
+
+  EXPECT_EQ(returnedString, expectedString);
+
+  this->disconnect();
+}
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputStringLength) {
   this->connect();
 
