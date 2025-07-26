@@ -1273,4 +1273,33 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
     return SQL_SUCCESS;
   });
 }
+
+SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
+                       SQLINTEGER inStatementTextLength, SQLWCHAR* outStatementText,
+                       SQLINTEGER bufferLength, SQLINTEGER* outStatementTextLength) {
+  LOG_DEBUG(
+      "SQLNativeSqlW called with connectionHandle: {}, inStatementText: {}, "
+      "inStatementTextLength: {}, outStatementText: {}, bufferLength: {}, "
+      "outStatementTextLength: {}",
+      connectionHandle, fmt::ptr(inStatementText), inStatementTextLength,
+      fmt::ptr(outStatementText), bufferLength, fmt::ptr(outStatementTextLength));
+
+  using driver::odbcabstraction::Diagnostics;
+  using ODBC::GetAttributeSQLWCHAR;
+  using ODBC::ODBCConnection;
+  using ODBC::SqlWcharToString;
+
+  return ODBCConnection::ExecuteWithDiagnostics(connectionHandle, SQL_ERROR, [=]() {
+    const bool isLengthInBytes = false;
+
+    ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(connectionHandle);
+    Diagnostics& diagnostics = connection->GetDiagnostics();
+
+    std::string inStatementStr = SqlWcharToString(inStatementText, inStatementTextLength);
+
+    return GetAttributeSQLWCHAR(inStatementStr, isLengthInBytes, outStatementText,
+                                bufferLength, outStatementTextLength, diagnostics);
+  });
+}
+
 }  // namespace arrow
