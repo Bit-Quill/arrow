@@ -2270,8 +2270,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsNTSInputString) {
   SQLINTEGER outputCharLen = 0;
   std::wstring expectedString = std::wstring(inputStr);
 
-  SQLRETURN ret =
-      SQLNativeSql(conn, inputStr, SQL_NTS, buf, bufCharLen, &outputCharLen);
+  SQLRETURN ret = SQLNativeSql(conn, inputStr, SQL_NTS, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
