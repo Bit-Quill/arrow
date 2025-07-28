@@ -776,7 +776,7 @@ void ODBCStatement::getColumnCount(SQLSMALLINT* columnCountPtr) {
     // error
     return;
   }
-  size_t columnCount = m_currentArd->GetRecords().size();
+  size_t columnCount = m_ird->GetRecords().size();
   *columnCountPtr = static_cast<SQLSMALLINT>(columnCount);
 }
 
