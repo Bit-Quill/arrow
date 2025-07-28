@@ -2400,4 +2400,50 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsErrorOnBadInputs) {
   this->disconnect();
 }
 
+TEST_F(FlightSQLODBCMockTestBase, SQLRowCountReturnsNegativeOneOnSelect) {
+  this->connect();
+  this->CreateTestTables();
+
+  SQLLEN rowCount = 0;
+  SQLLEN expectedValue = -1;
+  SQLWCHAR sqlQuery[] = L"SELECT * FROM TestTable;";
+  SQLINTEGER queryLength = static_cast<SQLINTEGER>(wcslen(sqlQuery));
+
+  SQLRETURN ret = SQLExecDirect(this->stmt, sqlQuery, queryLength);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  CheckIntColumn(this->stmt, 1, 1);
+  CheckStringColumnW(this->stmt, 2, L"One");
+  CheckIntColumn(this->stmt, 3, 1);
+
+  ret = SQLRowCount(this->stmt, &rowCount);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(rowCount, expectedValue);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountFunctionSequenceErrorOnNoQuery) {
+  this->connect();
+
+  SQLLEN rowCount = 0;
+  SQLLEN expectedValue = 0;
+
+  SQLRETURN ret = SQLRowCount(this->stmt, &rowCount);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
+
+  EXPECT_EQ(rowCount, expectedValue);
+
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc
