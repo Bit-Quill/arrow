@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// platform.h includes windows.h, so it needs to be included first
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
+
 #ifdef _WIN32
 #  include <windows.h>
 #endif
@@ -26,6 +29,11 @@
 
 #include "arrow/flight/sql/odbc/odbc_api.h"
 #include "arrow/flight/sql/odbc/visibility.h"
+
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_descriptor.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_environment.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_statement.h"
 
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/logger.h"
 
@@ -171,12 +179,20 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLI
 
 SQLRETURN SQL_API SQLCancel(SQLHSTMT stmt) {
   LOG_DEBUG("SQLCancel called with stmt: {}", stmt);
-  return SQL_ERROR;
+  return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    throw driver::odbcabstraction::DriverException("SQLCancel is not implemented",
+                                                   "IM001");
+    return SQL_ERROR;
+  });
 }
 
 SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT stmt) {
   LOG_DEBUG("SQLCloseCursor called with stmt: {}", stmt);
-  return SQL_ERROR;
+  return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    throw driver::odbcabstraction::DriverException("SQLCloseCursor is not implemented",
+                                                   "IM001");
+    return SQL_ERROR;
+  });
 }
 
 SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
@@ -209,18 +225,6 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName,
                            columnNameLength);
 }
 
-SQLRETURN SQL_API SQLError(SQLHENV handleType, SQLHDBC handle, SQLHSTMT hstmt,
-                           SQLWCHAR FAR* szSqlState, SQLINTEGER FAR* pfNativeError,
-                           SQLWCHAR FAR* szErrorMsg, SQLSMALLINT cbErrorMsgMax,
-                           SQLSMALLINT FAR* pcbErrorMsg) {
-  LOG_DEBUG(
-      "SQLErrorW called with handleType: {}, handle: {}, hstmt: {}, szSqlState: {}, "
-      "pfNativeError: {}, szErrorMsg: {}, cbErrorMsgMax: {}, pcbErrorMsg: {}",
-      handleType, handle, hstmt, fmt::ptr(szSqlState), fmt::ptr(pfNativeError),
-      fmt::ptr(szErrorMsg), cbErrorMsgMax, fmt::ptr(pcbErrorMsg));
-  return SQL_ERROR;
-}
-
 SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT stmt, SQLWCHAR* pKCatalogName,
                                  SQLSMALLINT pKCatalogNameLength, SQLWCHAR* pKSchemaName,
                                  SQLSMALLINT pKSchemaNameLength, SQLWCHAR* pKTableName,
@@ -240,12 +244,20 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT stmt, SQLWCHAR* pKCatalogName,
       pKSchemaNameLength, fmt::ptr(pKTableName), pKTableNameLength,
       fmt::ptr(fKCatalogName), fKCatalogNameLength, fmt::ptr(fKSchemaName),
       fKSchemaNameLength, fmt::ptr(fKTableName), fKTableNameLength);
-  return SQL_ERROR;
+  return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    throw driver::odbcabstraction::DriverException("SQLForeignKeysW is not implemented",
+                                                   "IM001");
+    return SQL_ERROR;
+  });
 }
 
 SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT dataType) {
   LOG_DEBUG("SQLGetTypeInfoW called with stmt: {} dataType: {}", stmt, dataType);
-  return SQL_ERROR;
+  return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    throw driver::odbcabstraction::DriverException("SQLGetTypeInfoW is not implemented",
+                                                   "IM001");
+    return SQL_ERROR;
+  });
 }
 
 SQLRETURN SQL_API SQLMoreResults(SQLHSTMT stmt) { return arrow::SQLMoreResults(stmt); }
@@ -276,7 +288,11 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
       "{}, schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}",
       stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
       schemaNameLength, fmt::ptr(tableName), tableNameLength);
-  return SQL_ERROR;
+  return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    throw driver::odbcabstraction::DriverException("SQLPrimaryKeysW is not implemented",
+                                                   "IM001");
+    return SQL_ERROR;
+  });
 }
 
 SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
