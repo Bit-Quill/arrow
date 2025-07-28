@@ -2277,7 +2277,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputString) {
   std::wstring expectedString = std::wstring(inputStr);
 
   SQLRETURN ret =
-      SQLNativeSql(conn, inputStr, inputCharLen, buf, bufCharLen, &outputCharLen);
+      SQLNativeSql(this->conn, inputStr, inputCharLen, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -2287,21 +2287,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputString) {
   std::wstring returnedString(buf, buf + outputCharLen);
 
   EXPECT_EQ(returnedString, expectedString);
-
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLMoreResultsNoData) {
-  // Verify SQLMoreResults is stubbed to return SQL_NO_DATA
-  this->connect();
-
-  std::wstring wsql = L"SELECT 1;";
-  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
-
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  ret = SQLMoreResults(this->stmt);
-
-  EXPECT_EQ(ret, SQL_NO_DATA);
 
   this->disconnect();
 }
@@ -2316,7 +2301,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsNTSInputString) {
   SQLINTEGER outputCharLen = 0;
   std::wstring expectedString = std::wstring(inputStr);
 
-  SQLRETURN ret = SQLNativeSql(conn, inputStr, SQL_NTS, buf, bufCharLen, &outputCharLen);
+  SQLRETURN ret =
+      SQLNativeSql(this->conn, inputStr, SQL_NTS, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -2338,13 +2324,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputStringLength) {
   SQLINTEGER outputCharLen = 0;
   std::wstring expectedString = std::wstring(inputStr);
 
-  SQLRETURN ret = SQLNativeSql(conn, inputStr, inputCharLen, nullptr, 0, &outputCharLen);
+  SQLRETURN ret =
+      SQLNativeSql(this->conn, inputStr, inputCharLen, nullptr, 0, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_EQ(outputCharLen, inputCharLen);
 
-  ret = SQLNativeSql(conn, inputStr, SQL_NTS, nullptr, 0, &outputCharLen);
+  ret = SQLNativeSql(this->conn, inputStr, SQL_NTS, nullptr, 0, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -2369,8 +2356,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsTruncatedString) {
   expectedStringBuf[10] = L'\0';
   std::wstring expectedString(expectedStringBuf, expectedStringBuf + smallBufSizeInChar);
 
-  SQLRETURN ret = SQLNativeSql(conn, inputStr, inputCharLen, smallBuf, smallBufCharLen,
-                               &outputCharLen);
+  SQLRETURN ret = SQLNativeSql(this->conn, inputStr, inputCharLen, smallBuf,
+                               smallBufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_01004);
@@ -2395,17 +2382,17 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsErrorOnBadInputs) {
   SQLINTEGER outputCharLen = 0;
 
   SQLRETURN ret =
-      SQLNativeSql(conn, nullptr, inputCharLen, buf, bufCharLen, &outputCharLen);
+      SQLNativeSql(this->conn, nullptr, inputCharLen, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_ERROR);
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY009);
 
-  ret = SQLNativeSql(conn, nullptr, SQL_NTS, buf, bufCharLen, &outputCharLen);
+  ret = SQLNativeSql(this->conn, nullptr, SQL_NTS, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_ERROR);
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY009);
 
-  ret = SQLNativeSql(conn, inputStr, -100, buf, bufCharLen, &outputCharLen);
+  ret = SQLNativeSql(this->conn, inputStr, -100, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_ERROR);
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY090);
