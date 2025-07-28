@@ -182,7 +182,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoBatchSupport) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDataSourceName) {
   this->connect();
 
-  validate(this->conn, SQL_DATA_SOURCE_NAME, L"");
+  validate(this->conn, SQL_DATA_SOURCE_NAME, (SQLWCHAR*)L"");
 
   this->disconnect();
 }
@@ -255,7 +255,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHstmt) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverName) {
   this->connect();
 
-  validate(this->conn, SQL_DRIVER_NAME, L"Arrow Flight ODBC Driver");
+  validate(this->conn, SQL_DRIVER_NAME, (SQLWCHAR*)L"Arrow Flight ODBC Driver");
 
   this->disconnect();
 }
@@ -263,7 +263,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverName) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverOdbcVer) {
   this->connect();
 
-  validate(this->conn, SQL_DRIVER_ODBC_VER, L"03.80");
+  validate(this->conn, SQL_DRIVER_ODBC_VER, (SQLWCHAR*)L"03.80");
 
   this->disconnect();
 }
@@ -271,7 +271,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverOdbcVer) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverVer) {
   this->connect();
 
-  validate(this->conn, SQL_DRIVER_VER, L"00.09.0000.0");
+  validate(this->conn, SQL_DRIVER_VER, (SQLWCHAR*)L"00.09.0000.0");
 
   this->disconnect();
 }
@@ -403,7 +403,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoOdbcVer) {
   // This is implemented only in the Driver Manager.
   this->connect();
 
-  validate(this->conn, SQL_ODBC_VER, L"03.80.0000");
+  validate(this->conn, SQL_ODBC_VER, (SQLWCHAR*)L"03.80.0000");
 
   this->disconnect();
 }
@@ -429,7 +429,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoParamArraySelects) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoRowUpdates) {
   this->connect();
 
-  validate(this->conn, SQL_ROW_UPDATES, L"N");
+  validate(this->conn, SQL_ROW_UPDATES, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -437,7 +437,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoRowUpdates) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoSearchPatternEscape) {
   this->connect();
 
-  validate(this->conn, SQL_SEARCH_PATTERN_ESCAPE, L"\\");
+  validate(this->conn, SQL_SEARCH_PATTERN_ESCAPE, (SQLWCHAR*)L"\\");
 
   this->disconnect();
 }
@@ -471,7 +471,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoStaticCursorAttributes2) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDatabaseName) {
   this->connect();
 
-  validate(this->conn, SQL_DATABASE_NAME, L"");
+  validate(this->conn, SQL_DATABASE_NAME, (SQLWCHAR*)L"");
 
   this->disconnect();
 }
@@ -497,7 +497,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDbmsVer) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAccessibleProcedures) {
   this->connect();
 
-  validate(this->conn, SQL_ACCESSIBLE_PROCEDURES, L"N");
+  validate(this->conn, SQL_ACCESSIBLE_PROCEDURES, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -505,7 +505,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAccessibleProcedures) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAccessibleTables) {
   this->connect();
 
-  validate(this->conn, SQL_ACCESSIBLE_TABLES, L"Y");
+  validate(this->conn, SQL_ACCESSIBLE_TABLES, (SQLWCHAR*)L"Y");
 
   this->disconnect();
 }
@@ -521,7 +521,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoBookmarkPersistence) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCatalogTerm) {
   this->connect();
 
-  validate(this->conn, SQL_CATALOG_TERM, L"");
+  validate(this->conn, SQL_CATALOG_TERM, (SQLWCHAR*)L"");
 
   this->disconnect();
 }
@@ -529,7 +529,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCatalogTerm) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCollationSeq) {
   this->connect();
 
-  validate(this->conn, SQL_COLLATION_SEQ, L"");
+  validate(this->conn, SQL_COLLATION_SEQ, (SQLWCHAR*)L"");
 
   this->disconnect();
 }
@@ -571,7 +571,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCursorSensitivity) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDataSourceReadOnly) {
   this->connect();
 
-  validate(this->conn, SQL_DATA_SOURCE_READ_ONLY, L"N");
+  validate(this->conn, SQL_DATA_SOURCE_READ_ONLY, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -587,7 +587,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDefaultTxnIsolation) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDescribeParameter) {
   this->connect();
 
-  validate(this->conn, SQL_DESCRIBE_PARAMETER, L"N");
+  validate(this->conn, SQL_DESCRIBE_PARAMETER, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -595,7 +595,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDescribeParameter) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMultResultSets) {
   this->connect();
 
-  validate(this->conn, SQL_MULT_RESULT_SETS, L"N");
+  validate(this->conn, SQL_MULT_RESULT_SETS, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -603,7 +603,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMultResultSets) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMultipleActiveTxn) {
   this->connect();
 
-  validate(this->conn, SQL_MULTIPLE_ACTIVE_TXN, L"N");
+  validate(this->conn, SQL_MULTIPLE_ACTIVE_TXN, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -611,7 +611,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMultipleActiveTxn) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoNeedLongDataLen) {
   this->connect();
 
-  validate(this->conn, SQL_NEED_LONG_DATA_LEN, L"N");
+  validate(this->conn, SQL_NEED_LONG_DATA_LEN, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -627,7 +627,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoNullCollation) {
 TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoProcedureTerm) {
   this->connect();
 
-  validate(this->conn, SQL_PROCEDURE_TERM, L"");
+  validate(this->conn, SQL_PROCEDURE_TERM, (SQLWCHAR*)L"");
 
   this->disconnect();
 }
@@ -635,7 +635,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoProcedureTerm) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoSchemaTerm) {
   this->connect();
 
-  validate(this->conn, SQL_SCHEMA_TERM, L"schema");
+  validate(this->conn, SQL_SCHEMA_TERM, (SQLWCHAR*)L"schema");
 
   this->disconnect();
 }
@@ -651,7 +651,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoScrollOptions) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoTableTerm) {
   this->connect();
 
-  validate(this->conn, SQL_TABLE_TERM, L"table");
+  validate(this->conn, SQL_TABLE_TERM, (SQLWCHAR*)L"table");
 
   this->disconnect();
 }
@@ -675,7 +675,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoTxnIsolationOption) {
 TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoUserName) {
   this->connect();
 
-  validate(this->conn, SQL_USER_NAME, L"");
+  validate(this->conn, SQL_USER_NAME, (SQLWCHAR*)L"");
 
   this->disconnect();
 }
@@ -726,7 +726,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAnsiSqlDatetimeLiterals) {
   this->connect();
 
   // Type does not exist in sql.h
-  // validate(this->conn, SQL_ANSI_SQL_DATETIME_LITERALS, L"");
+  // validate(this->conn, SQL_ANSI_SQL_DATETIME_LITERALS, (SQLWCHAR*)L"");
 
   this->disconnect();
 }
@@ -742,7 +742,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCatalogLocation) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCatalogName) {
   this->connect();
 
-  validate(this->conn, SQL_CATALOG_NAME, L"N");
+  validate(this->conn, SQL_CATALOG_NAME, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -750,7 +750,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCatalogName) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCatalogNameSeparator) {
   this->connect();
 
-  validate(this->conn, SQL_CATALOG_NAME_SEPARATOR, L"");
+  validate(this->conn, SQL_CATALOG_NAME_SEPARATOR, (SQLWCHAR*)L"");
 
   this->disconnect();
 }
@@ -766,7 +766,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoCatalogUsage) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoColumnAlias) {
   this->connect();
 
-  validate(this->conn, SQL_COLUMN_ALIAS, L"Y");
+  validate(this->conn, SQL_COLUMN_ALIAS, (SQLWCHAR*)L"Y");
 
   this->disconnect();
 }
@@ -910,7 +910,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDropView) {
 TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoExpressionsInOrderby) {
   this->connect();
 
-  validate(this->conn, SQL_EXPRESSIONS_IN_ORDERBY, L"N");
+  validate(this->conn, SQL_EXPRESSIONS_IN_ORDERBY, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -935,7 +935,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoIdentifierCase) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoIdentifierQuoteChar) {
   this->connect();
 
-  validate(this->conn, SQL_IDENTIFIER_QUOTE_CHAR, L"\"");
+  validate(this->conn, SQL_IDENTIFIER_QUOTE_CHAR, (SQLWCHAR*)L"\"");
 
   this->disconnect();
 }
@@ -961,7 +961,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoInsertStatement) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoIntegrity) {
   this->connect();
 
-  validate(this->conn, SQL_INTEGRITY, L"N");
+  validate(this->conn, SQL_INTEGRITY, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -977,7 +977,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoKeywords) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoLikeEscapeClause) {
   this->connect();
 
-  validate(this->conn, SQL_LIKE_ESCAPE_CLAUSE, L"Y");
+  validate(this->conn, SQL_LIKE_ESCAPE_CLAUSE, (SQLWCHAR*)L"Y");
 
   this->disconnect();
 }
@@ -1002,7 +1002,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoOjCapabilities) {
 TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoOrderByColumnsInSelect) {
   this->connect();
 
-  validate(this->conn, SQL_ORDER_BY_COLUMNS_IN_SELECT, L"Y");
+  validate(this->conn, SQL_ORDER_BY_COLUMNS_IN_SELECT, (SQLWCHAR*)L"Y");
 
   this->disconnect();
 }
@@ -1010,7 +1010,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoOrderByColumnsInSelect) {
 TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoOuterJoins) {
   this->connect();
 
-  validate(this->conn, SQL_OUTER_JOINS, L"N");
+  validate(this->conn, SQL_OUTER_JOINS, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -1018,7 +1018,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoOuterJoins) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoProcedures) {
   this->connect();
 
-  validate(this->conn, SQL_PROCEDURES, L"N");
+  validate(this->conn, SQL_PROCEDURES, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
@@ -1043,7 +1043,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoSchemaUsage) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoSpecialCharacters) {
   this->connect();
 
-  validate(this->conn, SQL_SPECIAL_CHARACTERS, L"");
+  validate(this->conn, SQL_SPECIAL_CHARACTERS, (SQLWCHAR*)L"");
 
   this->disconnect();
 }
@@ -1184,7 +1184,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxProcedureNameLen) {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxRowSize) {
   this->connect();
 
-  validate(this->conn, SQL_MAX_ROW_SIZE, L"");
+  validate(this->conn, SQL_MAX_ROW_SIZE, (SQLWCHAR*)L"");
 
   this->disconnect();
 }
@@ -1192,7 +1192,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxRowSize) {
 TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoMaxRowSizeIncludesLong) {
   this->connect();
 
-  validate(this->conn, SQL_MAX_ROW_SIZE_INCLUDES_LONG, L"N");
+  validate(this->conn, SQL_MAX_ROW_SIZE_INCLUDES_LONG, (SQLWCHAR*)L"N");
 
   this->disconnect();
 }
