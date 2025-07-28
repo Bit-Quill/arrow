@@ -254,13 +254,8 @@ SQLRETURN SQL_API SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementTe
                                SQLINTEGER inStatementTextLength,
                                SQLWCHAR* outStatementText, SQLINTEGER bufferLength,
                                SQLINTEGER* outStatementTextLength) {
-  LOG_DEBUG(
-      "SQLNativeSqlW called with connectionHandle: {}, inStatementText: {}, "
-      "inStatementTextLength: "
-      "{}, outStatementText: {}, bufferLength: {}, outStatementTextLength: {}",
-      connectionHandle, fmt::ptr(inStatementText), inStatementTextLength,
-      fmt::ptr(outStatementText), bufferLength, fmt::ptr(outStatementTextLength));
-  return SQL_ERROR;
+  return arrow::SQLNativeSql(connectionHandle, inStatementText, inStatementTextLength,
+                             outStatementText, bufferLength, outStatementTextLength);
 }
 
 SQLRETURN SQL_API SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
