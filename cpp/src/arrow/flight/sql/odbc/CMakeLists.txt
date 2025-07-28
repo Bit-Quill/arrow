@@ -15,6 +15,11 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# Use C++ 20 for ODBC and its subdirectory
+# GH-44792: Arrow will switch to C++ 20
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 add_custom_target(arrow_flight_sql_odbc)
 
 # Ensure fmt is loaded as header only
@@ -36,7 +41,7 @@ add_definitions(-DUNICODE=1)
 
 include(FetchContent)
 fetchcontent_declare(spdlog
-                     URL https://github.com/gabime/spdlog/archive/76fb40d95455f249bd70824ecfcae7a8f0930fa3.zip
+                     URL https://github.com/gabime/spdlog/archive/refs/tags/v1.15.3.zip
                          CONFIGURE_COMMAND
                          ""
                          BUILD_COMMAND
