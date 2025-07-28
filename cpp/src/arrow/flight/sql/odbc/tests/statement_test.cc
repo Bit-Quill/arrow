@@ -2235,6 +2235,37 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExtendedFetchQueryNullIndicator) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLMoreResultsNoData) {
+  // Verify SQLMoreResults is stubbed to return SQL_NO_DATA
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLMoreResults(this->stmt);
+
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLMoreResultsInvalidFunctionSequence) {
+  this->connect();
+
+  SQLRETURN ret = SQLMoreResults(this->stmt);
+
+  // Verify function sequence error state is reported when SQLMoreResults is called
+  // without executing any queries
+  EXPECT_EQ(ret, SQL_ERROR);
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
+
+  this->disconnect();
+}
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputString) {
   this->connect();
 
@@ -2256,6 +2287,21 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputString) {
   std::wstring returnedString(buf, buf + outputCharLen);
 
   EXPECT_EQ(returnedString, expectedString);
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLMoreResultsNoData) {
+  // Verify SQLMoreResults is stubbed to return SQL_NO_DATA
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLMoreResults(this->stmt);
+
+  EXPECT_EQ(ret, SQL_NO_DATA);
 
   this->disconnect();
 }
