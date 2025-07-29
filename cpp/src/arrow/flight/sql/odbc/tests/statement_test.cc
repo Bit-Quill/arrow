@@ -1811,7 +1811,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColDataQuery) {
   // Date
   EXPECT_EQ(date_val_min.day, 1);
   EXPECT_EQ(date_val_min.month, 1);
-  EXPECT_EQ(date_val_min.year, 1400);
+  EXPECT_EQ(date_val_min.year, 1399);
 
   EXPECT_EQ(date_val_max.day, 31);
   EXPECT_EQ(date_val_max.month, 12);
@@ -1820,7 +1820,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColDataQuery) {
   // Timestamp
   EXPECT_EQ(timestamp_val_min.day, 1);
   EXPECT_EQ(timestamp_val_min.month, 1);
-  EXPECT_EQ(timestamp_val_min.year, 1400);
+  EXPECT_EQ(timestamp_val_min.year, 1399);
   EXPECT_EQ(timestamp_val_min.hour, 0);
   EXPECT_EQ(timestamp_val_min.minute, 0);
   EXPECT_EQ(timestamp_val_min.second, 0);
