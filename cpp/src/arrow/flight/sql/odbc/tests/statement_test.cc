@@ -2400,4 +2400,74 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsErrorOnBadInputs) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsReturnsColumnsOnSelect) {
+  this->connect();
+
+  SQLSMALLINT columnCount = 0;
+  SQLSMALLINT expectedValue = 3;
+  SQLWCHAR sqlQuery[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3";
+  SQLINTEGER queryLength = static_cast<SQLINTEGER>(wcslen(sqlQuery));
+
+  SQLRETURN ret = SQLExecDirect(this->stmt, sqlQuery, queryLength);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  CheckIntColumn(this->stmt, 1, 1);
+  CheckStringColumnW(this->stmt, 2, L"One");
+  CheckIntColumn(this->stmt, 3, 3);
+
+  ret = SQLNumResultCols(this->stmt, &columnCount);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(columnCount, expectedValue);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsReturnsSuccessOnNullptr) {
+  this->connect();
+
+  SQLWCHAR sqlQuery[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3";
+  SQLINTEGER queryLength = static_cast<SQLINTEGER>(wcslen(sqlQuery));
+
+  SQLRETURN ret = SQLExecDirect(this->stmt, sqlQuery, queryLength);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  CheckIntColumn(this->stmt, 1, 1);
+  CheckStringColumnW(this->stmt, 2, L"One");
+  CheckIntColumn(this->stmt, 3, 3);
+
+  ret = SQLNumResultCols(this->stmt, nullptr);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsFunctionSequenceErrorOnNoQuery) {
+  this->connect();
+
+  SQLSMALLINT columnCount = 0;
+  SQLSMALLINT expectedValue = 0;
+
+  SQLRETURN ret = SQLNumResultCols(this->stmt, &columnCount);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
+
+  EXPECT_EQ(columnCount, expectedValue);
+
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc
