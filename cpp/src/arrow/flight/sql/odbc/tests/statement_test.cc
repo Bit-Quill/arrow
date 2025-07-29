@@ -2405,7 +2405,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountReturnsNegativeOneOnSelect) {
 
   SQLLEN rowCount = 0;
   SQLLEN expectedValue = -1;
-  SQLWCHAR sqlQuery[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3 ";
+  SQLWCHAR sqlQuery[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3";
   SQLINTEGER queryLength = static_cast<SQLINTEGER>(wcslen(sqlQuery));
 
   SQLRETURN ret = SQLExecDirect(this->stmt, sqlQuery, queryLength);
@@ -2432,7 +2432,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountReturnsNegativeOneOnSelect) {
 TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountReturnsSuccessOnNullptr) {
   this->connect();
 
-  SQLWCHAR sqlQuery[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3 ";
+  SQLWCHAR sqlQuery[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3";
   SQLINTEGER queryLength = static_cast<SQLINTEGER>(wcslen(sqlQuery));
 
   SQLRETURN ret = SQLExecDirect(this->stmt, sqlQuery, queryLength);
