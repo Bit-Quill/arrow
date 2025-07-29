@@ -179,12 +179,8 @@ SQLRETURN SQLFreeStmt(SQLHSTMT handle, SQLUSMALLINT option) {
     case SQL_CLOSE: {
       using ODBC::ODBCStatement;
 
-      ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(handle);
-
-      return ODBCStatement::ExecuteWithDiagnostics(statement, SQL_ERROR, [=]() {
-        if (!statement) {
-          return SQL_INVALID_HANDLE;
-        }
+      return ODBCStatement::ExecuteWithDiagnostics(handle, SQL_ERROR, [=]() {
+        ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(handle);
 
         // Close cursor with suppressErrors set to true
         statement->closeCursor(true);
@@ -1056,6 +1052,19 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
     ODBCDescriptor* ard = statement->GetARD();
     ard->BindCol(recordNumber, cType, dataPtr, bufferLength, indicatorPtr);
+    return SQL_SUCCESS;
+  });
+}
+
+SQLRETURN SQLCloseCursor(SQLHSTMT stmt) {
+  LOG_DEBUG("SQLCloseCursor called with stmt: {}", stmt);
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    // Close cursor with suppressErrors set to false
+    statement->closeCursor(false);
+
     return SQL_SUCCESS;
   });
 }
