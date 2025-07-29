@@ -92,6 +92,7 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
                           SQLUSMALLINT fieldIdentifier, SQLPOINTER characterAttributePtr,
                           SQLSMALLINT bufferLength, SQLSMALLINT* outputLength,
                           SQLLEN* numericAttributePtr);
+SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT dataType);
 SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
                        SQLINTEGER inStatementTextLength, SQLWCHAR* outStatementText,
                        SQLINTEGER bufferLength, SQLINTEGER* outStatementTextLength);
