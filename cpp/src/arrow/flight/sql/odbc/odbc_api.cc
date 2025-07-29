@@ -1281,6 +1281,8 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
 }
 
 SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT dataType) {
+  // GH-47237 return SQL_PRED_CHAR and SQL_PRED_BASIC for
+  // appropriate data types in `SEARCHABLE` field
   LOG_DEBUG("SQLGetTypeInfoW called with stmt: {} dataType: {}", stmt, dataType);
   using ODBC::ODBCStatement;
   return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
