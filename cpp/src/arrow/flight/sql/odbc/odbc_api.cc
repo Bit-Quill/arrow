@@ -1280,6 +1280,16 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
   });
 }
 
+SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT dataType) {
+  LOG_DEBUG("SQLGetTypeInfoW called with stmt: {} dataType: {}", stmt, dataType);
+  using ODBC::ODBCStatement;
+  return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    statement->GetTypeInfo(dataType);
+    return SQL_SUCCESS;
+  });
+}
+
 SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
                        SQLINTEGER inStatementTextLength, SQLWCHAR* outStatementText,
                        SQLINTEGER bufferLength, SQLINTEGER* outStatementTextLength) {
