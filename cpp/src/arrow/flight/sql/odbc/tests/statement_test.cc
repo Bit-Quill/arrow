@@ -2470,4 +2470,64 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsFunctionSequenceErrorOnNoQuery
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLFreeStmtSQLClose) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFreeStmt(this->stmt, SQL_CLOSE);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLCloseCursor) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLCloseCursor(this->stmt);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLFreeStmtSQLCloseWithoutCursor) {
+  // SQLFreeStmt(SQL_CLOSE) does not throw error with invalid cursor
+  this->connect();
+
+  SQLRETURN ret = SQLFreeStmt(this->stmt, SQL_CLOSE);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLCloseCursorWithoutCursor) {
+  this->connect();
+
+  SQLRETURN ret = SQLCloseCursor(this->stmt);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // Verify invalid cursor error state is returned
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
+
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc
