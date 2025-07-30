@@ -703,7 +703,7 @@ void ODBCStatement::RevertAppDescriptor(bool isApd) {
 
 void ODBCStatement::closeCursor(bool suppressErrors) {
   if (!suppressErrors && !m_currenResult) {
-    throw DriverException("Invalid cursor state", "28000");
+    throw DriverException("Invalid cursor state", "24000");
   }
 
   if (m_currenResult) {
