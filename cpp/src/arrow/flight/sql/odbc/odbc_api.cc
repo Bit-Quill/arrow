@@ -179,12 +179,8 @@ SQLRETURN SQLFreeStmt(SQLHSTMT handle, SQLUSMALLINT option) {
     case SQL_CLOSE: {
       using ODBC::ODBCStatement;
 
-      ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(handle);
-
-      return ODBCStatement::ExecuteWithDiagnostics(statement, SQL_ERROR, [=]() {
-        if (!statement) {
-          return SQL_INVALID_HANDLE;
-        }
+      return ODBCStatement::ExecuteWithDiagnostics(handle, SQL_ERROR, [=]() {
+        ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(handle);
 
         // Close cursor with suppressErrors set to true
         statement->closeCursor(true);
@@ -1060,6 +1056,19 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
   });
 }
 
+SQLRETURN SQLCloseCursor(SQLHSTMT stmt) {
+  LOG_DEBUG("SQLCloseCursor called with stmt: {}", stmt);
+  using ODBC::ODBCStatement;
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    // Close cursor with suppressErrors set to false
+    statement->closeCursor(false);
+
+    return SQL_SUCCESS;
+  });
+}
+
 SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
                      SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr) {
   // GH-46979: support SQL_C_GUID data type
@@ -1080,7 +1089,6 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
 
 SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
   LOG_DEBUG("SQLMoreResults called with stmt: {}", stmt);
-  // TODO: write tests for SQLMoreResults
   using ODBC::ODBCStatement;
   // Multiple result sets not supported. Return SQL_NO_DATA by default.
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -1092,7 +1100,6 @@ SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
 SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
   LOG_DEBUG("SQLNumResultCols called with stmt: {}, columnCountPtr: {}", stmt,
             fmt::ptr(columnCountPtr));
-  // TODO: write tests for SQLNumResultCols
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
@@ -1104,7 +1111,6 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
 SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
   LOG_DEBUG("SQLRowCount called with stmt: {}, columnCountPtr: {}", stmt,
             fmt::ptr(rowCountPtr));
-  // TODO: write tests for SQLRowCount
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
