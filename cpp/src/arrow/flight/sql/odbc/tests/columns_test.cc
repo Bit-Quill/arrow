@@ -366,6 +366,51 @@ void checkSQLColAttributesNumeric(SQLHSTMT stmt, const std::wstring& wsql,
   EXPECT_EQ(numVal, expectedAttrNumeric);
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsTestInputData) {
+  this->connect();
+
+  SQLWCHAR catalogName[] = L"";
+  SQLWCHAR schemaName[] = L"";
+  SQLWCHAR tableName[] = L"";
+  SQLWCHAR columnName[] = L"";
+
+  // All values populated
+  SQLRETURN ret = SQLColumns(this->stmt, catalogName, sizeof(catalogName), schemaName,
+                             sizeof(schemaName), tableName, sizeof(tableName), columnName,
+                             sizeof(columnName));
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  // Sizes are nulls
+  ret =
+      SQLColumns(this->stmt, catalogName, 0, schemaName, 0, tableName, 0, columnName, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  // Values are nulls
+  ret = SQLColumns(this->stmt, 0, sizeof(catalogName), 0, sizeof(schemaName), 0,
+                   sizeof(tableName), 0, sizeof(columnName));
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_SUCCESS);
+  // Close statement cursor to avoid leaving in an invalid state
+  SQLFreeStmt(this->stmt, SQL_CLOSE);
+
+  // All values and sizes are nulls
+  ret = SQLColumns(this->stmt, 0, 0, 0, 0, 0, 0, 0, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ValidateFetch(this->stmt, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
 TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   // Check table pattern and column pattern returns all columns
   this->connect();
@@ -1241,6 +1286,125 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsInvalidTablePattern) {
   // There is no column from filter
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeTestInputData) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1 as col1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLUSMALLINT idx = 1;
+  std::vector<SQLWCHAR> characterAttr(ODBC_BUFFER_SIZE);
+  SQLSMALLINT characterAttrLen = 0;
+  SQLLEN numericAttr = 0;
+
+  // All character values populated
+  ret = SQLColAttribute(this->stmt, idx, SQL_DESC_NAME, &characterAttr[0],
+                        (SQLSMALLINT)characterAttr.size(), &characterAttrLen, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // All numeric values populated
+  ret = SQLColAttribute(this->stmt, idx, SQL_DESC_COUNT, 0, 0, 0, &numericAttr);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Pass null values, driver should not throw error
+  ret = SQLColAttribute(this->stmt, idx, SQL_COLUMN_TABLE_NAME, 0, 0, 0, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLColAttribute(this->stmt, idx, SQL_DESC_COUNT, 0, 0, 0, 0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeGetCharacterLen) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1 as col1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLSMALLINT characterAttrLen = 0;
+
+  // Check length of character attribute
+  ret = SQLColAttribute(this->stmt, 1, SQL_DESC_BASE_COLUMN_NAME, 0, 0, &characterAttrLen,
+                        0);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(characterAttrLen, 4 * ODBC::GetSqlWCharSize());
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeInvalidFieldId) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1 as col1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLUSMALLINT invalidFieldId = -100;
+  SQLUSMALLINT idx = 1;
+  std::vector<SQLWCHAR> characterAttr(ODBC_BUFFER_SIZE);
+  SQLSMALLINT characterAttrLen = 0;
+  SQLLEN numericAttr = 0;
+
+  ret = SQLColAttribute(this->stmt, idx, invalidFieldId, &characterAttr[0],
+                        (SQLSMALLINT)characterAttr.size(), &characterAttrLen, 0);
+  EXPECT_EQ(ret, SQL_ERROR);
+  // Verify invalid descriptor field identifier error state is returned
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY091);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeInvalidColId) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1 as col1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  SQLUSMALLINT invalidColId = 2;
+  std::vector<SQLWCHAR> characterAttr(ODBC_BUFFER_SIZE);
+  SQLSMALLINT characterAttrLen = 0;
+  SQLLEN numericAttr = 0;
+
+  ret = SQLColAttribute(this->stmt, invalidColId, SQL_DESC_BASE_COLUMN_NAME,
+                        &characterAttr[0], (SQLSMALLINT)characterAttr.size(),
+                        &characterAttrLen, 0);
+  EXPECT_EQ(ret, SQL_ERROR);
+  // Verify invalid descriptor index error state is returned
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
 
   this->disconnect();
 }
