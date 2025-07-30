@@ -26,6 +26,9 @@
 
 #include "gtest/gtest.h"
 
+// TODO: add tests with SQLDescribeCol to check metadata of SQLGetTypeInfo for ODBC 2 and
+// ODBC 3.
+
 namespace arrow::flight::sql::odbc {
 
 using std::optional;
