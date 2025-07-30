@@ -55,14 +55,13 @@ std::wstring GetStringColumnW(SQLHSTMT stmt, int colId) {
 
 // Test Cases
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestInputData) {
+TYPED_TEST(FlightSQLODBCTestBase, SQLTablesTestInputData) {
   this->connect();
 
   SQLWCHAR catalogName[] = L"";
   SQLWCHAR schemaName[] = L"";
   SQLWCHAR tableName[] = L"";
   SQLWCHAR tableType[] = L"";
-  std::wstring expectedCatalogName = std::wstring(L"main");
 
   // All values populated
   SQLRETURN ret = SQLTables(this->stmt, catalogName, sizeof(catalogName), schemaName,
@@ -88,7 +87,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestInputData) {
 
   ValidateFetch(this->stmt, SQL_SUCCESS);
   // Close statement cursor to avoid leaving in an invalid state
-  SQLFreeStmt(stmt, SQL_CLOSE);
+  SQLFreeStmt(this->stmt, SQL_CLOSE);
 
   // All values and sizes are nulls
   ret = SQLTables(this->stmt, 0, 0, 0, 0, 0, 0, 0, 0);
