@@ -372,38 +372,31 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForTableName) {
 TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestGetMetadataWithTableInfluxDB) {
   this->connect();
 
-  SQLWCHAR tableType[] = L"VIEW";
   SQLWCHAR tableName[] = L"weather";
-  //SQLWCHAR tableType[] = L"BASE TABLE";
+  //SQLWCHAR tableType[] = L"BASE TABLE"; // does NOT work, since it contains space, must be quoted
+  SQLWCHAR tableType[] = L"'BASE TABLE'";
   SQLWCHAR* tableNames[] = {(SQLWCHAR*)L"weather"};
   std::wstring expectedTableType = std::wstring(L"BASE TABLE");
   std::wstring expectedCatalogName = std::wstring(L"public");
-  std::wstring expectedSchema = std::wstring(L"iox"); // NOT bucket1
+  std::wstring expectedSchema = std::wstring(L"iox");  // NOT bucket1
 
-  // Get named Catalog metadata - Mock server returns the system table sqlite_sequence as
-  // type "table"
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, tableName,
-                            SQL_NTS, nullptr, SQL_NTS);
+                            SQL_NTS, tableType, SQL_NTS);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  // -AL- InfluxDB returns no tables.
-    ValidateFetch(this->stmt, SQL_SUCCESS);
+  ValidateFetch(this->stmt, SQL_SUCCESS);
 
-    CheckStringColumnW(this->stmt, 1, expectedCatalogName);
-    CheckStringColumnW(this->stmt, 2, expectedSchema);
-    
-    CheckStringColumnW(this->stmt, 3, tableNames[0]);
-    CheckStringColumnW(this->stmt, 4, expectedTableType);
-    CheckNullColumnW(this->stmt, 5);
-    
-  
+  CheckStringColumnW(this->stmt, 1, expectedCatalogName);
+  CheckStringColumnW(this->stmt, 2, expectedSchema);
+  CheckStringColumnW(this->stmt, 3, tableNames[0]);
+  CheckStringColumnW(this->stmt, 4, expectedTableType);
+  CheckNullColumnW(this->stmt, 5);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
   this->disconnect();
 }
-
 
 TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForUnicodeTableByTableName) {
   this->connect();
