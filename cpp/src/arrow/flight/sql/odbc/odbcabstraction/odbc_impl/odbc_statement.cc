@@ -703,7 +703,7 @@ void ODBCStatement::RevertAppDescriptor(bool isApd) {
 
 void ODBCStatement::closeCursor(bool suppressErrors) {
   if (!suppressErrors && !m_currenResult) {
-    throw DriverException("Invalid cursor state", "28000");
+    throw DriverException("Invalid cursor state", "24000");
   }
 
   if (m_currenResult) {
@@ -776,7 +776,7 @@ void ODBCStatement::getColumnCount(SQLSMALLINT* columnCountPtr) {
     // error
     return;
   }
-  size_t columnCount = m_currentArd->GetRecords().size();
+  size_t columnCount = m_ird->GetRecords().size();
   *columnCountPtr = static_cast<SQLSMALLINT>(columnCount);
 }
 

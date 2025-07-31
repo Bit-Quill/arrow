@@ -2400,6 +2400,76 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsErrorOnBadInputs) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsReturnsColumnsOnSelect) {
+  this->connect();
+
+  SQLSMALLINT columnCount = 0;
+  SQLSMALLINT expectedValue = 3;
+  SQLWCHAR sqlQuery[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3";
+  SQLINTEGER queryLength = static_cast<SQLINTEGER>(wcslen(sqlQuery));
+
+  SQLRETURN ret = SQLExecDirect(this->stmt, sqlQuery, queryLength);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  CheckIntColumn(this->stmt, 1, 1);
+  CheckStringColumnW(this->stmt, 2, L"One");
+  CheckIntColumn(this->stmt, 3, 3);
+
+  ret = SQLNumResultCols(this->stmt, &columnCount);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(columnCount, expectedValue);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsReturnsSuccessOnNullptr) {
+  this->connect();
+
+  SQLWCHAR sqlQuery[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3";
+  SQLINTEGER queryLength = static_cast<SQLINTEGER>(wcslen(sqlQuery));
+
+  SQLRETURN ret = SQLExecDirect(this->stmt, sqlQuery, queryLength);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  CheckIntColumn(this->stmt, 1, 1);
+  CheckStringColumnW(this->stmt, 2, L"One");
+  CheckIntColumn(this->stmt, 3, 3);
+
+  ret = SQLNumResultCols(this->stmt, nullptr);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsFunctionSequenceErrorOnNoQuery) {
+  this->connect();
+
+  SQLSMALLINT columnCount = 0;
+  SQLSMALLINT expectedValue = 0;
+
+  SQLRETURN ret = SQLNumResultCols(this->stmt, &columnCount);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
+
+  EXPECT_EQ(columnCount, expectedValue);
+
+  this->disconnect();
+}
+
 TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountReturnsNegativeOneOnSelect) {
   this->connect();
 
@@ -2466,6 +2536,66 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountFunctionSequenceErrorOnNoQuery) {
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
 
   EXPECT_EQ(rowCount, expectedValue);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLFreeStmtSQLClose) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFreeStmt(this->stmt, SQL_CLOSE);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLCloseCursor) {
+  this->connect();
+
+  std::wstring wsql = L"SELECT 1;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLCloseCursor(this->stmt);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLFreeStmtSQLCloseWithoutCursor) {
+  // SQLFreeStmt(SQL_CLOSE) does not throw error with invalid cursor
+  this->connect();
+
+  SQLRETURN ret = SQLFreeStmt(this->stmt, SQL_CLOSE);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLCloseCursorWithoutCursor) {
+  this->connect();
+
+  SQLRETURN ret = SQLCloseCursor(this->stmt);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // Verify invalid cursor error state is returned
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
 
   this->disconnect();
 }

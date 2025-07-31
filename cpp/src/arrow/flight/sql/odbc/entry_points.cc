@@ -186,14 +186,7 @@ SQLRETURN SQL_API SQLCancel(SQLHSTMT stmt) {
   });
 }
 
-SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT stmt) {
-  LOG_DEBUG("SQLCloseCursor called with stmt: {}", stmt);
-  return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
-    throw driver::odbcabstraction::DriverException("SQLCloseCursor is not implemented",
-                                                   "IM001");
-    return SQL_ERROR;
-  });
-}
+SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT stmt) { return arrow::SQLCloseCursor(stmt); }
 
 SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
                                   SQLUSMALLINT fieldIdentifier,
