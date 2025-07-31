@@ -1587,7 +1587,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
                        SQL_NULLABLE,                   // expectedColumnNullability
                        10,                             // expectedNumPrecRadix
                        4,                              // expectedOctetLength
-                       SQL_PRED_NONE,                  // expectedSearchable
+                       SQL_SEARCHABLE,                 // expectedSearchable
                        SQL_FALSE);                     // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 2,
@@ -1604,7 +1604,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
                        SQL_NULLABLE,                  // expectedColumnNullability
                        10,                            // expectedNumPrecRadix
                        8,                             // expectedOctetLength
-                       SQL_PRED_NONE,                 // expectedSearchable
+                       SQL_SEARCHABLE,                // expectedSearchable
                        SQL_FALSE);                    // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 3,
@@ -1621,7 +1621,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
                        SQL_NULLABLE,                       // expectedColumnNullability
                        10,                                 // expectedNumPrecRadix
                        40,                                 // expectedOctetLength
-                       SQL_PRED_NONE,                      // expectedSearchable
+                       SQL_SEARCHABLE,                     // expectedSearchable
                        SQL_FALSE);                         // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 4,
@@ -1638,7 +1638,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
                        SQL_NULLABLE,                // expectedColumnNullability
                        2,                           // expectedNumPrecRadix
                        8,                           // expectedOctetLength
-                       SQL_PRED_NONE,               // expectedSearchable
+                       SQL_SEARCHABLE,              // expectedSearchable
                        SQL_FALSE);                  // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 5,
@@ -1655,7 +1655,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
                        SQL_NULLABLE,                 // expectedColumnNullability
                        2,                            // expectedNumPrecRadix
                        8,                            // expectedOctetLength
-                       SQL_PRED_NONE,                // expectedSearchable
+                       SQL_SEARCHABLE,               // expectedSearchable
                        SQL_FALSE);                   // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 6,
@@ -1672,7 +1672,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
                        SQL_NULLABLE,               // expectedColumnNullability
                        0,                          // expectedNumPrecRadix
                        1,                          // expectedOctetLength
-                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_SEARCHABLE,             // expectedSearchable
                        SQL_TRUE);                  // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 7,
@@ -1689,7 +1689,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
                        SQL_NULLABLE,               // expectedColumnNullability
                        0,                          // expectedNumPrecRadix
                        6,                          // expectedOctetLength
-                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_SEARCHABLE,             // expectedSearchable
                        SQL_TRUE);                  // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 8,
@@ -1706,7 +1706,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
                        SQL_NULLABLE,               // expectedColumnNullability
                        0,                          // expectedNumPrecRadix
                        6,                          // expectedOctetLength
-                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_SEARCHABLE,             // expectedSearchable
                        SQL_TRUE);                  // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 9,
@@ -1723,7 +1723,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
                        SQL_NULLABLE,                    // expectedColumnNullability
                        0,                               // expectedNumPrecRadix
                        16,                              // expectedOctetLength
-                       SQL_PRED_NONE,                   // expectedSearchable
+                       SQL_SEARCHABLE,                  // expectedSearchable
                        SQL_TRUE);                       // expectedUnsignedColumn
 
   this->disconnect();
@@ -1757,7 +1757,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
                        SQL_NULLABLE,                   // expectedColumnNullability
                        10,                             // expectedNumPrecRadix
                        4,                              // expectedOctetLength
-                       SQL_PRED_NONE,                  // expectedSearchable
+                       SQL_SEARCHABLE,                 // expectedSearchable
                        SQL_FALSE);                     // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 2,
@@ -1774,7 +1774,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
                        SQL_NULLABLE,                  // expectedColumnNullability
                        10,                            // expectedNumPrecRadix
                        8,                             // expectedOctetLength
-                       SQL_PRED_NONE,                 // expectedSearchable
+                       SQL_SEARCHABLE,                // expectedSearchable
                        SQL_FALSE);                    // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 3,
@@ -1791,7 +1791,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
                        SQL_NULLABLE,                       // expectedColumnNullability
                        10,                                 // expectedNumPrecRadix
                        40,                                 // expectedOctetLength
-                       SQL_PRED_NONE,                      // expectedSearchable
+                       SQL_SEARCHABLE,                     // expectedSearchable
                        SQL_FALSE);                         // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 4,
@@ -1808,7 +1808,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
                        SQL_NULLABLE,                // expectedColumnNullability
                        2,                           // expectedNumPrecRadix
                        8,                           // expectedOctetLength
-                       SQL_PRED_NONE,               // expectedSearchable
+                       SQL_SEARCHABLE,              // expectedSearchable
                        SQL_FALSE);                  // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 5,
@@ -1825,7 +1825,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
                        SQL_NULLABLE,                 // expectedColumnNullability
                        2,                            // expectedNumPrecRadix
                        8,                            // expectedOctetLength
-                       SQL_PRED_NONE,                // expectedSearchable
+                       SQL_SEARCHABLE,               // expectedSearchable
                        SQL_FALSE);                   // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 6,
@@ -1842,7 +1842,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
                        SQL_NULLABLE,               // expectedColumnNullability
                        0,                          // expectedNumPrecRadix
                        1,                          // expectedOctetLength
-                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_SEARCHABLE,             // expectedSearchable
                        SQL_TRUE);                  // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 7,
@@ -1859,7 +1859,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
                        SQL_NULLABLE,               // expectedColumnNullability
                        0,                          // expectedNumPrecRadix
                        6,                          // expectedOctetLength
-                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_SEARCHABLE,             // expectedSearchable
                        SQL_TRUE);                  // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 8,
@@ -1876,7 +1876,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
                        SQL_NULLABLE,               // expectedColumnNullability
                        0,                          // expectedNumPrecRadix
                        6,                          // expectedOctetLength
-                       SQL_PRED_NONE,              // expectedSearchable
+                       SQL_SEARCHABLE,             // expectedSearchable
                        SQL_TRUE);                  // expectedUnsignedColumn
 
   checkSQLColAttribute(this->stmt, 9,
@@ -1893,7 +1893,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
                        SQL_NULLABLE,                    // expectedColumnNullability
                        0,                               // expectedNumPrecRadix
                        16,                              // expectedOctetLength
-                       SQL_PRED_NONE,                   // expectedSearchable
+                       SQL_SEARCHABLE,                  // expectedSearchable
                        SQL_TRUE);                       // expectedUnsignedColumn
 
   this->disconnect();
@@ -1923,7 +1923,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         4,                              // expectedColumnSize
                         0,                              // expectedColumnScale
                         SQL_NULLABLE,                   // expectedColumnNullability
-                        SQL_PRED_NONE,                  // expectedSearchable
+                        SQL_SEARCHABLE,                 // expectedSearchable
                         SQL_FALSE);                     // expectedUnsignedColumn
 
   checkSQLColAttributes(this->stmt, 2,
@@ -1935,7 +1935,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         8,                             // expectedColumnSize
                         0,                             // expectedColumnScale
                         SQL_NULLABLE,                  // expectedColumnNullability
-                        SQL_PRED_NONE,                 // expectedSearchable
+                        SQL_SEARCHABLE,                // expectedSearchable
                         SQL_FALSE);                    // expectedUnsignedColumn
 
   checkSQLColAttributes(this->stmt, 3,
@@ -1947,7 +1947,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         19,                                 // expectedColumnSize
                         0,                                  // expectedColumnScale
                         SQL_NULLABLE,                       // expectedColumnNullability
-                        SQL_PRED_NONE,                      // expectedSearchable
+                        SQL_SEARCHABLE,                     // expectedSearchable
                         SQL_FALSE);                         // expectedUnsignedColumn
 
   checkSQLColAttributes(this->stmt, 4,
@@ -1959,7 +1959,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         8,                           // expectedColumnSize
                         0,                           // expectedColumnScale
                         SQL_NULLABLE,                // expectedColumnNullability
-                        SQL_PRED_NONE,               // expectedSearchable
+                        SQL_SEARCHABLE,              // expectedSearchable
                         SQL_FALSE);                  // expectedUnsignedColumn
 
   checkSQLColAttributes(this->stmt, 5,
@@ -1971,7 +1971,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         8,                            // expectedColumnSize
                         0,                            // expectedColumnScale
                         SQL_NULLABLE,                 // expectedColumnNullability
-                        SQL_PRED_NONE,                // expectedSearchable
+                        SQL_SEARCHABLE,               // expectedSearchable
                         SQL_FALSE);                   // expectedUnsignedColumn
 
   checkSQLColAttributes(this->stmt, 6,
@@ -1983,7 +1983,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         1,                          // expectedColumnSize
                         0,                          // expectedColumnScale
                         SQL_NULLABLE,               // expectedColumnNullability
-                        SQL_PRED_NONE,              // expectedSearchable
+                        SQL_SEARCHABLE,             // expectedSearchable
                         SQL_TRUE);                  // expectedUnsignedColumn
 
   checkSQLColAttributes(this->stmt, 7,
@@ -1995,7 +1995,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         10,                         // expectedColumnSize
                         0,                          // expectedColumnScale
                         SQL_NULLABLE,               // expectedColumnNullability
-                        SQL_PRED_NONE,              // expectedSearchable
+                        SQL_SEARCHABLE,             // expectedSearchable
                         SQL_TRUE);                  // expectedUnsignedColumn
 
   checkSQLColAttributes(this->stmt, 8,
@@ -2007,7 +2007,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         12,                         // expectedColumnSize
                         3,                          // expectedColumnScale
                         SQL_NULLABLE,               // expectedColumnNullability
-                        SQL_PRED_NONE,              // expectedSearchable
+                        SQL_SEARCHABLE,             // expectedSearchable
                         SQL_TRUE);                  // expectedUnsignedColumn
 
   checkSQLColAttributes(this->stmt, 9,
@@ -2019,7 +2019,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         23,                              // expectedColumnSize
                         3,                               // expectedColumnScale
                         SQL_NULLABLE,                    // expectedColumnNullability
-                        SQL_PRED_NONE,                   // expectedSearchable
+                        SQL_SEARCHABLE,                  // expectedSearchable
                         SQL_TRUE);                       // expectedUnsignedColumn
 
   this->disconnect();
