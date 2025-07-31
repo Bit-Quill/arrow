@@ -96,4 +96,9 @@ SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT dataType);
 SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
                        SQLINTEGER inStatementTextLength, SQLWCHAR* outStatementText,
                        SQLINTEGER bufferLength, SQLINTEGER* outStatementTextLength);
+SQLRETURN SQLDescribeCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
+                         SQLWCHAR* columnName, SQLSMALLINT bufferLength,
+                         SQLSMALLINT* nameLengthPtr, SQLSMALLINT* dataTypePtr,
+                         SQLULEN* columnSizePtr, SQLSMALLINT* decimalDigitsPtr,
+                         SQLSMALLINT* nullablePtr);
 }  // namespace arrow

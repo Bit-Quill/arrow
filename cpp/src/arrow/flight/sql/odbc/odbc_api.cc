@@ -1367,4 +1367,115 @@ SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
   });
 }
 
+SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNumber, SQLWCHAR* columnName,
+                         SQLSMALLINT bufferLength, SQLSMALLINT* nameLengthPtr,
+                         SQLSMALLINT* dataTypePtr, SQLULEN* columnSizePtr,
+                         SQLSMALLINT* decimalDigitsPtr, SQLSMALLINT* nullablePtr) {
+  LOG_DEBUG(
+      "SQLDescribeColW called with stmt: {}, columnNumber: {}, "
+      "columnName: {}, bufferLength: {}, nameLengthPtr: {}, dataTypePtr: {}, "
+      "columnSizePtr: {}, decimalDigitsPtr: {}, nullablePtr: {}",
+      stmt, columnNumber, fmt::ptr(columnName), bufferLength, fmt::ptr(nameLengthPtr),
+      fmt::ptr(dataTypePtr), fmt::ptr(columnSizePtr), fmt::ptr(decimalDigitsPtr),
+      fmt::ptr(nullablePtr));
+  using ODBC::ODBCDescriptor;
+  using ODBC::ODBCStatement;
+
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    ODBCDescriptor* ird = statement->GetIRD();
+
+    SQLSMALLINT sqlType;
+    ird->GetField(columnNumber, SQL_DESC_CONCISE_TYPE, &sqlType, sizeof(SQLSMALLINT),
+                  nullptr);
+
+    SQLINTEGER outputLengthInt;
+    ird->GetField(columnNumber, SQL_DESC_NAME, columnName, bufferLength,
+                  &outputLengthInt);
+    if (nameLengthPtr) {
+      *nameLengthPtr = static_cast<SQLSMALLINT>(outputLengthInt);
+    }
+
+    if (dataTypePtr) {
+      *dataTypePtr = sqlType;
+    }
+
+    // Column Size
+    if (columnSizePtr) {
+      switch (sqlType) {
+        // All numeric types
+        case SQL_DECIMAL:
+        case SQL_NUMERIC:
+        case SQL_TINYINT:
+        case SQL_SMALLINT:
+        case SQL_INTEGER:
+        case SQL_BIGINT:
+        case SQL_REAL:
+        case SQL_FLOAT:
+        case SQL_DOUBLE: {
+          ird->GetField(columnNumber, SQL_DESC_PRECISION, columnSizePtr, sizeof(SQLULEN),
+                        nullptr);
+          break;
+        }
+
+        default: {
+          ird->GetField(columnNumber, SQL_DESC_LENGTH, columnSizePtr, sizeof(SQLULEN),
+                        nullptr);
+        }
+      }
+    }
+
+    // Decimal Digits
+    if (decimalDigitsPtr) {
+      switch (sqlType) {
+        // All exact numeric types
+        case SQL_TINYINT:
+        case SQL_SMALLINT:
+        case SQL_INTEGER:
+        case SQL_BIGINT:
+        case SQL_DECIMAL:
+        case SQL_NUMERIC: {
+          ird->GetField(columnNumber, SQL_DESC_SCALE, decimalDigitsPtr, sizeof(SQLULEN),
+                        nullptr);
+          break;
+        }
+
+        // All datetime types
+        case SQL_DATE:
+        case SQL_TIME:
+        case SQL_TIMESTAMP:
+        // TODO THESE ARE UNDEFINED - ODBC 3 Only Datetime Types
+        // SQL_TYPE_TIMESTAMP_WITH_TIMEZONE and SQL_TYPE_TIME_WITH_TIMEZONE are rarely
+        // used and not universally supported.
+        // case SQL_TYPE_TIME_WITH_TIMEZONE:
+        // case SQL_TYPE_TIMESTAMP_WITH_TIMEZONE:
+        //
+        // All interval types with a seconds component
+        case SQL_INTERVAL_SECOND:
+        case SQL_INTERVAL_MINUTE_TO_SECOND:
+        case SQL_INTERVAL_HOUR_TO_SECOND:
+        case SQL_INTERVAL_DAY_TO_SECOND: {
+          ird->GetField(columnNumber, SQL_DESC_PRECISION, decimalDigitsPtr,
+                        sizeof(SQLULEN), nullptr);
+          break;
+        }
+
+        default: {
+          // All character and binary types
+          // SQL_BIT
+          // All approximate numeric types
+          // All interval types with no seconds component
+          *decimalDigitsPtr = static_cast<SQLSMALLINT>(0);
+        }
+      }
+    }
+
+    // Nullable
+    ird->GetField(columnNumber, SQL_DESC_NULLABLE, nullablePtr, sizeof(SQLSMALLINT),
+                  nullptr);
+
+    return SQL_SUCCESS;
+  });
+}
+
 }  // namespace arrow
