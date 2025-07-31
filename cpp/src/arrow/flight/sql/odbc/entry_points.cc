@@ -186,7 +186,14 @@ SQLRETURN SQL_API SQLCancel(SQLHSTMT stmt) {
   });
 }
 
-SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT stmt) { return arrow::SQLCloseCursor(stmt); }
+SQLRETURN SQL_API SQLCloseCursor(SQLHSTMT stmt) {
+  LOG_DEBUG("SQLCloseCursor called with stmt: {}", stmt);
+  return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    throw driver::odbcabstraction::DriverException("SQLCloseCursor is not implemented",
+                                                   "IM001");
+    return SQL_ERROR;
+  });
+}
 
 SQLRETURN SQL_API SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
                                   SQLUSMALLINT fieldIdentifier,
@@ -291,4 +298,14 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
 SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
                                  SQLINTEGER stringLength) {
   return arrow::SQLSetStmtAttr(stmt, attribute, valuePtr, stringLength);
+}
+
+SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
+                                 SQLWCHAR* columnName, SQLSMALLINT bufferLength,
+                                 SQLSMALLINT* nameLengthPtr, SQLSMALLINT* dataTypePtr,
+                                 SQLULEN* columnSizePtr, SQLSMALLINT* decimalDigitsPtr,
+                                 SQLSMALLINT* nullablePtr) {
+  return arrow::SQLDescribeCol(statementHandle, columnNumber, columnName, bufferLength,
+                               nameLengthPtr, dataTypePtr, columnSizePtr,
+                               decimalDigitsPtr, nullablePtr);
 }
