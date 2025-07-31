@@ -32,6 +32,7 @@ using arrow::NumericArray;
 
 using odbcabstraction::DATE_STRUCT;
 using odbcabstraction::OdbcVersion;
+using odbcabstraction::tagDATE_STRUCT;
 
 using arrow::ArrayFromVector;
 using odbcabstraction::GetTimeForSecondsSinceEpoch;
@@ -49,7 +50,7 @@ TEST(DateArrayAccessor, Test_Date32Array_CDataType_DATE) {
   DateArrayFlightSqlAccessor<odbcabstraction::CDataType_DATE, Date32Array> accessor(
       dynamic_cast<NumericArray<Date32Type>*>(array.get()));
 
-  std::vector<DATE_STRUCT> buffer(values.size());
+  std::vector<tagDATE_STRUCT> buffer(values.size());
   std::vector<ssize_t> strlen_buffer(values.size());
 
   ColumnBinding binding(odbcabstraction::CDataType_DATE, 0, 0, buffer.data(), 0,
@@ -87,7 +88,7 @@ TEST(DateArrayAccessor, Test_Date64Array_CDataType_DATE) {
   DateArrayFlightSqlAccessor<odbcabstraction::CDataType_DATE, Date64Array> accessor(
       dynamic_cast<NumericArray<Date64Type>*>(array.get()));
 
-  std::vector<DATE_STRUCT> buffer(values.size());
+  std::vector<tagDATE_STRUCT> buffer(values.size());
   std::vector<ssize_t> strlen_buffer(values.size());
 
   ColumnBinding binding(odbcabstraction::CDataType_DATE, 0, 0, buffer.data(), 0,
