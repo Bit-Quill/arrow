@@ -66,6 +66,26 @@ void checkSQLColumns(
   CheckStringColumnW(stmt, 18, expectedIsNullable);  // is nullable
 }
 
+void checkInfluxDBSQLColumns(
+    SQLHSTMT stmt, const std::wstring& expectedCatalog,
+    const std::wstring& expectedSchema, const std::wstring& expectedTable,
+    const std::wstring& expectedColumn, const SQLINTEGER& expectedDataType,
+    const std::wstring& expectedTypeName, const SQLINTEGER& expectedColumnSize,
+    const SQLINTEGER& expectedBufferLength, const SQLSMALLINT& expectedDecimalDigits,
+    const SQLSMALLINT& expectedNumPrecRadix, const SQLSMALLINT& expectedNullable,
+    const SQLSMALLINT& expectedSqlDataType, const SQLSMALLINT& expectedDateTimeSub,
+    const SQLINTEGER& expectedOctetCharLength, const SQLINTEGER& expectedOrdinalPosition,
+    const std::wstring& expectedIsNullable) {
+  CheckStringColumnW(stmt, 1, expectedCatalog);  // catalog
+  CheckStringColumnW(stmt, 2, expectedSchema);   // schema
+
+  checkSQLColumns(stmt, expectedTable, expectedColumn, expectedDataType, expectedTypeName,
+                  expectedColumnSize, expectedBufferLength, expectedDecimalDigits,
+                  expectedNumPrecRadix, expectedNullable, expectedSqlDataType,
+                  expectedDateTimeSub, expectedOctetCharLength, expectedOrdinalPosition,
+                  expectedIsNullable);
+}
+
 void checkMockSQLColumns(
     SQLHSTMT stmt, const std::wstring& expectedCatalog, const std::wstring& expectedTable,
     const std::wstring& expectedColumn, const SQLINTEGER& expectedDataType,
