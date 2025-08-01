@@ -175,32 +175,32 @@ SQLSMALLINT getCTypeForSQLType(const DescriptorRecord& record) {
     case SQL_TYPE_TIMESTAMP:
       return SQL_C_TYPE_TIMESTAMP;
 
-    case SQL_C_INTERVAL_DAY:
-      return SQL_INTERVAL_DAY;
-    case SQL_C_INTERVAL_DAY_TO_HOUR:
-      return SQL_INTERVAL_DAY_TO_HOUR;
-    case SQL_C_INTERVAL_DAY_TO_MINUTE:
-      return SQL_INTERVAL_DAY_TO_MINUTE;
-    case SQL_C_INTERVAL_DAY_TO_SECOND:
-      return SQL_INTERVAL_DAY_TO_SECOND;
-    case SQL_C_INTERVAL_HOUR:
-      return SQL_INTERVAL_HOUR;
-    case SQL_C_INTERVAL_HOUR_TO_MINUTE:
-      return SQL_INTERVAL_HOUR_TO_MINUTE;
-    case SQL_C_INTERVAL_HOUR_TO_SECOND:
-      return SQL_INTERVAL_HOUR_TO_SECOND;
-    case SQL_C_INTERVAL_MINUTE:
-      return SQL_INTERVAL_MINUTE;
-    case SQL_C_INTERVAL_MINUTE_TO_SECOND:
-      return SQL_INTERVAL_MINUTE_TO_SECOND;
-    case SQL_C_INTERVAL_SECOND:
-      return SQL_INTERVAL_SECOND;
-    case SQL_C_INTERVAL_YEAR:
-      return SQL_INTERVAL_YEAR;
-    case SQL_C_INTERVAL_YEAR_TO_MONTH:
-      return SQL_INTERVAL_YEAR_TO_MONTH;
-    case SQL_C_INTERVAL_MONTH:
-      return SQL_INTERVAL_MONTH;
+    case SQL_INTERVAL_DAY:
+      return SQL_C_INTERVAL_DAY;
+    case SQL_INTERVAL_DAY_TO_HOUR:
+      return SQL_C_INTERVAL_DAY_TO_HOUR;
+    case SQL_INTERVAL_DAY_TO_MINUTE:
+      return SQL_C_INTERVAL_DAY_TO_MINUTE;
+    case SQL_INTERVAL_DAY_TO_SECOND:
+      return SQL_C_INTERVAL_DAY_TO_SECOND;
+    case SQL_INTERVAL_HOUR:
+      return SQL_C_INTERVAL_HOUR;
+    case SQL_INTERVAL_HOUR_TO_MINUTE:
+      return SQL_C_INTERVAL_HOUR_TO_MINUTE;
+    case SQL_INTERVAL_HOUR_TO_SECOND:
+      return SQL_C_INTERVAL_HOUR_TO_SECOND;
+    case SQL_INTERVAL_MINUTE:
+      return SQL_C_INTERVAL_MINUTE;
+    case SQL_INTERVAL_MINUTE_TO_SECOND:
+      return SQL_C_INTERVAL_MINUTE_TO_SECOND;
+    case SQL_INTERVAL_SECOND:
+      return SQL_C_INTERVAL_SECOND;
+    case SQL_INTERVAL_YEAR:
+      return SQL_C_INTERVAL_YEAR;
+    case SQL_INTERVAL_YEAR_TO_MONTH:
+      return SQL_C_INTERVAL_YEAR_TO_MONTH;
+    case SQL_INTERVAL_MONTH:
+      return SQL_C_INTERVAL_MONTH;
 
     default:
       throw DriverException("Unknown SQL type: " + std::to_string(record.m_conciseType),
