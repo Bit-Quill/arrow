@@ -115,7 +115,10 @@ Result<std::shared_ptr<RecordBatch>> Transform_inner(
       odbcabstraction::SqlDataType data_type_v3 =
           GetDataTypeFromArrowField_V3(field, metadata_settings.use_wide_char_);
 
-      ColumnMetadata metadata(field->metadata());
+      const auto& metadata_map = field->metadata();
+      std::shared_ptr<const arrow::KeyValueMetadata> empty_metadata_map(
+          new arrow::KeyValueMetadata);
+      ColumnMetadata metadata(metadata_map ? metadata_map : empty_metadata_map);
 
       data.table_cat = table_catalog;
       data.table_schem = table_schema;
@@ -125,8 +128,8 @@ Result<std::shared_ptr<RecordBatch>> Transform_inner(
                            ? data_type_v3
                            : ConvertSqlDataTypeFromV3ToV2(data_type_v3);
 
-      // TODO: Use `metadata.GetTypeName()` when ARROW-16064 is merged.
-      const auto& type_name_result = field->metadata()->Get("ARROW:FLIGHT:SQL:TYPE_NAME");
+      const auto& type_name_result = metadata.GetTypeName();
+
       data.type_name = type_name_result.ok() ? type_name_result.ValueOrDie()
                                              : GetTypeNameFromSqlDataType(data_type_v3);
 
