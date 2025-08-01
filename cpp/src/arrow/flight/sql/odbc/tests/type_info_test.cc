@@ -521,6 +521,444 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
   this->disconnect();
 }
 
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
+  this->connect(SQL_OV_ODBC2);
+
+  SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_ALL_TYPES);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Check bit data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"bit"),  // expectedTypeName
+                      SQL_BIT,               // expectedDataType
+                      1,                     // expectedColumnSize
+                      std::nullopt,          // expectedLiteralPrefix
+                      std::nullopt,          // expectedLiteralSuffix
+                      std::nullopt,          // expectedCreateParams
+                      SQL_NULLABLE,          // expectedNullable
+                      SQL_FALSE,             // expectedCaseSensitive
+                      SQL_SEARCHABLE,        // expectedSearchable
+                      NULL,                  // expectedUnsignedAttr
+                      SQL_FALSE,             // expectedFixedPrecScale
+                      NULL,                  // expectedAutoUniqueValue
+                      std::wstring(L"bit"),  // expectedLocalTypeName
+                      NULL,                  // expectedMinScale
+                      NULL,                  // expectedMaxScale
+                      SQL_BIT,               // expectedSqlDataType
+                      NULL,                  // expectedSqlDatetimeSub
+                      NULL,                  // expectedNumPrecRadix
+                      NULL);                 // expectedIntervalPrec
+
+  // Check tinyint data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"tinyint"),  // expectedTypeName
+                      SQL_TINYINT,               // expectedDataType
+                      3,                         // expectedColumnSize
+                      std::nullopt,              // expectedLiteralPrefix
+                      std::nullopt,              // expectedLiteralSuffix
+                      std::nullopt,              // expectedCreateParams
+                      SQL_NULLABLE,              // expectedNullable
+                      SQL_FALSE,                 // expectedCaseSensitive
+                      SQL_SEARCHABLE,            // expectedSearchable
+                      SQL_FALSE,                 // expectedUnsignedAttr
+                      SQL_FALSE,                 // expectedFixedPrecScale
+                      NULL,                      // expectedAutoUniqueValue
+                      std::wstring(L"tinyint"),  // expectedLocalTypeName
+                      NULL,                      // expectedMinScale
+                      NULL,                      // expectedMaxScale
+                      SQL_TINYINT,               // expectedSqlDataType
+                      NULL,                      // expectedSqlDatetimeSub
+                      NULL,                      // expectedNumPrecRadix
+                      NULL);                     // expectedIntervalPrec
+
+  // Check bigint data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"bigint"),  // expectedTypeName
+                      SQL_BIGINT,               // expectedDataType
+                      19,                       // expectedColumnSize
+                      std::nullopt,             // expectedLiteralPrefix
+                      std::nullopt,             // expectedLiteralSuffix
+                      std::nullopt,             // expectedCreateParams
+                      SQL_NULLABLE,             // expectedNullable
+                      SQL_FALSE,                // expectedCaseSensitive
+                      SQL_SEARCHABLE,           // expectedSearchable
+                      SQL_FALSE,                // expectedUnsignedAttr
+                      SQL_FALSE,                // expectedFixedPrecScale
+                      NULL,                     // expectedAutoUniqueValue
+                      std::wstring(L"bigint"),  // expectedLocalTypeName
+                      NULL,                     // expectedMinScale
+                      NULL,                     // expectedMaxScale
+                      SQL_BIGINT,               // expectedSqlDataType
+                      NULL,                     // expectedSqlDatetimeSub
+                      NULL,                     // expectedNumPrecRadix
+                      NULL);                    // expectedIntervalPrec
+
+  // Check longvarbinary data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"longvarbinary"),  // expectedTypeName
+                      SQL_LONGVARBINARY,               // expectedDataType
+                      65536,                           // expectedColumnSize
+                      std::nullopt,                    // expectedLiteralPrefix
+                      std::nullopt,                    // expectedLiteralSuffix
+                      std::nullopt,                    // expectedCreateParams
+                      SQL_NULLABLE,                    // expectedNullable
+                      SQL_FALSE,                       // expectedCaseSensitive
+                      SQL_SEARCHABLE,                  // expectedSearchable
+                      NULL,                            // expectedUnsignedAttr
+                      SQL_FALSE,                       // expectedFixedPrecScale
+                      NULL,                            // expectedAutoUniqueValue
+                      std::wstring(L"longvarbinary"),  // expectedLocalTypeName
+                      NULL,                            // expectedMinScale
+                      NULL,                            // expectedMaxScale
+                      SQL_LONGVARBINARY,               // expectedSqlDataType
+                      NULL,                            // expectedSqlDatetimeSub
+                      NULL,                            // expectedNumPrecRadix
+                      NULL);                           // expectedIntervalPrec
+
+  // Check varbinary data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"varbinary"),  // expectedTypeName
+                      SQL_VARBINARY,               // expectedDataType
+                      255,                         // expectedColumnSize
+                      std::nullopt,                // expectedLiteralPrefix
+                      std::nullopt,                // expectedLiteralSuffix
+                      std::nullopt,                // expectedCreateParams
+                      SQL_NULLABLE,                // expectedNullable
+                      SQL_FALSE,                   // expectedCaseSensitive
+                      SQL_SEARCHABLE,              // expectedSearchable
+                      NULL,                        // expectedUnsignedAttr
+                      SQL_FALSE,                   // expectedFixedPrecScale
+                      NULL,                        // expectedAutoUniqueValue
+                      std::wstring(L"varbinary"),  // expectedLocalTypeName
+                      NULL,                        // expectedMinScale
+                      NULL,                        // expectedMaxScale
+                      SQL_VARBINARY,               // expectedSqlDataType
+                      NULL,                        // expectedSqlDatetimeSub
+                      NULL,                        // expectedNumPrecRadix
+                      NULL);                       // expectedIntervalPrec
+
+  // Check text data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Driver returns SQL_WLONGVARCHAR since unicode is enabled
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"text"),    // expectedTypeName
+                      SQL_WLONGVARCHAR,         // expectedDataType
+                      65536,                    // expectedColumnSize
+                      std::wstring(L"'"),       // expectedLiteralPrefix
+                      std::wstring(L"'"),       // expectedLiteralSuffix
+                      std::wstring(L"length"),  // expectedCreateParams
+                      SQL_NULLABLE,             // expectedNullable
+                      SQL_FALSE,                // expectedCaseSensitive
+                      SQL_SEARCHABLE,           // expectedSearchable
+                      NULL,                     // expectedUnsignedAttr
+                      SQL_FALSE,                // expectedFixedPrecScale
+                      NULL,                     // expectedAutoUniqueValue
+                      std::wstring(L"text"),    // expectedLocalTypeName
+                      NULL,                     // expectedMinScale
+                      NULL,                     // expectedMaxScale
+                      SQL_WLONGVARCHAR,         // expectedSqlDataType
+                      NULL,                     // expectedSqlDatetimeSub
+                      NULL,                     // expectedNumPrecRadix
+                      NULL);                    // expectedIntervalPrec
+
+  // Check longvarchar data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"longvarchar"),  // expectedTypeName
+                      SQL_WLONGVARCHAR,              // expectedDataType
+                      65536,                         // expectedColumnSize
+                      std::wstring(L"'"),            // expectedLiteralPrefix
+                      std::wstring(L"'"),            // expectedLiteralSuffix
+                      std::wstring(L"length"),       // expectedCreateParams
+                      SQL_NULLABLE,                  // expectedNullable
+                      SQL_FALSE,                     // expectedCaseSensitive
+                      SQL_SEARCHABLE,                // expectedSearchable
+                      NULL,                          // expectedUnsignedAttr
+                      SQL_FALSE,                     // expectedFixedPrecScale
+                      NULL,                          // expectedAutoUniqueValue
+                      std::wstring(L"longvarchar"),  // expectedLocalTypeName
+                      NULL,                          // expectedMinScale
+                      NULL,                          // expectedMaxScale
+                      SQL_WLONGVARCHAR,              // expectedSqlDataType
+                      NULL,                          // expectedSqlDatetimeSub
+                      NULL,                          // expectedNumPrecRadix
+                      NULL);                         // expectedIntervalPrec
+
+  // Check char data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Driver returns SQL_WCHAR since unicode is enabled
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"char"),    // expectedTypeName
+                      SQL_WCHAR,                // expectedDataType
+                      255,                      // expectedColumnSize
+                      std::wstring(L"'"),       // expectedLiteralPrefix
+                      std::wstring(L"'"),       // expectedLiteralSuffix
+                      std::wstring(L"length"),  // expectedCreateParams
+                      SQL_NULLABLE,             // expectedNullable
+                      SQL_FALSE,                // expectedCaseSensitive
+                      SQL_SEARCHABLE,           // expectedSearchable
+                      NULL,                     // expectedUnsignedAttr
+                      SQL_FALSE,                // expectedFixedPrecScale
+                      NULL,                     // expectedAutoUniqueValue
+                      std::wstring(L"char"),    // expectedLocalTypeName
+                      NULL,                     // expectedMinScale
+                      NULL,                     // expectedMaxScale
+                      SQL_WCHAR,                // expectedSqlDataType
+                      NULL,                     // expectedSqlDatetimeSub
+                      NULL,                     // expectedNumPrecRadix
+                      NULL);                    // expectedIntervalPrec
+
+  // Check integer data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"integer"),  // expectedTypeName
+                      SQL_INTEGER,               // expectedDataType
+                      9,                         // expectedColumnSize
+                      std::nullopt,              // expectedLiteralPrefix
+                      std::nullopt,              // expectedLiteralSuffix
+                      std::nullopt,              // expectedCreateParams
+                      SQL_NULLABLE,              // expectedNullable
+                      SQL_FALSE,                 // expectedCaseSensitive
+                      SQL_SEARCHABLE,            // expectedSearchable
+                      SQL_FALSE,                 // expectedUnsignedAttr
+                      SQL_FALSE,                 // expectedFixedPrecScale
+                      NULL,                      // expectedAutoUniqueValue
+                      std::wstring(L"integer"),  // expectedLocalTypeName
+                      NULL,                      // expectedMinScale
+                      NULL,                      // expectedMaxScale
+                      SQL_INTEGER,               // expectedSqlDataType
+                      NULL,                      // expectedSqlDatetimeSub
+                      NULL,                      // expectedNumPrecRadix
+                      NULL);                     // expectedIntervalPrec
+
+  // Check smallint data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"smallint"),  // expectedTypeName
+                      SQL_SMALLINT,               // expectedDataType
+                      5,                          // expectedColumnSize
+                      std::nullopt,               // expectedLiteralPrefix
+                      std::nullopt,               // expectedLiteralSuffix
+                      std::nullopt,               // expectedCreateParams
+                      SQL_NULLABLE,               // expectedNullable
+                      SQL_FALSE,                  // expectedCaseSensitive
+                      SQL_SEARCHABLE,             // expectedSearchable
+                      SQL_FALSE,                  // expectedUnsignedAttr
+                      SQL_FALSE,                  // expectedFixedPrecScale
+                      NULL,                       // expectedAutoUniqueValue
+                      std::wstring(L"smallint"),  // expectedLocalTypeName
+                      NULL,                       // expectedMinScale
+                      NULL,                       // expectedMaxScale
+                      SQL_SMALLINT,               // expectedSqlDataType
+                      NULL,                       // expectedSqlDatetimeSub
+                      NULL,                       // expectedNumPrecRadix
+                      NULL);                      // expectedIntervalPrec
+
+  // Check float data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"float"),  // expectedTypeName
+                      SQL_FLOAT,               // expectedDataType
+                      7,                       // expectedColumnSize
+                      std::nullopt,            // expectedLiteralPrefix
+                      std::nullopt,            // expectedLiteralSuffix
+                      std::nullopt,            // expectedCreateParams
+                      SQL_NULLABLE,            // expectedNullable
+                      SQL_FALSE,               // expectedCaseSensitive
+                      SQL_SEARCHABLE,          // expectedSearchable
+                      SQL_FALSE,               // expectedUnsignedAttr
+                      SQL_FALSE,               // expectedFixedPrecScale
+                      NULL,                    // expectedAutoUniqueValue
+                      std::wstring(L"float"),  // expectedLocalTypeName
+                      NULL,                    // expectedMinScale
+                      NULL,                    // expectedMaxScale
+                      SQL_FLOAT,               // expectedSqlDataType
+                      NULL,                    // expectedSqlDatetimeSub
+                      NULL,                    // expectedNumPrecRadix
+                      NULL);                   // expectedIntervalPrec
+
+  // Check double data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"double"),  // expectedTypeName
+                      SQL_DOUBLE,               // expectedDataType
+                      15,                       // expectedColumnSize
+                      std::nullopt,             // expectedLiteralPrefix
+                      std::nullopt,             // expectedLiteralSuffix
+                      std::nullopt,             // expectedCreateParams
+                      SQL_NULLABLE,             // expectedNullable
+                      SQL_FALSE,                // expectedCaseSensitive
+                      SQL_SEARCHABLE,           // expectedSearchable
+                      SQL_FALSE,                // expectedUnsignedAttr
+                      SQL_FALSE,                // expectedFixedPrecScale
+                      NULL,                     // expectedAutoUniqueValue
+                      std::wstring(L"double"),  // expectedLocalTypeName
+                      NULL,                     // expectedMinScale
+                      NULL,                     // expectedMaxScale
+                      SQL_DOUBLE,               // expectedSqlDataType
+                      NULL,                     // expectedSqlDatetimeSub
+                      NULL,                     // expectedNumPrecRadix
+                      NULL);                    // expectedIntervalPrec
+
+  // Check numeric data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Mock server treats numeric data type as a double type
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"numeric"),  // expectedTypeName
+                      SQL_DOUBLE,                // expectedDataType
+                      15,                        // expectedColumnSize
+                      std::nullopt,              // expectedLiteralPrefix
+                      std::nullopt,              // expectedLiteralSuffix
+                      std::nullopt,              // expectedCreateParams
+                      SQL_NULLABLE,              // expectedNullable
+                      SQL_FALSE,                 // expectedCaseSensitive
+                      SQL_SEARCHABLE,            // expectedSearchable
+                      SQL_FALSE,                 // expectedUnsignedAttr
+                      SQL_FALSE,                 // expectedFixedPrecScale
+                      NULL,                      // expectedAutoUniqueValue
+                      std::wstring(L"numeric"),  // expectedLocalTypeName
+                      NULL,                      // expectedMinScale
+                      NULL,                      // expectedMaxScale
+                      SQL_DOUBLE,                // expectedSqlDataType
+                      NULL,                      // expectedSqlDatetimeSub
+                      NULL,                      // expectedNumPrecRadix
+                      NULL);                     // expectedIntervalPrec
+
+  // Check varchar data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Driver returns SQL_WVARCHAR since unicode is enabled
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"varchar"),  // expectedTypeName
+                      SQL_WVARCHAR,              // expectedDataType
+                      255,                       // expectedColumnSize
+                      std::wstring(L"'"),        // expectedLiteralPrefix
+                      std::wstring(L"'"),        // expectedLiteralSuffix
+                      std::wstring(L"length"),   // expectedCreateParams
+                      SQL_NULLABLE,              // expectedNullable
+                      SQL_FALSE,                 // expectedCaseSensitive
+                      SQL_SEARCHABLE,            // expectedSearchable
+                      SQL_FALSE,                 // expectedUnsignedAttr
+                      SQL_FALSE,                 // expectedFixedPrecScale
+                      NULL,                      // expectedAutoUniqueValue
+                      std::wstring(L"varchar"),  // expectedLocalTypeName
+                      NULL,                      // expectedMinScale
+                      NULL,                      // expectedMaxScale
+                      SQL_WVARCHAR,              // expectedSqlDataType
+                      NULL,                      // expectedSqlDatetimeSub
+                      NULL,                      // expectedNumPrecRadix
+                      NULL);                     // expectedIntervalPrec
+
+  // Check date data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"date"),  // expectedTypeName
+                      SQL_DATE,               // expectedDataType
+                      10,                     // expectedColumnSize
+                      std::wstring(L"'"),     // expectedLiteralPrefix
+                      std::wstring(L"'"),     // expectedLiteralSuffix
+                      std::nullopt,           // expectedCreateParams
+                      SQL_NULLABLE,           // expectedNullable
+                      SQL_FALSE,              // expectedCaseSensitive
+                      SQL_SEARCHABLE,         // expectedSearchable
+                      SQL_FALSE,              // expectedUnsignedAttr
+                      SQL_FALSE,              // expectedFixedPrecScale
+                      NULL,                   // expectedAutoUniqueValue
+                      std::wstring(L"date"),  // expectedLocalTypeName
+                      NULL,                   // expectedMinScale
+                      NULL,                   // expectedMaxScale
+                      SQL_DATETIME,           // expectedSqlDataType
+                      NULL,   // expectedSqlDatetimeSub, driver returns NULL for Ver2
+                      NULL,   // expectedNumPrecRadix
+                      NULL);  // expectedIntervalPrec
+
+  // Check time data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"time"),  // expectedTypeName
+                      SQL_TIME,               // expectedDataType
+                      8,                      // expectedColumnSize
+                      std::wstring(L"'"),     // expectedLiteralPrefix
+                      std::wstring(L"'"),     // expectedLiteralSuffix
+                      std::nullopt,           // expectedCreateParams
+                      SQL_NULLABLE,           // expectedNullable
+                      SQL_FALSE,              // expectedCaseSensitive
+                      SQL_SEARCHABLE,         // expectedSearchable
+                      SQL_FALSE,              // expectedUnsignedAttr
+                      SQL_FALSE,              // expectedFixedPrecScale
+                      NULL,                   // expectedAutoUniqueValue
+                      std::wstring(L"time"),  // expectedLocalTypeName
+                      NULL,                   // expectedMinScale
+                      NULL,                   // expectedMaxScale
+                      SQL_DATETIME,           // expectedSqlDataType
+                      NULL,   // expectedSqlDatetimeSub, driver returns NULL for Ver2
+                      NULL,   // expectedNumPrecRadix
+                      NULL);  // expectedIntervalPrec
+
+  // Check timestamp data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"timestamp"),  // expectedTypeName
+                      SQL_TIMESTAMP,               // expectedDataType
+                      32,                          // expectedColumnSize
+                      std::wstring(L"'"),          // expectedLiteralPrefix
+                      std::wstring(L"'"),          // expectedLiteralSuffix
+                      std::nullopt,                // expectedCreateParams
+                      SQL_NULLABLE,                // expectedNullable
+                      SQL_FALSE,                   // expectedCaseSensitive
+                      SQL_SEARCHABLE,              // expectedSearchable
+                      SQL_FALSE,                   // expectedUnsignedAttr
+                      SQL_FALSE,                   // expectedFixedPrecScale
+                      NULL,                        // expectedAutoUniqueValue
+                      std::wstring(L"timestamp"),  // expectedLocalTypeName
+                      NULL,                        // expectedMinScale
+                      NULL,                        // expectedMaxScale
+                      SQL_DATETIME,                // expectedSqlDataType
+                      NULL,   // expectedSqlDatetimeSub, driver returns NULL for Ver2
+                      NULL,   // expectedNumPrecRadix
+                      NULL);  // expectedIntervalPrec
+
+  this->disconnect();
+}
+
 TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBit) {
   this->connect();
 
@@ -1031,10 +1469,49 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarchar) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDate) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDate) {
   this->connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_DATE);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Check date data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"date"),  // expectedTypeName
+                      SQL_TYPE_DATE,          // expectedDataType
+                      10,                     // expectedColumnSize
+                      std::wstring(L"'"),     // expectedLiteralPrefix
+                      std::wstring(L"'"),     // expectedLiteralSuffix
+                      std::nullopt,           // expectedCreateParams
+                      SQL_NULLABLE,           // expectedNullable
+                      SQL_FALSE,              // expectedCaseSensitive
+                      SQL_SEARCHABLE,         // expectedSearchable
+                      SQL_FALSE,              // expectedUnsignedAttr
+                      SQL_FALSE,              // expectedFixedPrecScale
+                      NULL,                   // expectedAutoUniqueValue
+                      std::wstring(L"date"),  // expectedLocalTypeName
+                      NULL,                   // expectedMinScale
+                      NULL,                   // expectedMaxScale
+                      SQL_DATETIME,           // expectedSqlDataType
+                      SQL_CODE_DATE,          // expectedSqlDatetimeSub
+                      NULL,                   // expectedNumPrecRadix
+                      NULL);                  // expectedIntervalPrec
+
+  // No more data
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLDate) {
+  this->connect();
+
+  // Pass ODBC Ver 2 data type
+  SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_DATE);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Check date data type
@@ -1107,10 +1584,63 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDateVer2) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTime) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDateVer2) {
+  this->connect(SQL_OV_ODBC2);
+
+  // Pass ODBC Ver 3 data type
+  SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_DATE);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // Driver manager returns SQL data type out of range error state
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1004);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTime) {
   this->connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_TIME);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Check time data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"time"),  // expectedTypeName
+                      SQL_TYPE_TIME,          // expectedDataType
+                      8,                      // expectedColumnSize
+                      std::wstring(L"'"),     // expectedLiteralPrefix
+                      std::wstring(L"'"),     // expectedLiteralSuffix
+                      std::nullopt,           // expectedCreateParams
+                      SQL_NULLABLE,           // expectedNullable
+                      SQL_FALSE,              // expectedCaseSensitive
+                      SQL_SEARCHABLE,         // expectedSearchable
+                      SQL_FALSE,              // expectedUnsignedAttr
+                      SQL_FALSE,              // expectedFixedPrecScale
+                      NULL,                   // expectedAutoUniqueValue
+                      std::wstring(L"time"),  // expectedLocalTypeName
+                      NULL,                   // expectedMinScale
+                      NULL,                   // expectedMaxScale
+                      SQL_DATETIME,           // expectedSqlDataType
+                      SQL_CODE_TIME,          // expectedSqlDatetimeSub
+                      NULL,                   // expectedNumPrecRadix
+                      NULL);                  // expectedIntervalPrec
+
+  // No more data
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTime) {
+  this->connect();
+
+  // Pass ODBC Ver 2 data type
+  SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TIME);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Check time data type
@@ -1183,7 +1713,21 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimeVer2) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimestamp) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimeVer2) {
+  this->connect(SQL_OV_ODBC2);
+
+  // Pass ODBC Ver 3 data type
+  SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_TIME);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // Driver manager returns SQL data type out of range error state
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1004);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestamp) {
   this->connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_TIMESTAMP);
@@ -1221,7 +1765,46 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimestamp) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimestampVer2) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestamp) {
+  this->connect();
+
+  // Pass ODBC Ver 2 data type
+  SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TIMESTAMP);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Check timestamp data type
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkSQLGetTypeInfo(this->stmt,
+                      std::wstring(L"timestamp"),  // expectedTypeName
+                      SQL_TYPE_TIMESTAMP,          // expectedDataType
+                      32,                          // expectedColumnSize
+                      std::wstring(L"'"),          // expectedLiteralPrefix
+                      std::wstring(L"'"),          // expectedLiteralSuffix
+                      std::nullopt,                // expectedCreateParams
+                      SQL_NULLABLE,                // expectedNullable
+                      SQL_FALSE,                   // expectedCaseSensitive
+                      SQL_SEARCHABLE,              // expectedSearchable
+                      SQL_FALSE,                   // expectedUnsignedAttr
+                      SQL_FALSE,                   // expectedFixedPrecScale
+                      NULL,                        // expectedAutoUniqueValue
+                      std::wstring(L"timestamp"),  // expectedLocalTypeName
+                      NULL,                        // expectedMinScale
+                      NULL,                        // expectedMaxScale
+                      SQL_DATETIME,                // expectedSqlDataType
+                      SQL_CODE_TIMESTAMP,          // expectedSqlDatetimeSub
+                      NULL,                        // expectedNumPrecRadix
+                      NULL);                       // expectedIntervalPrec
+
+  // No more data
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampVer2) {
   this->connect(SQL_OV_ODBC2);
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TIMESTAMP);
@@ -1253,6 +1836,47 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimestampVer2) {
                       NULL);  // expectedIntervalPrec
 
   // No more data
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestampVer2) {
+  this->connect(SQL_OV_ODBC2);
+
+  // Pass ODBC Ver 3 data type
+  SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_TIMESTAMP);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // Driver manager returns SQL data type out of range error state
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1004);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoInvalidDataType) {
+  this->connect();
+
+  SQLSMALLINT invalidDataType = -114;
+  SQLRETURN ret = SQLGetTypeInfo(this->stmt, invalidDataType);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY004);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetTypeInfoUnsupportedDataType) {
+  // Assumes mock and remote server don't support GUID data type
+  this->connect();
+
+  SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_GUID);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Result set is empty with valid data type that is unsupported by the server
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
 
