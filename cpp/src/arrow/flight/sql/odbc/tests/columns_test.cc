@@ -511,12 +511,18 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsPBIInfluxDB) {
   SQLWCHAR schemaName[] = L"information_schema";
   SQLWCHAR tableName[] = L"columns";
 
+  std::cout << "-AL- before calling SQLColumns\n";
+
   SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, schemaName, SQL_NTS, tableName,
                              SQL_NTS, nullptr, SQL_NTS);
 
+  std::cout << "-AL- after calling SQLColumns\n";
+
   EXPECT_EQ(ret, SQL_SUCCESS);
 
+  std::cout << "-AL- before calling SQLFetch\n";
   ret = SQLFetch(this->stmt);
+  std::cout << "-AL- after calling SQLFetch\n";
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   this->disconnect();

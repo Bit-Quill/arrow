@@ -39,6 +39,8 @@
 // odbc_environment.h includes winsock2.h
 #include "arrow/flight/sql/odbc/odbc_api.h"
 
+#include <iostream> //-AL- add iostream for stdout
+
 namespace arrow {
 SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
   LOG_DEBUG("SQLAllocHandle called with type: {}, parent: {}, result: {}", type, parent,
@@ -959,25 +961,40 @@ SQLRETURN SQLExecute(SQLHSTMT stmt) {
 
 SQLRETURN SQLFetch(SQLHSTMT stmt) {
   LOG_DEBUG("SQLFetch called with stmt: {}", stmt);
+  std::cout << "SQLFetch called with stmt: " << stmt << std::endl;
 
   using ODBC::ODBCDescriptor;
   using ODBC::ODBCStatement;
 
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
-    LOG_DEBUG("SQLFetch line 1 ");
+    LOG_DEBUG("-AL- SQLFetch line 1 ");
+    std::cout << "-AL- SQLFetch line 1 " << std::endl;
+
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
-    LOG_DEBUG("SQLFetch line 2 ");
+
+    LOG_DEBUG("-AL- SQLFetch line 2 ");
+    std::cout << "-AL- SQLFetch line 2 " << std::endl;
+
     // The SQL_ATTR_ROW_ARRAY_SIZE statement attribute specifies the number of rows in the
     // rowset.
     ODBCDescriptor* ard = statement->GetARD();
-    LOG_DEBUG("SQLFetch line 3 ");
+
+    LOG_DEBUG("-AL- SQLFetch line 3 ");
+    std::cout << "-AL- SQLFetch line 3 " << std::endl;
+
     size_t rows = static_cast<size_t>(ard->GetArraySize());
-    LOG_DEBUG("SQLFetch line 4 ");
+
+    LOG_DEBUG("-AL- SQLFetch line 4 ");
+    std::cout << "-AL- SQLFetch line 4 " << std::endl;
+
+    // -AL- segfault error occurred after `statement->Fetch` is called.
     if (statement->Fetch(rows)) {
-      LOG_DEBUG("SQLFetch line 5.1 ");
+      LOG_DEBUG("-AL- SQLFetch line 5.1 ");
+      std::cout << "-AL- SQLFetch line 5.1 " << std::endl;
       return SQL_SUCCESS;
     } else {
-      LOG_DEBUG("SQLFetch line 5.2 ");
+      LOG_DEBUG("-AL- SQLFetch line 5.2 ");
+      std::cout << "-AL- SQLFetch line 5.2 " << std::endl;
       // Reached the end of rowset
       return SQL_NO_DATA;
     }
