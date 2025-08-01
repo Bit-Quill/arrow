@@ -411,6 +411,117 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsTestInputData) {
   this->disconnect();
 }
 
+// -AL- todo remove "influxdb" test cases
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllColumnsInfluxDB) {
+  // Check table pattern and column pattern returns all columns
+  this->connect();
+
+  // Attempt to get all columns
+  SQLWCHAR tablePattern[] = L"weather";
+  SQLWCHAR columnPattern[] = L"%";
+
+  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, tablePattern,
+                             SQL_NTS, columnPattern, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // mock limitation: SQLite mock server returns 10 for bigint size when spec indicates
+  // should be 19
+  // DECIMAL_DIGITS should be 0 for bigint type since it is exact
+  // mock limitation: SQLite mock server returns 10 for bigint decimal digits when spec
+  // indicates should be 0
+  checkInfluxDBSQLColumns(this->stmt,
+                          std::wstring(L"public"),    // expectedCatalog
+                          std::wstring(L"iox"),       // expectedSchema
+                          std::wstring(L"weather"),   // expectedTable
+                          std::wstring(L"city"),      // expectedColumn
+                          SQL_WVARCHAR,               // expectedDataType
+                          std::wstring(L"WVARCHAR"),  // expectedTypeName
+                          0,  // expectedColumnSize (mock returns 10 instead of 19)
+                          0,  // expectedBufferLength
+                          0,  // expectedDecimalDigits (mock returns 15 instead of 0)
+                          0,  // expectedNumPrecRadix
+                          SQL_NULLABLE,           // expectedNullable
+                          SQL_WVARCHAR,           // expectedSqlDataType
+                          NULL,                   // expectedDateTimeSub
+                          0,                      // expectedOctetCharLength
+                          1,                      // expectedOrdinalPosition
+                          std::wstring(L"YES"));  // expectedIsNullable
+
+  // Check 2nd Column
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkInfluxDBSQLColumns(this->stmt,
+                          std::wstring(L"public"),       // expectedCatalog
+                          std::wstring(L"iox"),          // expectedSchema
+                          std::wstring(L"weather"),      // expectedTable
+                          std::wstring(L"temperature"),  // expectedColumn
+                          SQL_DOUBLE,                    // expectedDataType
+                          std::wstring(L"DOUBLE"),       // expectedTypeName
+                          0,                             // expectedColumnSize
+                          8,                             // expectedBufferLength
+                          0,                             // expectedDecimalDigits
+                          2,                             // expectedNumPrecRadix
+                          SQL_NULLABLE,                  // expectedNullable
+                          SQL_DOUBLE,                    // expectedSqlDataType
+                          NULL,                          // expectedDateTimeSub
+                          8,                             // expectedOctetCharLength
+                          2,                             // expectedOrdinalPosition
+                          std::wstring(L"YES"));         // expectedIsNullable
+
+  // Check 3rd Column
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  checkInfluxDBSQLColumns(this->stmt,
+                          std::wstring(L"public"),     // expectedCatalog
+                          std::wstring(L"iox"),        // expectedSchema
+                          std::wstring(L"weather"),    // expectedTable
+                          std::wstring(L"time"),       // expectedColumn
+                          SQL_TYPE_TIMESTAMP,          // expectedDataType
+                          std::wstring(L"TIMESTAMP"),  // expectedTypeName
+                          0,   // expectedColumnSize (mock returns 10 instead of 19)
+                          23,  // expectedBufferLength
+                          0,   // expectedDecimalDigits (mock returns 15 instead of 0)
+                          0,   // expectedNumPrecRadix
+                          SQL_NO_NULLS,          // expectedNullable
+                          SQL_DATETIME,          // expectedSqlDataType
+                          SQL_CODE_TIMESTAMP,    // expectedDateTimeSub
+                          16,                    // expectedOctetCharLength
+                          3,                     // expectedOrdinalPosition
+                          std::wstring(L"NO"));  // expectedIsNullable
+
+  
+  // No more columns
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsPBIInfluxDB) {
+  // Test case to reproduce nullptr issue
+  this->connect();
+
+  // Attempt to get all columns
+  SQLWCHAR schemaName[] = L"information_schema";
+  SQLWCHAR tableName[] = L"columns";
+
+  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, schemaName, SQL_NTS, tableName,
+                             SQL_NTS, nullptr, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
 TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   // Check table pattern and column pattern returns all columns
   this->connect();
