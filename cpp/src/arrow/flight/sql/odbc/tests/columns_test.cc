@@ -522,6 +522,25 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllColumnsInfluxDB) {
   this->disconnect();
 }
 
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsPBIInfluxDB) {
+  // Test case to reproduce nullptr issue
+  this->connect();
+
+  // Attempt to get all columns
+  SQLWCHAR schemaName[] = L"information_schema";
+  SQLWCHAR tableName[] = L"columns";
+
+  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, schemaName, SQL_NTS, tableName,
+                             SQL_NTS, nullptr, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
 TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   // Check table pattern and column pattern returns all columns
   this->connect();

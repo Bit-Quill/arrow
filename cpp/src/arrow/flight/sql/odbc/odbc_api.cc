@@ -964,15 +964,20 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
   using ODBC::ODBCStatement;
 
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    LOG_DEBUG("SQLFetch line 1 ");
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
-
+    LOG_DEBUG("SQLFetch line 2 ");
     // The SQL_ATTR_ROW_ARRAY_SIZE statement attribute specifies the number of rows in the
     // rowset.
     ODBCDescriptor* ard = statement->GetARD();
+    LOG_DEBUG("SQLFetch line 3 ");
     size_t rows = static_cast<size_t>(ard->GetArraySize());
+    LOG_DEBUG("SQLFetch line 4 ");
     if (statement->Fetch(rows)) {
+      LOG_DEBUG("SQLFetch line 5.1 ");
       return SQL_SUCCESS;
     } else {
+      LOG_DEBUG("SQLFetch line 5.2 ");
       // Reached the end of rowset
       return SQL_NO_DATA;
     }
