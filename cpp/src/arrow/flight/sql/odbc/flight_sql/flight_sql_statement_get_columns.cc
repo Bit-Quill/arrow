@@ -115,10 +115,7 @@ Result<std::shared_ptr<RecordBatch>> Transform_inner(
       odbcabstraction::SqlDataType data_type_v3 =
           GetDataTypeFromArrowField_V3(field, metadata_settings.use_wide_char_);
 
-      const auto& metadata_map = field->metadata();
-      std::shared_ptr<const arrow::KeyValueMetadata> empty_metadata_map(
-          new arrow::KeyValueMetadata);
-      ColumnMetadata metadata(metadata_map ? metadata_map : empty_metadata_map);
+      ColumnMetadata metadata(field->metadata());
 
       data.table_cat = table_catalog;
       data.table_schem = table_schema;
