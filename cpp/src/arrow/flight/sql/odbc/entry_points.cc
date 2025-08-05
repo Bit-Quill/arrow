@@ -245,12 +245,7 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT stmt, SQLWCHAR* pKCatalogName,
 }
 
 SQLRETURN SQL_API SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT dataType) {
-  LOG_DEBUG("SQLGetTypeInfoW called with stmt: {} dataType: {}", stmt, dataType);
-  return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
-    throw driver::odbcabstraction::DriverException("SQLGetTypeInfoW is not implemented",
-                                                   "IM001");
-    return SQL_ERROR;
-  });
+  return arrow::SQLGetTypeInfo(stmt, dataType);
 }
 
 SQLRETURN SQL_API SQLMoreResults(SQLHSTMT stmt) { return arrow::SQLMoreResults(stmt); }
