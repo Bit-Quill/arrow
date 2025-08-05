@@ -128,6 +128,24 @@ TEST(SQLFreeHandle, TestSQLFreeHandleConnect) {
   EXPECT_TRUE(return_free_handle == SQL_SUCCESS);
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestFreeNullHandles) {
+  // Verifies attempt to free invalid handle does not cause segfault
+  // Attempt to free null statement handle
+  SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, this->stmt);
+
+  EXPECT_EQ(ret, SQL_INVALID_HANDLE);
+
+  // Attempt to free null connection handle
+  ret = SQLFreeHandle(SQL_HANDLE_DBC, this->conn);
+
+  EXPECT_EQ(ret, SQL_INVALID_HANDLE);
+
+  // Attempt to free null environment handle
+  ret = SQLFreeHandle(SQL_HANDLE_ENV, this->env);
+
+  EXPECT_EQ(ret, SQL_INVALID_HANDLE);
+}
+
 TEST(SQLFreeConnect, TestSQLFreeConnect) {
   // ODBC Environment
   SQLHENV env;
