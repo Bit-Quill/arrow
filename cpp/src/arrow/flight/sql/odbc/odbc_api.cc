@@ -1280,6 +1280,65 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
   });
 }
 
+SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT dataType) {
+  // GH-47237 return SQL_PRED_CHAR and SQL_PRED_BASIC for
+  // appropriate data types in `SEARCHABLE` field
+  LOG_DEBUG("SQLGetTypeInfoW called with stmt: {} dataType: {}", stmt, dataType);
+  using ODBC::ODBCStatement;
+  return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    switch (dataType) {
+      case SQL_ALL_TYPES:
+      case SQL_CHAR:
+      case SQL_VARCHAR:
+      case SQL_LONGVARCHAR:
+      case SQL_WCHAR:
+      case SQL_WVARCHAR:
+      case SQL_WLONGVARCHAR:
+      case SQL_BIT:
+      case SQL_BINARY:
+      case SQL_VARBINARY:
+      case SQL_LONGVARBINARY:
+      case SQL_TINYINT:
+      case SQL_SMALLINT:
+      case SQL_INTEGER:
+      case SQL_BIGINT:
+      case SQL_NUMERIC:
+      case SQL_DECIMAL:
+      case SQL_FLOAT:
+      case SQL_REAL:
+      case SQL_DOUBLE:
+      case SQL_GUID:
+      case SQL_DATE:
+      case SQL_TYPE_DATE:
+      case SQL_TIME:
+      case SQL_TYPE_TIME:
+      case SQL_TIMESTAMP:
+      case SQL_TYPE_TIMESTAMP:
+      case SQL_INTERVAL_DAY:
+      case SQL_INTERVAL_DAY_TO_HOUR:
+      case SQL_INTERVAL_DAY_TO_MINUTE:
+      case SQL_INTERVAL_DAY_TO_SECOND:
+      case SQL_INTERVAL_HOUR:
+      case SQL_INTERVAL_HOUR_TO_MINUTE:
+      case SQL_INTERVAL_HOUR_TO_SECOND:
+      case SQL_INTERVAL_MINUTE:
+      case SQL_INTERVAL_MINUTE_TO_SECOND:
+      case SQL_INTERVAL_SECOND:
+      case SQL_INTERVAL_YEAR:
+      case SQL_INTERVAL_YEAR_TO_MONTH:
+      case SQL_INTERVAL_MONTH:
+        statement->GetTypeInfo(dataType);
+        break;
+      default:
+        throw DriverException("Invalid SQL data type", "HY004");
+    }
+
+    return SQL_SUCCESS;
+  });
+}
+
 SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
                        SQLINTEGER inStatementTextLength, SQLWCHAR* outStatementText,
                        SQLINTEGER bufferLength, SQLINTEGER* outStatementTextLength) {

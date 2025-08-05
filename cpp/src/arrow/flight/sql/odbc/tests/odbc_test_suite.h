@@ -173,6 +173,7 @@ static constexpr std::string_view error_state_22002 = "22002";
 static constexpr std::string_view error_state_24000 = "24000";
 static constexpr std::string_view error_state_28000 = "28000";
 static constexpr std::string_view error_state_HY000 = "HY000";
+static constexpr std::string_view error_state_HY004 = "HY004";
 static constexpr std::string_view error_state_HY009 = "HY009";
 static constexpr std::string_view error_state_HY010 = "HY010";
 static constexpr std::string_view error_state_HY017 = "HY017";
@@ -184,6 +185,7 @@ static constexpr std::string_view error_state_HY106 = "HY106";
 static constexpr std::string_view error_state_HY114 = "HY114";
 static constexpr std::string_view error_state_HY118 = "HY118";
 static constexpr std::string_view error_state_HYC00 = "HYC00";
+static constexpr std::string_view error_state_S1004 = "S1004";
 
 /// Verify ODBC Error State
 void VerifyOdbcErrorState(SQLSMALLINT handle_type, SQLHANDLE handle,
