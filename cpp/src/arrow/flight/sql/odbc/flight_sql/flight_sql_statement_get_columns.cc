@@ -116,12 +116,12 @@ Result<std::shared_ptr<RecordBatch>> Transform_inner(
           GetDataTypeFromArrowField_V3(field, metadata_settings.use_wide_char_);
 
       // -AL- issue is here. metadata is null.
-      //ColumnMetadata metadata(field->metadata());
-      std::optional<ColumnMetadata> metadata;
-      std::shared_ptr< const arrow::KeyValueMetadata > metadata_ptr = field->metadata();
-      if (metadata_ptr) {
-        metadata = ColumnMetadata(metadata_ptr);
-      }
+      // ColumnMetadata metadata(field->metadata());
+
+      const auto& metadata_map = field->metadata();
+      std::shared_ptr<const arrow::KeyValueMetadata> empty_metadata_map(
+          new arrow::KeyValueMetadata);
+      ColumnMetadata metadata(metadata_map ? metadata_map : empty_metadata_map);
 
       data.table_cat = table_catalog;
       data.table_schem = table_schema;
@@ -131,27 +131,20 @@ Result<std::shared_ptr<RecordBatch>> Transform_inner(
                            ? data_type_v3
                            : ConvertSqlDataTypeFromV3ToV2(data_type_v3);
 
-      // TODO: Use `metadata.GetTypeName()` when ARROW-16064 is merged.
-      // -AL- segfault is from here.
-      const auto& type_name_result = metadata
-                                         ? metadata->GetTypeName()
-                                         : arrow::Status::Invalid("No metadata from server");
-      
+      // -AL- segfault is from here. because it is first read of metadata
+      const auto& type_name_result = metadata.GetTypeName();
+
       data.type_name = type_name_result.ok() ? type_name_result.ValueOrDie()
                                              : GetTypeNameFromSqlDataType(data_type_v3);
 
-      const Result<int32_t>& precision_result =
-          metadata ? metadata->GetPrecision()
-                   : arrow::Status::Invalid("No metadata from server");
+      const Result<int32_t>& precision_result = metadata.GetPrecision();
       data.column_size =
           precision_result.ok() ? make_optional(precision_result.ValueOrDie()) : nullopt;
       data.char_octet_length = GetCharOctetLength(data_type_v3, precision_result);
 
       data.buffer_length = GetBufferLength(data_type_v3, data.column_size);
 
-      const Result<int32_t>& scale_result =
-          metadata ? metadata->GetScale()
-                   : arrow::Status::Invalid("No metadata from server");
+      const Result<int32_t>& scale_result = metadata.GetScale();
       data.decimal_digits =
           scale_result.ok() ? make_optional(scale_result.ValueOrDie()) : nullopt;
       data.num_prec_radix = GetRadixFromSqlDataType(data_type_v3);
