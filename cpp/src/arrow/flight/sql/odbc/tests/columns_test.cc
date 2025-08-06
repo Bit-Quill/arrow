@@ -2373,6 +2373,8 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColValidateInput) {
 }
 
 TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColQueryAllDataTypesMetadataMock) {
+  // Mock server has a limitation where only SQL_WVARCHAR column type values are returned
+  // from SELECT AS queries
   this->connect();
 
   SQLWCHAR columnName[1024];
@@ -2663,7 +2665,6 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataRemoteODB
 }
 
 TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColAllTypesTableMetadataMock) {
-  //  Test assumes there is a table $scratch.ODBCTest in remote server
   this->connect();
   this->CreateTableAllDataType();
 
@@ -2722,7 +2723,6 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColAllTypesTableMetadataMock) {
 }
 
 TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColUnicodeTableMetadataMock) {
-  //  Test assumes there is a table $scratch.ODBCTest in remote server
   this->connect();
   this->CreateUnicodeTable();
 
