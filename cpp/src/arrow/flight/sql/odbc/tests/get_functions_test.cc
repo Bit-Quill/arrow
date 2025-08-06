@@ -47,21 +47,20 @@ SQL_API_SQLCONNECT
 SQL_API_SQLGETFUNCTIONS
 SQL_API_SQLGETINFO
 SQL_API_SQLGETSTMTATTR
-SQL_API_SQLDESCRIBECOL //-AL- this will be really implemented  after Rob implements the func
+SQL_API_SQLDESCRIBECOL
+//-AL- SQLDescribeCol will be implemented afterwards.
 // -AL- not sure if driver returning IM001 in diag will change SQLGetFunctions return result or not
 SQL_API_SQLGETTYPEINFO
 SQL_API_SQLDISCONNECT
 SQL_API_SQLNUMRESULTCOLS
 SQL_API_SQLPREPARE
 SQL_API_SQLEXECDIRECT
-SQL_API_SQLPUTDATA
 SQL_API_SQLEXECUTE
 SQL_API_SQLROWCOUNT
 SQL_API_SQLFETCH
 SQL_API_SQLSETCONNECTATTR
 SQL_API_SQLFETCHSCROLL
 SQL_API_SQLFREEHANDLE
-SQL_API_SQLFREESTMT
 SQL_API_SQLGETCONNECTATTR
 SQL_API_SQLSETENVATTR
 SQL_API_SQLSETSTMTATTR
@@ -91,6 +90,7 @@ SQL_API_SQLFREECONNECT
 // -AL- Not supported functions:
 // (May return supported? need to double check)
 /*
+SQL_API_SQLPUTDATA
 SQL_API_SQLGETDESCFIELD
 SQL_API_SQLGETDESCREC
 SQL_API_SQLCANCEL
@@ -125,17 +125,62 @@ SQL_API_SQLTABLEPRIVILEGES
 */
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctions) {
-  // -AL- todo driver manager implements SQLGetFunctions.
-  // -AL- this test verifies Driver manager is able to detect functions and return correct
-  // values for SQLGetFunctions
+  // Verify driver manager return values for SQLGetFunctions
   this->connect();
 
-  SQLUSMALLINT supported_functions[SQL_API_ODBC3_ALL_FUNCTIONS_SIZE];  
-  SQLRETURN ret = SQLGetFunctions(this->conn, SQL_API_ODBC3_ALL_FUNCTIONS, supported_functions);
+  SQLUSMALLINT api_exists[SQL_API_ODBC3_ALL_FUNCTIONS_SIZE];
+  const std::vector<int> supported_functions = {
+      SQL_API_SQLALLOCHANDLE, SQL_API_SQLBINDCOL, SQL_API_SQLGETDIAGFIELD,
+      SQL_API_SQLCLOSECURSOR, SQL_API_SQLGETDIAGREC, SQL_API_SQLCOLATTRIBUTE,
+      SQL_API_SQLGETENVATTR, SQL_API_SQLCONNECT, SQL_API_SQLGETFUNCTIONS,
+      SQL_API_SQLGETINFO, SQL_API_SQLGETSTMTATTR,
+      // SQL_API_SQLDESCRIBECOL, // -AL- todo enable once SQLDescribeCol is implemented.
+      SQL_API_SQLGETTYPEINFO, SQL_API_SQLDISCONNECT, SQL_API_SQLNUMRESULTCOLS,
+      SQL_API_SQLPREPARE, SQL_API_SQLEXECDIRECT, SQL_API_SQLEXECUTE,
+      SQL_API_SQLROWCOUNT, SQL_API_SQLFETCH, SQL_API_SQLSETCONNECTATTR,
+      SQL_API_SQLFETCHSCROLL, SQL_API_SQLFREEHANDLE, SQL_API_SQLFREESTMT,
+      SQL_API_SQLGETCONNECTATTR, SQL_API_SQLSETENVATTR, SQL_API_SQLSETSTMTATTR,
+      SQL_API_SQLGETDATA, SQL_API_SQLCOLUMNS, SQL_API_SQLTABLES, SQL_API_SQLNATIVESQL,
+      SQL_API_SQLDRIVERCONNECT, SQL_API_SQLMORERESULTS,
+
+      // ODBC 2.0 APIs
+      SQL_API_SQLSETSTMTOPTION, SQL_API_SQLGETSTMTOPTION, SQL_API_SQLSETCONNECTOPTION,
+      SQL_API_SQLGETCONNECTOPTION, SQL_API_SQLALLOCCONNECT, SQL_API_SQLALLOCENV,
+      SQL_API_SQLALLOCSTMT, SQL_API_SQLFREEENV, SQL_API_SQLFREECONNECT};
+  SQLRETURN ret = SQLGetFunctions(this->conn, SQL_API_ODBC3_ALL_FUNCTIONS, api_exists);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
+  for (int api : supported_functions) {
+    EXPECT_EQ(SQL_FUNC_EXISTS(api_exists, api), SQL_TRUE);
+  }
 
+  this->disconnect();
+}
+
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetFunctionsTEMP) {
+  // -AL- use this test to find singular values.
+  this->connect();
+
+  SQLUSMALLINT sql_tables_exists;
+  SQLRETURN ret = SQLGetFunctions(this->conn, SQL_API_SQLTABLES, &sql_tables_exists);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(sql_tables_exists, SQL_TRUE);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsCheckSQLTables) {
+  this->connect();
+  
+  SQLUSMALLINT sql_tables_exists;
+  SQLRETURN ret = SQLGetFunctions(this->conn, SQL_API_SQLTABLES, &sql_tables_exists);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(sql_tables_exists, SQL_TRUE);
 
   this->disconnect();
 }
