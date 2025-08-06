@@ -264,11 +264,40 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecInputData) {
+  // SQLGetDiagRec does not post diagnostic records for itself.
+  this->connect();
+
+  SQLWCHAR sql_state[6];
+  SQLINTEGER native_error;
+  SQLWCHAR message[ODBC_BUFFER_SIZE];
+  SQLSMALLINT message_length;
+
+  // Pass invalid record number
+  SQLRETURN ret = SQLGetDiagRec(SQL_HANDLE_DBC, this->conn, 0, sql_state, &native_error,
+                                message, ODBC_BUFFER_SIZE, &message_length);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // Pass valid record number with null inputs
+  ret = SQLGetDiagRec(SQL_HANDLE_DBC, this->conn, 1, 0, 0, 0, 0, 0);
+
+  EXPECT_EQ(ret, SQL_NO_DATA);
+
+  // Invalid handle
+  ret = SQLGetDiagRec(0, 0, 0, 0, 0, 0, 0, 0);
+
+  EXPECT_EQ(ret, SQL_INVALID_HANDLE);
+
+  this->disconnect();
+}
+
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorInputData) {
   // Test ODBC 2.0 API SQLError. Driver manager maps SQLError to SQLGetDiagRec.
   // SQLError does not post diagnostic records for itself.
   this->connect();
 
+  // Pass valid handles with null inputs
   SQLRETURN ret = SQLError(this->env, 0, 0, 0, 0, 0, 0, 0);
 
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -281,6 +310,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorInputData) {
 
   EXPECT_EQ(ret, SQL_NO_DATA);
 
+  // Invalid handle
   ret = SQLError(0, 0, 0, 0, 0, 0, 0, 0);
 
   EXPECT_EQ(ret, SQL_INVALID_HANDLE);
