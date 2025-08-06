@@ -1,0 +1,143 @@
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+#include "arrow/flight/sql/odbc/tests/odbc_test_suite.h"
+
+#ifdef _WIN32
+#  include <windows.h>
+#endif
+
+#include <sql.h>
+#include <sqltypes.h>
+#include <sqlucode.h>
+
+#include "gtest/gtest.h"
+
+namespace arrow::flight::sql::odbc {
+
+// -AL- todo add tests for SQLGetFunctions
+  // -AL- [ ] test "all functions" with ODBC3
+  // [ ] test singular functions with ODBC3
+  // [ ] test singular functions with ODBC2
+  // [ ] test "all functions" with ODBC2
+
+// Supported functions:
+/*
+SQL_API_SQLALLOCHANDLE
+SQL_API_SQLBINDCOL
+SQL_API_SQLGETDIAGFIELD
+SQL_API_SQLCLOSECURSOR
+SQL_API_SQLGETDIAGREC
+SQL_API_SQLCOLATTRIBUTE
+SQL_API_SQLGETENVATTR
+SQL_API_SQLCONNECT
+SQL_API_SQLGETFUNCTIONS
+SQL_API_SQLGETINFO
+SQL_API_SQLGETSTMTATTR
+SQL_API_SQLDESCRIBECOL //-AL- this will be really implemented  after Rob implements the func
+// -AL- not sure if driver returning IM001 in diag will change SQLGetFunctions return result or not
+SQL_API_SQLGETTYPEINFO
+SQL_API_SQLDISCONNECT
+SQL_API_SQLNUMRESULTCOLS
+SQL_API_SQLPREPARE
+SQL_API_SQLEXECDIRECT
+SQL_API_SQLPUTDATA
+SQL_API_SQLEXECUTE
+SQL_API_SQLROWCOUNT
+SQL_API_SQLFETCH
+SQL_API_SQLSETCONNECTATTR
+SQL_API_SQLFETCHSCROLL
+SQL_API_SQLFREEHANDLE
+SQL_API_SQLFREESTMT
+SQL_API_SQLGETCONNECTATTR
+SQL_API_SQLSETENVATTR
+SQL_API_SQLSETSTMTATTR
+SQL_API_SQLGETDATA
+SQL_API_SQLCOLUMNS	
+SQL_API_SQLTABLES
+
+SQL_API_SQLNATIVESQL
+
+SQL_API_SQLDRIVERCONNECT
+
+SQL_API_SQLMORERESULTS
+
+// ODBC 2.0 APIs
+SQL_API_SQLSETSTMTOPTION
+SQL_API_SQLGETSTMTOPTION
+SQL_API_SQLSETCONNECTOPTION
+SQL_API_SQLGETCONNECTOPTION
+
+SQL_API_SQLALLOCCONNECT
+SQL_API_SQLALLOCENV
+SQL_API_SQLALLOCSTMT
+SQL_API_SQLFREEENV
+SQL_API_SQLFREESTMT
+SQL_API_SQLFREECONNECT
+*/
+// -AL- Not supported functions:
+// (May return supported? need to double check)
+/*
+SQL_API_SQLGETDESCFIELD
+SQL_API_SQLGETDESCREC
+SQL_API_SQLCANCEL
+SQL_API_SQLCOPYDESC
+SQL_API_SQLDATASOURCES
+SQL_API_SQLPARAMDATA
+SQL_API_SQLDRIVERS
+SQL_API_SQLENDTRAN
+SQL_API_SQLSETCURSORNAME
+SQL_API_SQLSETDESCFIELD
+SQL_API_SQLSETDESCREC
+SQL_API_SQLGETCURSORNAME
+
+SQL_API_SQLSTATISTICS
+SQL_API_SQLSPECIALCOLUMNS
+
+SQL_API_SQLBINDPARAMETER
+SQL_API_SQLBROWSECONNECT
+
+SQL_API_SQLNUMPARAMS
+SQL_API_SQLBULKOPERATIONS
+SQL_API_SQLPRIMARYKEYS
+SQL_API_SQLCOLUMNPRIVILEGES
+SQL_API_SQLPROCEDURECOLUMNS
+SQL_API_SQLDESCRIBEPARAM
+SQL_API_SQLPROCEDURES
+SQL_API_SQLSETPOS
+SQL_API_SQLFOREIGNKEYS
+SQL_API_SQLTABLEPRIVILEGES
+
+// Note: SQLCancelHandle and SQLCompleteAsync are 3.8 only.
+*/
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctions) {
+  // -AL- todo driver manager implements SQLGetFunctions.
+  // -AL- this test verifies Driver manager is able to detect functions and return correct
+  // values for SQLGetFunctions
+  this->connect();
+
+  SQLUSMALLINT supported_functions[SQL_API_ODBC3_ALL_FUNCTIONS_SIZE];  
+  SQLRETURN ret = SQLGetFunctions(this->conn, SQL_API_ODBC3_ALL_FUNCTIONS, supported_functions);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+
+
+  this->disconnect();
+}
+
+}  // namespace arrow::flight::sql::odbc
