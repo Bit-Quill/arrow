@@ -42,15 +42,9 @@ constexpr int32_t DefaultDecimalPrecision = 38;
 constexpr int32_t DefaultLengthForVariableLengthColumns = 1024;
 
 namespace {
-std::shared_ptr<const arrow::KeyValueMetadata> empty_metadata_map(
-    new arrow::KeyValueMetadata);
-
 inline arrow::flight::sql::ColumnMetadata GetMetadata(
     const std::shared_ptr<Field>& field) {
-  const auto& metadata_map = field->metadata();
-
-  arrow::flight::sql::ColumnMetadata metadata(metadata_map ? metadata_map
-                                                           : empty_metadata_map);
+  arrow::flight::sql::ColumnMetadata metadata(field->metadata());
   return metadata;
 }
 
