@@ -2356,9 +2356,8 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColValidateInput) {
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
 
   // Invalid descriptor index - index out of range
-  ret =
-      SQLDescribeCol(this->stmt, outOfRangeColumn, columnName, bufCharLen, &nameLength,
-                     &dataType, &columnSize, &decimalDigits, &nullable);
+  ret = SQLDescribeCol(this->stmt, outOfRangeColumn, columnName, bufCharLen, &nameLength,
+                       &dataType, &columnSize, &decimalDigits, &nullable);
 
   EXPECT_EQ(ret, SQL_ERROR);
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
@@ -2479,11 +2478,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadataRemot
       (SQLWCHAR*)L"float_min",        (SQLWCHAR*)L"float_max",
       (SQLWCHAR*)L"double_min",       (SQLWCHAR*)L"double_max",
       (SQLWCHAR*)L"bit_false",        (SQLWCHAR*)L"bit_true",
-      (SQLWCHAR*)L"c_char",        (SQLWCHAR*)L"c_wchar",
-      (SQLWCHAR*)L"c_wvarchar",
-      (SQLWCHAR*)L"c_varchar",        (SQLWCHAR*)L"date_min",
-      (SQLWCHAR*)L"date_max",         (SQLWCHAR*)L"timestamp_min",
-      (SQLWCHAR*)L"timestamp_max"};
+      (SQLWCHAR*)L"c_char",           (SQLWCHAR*)L"c_wchar",
+      (SQLWCHAR*)L"c_wvarchar",       (SQLWCHAR*)L"c_varchar",
+      (SQLWCHAR*)L"date_min",         (SQLWCHAR*)L"date_max",
+      (SQLWCHAR*)L"timestamp_min",    (SQLWCHAR*)L"timestamp_max"};
   SQLSMALLINT columnDataTypes[] = {
       SQL_INTEGER,        SQL_INTEGER,       SQL_INTEGER,  SQL_INTEGER,   SQL_INTEGER,
       SQL_INTEGER,        SQL_INTEGER,       SQL_INTEGER,  SQL_INTEGER,   SQL_INTEGER,
@@ -2618,8 +2616,8 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataRemoteODB
                              (SQLWCHAR*)L"double_max",       (SQLWCHAR*)L"bit_true",
                              (SQLWCHAR*)L"date_max",         (SQLWCHAR*)L"time_max",
                              (SQLWCHAR*)L"timestamp_max"};
-  SQLSMALLINT columnDataTypes[] = {SQL_INTEGER,   SQL_BIGINT,    SQL_DECIMAL,
-                                   SQL_FLOAT,     SQL_DOUBLE,    SQL_BIT,
+  SQLSMALLINT columnDataTypes[] = {SQL_INTEGER,  SQL_BIGINT, SQL_DECIMAL,
+                                   SQL_FLOAT,    SQL_DOUBLE, SQL_BIT,
                                    SQL_DATETIME, SQL_TIME,   SQL_TIMESTAMP};
   SQLULEN columnSizes[] = {4, 8, 19, 8, 8, 1, 10, 12, 23};
   SQLULEN columnDecimalDigits[] = {0, 0, 0, 0, 0, 0, 10, 12, 23};
@@ -2678,7 +2676,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColAllTypesTableMetadataMock) {
   SQLWCHAR sqlQuery[] = L"SELECT * from AllTypesTable LIMIT 1;";
   SQLINTEGER queryLength = static_cast<SQLINTEGER>(wcslen(sqlQuery));
 
-  SQLWCHAR* columnNames[] = {(SQLWCHAR*)L"bigint_col",     (SQLWCHAR*)L"char_col",
+  SQLWCHAR* columnNames[] = {(SQLWCHAR*)L"bigint_col", (SQLWCHAR*)L"char_col",
                              (SQLWCHAR*)L"varbinary_col", (SQLWCHAR*)L"double_col"};
   SQLSMALLINT columnDataTypes[] = {SQL_BIGINT, SQL_WVARCHAR, SQL_BINARY, SQL_DOUBLE};
   SQLULEN columnSizes[] = {8, 0, 0, 8};
