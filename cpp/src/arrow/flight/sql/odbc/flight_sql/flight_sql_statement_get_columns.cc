@@ -125,8 +125,8 @@ Result<std::shared_ptr<RecordBatch>> Transform_inner(
                            ? data_type_v3
                            : ConvertSqlDataTypeFromV3ToV2(data_type_v3);
 
-      // TODO: Use `metadata.GetTypeName()` when ARROW-16064 is merged.
-      const auto& type_name_result = field->metadata()->Get("ARROW:FLIGHT:SQL:TYPE_NAME");
+      const auto& type_name_result = metadata.GetTypeName();
+
       data.type_name = type_name_result.ok() ? type_name_result.ValueOrDie()
                                              : GetTypeNameFromSqlDataType(data_type_v3);
 
