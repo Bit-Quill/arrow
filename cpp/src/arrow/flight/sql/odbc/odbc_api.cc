@@ -962,7 +962,6 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
 
   using ODBC::ODBCDescriptor;
   using ODBC::ODBCStatement;
-
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
 
@@ -970,6 +969,7 @@ SQLRETURN SQLFetch(SQLHSTMT stmt) {
     // rowset.
     ODBCDescriptor* ard = statement->GetARD();
     size_t rows = static_cast<size_t>(ard->GetArraySize());
+
     if (statement->Fetch(rows)) {
       return SQL_SUCCESS;
     } else {
