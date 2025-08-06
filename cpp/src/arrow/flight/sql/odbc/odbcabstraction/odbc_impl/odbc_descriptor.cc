@@ -462,6 +462,10 @@ void ODBCDescriptor::DetachFromStatement(ODBCStatement* statement, bool isApd) {
   }
 }
 
+// -AL- driver reverts back app descritor here.
+// all statement registered to this descriptor will have
+// their APD/ARD reverted.
+
 void ODBCDescriptor::ReleaseDescriptor() {
   for (ODBCStatement* stmt : m_registeredOnStatementsAsApd) {
     stmt->RevertAppDescriptor(true);

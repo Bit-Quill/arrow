@@ -77,6 +77,8 @@ class ODBCStatement : public ODBCHandle<ODBCStatement> {
   void SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value, SQLINTEGER bufferSize,
                    bool isUnicode);
 
+  // -AL- Add doc comments. bool is just to differentiate between apd and ard,
+  // not "yes -> revert" or "no -> don't revert"
   void RevertAppDescriptor(bool isApd);
 
   inline ODBCDescriptor* GetIRD() { return m_ird.get(); }

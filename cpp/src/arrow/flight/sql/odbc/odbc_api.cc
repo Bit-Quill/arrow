@@ -107,9 +107,28 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
       });
     }
 
-    // TODO Implement for case of descriptor
-    case SQL_HANDLE_DESC:
-      return SQL_INVALID_HANDLE;
+    // TODO -AL- Implement for case of descriptor, explicit descriptors are associated
+    // with connection handles.
+    case SQL_HANDLE_DESC: {
+      using ODBC::ODBCConnection;
+      using ODBC::ODBCDescriptor;
+
+      *result = SQL_NULL_HDESC;
+
+      ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(parent);
+
+      return ODBCConnection::ExecuteWithDiagnostics(connection, SQL_ERROR, [=]() {
+        std::shared_ptr<ODBCDescriptor> descriptor = connection->createDescriptor();
+
+        if (descriptor) {
+          *result = reinterpret_cast<SQLHDESC>(descriptor.get());
+
+          return SQL_SUCCESS;
+        }
+
+        return SQL_ERROR;
+      });
+    }
 
     default:
       break;
@@ -164,8 +183,20 @@ SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
       return SQL_SUCCESS;
     }
 
-    case SQL_HANDLE_DESC:
-      return SQL_INVALID_HANDLE;
+    case SQL_HANDLE_DESC: {
+      // -AL- todo free Descriptor
+      using ODBC::ODBCDescriptor;
+
+      ODBCDescriptor* descriptor = reinterpret_cast<ODBCDescriptor*>(handle);
+
+      if (!descriptor) {
+        return SQL_INVALID_HANDLE;
+      }
+
+      descriptor->ReleaseDescriptor();
+
+      return SQL_SUCCESS;
+    }
 
     default:
       break;
