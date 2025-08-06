@@ -2493,6 +2493,8 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadataRemot
   SQLULEN columnSizes[] = {4, 4, 4,     4,     4,     4,     4,  4,  4,  4, 8,
                            8, 8, 8,     8,     65536, 19,    19, 8,  8,  8, 8,
                            1, 1, 65536, 65536, 65536, 65536, 10, 10, 23, 23};
+  SQLULEN columnDecimalDigits[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0,  0,
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 23, 23};
 
   SQLRETURN ret =
       SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
@@ -2519,7 +2521,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadataRemot
     EXPECT_EQ(returned, columnNames[i]);
     EXPECT_EQ(columnDataType, columnDataTypes[i]);
     EXPECT_EQ(columnSize, columnSizes[i]);
-    EXPECT_EQ(decimalDigits, 0);
+    EXPECT_EQ(decimalDigits, columnDecimalDigits[i]);
     EXPECT_EQ(nullable, SQL_NULLABLE);
 
     nameLength = 0;
@@ -2557,6 +2559,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataRemote) {
                                    SQL_FLOAT,     SQL_DOUBLE,    SQL_BIT,
                                    SQL_TYPE_DATE, SQL_TYPE_TIME, SQL_TYPE_TIMESTAMP};
   SQLULEN columnSizes[] = {4, 8, 19, 8, 8, 1, 10, 12, 23};
+  SQLULEN columnDecimalDigits[] = {0, 0, 0, 0, 0, 0, 10, 12, 23};
 
   SQLRETURN ret = SQLExecDirect(this->stmt, sqlQuery, queryLength);
 
@@ -2582,7 +2585,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataRemote) {
     EXPECT_EQ(returned, columnNames[i]);
     EXPECT_EQ(columnDataType, columnDataTypes[i]);
     EXPECT_EQ(columnSize, columnSizes[i]);
-    EXPECT_EQ(decimalDigits, 0);
+    EXPECT_EQ(decimalDigits, columnDecimalDigits[i]);
     EXPECT_EQ(nullable, SQL_NULLABLE);
 
     nameLength = 0;

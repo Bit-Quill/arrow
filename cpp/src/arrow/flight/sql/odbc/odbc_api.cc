@@ -1384,20 +1384,23 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNumber, SQLWCHAR* col
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
     ODBCDescriptor* ird = statement->GetIRD();
-
+    SQLINTEGER outputLengthInt;
     SQLSMALLINT sqlType;
+
+    // Column SQL Type
     ird->GetField(columnNumber, SQL_DESC_CONCISE_TYPE, &sqlType, sizeof(SQLSMALLINT),
                   nullptr);
-
-    SQLINTEGER outputLengthInt;
-    ird->GetField(columnNumber, SQL_DESC_NAME, columnName, bufferLength,
-                  &outputLengthInt);
-    if (nameLengthPtr) {
-      *nameLengthPtr = static_cast<SQLSMALLINT>(outputLengthInt);
-    }
-
     if (dataTypePtr) {
       *dataTypePtr = sqlType;
+    }
+
+    // Column Name
+    if (columnName || nameLengthPtr) {
+      ird->GetField(columnNumber, SQL_DESC_NAME, columnName, bufferLength,
+                    &outputLengthInt);
+      if (nameLengthPtr) {
+        *nameLengthPtr = static_cast<SQLSMALLINT>(outputLengthInt);
+      }
     }
 
     // Column Size
@@ -1425,7 +1428,7 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNumber, SQLWCHAR* col
       }
     }
 
-    // Decimal Digits
+    // Column Decimal Digits
     if (decimalDigitsPtr) {
       switch (sqlType) {
         // All exact numeric types
@@ -1440,16 +1443,14 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNumber, SQLWCHAR* col
           break;
         }
 
-        // All datetime types
+        // All datetime types (ODBC2)
         case SQL_DATE:
         case SQL_TIME:
         case SQL_TIMESTAMP:
-        // TODO THESE ARE UNDEFINED - ODBC 3 Only Datetime Types
-        // SQL_TYPE_TIMESTAMP_WITH_TIMEZONE and SQL_TYPE_TIME_WITH_TIMEZONE are rarely
-        // used and not universally supported.
-        // case SQL_TYPE_TIME_WITH_TIMEZONE:
-        // case SQL_TYPE_TIMESTAMP_WITH_TIMEZONE:
-        //
+        // All datetime types (ODBC3)
+        case SQL_TYPE_DATE:
+        case SQL_TYPE_TIME:
+        case SQL_TYPE_TIMESTAMP:
         // All interval types with a seconds component
         case SQL_INTERVAL_SECOND:
         case SQL_INTERVAL_MINUTE_TO_SECOND:
@@ -1470,9 +1471,11 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNumber, SQLWCHAR* col
       }
     }
 
-    // Nullable
-    ird->GetField(columnNumber, SQL_DESC_NULLABLE, nullablePtr, sizeof(SQLSMALLINT),
-                  nullptr);
+    // Column Nullable
+    if (nullablePtr) {
+      ird->GetField(columnNumber, SQL_DESC_NULLABLE, nullablePtr, sizeof(SQLSMALLINT),
+                    nullptr);
+    }
 
     return SQL_SUCCESS;
   });
