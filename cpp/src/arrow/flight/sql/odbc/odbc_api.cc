@@ -273,6 +273,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetStringAttribute;
   using ODBC::ODBCConnection;
+  using ODBC::ODBCDescriptor;
   using ODBC::ODBCEnvironment;
   using ODBC::ODBCStatement;
 
@@ -308,7 +309,10 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
     }
 
     case SQL_HANDLE_DESC: {
-      return SQL_ERROR;
+      // -AL- todo add support here
+      ODBCDescriptor* descriptor = reinterpret_cast<ODBCDescriptor*>(handle);
+      diagnostics = &descriptor->GetDiagnostics();
+      break;
     }
 
     case SQL_HANDLE_STMT: {
@@ -436,8 +440,13 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
           }
 
           case SQL_HANDLE_DESC: {
-            // TODO Implement for case of descriptor
-            return SQL_ERROR;
+            // TODO -AL- Implement for case of descriptor
+            ODBCDescriptor* descriptor = reinterpret_cast<ODBCDescriptor*>(handle);
+            ODBCConnection* connection = &descriptor->GetConnection();
+            std::string dsn = connection->GetDSN();
+            return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
+                                      stringLengthPtr, *diagnostics);
+            break;
           }
 
           case SQL_HANDLE_STMT: {
@@ -526,6 +535,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT re
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetStringAttribute;
   using ODBC::ODBCConnection;
+  using ODBC::ODBCDescriptor;
   using ODBC::ODBCEnvironment;
   using ODBC::ODBCStatement;
 
@@ -556,7 +566,10 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT re
     }
 
     case SQL_HANDLE_DESC: {
-      return SQL_ERROR;
+      // -AL- todo add support here. + tests (?)
+      auto* descriptor = ODBCDescriptor::of(handle);
+      diagnostics = &descriptor->GetDiagnostics();
+      break;
     }
 
     case SQL_HANDLE_STMT: {
