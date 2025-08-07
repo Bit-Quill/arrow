@@ -154,7 +154,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsSupportedSingleAPI) {
 
     EXPECT_EQ(api_exists, SQL_TRUE);
 
-    api_exists = SQL_FALSE;
+    api_exists = -1;
   }
 
   this->disconnect();
@@ -180,7 +180,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsUnsupportedSingleAPI) {
 
     EXPECT_EQ(api_exists, SQL_FALSE);
 
-    api_exists = SQL_TRUE;
+    api_exists = -1;
   }
 
   this->disconnect();
@@ -212,7 +212,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsSupportedSingleAPIODBCVer2)
 
     EXPECT_EQ(api_exists, SQL_TRUE);
 
-    api_exists = SQL_FALSE;
+    api_exists = -1;
   }
 
   this->disconnect();
@@ -236,7 +236,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsUnsupportedSingleAPIODBCVer
 
     EXPECT_EQ(api_exists, SQL_FALSE);
 
-    api_exists = SQL_TRUE;
+    api_exists = -1;
   }
 
   this->disconnect();
