@@ -2536,9 +2536,8 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
   this->disconnect();
 }
 
-TEST_F(
-    FlightSQLODBCRemoteTestBase,
-    SQLDescribeColODBCTestTableMetadatafSQLDescribeColQueryAllDataTypesMetadata) {
+TEST_F(FlightSQLODBCRemoteTestBase,
+       SQLDescribeColODBCTestTableMetadatafSQLDescribeColQueryAllDataTypesMetadata) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
   this->connect();
 
@@ -2623,9 +2622,9 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataODBC2) {
                              (SQLWCHAR*)L"double_max",       (SQLWCHAR*)L"bit_true",
                              (SQLWCHAR*)L"date_max",         (SQLWCHAR*)L"time_max",
                              (SQLWCHAR*)L"timestamp_max"};
-  SQLSMALLINT columnDataTypes[] = {SQL_INTEGER,  SQL_BIGINT, SQL_DECIMAL,
-                                   SQL_FLOAT,    SQL_DOUBLE, SQL_BIT,
-                                   SQL_DATE, SQL_TIME,   SQL_TIMESTAMP};
+  SQLSMALLINT columnDataTypes[] = {SQL_INTEGER, SQL_BIGINT, SQL_DECIMAL,
+                                   SQL_FLOAT,   SQL_DOUBLE, SQL_BIT,
+                                   SQL_DATE,    SQL_TIME,   SQL_TIMESTAMP};
   SQLULEN columnSizes[] = {4, 8, 19, 8, 8, 1, 10, 12, 23};
   SQLULEN columnDecimalDigits[] = {0, 0, 0, 0, 0, 0, 10, 12, 23};
 
