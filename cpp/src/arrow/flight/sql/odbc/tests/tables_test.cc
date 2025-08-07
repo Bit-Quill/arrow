@@ -28,9 +28,6 @@
 
 namespace arrow::flight::sql::odbc {
 
-// TODO: Add tests with SQLDescribeCol to check metadata of SQLColumns for ODBC 2 and
-// ODBC 3.
-
 // Helper Functions
 
 std::wstring GetStringColumnW(SQLHSTMT stmt, int colId) {
