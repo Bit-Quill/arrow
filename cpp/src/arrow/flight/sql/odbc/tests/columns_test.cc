@@ -2372,7 +2372,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColValidateInput) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColQueryAllDataTypesMetadataMock) {
+TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
   // Mock server has a limitation where only SQL_WVARCHAR column type values are returned
   // from SELECT AS queries
   this->connect();
@@ -2452,7 +2452,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColQueryAllDataTypesMetadataMock) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadataRemote) {
+TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
   this->connect();
 
   SQLWCHAR columnName[1024];
@@ -2536,7 +2536,9 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadataRemot
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataRemote) {
+TEST_F(
+    FlightSQLODBCRemoteTestBase,
+    SQLDescribeColODBCTestTableMetadatafSQLDescribeColQueryAllDataTypesMetadata) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
   this->connect();
 
@@ -2600,7 +2602,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataRemote) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataRemoteODBC2) {
+TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataODBC2) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
   this->connect(SQL_OV_ODBC2);
 
@@ -2623,7 +2625,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataRemoteODB
                              (SQLWCHAR*)L"timestamp_max"};
   SQLSMALLINT columnDataTypes[] = {SQL_INTEGER,  SQL_BIGINT, SQL_DECIMAL,
                                    SQL_FLOAT,    SQL_DOUBLE, SQL_BIT,
-                                   SQL_DATETIME, SQL_TIME,   SQL_TIMESTAMP};
+                                   SQL_DATE, SQL_TIME,   SQL_TIMESTAMP};
   SQLULEN columnSizes[] = {4, 8, 19, 8, 8, 1, 10, 12, 23};
   SQLULEN columnDecimalDigits[] = {0, 0, 0, 0, 0, 0, 10, 12, 23};
 
@@ -2664,7 +2666,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataRemoteODB
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColAllTypesTableMetadataMock) {
+TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColAllTypesTableMetadata) {
   this->connect();
   this->CreateTableAllDataType();
 
@@ -2722,7 +2724,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColAllTypesTableMetadataMock) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColUnicodeTableMetadataMock) {
+TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColUnicodeTableMetadata) {
   this->connect();
   this->CreateUnicodeTable();
 
