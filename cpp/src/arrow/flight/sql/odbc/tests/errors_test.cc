@@ -359,8 +359,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
   // DM passes 512 as buffer length to SQLError.
   this->connect();
 
-  // Attempt to set unsettable attribute
-  SQLRETURN ret = SQLSetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_EVENT, 0, 0);
+  // Attempt to set unsupported attribute
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, 0);
 
   EXPECT_EQ(ret, SQL_ERROR);
 
@@ -373,12 +373,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  EXPECT_GT(message_length, 70);
+  EXPECT_GT(message_length, 60);
 
-  EXPECT_EQ(native_error, 0);
+  EXPECT_EQ(native_error, 100);
 
-  // HY118 returned from driver manager
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"HY118"));
+  // optional feature not supported error state
+  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"HYC00"));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
@@ -419,5 +419,110 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
 
   this->disconnect();
 }
+
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorODBCVer2) {
+  // Test ODBC 2.0 API SQLError with ODBC ver 2.
+  // Known Windows Driver Manager (DM) behavior:
+  // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
+  // DM passes 512 as buffer length to SQLError.
+  this->connect(SQL_OV_ODBC2);
+
+  // Attempt to set environment attribute after connection handle allocation
+  SQLRETURN ret = SQLSetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION,
+                                reinterpret_cast<void*>(SQL_OV_ODBC2), 0);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  SQLWCHAR sql_state[6] = {0};
+  SQLINTEGER native_error = 0;
+  SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
+  SQLSMALLINT message_length = 0;
+  ret = SQLError(this->env, 0, 0, sql_state, &native_error, message,
+                 SQL_MAX_MESSAGE_LENGTH, &message_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_GT(message_length, 50);
+
+  EXPECT_EQ(native_error, 0);
+
+  // Function sequence error state from driver manager
+  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"S1010"));
+
+  EXPECT_TRUE(!std::wstring(message).empty());
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnErrorODBCVer2) {
+  // Test ODBC 2.0 API SQLError with ODBC ver 2.
+  // Known Windows Driver Manager (DM) behavior:
+  // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
+  // DM passes 512 as buffer length to SQLError.
+  this->connect(SQL_OV_ODBC2);
+
+  // Attempt to set unsupported attribute
+  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, 0);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  SQLWCHAR sql_state[6] = {0};
+  SQLINTEGER native_error = 0;
+  SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
+  SQLSMALLINT message_length = 0;
+  ret = SQLError(0, this->conn, 0, sql_state, &native_error, message,
+                 SQL_MAX_MESSAGE_LENGTH, &message_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_GT(message_length, 60);
+
+  EXPECT_EQ(native_error, 100);
+
+  // optional feature not supported error state. Driver Manager maps state to S1C00
+  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"S1C00"));
+
+  EXPECT_TRUE(!std::wstring(message).empty());
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtErrorODBCVer2) {
+  // Test ODBC 2.0 API SQLError with ODBC ver 2.
+  // Known Windows Driver Manager (DM) behavior:
+  // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
+  // DM passes 512 as buffer length to SQLError.
+  this->connect(SQL_OV_ODBC2);
+
+  std::wstring wsql = L"1";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  SQLWCHAR sql_state[6] = {0};
+  SQLINTEGER native_error = 0;
+  SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
+  SQLSMALLINT message_length = 0;
+  ret = SQLError(0, 0, this->stmt, sql_state, &native_error, message,
+                 SQL_MAX_MESSAGE_LENGTH, &message_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_GT(message_length, 70);
+
+  EXPECT_EQ(native_error, 100);
+
+  // Driver Manager maps error state to S1000
+  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"S1000"));
+
+  EXPECT_TRUE(!std::wstring(message).empty());
+
+  this->disconnect();
+}
+
 
 }  // namespace arrow::flight::sql::odbc
