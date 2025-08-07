@@ -2536,8 +2536,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase,
-       SQLDescribeColODBCTestTableMetadatafSQLDescribeColQueryAllDataTypesMetadata) {
+TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadata) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
   this->connect();
 
