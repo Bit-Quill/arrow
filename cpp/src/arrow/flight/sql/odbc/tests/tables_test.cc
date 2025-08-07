@@ -578,4 +578,56 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetSupportedTableTypes) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeCol) {
+  this->connect();
+
+  SQLWCHAR columnName[1024];
+  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLSMALLINT nameLength = 0;
+  SQLSMALLINT columnDataType = 0;
+  SQLULEN columnSize = 0;
+  SQLSMALLINT decimalDigits = 0;
+  SQLSMALLINT nullable = 0;
+  size_t columnIndex = 0;
+
+  SQLWCHAR* columnNames[] = {(SQLWCHAR*)L"TABLE_CAT", (SQLWCHAR*)L"TABLE_SCHEM",
+                             (SQLWCHAR*)L"TABLE_NAME", (SQLWCHAR*)L"TABLE_TYPE",
+                             (SQLWCHAR*)L"REMARKS"};
+  SQLSMALLINT columnDataTypes[] = {SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR,
+                                   SQL_WVARCHAR};
+  SQLULEN columnSizes[] = {1024, 1024, 1024, 1024, 1024};
+
+  SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr,
+                            SQL_NTS, nullptr, SQL_NTS);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  for (size_t i = 0; i < sizeof(columnNames) / sizeof(*columnNames); ++i) {
+    columnIndex = i + 1;
+
+    ret = SQLDescribeCol(this->stmt, columnIndex, columnName, bufCharLen, &nameLength,
+                         &columnDataType, &columnSize, &decimalDigits, &nullable);
+
+    EXPECT_EQ(ret, SQL_SUCCESS);
+
+    EXPECT_GT(nameLength, 0);
+
+    // Returned nameLength is in bytes so convert to length in characters
+    size_t charCount = static_cast<size_t>(nameLength) / ODBC::GetSqlWCharSize();
+    std::wstring returned(columnName, columnName + charCount);
+    EXPECT_EQ(returned, columnNames[i]);
+    EXPECT_EQ(columnDataType, columnDataTypes[i]);
+    EXPECT_EQ(columnSize, columnSizes[i]);
+    EXPECT_EQ(decimalDigits, 0);
+    EXPECT_EQ(nullable, SQL_NULLABLE);
+
+    nameLength = 0;
+    columnDataType = 0;
+    columnSize = 0;
+    decimalDigits = 0;
+    nullable = 0;
+  }
+
+  this->disconnect();
+}
 }  // namespace arrow::flight::sql::odbc
