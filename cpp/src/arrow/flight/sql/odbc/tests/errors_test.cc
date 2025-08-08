@@ -200,6 +200,86 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase,
+           TestSQLGetDiagFieldWForDescriptorFailureFromDriverManager) {
+  this->connect();
+  SQLHDESC descriptor;
+
+  // Allocate a descriptor using alloc handle
+  SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_DESC, this->conn, &descriptor);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetDescField(descriptor, 1, SQL_DESC_DATETIME_INTERVAL_CODE, 0, 0, 0);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  // Retrieve all supported header level and record level data
+  SQLSMALLINT HEADER_LEVEL = 0;
+  SQLSMALLINT RECORD_1 = 1;
+
+  // SQL_DIAG_NUMBER
+  SQLINTEGER diag_number;
+  SQLSMALLINT diag_number_length;
+
+  ret = SQLGetDiagField(SQL_HANDLE_DESC, descriptor, HEADER_LEVEL, SQL_DIAG_NUMBER,
+                        &diag_number, sizeof(SQLINTEGER), &diag_number_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(diag_number, 1);
+
+  // SQL_DIAG_SERVER_NAME
+  SQLWCHAR server_name[ODBC_BUFFER_SIZE];
+  SQLSMALLINT server_name_length;
+
+  ret = SQLGetDiagField(SQL_HANDLE_DESC, descriptor, RECORD_1, SQL_DIAG_SERVER_NAME,
+                        server_name, ODBC_BUFFER_SIZE, &server_name_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // SQL_DIAG_MESSAGE_TEXT
+  SQLWCHAR message_text[ODBC_BUFFER_SIZE];
+  SQLSMALLINT message_text_length;
+
+  ret = SQLGetDiagField(SQL_HANDLE_DESC, descriptor, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
+                        message_text, ODBC_BUFFER_SIZE, &message_text_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_GT(message_text_length, 100);
+
+  // SQL_DIAG_NATIVE
+  SQLINTEGER diag_native;
+  SQLSMALLINT diag_native_length;
+
+  ret = SQLGetDiagField(SQL_HANDLE_DESC, descriptor, RECORD_1, SQL_DIAG_NATIVE,
+                        &diag_native, sizeof(diag_native), &diag_native_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(diag_native, 0);
+
+  // SQL_DIAG_SQLSTATE
+  const SQLSMALLINT sql_state_size = 6;
+  SQLWCHAR sql_state[sql_state_size];
+  SQLSMALLINT sql_state_length;
+  ret = SQLGetDiagField(
+      SQL_HANDLE_DESC, descriptor, RECORD_1, SQL_DIAG_SQLSTATE, sql_state,
+      sql_state_size * driver::odbcabstraction::GetSqlWCharSize(), &sql_state_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"IM001"));
+
+  // Free descriptor handle
+  ret = SQLFreeHandle(SQL_HANDLE_DESC, descriptor);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase,
            TestSQLGetDiagRecForDescriptorFailureFromDriverManager) {
   this->connect();
   SQLHDESC descriptor;

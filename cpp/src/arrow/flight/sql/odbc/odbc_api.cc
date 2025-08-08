@@ -107,8 +107,6 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
       });
     }
 
-    // TODO -AL- Implement for case of descriptor, explicit descriptors are associated
-    // with connection handles.
     case SQL_HANDLE_DESC: {
       using ODBC::ODBCConnection;
       using ODBC::ODBCDescriptor;
@@ -184,7 +182,6 @@ SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
     }
 
     case SQL_HANDLE_DESC: {
-      // -AL- todo free Descriptor
       using ODBC::ODBCDescriptor;
 
       ODBCDescriptor* descriptor = reinterpret_cast<ODBCDescriptor*>(handle);
@@ -309,7 +306,6 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
     }
 
     case SQL_HANDLE_DESC: {
-      // -AL- todo add support here
       ODBCDescriptor* descriptor = reinterpret_cast<ODBCDescriptor*>(handle);
       diagnostics = &descriptor->GetDiagnostics();
       break;
@@ -440,7 +436,6 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
           }
 
           case SQL_HANDLE_DESC: {
-            // TODO -AL- Implement for case of descriptor
             ODBCDescriptor* descriptor = reinterpret_cast<ODBCDescriptor*>(handle);
             ODBCConnection* connection = &descriptor->GetConnection();
             std::string dsn = connection->GetDSN();
@@ -566,7 +561,6 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT re
     }
 
     case SQL_HANDLE_DESC: {
-      // -AL- todo add support here. + tests (?)
       auto* descriptor = ODBCDescriptor::of(handle);
       diagnostics = &descriptor->GetDiagnostics();
       break;
