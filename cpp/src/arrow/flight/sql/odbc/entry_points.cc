@@ -287,3 +287,13 @@ SQLRETURN SQL_API SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER
                                  SQLINTEGER stringLength) {
   return arrow::SQLSetStmtAttr(stmt, attribute, valuePtr, stringLength);
 }
+
+SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNumber,
+                                 SQLWCHAR* columnName, SQLSMALLINT bufferLength,
+                                 SQLSMALLINT* nameLengthPtr, SQLSMALLINT* dataTypePtr,
+                                 SQLULEN* columnSizePtr, SQLSMALLINT* decimalDigitsPtr,
+                                 SQLSMALLINT* nullablePtr) {
+  return arrow::SQLDescribeCol(statementHandle, columnNumber, columnName, bufferLength,
+                               nameLengthPtr, dataTypePtr, columnSizePtr,
+                               decimalDigitsPtr, nullablePtr);
+}
