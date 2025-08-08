@@ -33,6 +33,113 @@ namespace arrow::flight::sql::odbc {
 
 using std::optional;
 
+void checkSQLDescribeCol(SQLHSTMT stmt, const SQLUSMALLINT columnIndex,
+                         const std::wstring& expectedName,
+                         const SQLSMALLINT& expectedDataType,
+                         const SQLULEN& expectedColumnSize,
+                         const SQLSMALLINT& expectedDecimalDigits,
+                         const SQLSMALLINT& expectedNullable) {
+  SQLWCHAR columnName[1024];
+  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLSMALLINT nameLength = 0;
+  SQLSMALLINT columnDataType = 0;
+  SQLULEN columnSize = 0;
+  SQLSMALLINT decimalDigits = 0;
+  SQLSMALLINT nullable = 0;
+
+  SQLRETURN ret = SQLDescribeCol(stmt, columnIndex, columnName, bufCharLen, &nameLength,
+                                 &columnDataType, &columnSize, &decimalDigits, &nullable);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_GT(nameLength, 0);
+
+  // returned nameLength is in bytes so convert to length in characters
+  size_t charCount = static_cast<size_t>(nameLength) / ODBC::GetSqlWCharSize();
+  std::wstring returned(columnName, columnName + charCount);
+  EXPECT_EQ(returned, expectedName);
+  EXPECT_EQ(columnDataType, expectedDataType);
+  EXPECT_EQ(columnSize, expectedColumnSize);
+  EXPECT_EQ(decimalDigits, expectedDecimalDigits);
+  EXPECT_EQ(nullable, expectedNullable);
+}
+
+void checkSQLDescribeColODBC2(SQLHSTMT stmt) {
+  SQLWCHAR* columnNames[] = {(SQLWCHAR*)L"TYPE_NAME",
+                             (SQLWCHAR*)L"DATA_TYPE",
+                             (SQLWCHAR*)L"PRECISION",
+                             (SQLWCHAR*)L"LITERAL_PREFIX",
+                             (SQLWCHAR*)L"LITERAL_SUFFIX",
+                             (SQLWCHAR*)L"CREATE_PARAMS",
+                             (SQLWCHAR*)L"NULLABLE",
+                             (SQLWCHAR*)L"CASE_SENSITIVE",
+                             (SQLWCHAR*)L"SEARCHABLE",
+                             (SQLWCHAR*)L"UNSIGNED_ATTRIBUTE",
+                             (SQLWCHAR*)L"MONEY",
+                             (SQLWCHAR*)L"AUTO_INCREMENT",
+                             (SQLWCHAR*)L"LOCAL_TYPE_NAME",
+                             (SQLWCHAR*)L"MINIMUM_SCALE",
+                             (SQLWCHAR*)L"MAXIMUM_SCALE",
+                             (SQLWCHAR*)L"SQL_DATA_TYPE",
+                             (SQLWCHAR*)L"SQL_DATETIME_SUB",
+                             (SQLWCHAR*)L"NUM_PREC_RADIX",
+                             (SQLWCHAR*)L"INTERVAL_PRECISION"};
+  SQLSMALLINT columnDataTypes[] = {SQL_WVARCHAR, SQL_SMALLINT, SQL_INTEGER,  SQL_WVARCHAR,
+                                   SQL_WVARCHAR, SQL_WVARCHAR, SQL_SMALLINT, SQL_SMALLINT,
+                                   SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT,
+                                   SQL_WVARCHAR, SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT,
+                                   SQL_SMALLINT, SQL_INTEGER,  SQL_SMALLINT};
+  SQLULEN columnSizes[] = {1024, 2, 4,    1024, 1024, 1024, 2, 2, 2, 2,
+                           2,    2, 1024, 2,    2,    2,    2, 4, 2};
+  SQLSMALLINT columnDecimalDigits[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  SQLSMALLINT columnNullable[] = {SQL_NO_NULLS, SQL_NO_NULLS, SQL_NULLABLE, SQL_NULLABLE,
+                                  SQL_NULLABLE, SQL_NULLABLE, SQL_NO_NULLS, SQL_NO_NULLS,
+                                  SQL_NO_NULLS, SQL_NULLABLE, SQL_NO_NULLS, SQL_NULLABLE,
+                                  SQL_NULLABLE, SQL_NULLABLE, SQL_NULLABLE, SQL_NO_NULLS,
+                                  SQL_NULLABLE, SQL_NULLABLE, SQL_NULLABLE};
+
+  for (size_t i = 0; i < sizeof(columnNames) / sizeof(*columnNames); ++i) {
+    SQLUSMALLINT columnIndex = i + 1;
+    checkSQLDescribeCol(stmt, columnIndex, columnNames[i], columnDataTypes[i],
+                        columnSizes[i], columnDecimalDigits[i], columnNullable[i]);
+  }
+}
+
+void checkSQLDescribeColODBC3(SQLHSTMT stmt) {
+  SQLWCHAR* columnNames[] = {
+      (SQLWCHAR*)L"TYPE_NAME",         (SQLWCHAR*)L"DATA_TYPE",
+      (SQLWCHAR*)L"COLUMN_SIZE",       (SQLWCHAR*)L"LITERAL_PREFIX",
+      (SQLWCHAR*)L"LITERAL_SUFFIX",    (SQLWCHAR*)L"CREATE_PARAMS",
+      (SQLWCHAR*)L"NULLABLE",          (SQLWCHAR*)L"CASE_SENSITIVE",
+      (SQLWCHAR*)L"SEARCHABLE",        (SQLWCHAR*)L"UNSIGNED_ATTRIBUTE",
+      (SQLWCHAR*)L"FIXED_PREC_SCALE",  (SQLWCHAR*)L"AUTO_UNIQUE_VALUE",
+      (SQLWCHAR*)L"LOCAL_TYPE_NAME",   (SQLWCHAR*)L"MINIMUM_SCALE",
+      (SQLWCHAR*)L"MAXIMUM_SCALE",     (SQLWCHAR*)L"SQL_DATA_TYPE",
+      (SQLWCHAR*)L"SQL_DATETIME_SUB",  (SQLWCHAR*)L"NUM_PREC_RADIX",
+      (SQLWCHAR*)L"INTERVAL_PRECISION"};
+  SQLSMALLINT columnDataTypes[] = {SQL_WVARCHAR, SQL_SMALLINT, SQL_INTEGER,  SQL_WVARCHAR,
+                                   SQL_WVARCHAR, SQL_WVARCHAR, SQL_SMALLINT, SQL_SMALLINT,
+                                   SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT,
+                                   SQL_WVARCHAR, SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT,
+                                   SQL_SMALLINT, SQL_INTEGER,  SQL_SMALLINT};
+  SQLULEN columnSizes[] = {1024, 2, 4,    1024, 1024, 1024, 2, 2, 2, 2,
+                           2,    2, 1024, 2,    2,    2,    2, 4, 2};
+  SQLSMALLINT columnDecimalDigits[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  SQLSMALLINT columnNullable[] = {SQL_NO_NULLS, SQL_NO_NULLS, SQL_NULLABLE, SQL_NULLABLE,
+                                  SQL_NULLABLE, SQL_NULLABLE, SQL_NO_NULLS, SQL_NO_NULLS,
+                                  SQL_NO_NULLS, SQL_NULLABLE, SQL_NO_NULLS, SQL_NULLABLE,
+                                  SQL_NULLABLE, SQL_NULLABLE, SQL_NULLABLE, SQL_NO_NULLS,
+                                  SQL_NULLABLE, SQL_NULLABLE, SQL_NULLABLE};
+
+  for (size_t i = 0; i < sizeof(columnNames) / sizeof(*columnNames); ++i) {
+    SQLUSMALLINT columnIndex = i + 1;
+    checkSQLDescribeCol(stmt, columnIndex, columnNames[i], columnDataTypes[i],
+                        columnSizes[i], columnDecimalDigits[i], columnNullable[i]);
+  }
+}
+
 void checkSQLGetTypeInfo(
     SQLHSTMT stmt, const std::wstring& expectedTypeName,
     const SQLSMALLINT& expectedDataType, const SQLINTEGER& expectedColumnSize,
@@ -114,6 +221,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                  // expectedNumPrecRadix
                       NULL);                 // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check tinyint data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -138,6 +247,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                      // expectedSqlDatetimeSub
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // Check bigint data type
   ret = SQLFetch(this->stmt);
@@ -164,6 +275,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check longvarbinary data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -189,6 +302,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                            // expectedNumPrecRadix
                       NULL);                           // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check varbinary data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -213,6 +328,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                        // expectedSqlDatetimeSub
                       NULL,                        // expectedNumPrecRadix
                       NULL);                       // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // Check text data type
   ret = SQLFetch(this->stmt);
@@ -240,6 +357,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check longvarchar data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -264,6 +383,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                          // expectedSqlDatetimeSub
                       NULL,                          // expectedNumPrecRadix
                       NULL);                         // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // Check char data type
   ret = SQLFetch(this->stmt);
@@ -291,6 +412,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check integer data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -315,6 +438,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                      // expectedSqlDatetimeSub
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // Check smallint data type
   ret = SQLFetch(this->stmt);
@@ -341,6 +466,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                       // expectedNumPrecRadix
                       NULL);                      // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check float data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -366,6 +493,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                    // expectedNumPrecRadix
                       NULL);                   // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check double data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -390,6 +519,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                     // expectedSqlDatetimeSub
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // Check numeric data type
   ret = SQLFetch(this->stmt);
@@ -417,6 +548,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check varchar data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -443,6 +576,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check date data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -467,6 +602,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       SQL_CODE_DATE,          // expectedSqlDatetimeSub
                       NULL,                   // expectedNumPrecRadix
                       NULL);                  // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // Check time data type
   ret = SQLFetch(this->stmt);
@@ -493,6 +630,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL,                   // expectedNumPrecRadix
                       NULL);                  // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check timestamp data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -517,6 +656,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       SQL_CODE_TIMESTAMP,          // expectedSqlDatetimeSub
                       NULL,                        // expectedNumPrecRadix
                       NULL);                       // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   this->disconnect();
 }
@@ -552,6 +693,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                  // expectedNumPrecRadix
                       NULL);                 // expectedIntervalPrec
 
+  checkSQLDescribeColODBC2(this->stmt);
+
   // Check tinyint data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -576,6 +719,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                      // expectedSqlDatetimeSub
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
+
+  checkSQLDescribeColODBC2(this->stmt);
 
   // Check bigint data type
   ret = SQLFetch(this->stmt);
@@ -602,6 +747,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
 
+  checkSQLDescribeColODBC2(this->stmt);
+
   // Check longvarbinary data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -627,6 +774,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                            // expectedNumPrecRadix
                       NULL);                           // expectedIntervalPrec
 
+  checkSQLDescribeColODBC2(this->stmt);
+
   // Check varbinary data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -651,6 +800,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                        // expectedSqlDatetimeSub
                       NULL,                        // expectedNumPrecRadix
                       NULL);                       // expectedIntervalPrec
+
+  checkSQLDescribeColODBC2(this->stmt);
 
   // Check text data type
   ret = SQLFetch(this->stmt);
@@ -678,6 +829,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
 
+  checkSQLDescribeColODBC2(this->stmt);
+
   // Check longvarchar data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -702,6 +855,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                          // expectedSqlDatetimeSub
                       NULL,                          // expectedNumPrecRadix
                       NULL);                         // expectedIntervalPrec
+
+  checkSQLDescribeColODBC2(this->stmt);
 
   // Check char data type
   ret = SQLFetch(this->stmt);
@@ -729,6 +884,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
 
+  checkSQLDescribeColODBC2(this->stmt);
+
   // Check integer data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -753,6 +910,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                      // expectedSqlDatetimeSub
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
+
+  checkSQLDescribeColODBC2(this->stmt);
 
   // Check smallint data type
   ret = SQLFetch(this->stmt);
@@ -779,6 +938,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                       // expectedNumPrecRadix
                       NULL);                      // expectedIntervalPrec
 
+  checkSQLDescribeColODBC2(this->stmt);
+
   // Check float data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -804,6 +965,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                    // expectedNumPrecRadix
                       NULL);                   // expectedIntervalPrec
 
+  checkSQLDescribeColODBC2(this->stmt);
+
   // Check double data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -828,6 +991,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                     // expectedSqlDatetimeSub
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
+
+  checkSQLDescribeColODBC2(this->stmt);
 
   // Check numeric data type
   ret = SQLFetch(this->stmt);
@@ -855,6 +1020,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
 
+  checkSQLDescribeColODBC2(this->stmt);
+
   // Check varchar data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -881,6 +1048,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
 
+  checkSQLDescribeColODBC2(this->stmt);
+
   // Check date data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -905,6 +1074,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,   // expectedSqlDatetimeSub, driver returns NULL for Ver2
                       NULL,   // expectedNumPrecRadix
                       NULL);  // expectedIntervalPrec
+
+  checkSQLDescribeColODBC2(this->stmt);
 
   // Check time data type
   ret = SQLFetch(this->stmt);
@@ -931,6 +1102,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,   // expectedNumPrecRadix
                       NULL);  // expectedIntervalPrec
 
+  checkSQLDescribeColODBC2(this->stmt);
+
   // Check timestamp data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -955,6 +1128,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
                       NULL,   // expectedSqlDatetimeSub, driver returns NULL for Ver2
                       NULL,   // expectedNumPrecRadix
                       NULL);  // expectedIntervalPrec
+
+  checkSQLDescribeColODBC2(this->stmt);
 
   this->disconnect();
 }
@@ -989,6 +1164,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBit) {
                       NULL,                  // expectedSqlDatetimeSub
                       NULL,                  // expectedNumPrecRadix
                       NULL);                 // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // No more data
   ret = SQLFetch(this->stmt);
@@ -1028,6 +1205,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTinyInt) {
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // No more data
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -1066,6 +1245,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBigInt) {
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // No more data
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -1103,6 +1284,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarbinary) {
                       NULL,                            // expectedSqlDatetimeSub
                       NULL,                            // expectedNumPrecRadix
                       NULL);                           // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // No more data
   ret = SQLFetch(this->stmt);
@@ -1181,6 +1364,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarchar) {
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check longvarchar data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -1205,6 +1390,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarchar) {
                       NULL,                          // expectedSqlDatetimeSub
                       NULL,                          // expectedNumPrecRadix
                       NULL);                         // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // No more data
   ret = SQLFetch(this->stmt);
@@ -1245,6 +1432,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoChar) {
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // No more data
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -1282,6 +1471,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoInteger) {
                       NULL,                      // expectedSqlDatetimeSub
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // No more data
   ret = SQLFetch(this->stmt);
@@ -1321,6 +1512,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSmallInt) {
                       NULL,                       // expectedNumPrecRadix
                       NULL);                      // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // No more data
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -1358,6 +1551,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoFloat) {
                       NULL,                    // expectedSqlDatetimeSub
                       NULL,                    // expectedNumPrecRadix
                       NULL);                   // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // No more data
   ret = SQLFetch(this->stmt);
@@ -1397,6 +1592,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDouble) {
                       NULL,                     // expectedNumPrecRadix
                       NULL);                    // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // Check numeric data type
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -1422,6 +1619,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDouble) {
                       NULL,                      // expectedSqlDatetimeSub
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // No more data
   ret = SQLFetch(this->stmt);
@@ -1462,6 +1661,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarchar) {
                       NULL,                      // expectedNumPrecRadix
                       NULL);                     // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // No more data
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -1499,6 +1700,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDate) {
                       SQL_CODE_DATE,          // expectedSqlDatetimeSub
                       NULL,                   // expectedNumPrecRadix
                       NULL);                  // expectedIntervalPrec
+
+  checkSQLDescribeColODBC3(this->stmt);
 
   // No more data
   ret = SQLFetch(this->stmt);
@@ -1539,6 +1742,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLDate) {
                       NULL,                   // expectedNumPrecRadix
                       NULL);                  // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // No more data
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -1576,6 +1781,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDateVer2) {
                       NULL,   // expectedSqlDatetimeSub, driver returns NULL for Ver2
                       NULL,   // expectedNumPrecRadix
                       NULL);  // expectedIntervalPrec
+
+  checkSQLDescribeColODBC2(this->stmt);
 
   // No more data
   ret = SQLFetch(this->stmt);
@@ -1629,6 +1836,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTime) {
                       NULL,                   // expectedNumPrecRadix
                       NULL);                  // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // No more data
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -1668,6 +1877,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTime) {
                       NULL,                   // expectedNumPrecRadix
                       NULL);                  // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // No more data
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -1705,6 +1916,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimeVer2) {
                       NULL,   // expectedSqlDatetimeSub, driver returns NULL for Ver2
                       NULL,   // expectedNumPrecRadix
                       NULL);  // expectedIntervalPrec
+
+  checkSQLDescribeColODBC2(this->stmt);
 
   // No more data
   ret = SQLFetch(this->stmt);
@@ -1758,6 +1971,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestamp) {
                       NULL,                        // expectedNumPrecRadix
                       NULL);                       // expectedIntervalPrec
 
+  checkSQLDescribeColODBC3(this->stmt);
+
   // No more data
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -1797,6 +2012,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestamp) {
                       NULL,                        // expectedNumPrecRadix
                       NULL);                       // expectedIntervalPrec
 
+  // TODO
+  checkSQLDescribeColODBC3(this->stmt);
+
   // No more data
   ret = SQLFetch(this->stmt);
   EXPECT_EQ(ret, SQL_NO_DATA);
@@ -1834,6 +2052,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampVer2) {
                       NULL,   // expectedSqlDatetimeSub, driver returns NULL for Ver2
                       NULL,   // expectedNumPrecRadix
                       NULL);  // expectedIntervalPrec
+
+  checkSQLDescribeColODBC2(this->stmt);
 
   // No more data
   ret = SQLFetch(this->stmt);
