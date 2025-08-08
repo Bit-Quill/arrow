@@ -26,9 +26,6 @@
 
 #include "gtest/gtest.h"
 
-// TODO: add tests with SQLDescribeCol to check metadata of SQLGetTypeInfo for ODBC 2 and
-// ODBC 3.
-
 namespace arrow::flight::sql::odbc {
 
 using std::optional;
@@ -2012,7 +2009,6 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestamp) {
                       NULL,                        // expectedNumPrecRadix
                       NULL);                       // expectedIntervalPrec
 
-  // TODO
   checkSQLDescribeColODBC3(this->stmt);
 
   // No more data
