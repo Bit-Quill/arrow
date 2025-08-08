@@ -1018,25 +1018,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrDescriptor) {
   this->disconnect();
 }
 
-// -AL- todo move this test to errors_test
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForDescriptorFailure) {
-  // -AL- todo work on this test next, need to generate an descriptor error
-  this->connect();
-  SQLHDESC descriptor;
-
-  // Allocate a descriptor using alloc handle
-  SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_DESC, this->conn, &descriptor);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  // Free descriptor handle
-  ret = SQLFreeHandle(SQL_HANDLE_DESC, descriptor);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  this->disconnect();
-}
-
 }  // namespace arrow::flight::sql::odbc
 
 int main(int argc, char** argv) {

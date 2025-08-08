@@ -62,7 +62,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
                          static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
                          ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
 
-  EXPECT_TRUE(ret == SQL_ERROR);
+  EXPECT_EQ(ret, SQL_ERROR);
 
   // Retrieve all supported header level and record level data
   SQLSMALLINT HEADER_LEVEL = 0;
@@ -170,7 +170,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
                          static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
                          ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
 
-  EXPECT_TRUE(ret == SQL_ERROR);
+  EXPECT_EQ(ret, SQL_ERROR);
 
   // Retrieve all supported header level and record level data
   SQLSMALLINT RECORD_1 = 1;
@@ -197,6 +197,47 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
+}
+
+TYPED_TEST(FlightSQLODBCTestBase,
+           TestSQLGetDiagRecForDescriptorFailureFromDriverManager) {
+  this->connect();
+  SQLHDESC descriptor;
+
+  // Allocate a descriptor using alloc handle
+  SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_DESC, this->conn, &descriptor);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetDescField(descriptor, 1, SQL_DESC_DATETIME_INTERVAL_CODE, 0, 0, 0);
+
+  EXPECT_EQ(ret, SQL_ERROR);
+
+  SQLWCHAR sql_state[6];
+  SQLINTEGER native_error;
+  SQLWCHAR message[ODBC_BUFFER_SIZE];
+  SQLSMALLINT message_length;
+
+  ret = SQLGetDiagRec(SQL_HANDLE_DESC, descriptor, 1, sql_state, &native_error, message,
+                      ODBC_BUFFER_SIZE, &message_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_GT(message_length, 60);
+
+  EXPECT_EQ(native_error, 0);
+
+  // API not implemented error from driver manager
+  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"IM001"));
+
+  EXPECT_TRUE(!std::wstring(message).empty());
+
+  // Free descriptor handle
+  ret = SQLFreeHandle(SQL_HANDLE_DESC, descriptor);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
@@ -233,7 +274,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
                          static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
                          ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
 
-  EXPECT_TRUE(ret == SQL_ERROR);
+  EXPECT_EQ(ret, SQL_ERROR);
 
   SQLWCHAR sql_state[6];
   SQLINTEGER native_error;
