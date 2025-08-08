@@ -617,8 +617,7 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
         return SQL_SUCCESS;
       }
 
-      case SQL_ATTR_CONNECTION_POOLING:
-      case SQL_ATTR_APP_ROW_DESC: {
+      case SQL_ATTR_CONNECTION_POOLING: {
         throw DriverException("Optional feature not supported.", "HYC00");
       }
 
@@ -669,8 +668,7 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
         }
       }
 
-      case SQL_ATTR_CONNECTION_POOLING:
-      case SQL_ATTR_APP_ROW_DESC: {
+      case SQL_ATTR_CONNECTION_POOLING: {
         throw DriverException("Optional feature not supported.", "HYC00");
       }
 

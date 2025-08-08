@@ -318,7 +318,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorInputData) {
   this->disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvError) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
   // Test ODBC 2.0 API SQLError.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -420,8 +420,49 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarning) {
+  // Test ODBC 2.0 API SQLError.
+  this->connect();
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorODBCVer2) {
+  std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  const int len = 17;
+  SQLCHAR char_val[len];
+  SQLLEN buf_len = sizeof(SQLCHAR) * len;
+  SQLLEN ind;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+
+  SQLWCHAR sql_state[6] = {0};
+  SQLINTEGER native_error = 0;
+  SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
+  SQLSMALLINT message_length = 0;
+  ret = SQLError(0, 0, this->stmt, sql_state, &native_error, message,
+                 SQL_MAX_MESSAGE_LENGTH, &message_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_GT(message_length, 50);
+
+  EXPECT_EQ(native_error, 1000100);
+
+  // Verify string truncation warning is reported
+  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"01004"));
+
+  EXPECT_TRUE(!std::wstring(message).empty());
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorODBCVer2FromDriverManager) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -524,5 +565,46 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtErrorODBCVer2) {
   this->disconnect();
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarningODBCVer2) {
+  // Test ODBC 2.0 API SQLError.
+  this->connect(SQL_OV_ODBC2);
+
+  std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
+  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+
+  SQLRETURN ret =
+      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFetch(this->stmt);
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  const int len = 17;
+  SQLCHAR char_val[len];
+  SQLLEN buf_len = sizeof(SQLCHAR) * len;
+  SQLLEN ind;
+
+  ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val, buf_len, &ind);
+
+  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+
+  SQLWCHAR sql_state[6] = {0};
+  SQLINTEGER native_error = 0;
+  SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
+  SQLSMALLINT message_length = 0;
+  ret = SQLError(0, 0, this->stmt, sql_state, &native_error, message,
+                 SQL_MAX_MESSAGE_LENGTH, &message_length);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_GT(message_length, 50);
+
+  EXPECT_EQ(native_error, 1000100);
+
+  // Verify string truncation warning is reported
+  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"01004"));
+
+  EXPECT_TRUE(!std::wstring(message).empty());
+}
 
 }  // namespace arrow::flight::sql::odbc
