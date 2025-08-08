@@ -521,7 +521,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesVer2) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
   this->connect(SQL_OV_ODBC2);
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_ALL_TYPES);
@@ -1546,7 +1546,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLDate) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDateVer2) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDateODBCVer2) {
   this->connect(SQL_OV_ODBC2);
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_DATE);
@@ -1584,7 +1584,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDateVer2) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDateVer2) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDateODBCVer2) {
   this->connect(SQL_OV_ODBC2);
 
   // Pass ODBC Ver 3 data type
@@ -1675,7 +1675,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTime) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimeVer2) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimeODBCVer2) {
   this->connect(SQL_OV_ODBC2);
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TIME);
@@ -1713,7 +1713,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimeVer2) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimeVer2) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimeODBCVer2) {
   this->connect(SQL_OV_ODBC2);
 
   // Pass ODBC Ver 3 data type
@@ -1804,7 +1804,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestamp) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampVer2) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampODBCVer2) {
   this->connect(SQL_OV_ODBC2);
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TIMESTAMP);
@@ -1842,7 +1842,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampVer2) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestampVer2) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestampODBCVer2) {
   this->connect(SQL_OV_ODBC2);
 
   // Pass ODBC Ver 3 data type
