@@ -66,13 +66,13 @@ class FlightSQLODBCRemoteTestBase : public ::testing::Test {
   std::wstring virtual getQueryAllDataTypes();
 
   /** ODBC Environment. */
-  SQLHENV env;
+  SQLHENV env = 0;
 
   /** ODBC Connect. */
-  SQLHDBC conn;
+  SQLHDBC conn = 0;
 
   /** ODBC Statement. */
-  SQLHSTMT stmt;
+  SQLHSTMT stmt = 0;
 
  protected:
   void SetUp() override;
