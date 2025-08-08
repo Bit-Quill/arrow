@@ -28,6 +28,7 @@ EXPORTS
 	SQLColAttributeW
 	SQLColumnsW
 	SQLConnectW
+	SQLDescribeColW
 	SQLDisconnect
 	SQLDriverConnectW
 	SQLExecDirectW
