@@ -77,6 +77,11 @@ class ODBCStatement : public ODBCHandle<ODBCStatement> {
   void SetStmtAttr(SQLINTEGER statementAttribute, SQLPOINTER value, SQLINTEGER bufferSize,
                    bool isUnicode);
 
+  /**
+   * @brief Revert back to implicitly allocated internal descriptors.
+   * isApd as True indicates APD descritor is to be reverted.
+   * isApd as False indicates ARD descritor is to be reverted.
+   */
   void RevertAppDescriptor(bool isApd);
 
   inline ODBCDescriptor* GetIRD() { return m_ird.get(); }
