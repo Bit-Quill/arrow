@@ -2843,16 +2843,24 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsGetMetadataBySQLDescribeColODBC2) {
   SQLSMALLINT nullable = 0;
   size_t columnIndex = 0;
 
-  SQLWCHAR* columnNames[] = {
-    (SQLWCHAR*)L"TABLE_QUALIFIER",  (SQLWCHAR*)L"TABLE_OWNER",
-    (SQLWCHAR*)L"TABLE_NAME",       (SQLWCHAR*)L"COLUMN_NAME",
-    (SQLWCHAR*)L"DATA_TYPE",        (SQLWCHAR*)L"TYPE_NAME",
-    (SQLWCHAR*)L"PRECISION",        (SQLWCHAR*)L"LENGTH",
-    (SQLWCHAR*)L"SCALE",            (SQLWCHAR*)L"RADIX",
-    (SQLWCHAR*)L"NULLABLE",         (SQLWCHAR*)L"REMARKS",
-    (SQLWCHAR*)L"COLUMN_DEF",       (SQLWCHAR*)L"SQL_DATA_TYPE",
-    (SQLWCHAR*)L"SQL_DATETIME_SUB", (SQLWCHAR*)L"CHAR_OCTET_LENGTH",
-    (SQLWCHAR*)L"ORDINAL_POSITION", (SQLWCHAR*)L"IS_NULLABLE"};
+  SQLWCHAR* columnNames[] = {(SQLWCHAR*)L"TABLE_QUALIFIER",
+                             (SQLWCHAR*)L"TABLE_OWNER",
+                             (SQLWCHAR*)L"TABLE_NAME",
+                             (SQLWCHAR*)L"COLUMN_NAME",
+                             (SQLWCHAR*)L"DATA_TYPE",
+                             (SQLWCHAR*)L"TYPE_NAME",
+                             (SQLWCHAR*)L"PRECISION",
+                             (SQLWCHAR*)L"LENGTH",
+                             (SQLWCHAR*)L"SCALE",
+                             (SQLWCHAR*)L"RADIX",
+                             (SQLWCHAR*)L"NULLABLE",
+                             (SQLWCHAR*)L"REMARKS",
+                             (SQLWCHAR*)L"COLUMN_DEF",
+                             (SQLWCHAR*)L"SQL_DATA_TYPE",
+                             (SQLWCHAR*)L"SQL_DATETIME_SUB",
+                             (SQLWCHAR*)L"CHAR_OCTET_LENGTH",
+                             (SQLWCHAR*)L"ORDINAL_POSITION",
+                             (SQLWCHAR*)L"IS_NULLABLE"};
   SQLSMALLINT columnDataTypes[] = {
       SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_SMALLINT, SQL_WVARCHAR,
       SQL_INTEGER,  SQL_INTEGER,  SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT, SQL_WVARCHAR,
