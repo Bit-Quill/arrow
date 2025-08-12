@@ -107,9 +107,26 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
       });
     }
 
-    // TODO Implement for case of descriptor
-    case SQL_HANDLE_DESC:
-      return SQL_INVALID_HANDLE;
+    case SQL_HANDLE_DESC: {
+      using ODBC::ODBCConnection;
+      using ODBC::ODBCDescriptor;
+
+      *result = SQL_NULL_HDESC;
+
+      ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(parent);
+
+      return ODBCConnection::ExecuteWithDiagnostics(connection, SQL_ERROR, [=]() {
+        std::shared_ptr<ODBCDescriptor> descriptor = connection->createDescriptor();
+
+        if (descriptor) {
+          *result = reinterpret_cast<SQLHDESC>(descriptor.get());
+
+          return SQL_SUCCESS;
+        }
+
+        return SQL_ERROR;
+      });
+    }
 
     default:
       break;
@@ -164,8 +181,19 @@ SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
       return SQL_SUCCESS;
     }
 
-    case SQL_HANDLE_DESC:
-      return SQL_INVALID_HANDLE;
+    case SQL_HANDLE_DESC: {
+      using ODBC::ODBCDescriptor;
+
+      ODBCDescriptor* descriptor = reinterpret_cast<ODBCDescriptor*>(handle);
+
+      if (!descriptor) {
+        return SQL_INVALID_HANDLE;
+      }
+
+      descriptor->ReleaseDescriptor();
+
+      return SQL_SUCCESS;
+    }
 
     default:
       break;
@@ -242,6 +270,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetStringAttribute;
   using ODBC::ODBCConnection;
+  using ODBC::ODBCDescriptor;
   using ODBC::ODBCEnvironment;
   using ODBC::ODBCStatement;
 
@@ -277,7 +306,9 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
     }
 
     case SQL_HANDLE_DESC: {
-      return SQL_ERROR;
+      ODBCDescriptor* descriptor = reinterpret_cast<ODBCDescriptor*>(handle);
+      diagnostics = &descriptor->GetDiagnostics();
+      break;
     }
 
     case SQL_HANDLE_STMT: {
@@ -405,8 +436,12 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
           }
 
           case SQL_HANDLE_DESC: {
-            // TODO Implement for case of descriptor
-            return SQL_ERROR;
+            ODBCDescriptor* descriptor = reinterpret_cast<ODBCDescriptor*>(handle);
+            ODBCConnection* connection = &descriptor->GetConnection();
+            std::string dsn = connection->GetDSN();
+            return GetStringAttribute(isUnicode, dsn, true, diagInfoPtr, bufferLength,
+                                      stringLengthPtr, *diagnostics);
+            break;
           }
 
           case SQL_HANDLE_STMT: {
@@ -495,6 +530,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT re
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetStringAttribute;
   using ODBC::ODBCConnection;
+  using ODBC::ODBCDescriptor;
   using ODBC::ODBCEnvironment;
   using ODBC::ODBCStatement;
 
@@ -525,7 +561,9 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT re
     }
 
     case SQL_HANDLE_DESC: {
-      return SQL_ERROR;
+      auto* descriptor = ODBCDescriptor::of(handle);
+      diagnostics = &descriptor->GetDiagnostics();
+      break;
     }
 
     case SQL_HANDLE_STMT: {
