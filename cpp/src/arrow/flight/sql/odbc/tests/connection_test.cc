@@ -919,6 +919,105 @@ TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeDesc) {
+  this->connect();
+  SQLHDESC descriptor;
+
+  // Allocate a descriptor using alloc handle
+  SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_DESC, this->conn, &descriptor);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Free descriptor handle
+  ret = SQLFreeHandle(SQL_HANDLE_DESC, descriptor);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  this->disconnect();
+}
+
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrDescriptor) {
+  this->connect();
+
+  SQLHDESC apd_descriptor, ard_descriptor;
+
+  // Allocate an APD descriptor using alloc handle
+  SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_DESC, this->conn, &apd_descriptor);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Allocate an ARD descriptor using alloc handle
+  ret = SQLAllocHandle(SQL_HANDLE_DESC, this->conn, &ard_descriptor);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Save implicitly allocated internal APD and ARD descriptor pointers
+  SQLPOINTER internal_apd, internal_ard = nullptr;
+
+  ret = SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_PARAM_DESC, &internal_apd,
+                       sizeof(internal_apd), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_ROW_DESC, &internal_ard,
+                       sizeof(internal_ard), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Set APD descriptor to explicitly allocated handle
+  ret = SQLSetStmtAttr(this->stmt, SQL_ATTR_APP_PARAM_DESC,
+                       reinterpret_cast<SQLPOINTER>(apd_descriptor), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Set ARD descriptor to explicitly allocated handle
+  ret = SQLSetStmtAttr(this->stmt, SQL_ATTR_APP_ROW_DESC,
+                       reinterpret_cast<SQLPOINTER>(ard_descriptor), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify APD and ARD descriptors are set to explicitly allocated pointers
+  SQLPOINTER value = nullptr;
+
+  ret = SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_PARAM_DESC, &value, sizeof(value), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(value, apd_descriptor);
+
+  ret = SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_ROW_DESC, &value, sizeof(value), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(value, ard_descriptor);
+
+  // Free explicitly allocated APD and ARD descriptor handles
+  ret = SQLFreeHandle(SQL_HANDLE_DESC, apd_descriptor);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLFreeHandle(SQL_HANDLE_DESC, ard_descriptor);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Verify APD and ARD descriptors has been reverted to implicit descriptors
+  value = nullptr;
+
+  ret = SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_PARAM_DESC, &value, sizeof(value), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(value, internal_apd);
+
+  ret = SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_ROW_DESC, &value, sizeof(value), 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  EXPECT_EQ(value, internal_ard);
+
+  this->disconnect();
+}
+
 }  // namespace arrow::flight::sql::odbc
 
 int main(int argc, char** argv) {
