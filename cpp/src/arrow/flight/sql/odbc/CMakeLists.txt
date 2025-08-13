@@ -91,3 +91,28 @@ add_arrow_lib(arrow_flight_sql_odbc
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
 endforeach()
+
+# -AL- code for CPack installer.
+# Let's make ODBC Windows installer
+#add_executable(coolstuff coolstuff.cxx)
+
+## -AL- nevermind this won't work since we have a dll. not an executable
+#install(TARGETS arrow_flight_sql_odbc RUNTIME DESTINATION bin)
+include(InstallRequiredSystemLibraries)
+
+# -AL- I see `install(TARGETS ${LIB_NAME}_shared` is run as part of `add_arrow_lib`
+#install(TARGETS arrow_flight_sql_odbc DESTINATION bin)
+
+#install(TARGETS ArrowFlightSqlOdbc DESTINATION bin)
+
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
+# Tentative version 1.0.0 (patch version is not set)
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+
+set(CPACK_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
+set(CPACK_PACKAGE_VENDOR "Apache Arrow")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
+set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
+
+include(CPack)
