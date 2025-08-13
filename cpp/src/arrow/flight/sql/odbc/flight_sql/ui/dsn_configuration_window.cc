@@ -246,6 +246,7 @@ int DsnConfigurationWindow::CreateEncryptionSettingsGroup(int posX, int posY, in
 
   std::string val = config.Get(FlightSqlConnection::USE_ENCRYPTION);
 
+  // Enable encryption default value is true
   const bool enableEncryption = driver::odbcabstraction::AsBool(val).value_or(true);
   labels.push_back(CreateLabel(labelPosX, rowPos, LABEL_WIDTH, ROW_HEIGHT,
                                L"Use Encryption:", ChildId::ENABLE_ENCRYPTION_LABEL));
@@ -270,6 +271,7 @@ int DsnConfigurationWindow::CreateEncryptionSettingsGroup(int posX, int posY, in
 
   val = config.Get(FlightSqlConnection::USE_SYSTEM_TRUST_STORE).c_str();
 
+  // System trust store default value is true
   const bool useSystemCertStore = driver::odbcabstraction::AsBool(val).value_or(true);
   labels.push_back(CreateLabel(labelPosX, rowPos, LABEL_WIDTH, 2 * ROW_HEIGHT,
                                L"Use System Certificate Store:",
@@ -296,6 +298,11 @@ int DsnConfigurationWindow::CreateEncryptionSettingsGroup(int posX, int posY, in
   encryptionSettingsGroupBox =
       CreateGroupBox(posX, posY, sizeX, rowPos - posY, L"Encryption settings",
                      ChildId::AUTH_SETTINGS_GROUP_BOX);
+
+  certificateEdit->SetEnabled(enableEncryption);
+  certificateBrowseButton->SetEnabled(enableEncryption);
+  useSystemCertStoreCheckBox->SetEnabled(enableEncryption);
+  disableCertVerificationCheckBox->SetEnabled(enableEncryption);
 
   return rowPos - posY;
 }
@@ -435,7 +442,9 @@ void DsnConfigurationWindow::SaveParameters(Configuration& targetConfig) {
     targetConfig.Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
                      disableCertVerificationCheckBox->IsChecked() ? TRUE_STR : FALSE_STR);
   } else {
+    // System trust store verification requires encryption
     targetConfig.Set(FlightSqlConnection::USE_ENCRYPTION, FALSE_STR);
+    targetConfig.Set(FlightSqlConnection::USE_SYSTEM_TRUST_STORE, FALSE_STR);
   }
 
   // Get all the list properties.
