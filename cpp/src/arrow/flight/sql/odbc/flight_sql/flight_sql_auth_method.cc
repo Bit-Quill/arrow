@@ -58,9 +58,9 @@ class NoOpClientAuthHandler : public arrow::flight::ClientAuthHandler {
 
   arrow::Status Authenticate(arrow::flight::ClientAuthSender* outgoing,
                              arrow::flight::ClientAuthReader* incoming) override {
-    // Return OK Status. The server should ignore this and just accept any Handshake
-    // request.
-    return arrow::Status::OK();
+    // The server should ignore this and just accept any Handshake
+    // request. Some servers do not allow authentication with no handshakes.
+    return outgoing->Write(std::string());
   }
 
   arrow::Status GetToken(std::string* token) override {
