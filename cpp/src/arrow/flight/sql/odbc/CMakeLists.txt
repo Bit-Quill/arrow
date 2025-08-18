@@ -92,26 +92,7 @@ foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
 endforeach()
 
-# -AL- code for CPack installer.
 # Construct ODBC Windows installer
-
-include(InstallRequiredSystemLibraries)
-
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
-# Tentative version 1.0.0 (patch version is not set)
-set(CPACK_PACKAGE_VERSION_MAJOR "1")
-set(CPACK_PACKAGE_VERSION_MINOR "0")
-
-set(CPACK_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
-set(CPACK_PACKAGE_VENDOR "Apache Arrow")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
-set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
-
-# SET(CPACK_INSTALL_CMAKE_PROJECTS  "bin;arrow_flight_sql_odbc;ALL;/")
-# -AL- above line causes error:
-# CPack Error: Error when generating package: Apache Arrow Flight SQL ODBC
-
-# Include all dependent dll files in bin
 
 # -AL- try to find the path for "release/Release"
 message(STATUS "-AL- CMAKE_INSTALL_LIBDIR = ${CMAKE_INSTALL_LIBDIR}")
@@ -127,28 +108,8 @@ message(STATUS "-AL- CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
 message(STATUS "-AL- $BUILD_OUTPUT_ROOT_DIRECTORY$CMAKE_BUILD_TYPE = ${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}")
 message(STATUS "-AL- CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
 
-install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
-        DESTINATION bin
-        COMPONENT libraries
-        FILES_MATCHING
-        PATTERN "*.dll")
-
 # Create folder of dll files -AL-
-# set(FILTERED_INSTALL_DIR "${BUILD_OUTPUT_ROOT_DIRECTORY}_install_odbc_filtered") # Only DLLs copied here
-# file(GLOB ODBC_DLL_FILES "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/*.dll")
-# file(COPY ${ODBC_DLL_FILES} DESTINATION ${FILTERED_INSTALL_DIR})
+set(FILTERED_INSTALL_DIR "${BUILD_OUTPUT_ROOT_DIRECTORY}_install_odbc_filtered") # Only DLLs copied here
+file(GLOB ODBC_DLL_FILES "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/*.dll")
+file(COPY ${ODBC_DLL_FILES} DESTINATION ${FILTERED_INSTALL_DIR})
 
-# -AL- use folder of dll files to extra directories (not recommended)
-# SET(CPACK_INSTALLED_DIRECTORIES "${FILTERED_INSTALL_DIR};bin")
-
-include(CPack)
-
-cpack_add_component(libraries)
-
-set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
-# Returns: 1>-- -AL- CPACK_COMPONENTS_ALL = Unspecified
-message(STATUS "-AL- CPACK_COMPONENTS_ALL before = ${CPACK_COMPONENTS_ALL}")
-list(REMOVE_ITEM CPACK_COMPONENTS_ALL "Unspecified")
-
-message(STATUS "-AL- CPACK_COMPONENTS_ALL after = ${CPACK_COMPONENTS_ALL}")
