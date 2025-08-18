@@ -93,17 +93,9 @@ foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
 endforeach()
 
 # -AL- code for CPack installer.
-# Let's make ODBC Windows installer
-#add_executable(coolstuff coolstuff.cxx)
+# Construct ODBC Windows installer
 
-## -AL- nevermind this won't work since we have a dll. not an executable
-#install(TARGETS arrow_flight_sql_odbc RUNTIME DESTINATION bin)
 include(InstallRequiredSystemLibraries)
-
-# -AL- I see `install(TARGETS ${LIB_NAME}_shared` is run as part of `add_arrow_lib`
-#install(TARGETS arrow_flight_sql_odbc DESTINATION bin)
-
-#install(TARGETS ArrowFlightSqlOdbc DESTINATION bin)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
 # Tentative version 1.0.0 (patch version is not set)
@@ -115,10 +107,15 @@ set(CPACK_PACKAGE_VENDOR "Apache Arrow")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
 set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
 
+# SET(CPACK_INSTALL_CMAKE_PROJECTS  "bin;arrow_flight_sql_odbc;ALL;/")
+# -AL- above line causes error:
+# CPack Error: Error when generating package: Apache Arrow Flight SQL ODBC
+
 # Include all dependent dll files in bin
 
 # -AL- try to find the path for "release/Release"
 message(STATUS "-AL- CMAKE_INSTALL_LIBDIR = ${CMAKE_INSTALL_LIBDIR}")
+message(STATUS "-AL- CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
 message(STATUS "-AL- CMAKE_INSTALL_INCLUDEDIR = ${CMAKE_INSTALL_INCLUDEDIR}")
 message(STATUS "-AL- CMAKE_INSTALL_BINDIR = ${CMAKE_INSTALL_BINDIR}")
 message(STATUS "-AL- ARROW_CMAKE_DIR = ${ARROW_CMAKE_DIR}")
@@ -128,10 +125,17 @@ message(STATUS "-AL- CMAKE_RUNTIME_OUTPUT_DIRECTORY = ${CMAKE_RUNTIME_OUTPUT_DIR
 message(STATUS "-AL- BUILD_OUTPUT_ROOT_DIRECTORY = ${BUILD_OUTPUT_ROOT_DIRECTORY}")
 message(STATUS "-AL- CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
 message(STATUS "-AL- $BUILD_OUTPUT_ROOT_DIRECTORY$CMAKE_BUILD_TYPE = ${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}")
+message(STATUS "-AL- CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
 
-install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
-        DESTINATION bin
-        FILES_MATCHING
-        PATTERN "*.dll")
+#install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
+#        DESTINATION bin
+#        FILES_MATCHING
+#        PATTERN "*.dll")
+
+set(FILTERED_INSTALL_DIR "${BUILD_OUTPUT_ROOT_DIRECTORY}_install_odbc_filtered") # Only DLLs copied here
+file(GLOB ODBC_DLL_FILES "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/*.dll")
+file(COPY ${ODBC_DLL_FILES} DESTINATION ${FILTERED_INSTALL_DIR})
+
+SET(CPACK_INSTALLED_DIRECTORIES "${FILTERED_INSTALL_DIR};bin")
 
 include(CPack)
