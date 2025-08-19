@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+#-AL- TEMP change to invoke CI
+
 add_custom_target(arrow-all)
 add_custom_target(arrow)
 add_custom_target(arrow-benchmarks)

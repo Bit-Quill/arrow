@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+#-AL- TEMP change to invoke CI
+
 cmake_minimum_required(VERSION 3.25)
 message(STATUS "Building using CMake version: ${CMAKE_VERSION}")
 
