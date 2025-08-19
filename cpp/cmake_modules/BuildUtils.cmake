@@ -411,8 +411,7 @@ function(ADD_ARROW_LIB LIB_NAME)
             RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR}
                     COMPONENT ${LIB_NAME}_shared_runtime
             INCLUDES
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-            COMPONENT ${LIB_NAME}_shared_includedir)
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
   endif()
 
   if(BUILD_STATIC)
@@ -483,8 +482,7 @@ function(ADD_ARROW_LIB LIB_NAME)
             RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR}
                     COMPONENT ${LIB_NAME}_static_library
             INCLUDES
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-            COMPONENT ${LIB_NAME}_static_includedir)
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
   endif()
 
   if(ARG_CMAKE_PACKAGE_NAME)
