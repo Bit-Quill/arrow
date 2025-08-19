@@ -127,7 +127,13 @@ set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
 install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
         DESTINATION bin
         FILES_MATCHING
-        PATTERN "*.dll")
+        PATTERN "*.dll"
+        PATTERN "arrow_flight_testing.dll" EXCLUDE
+        PATTERN "arrow_testing.dll" EXCLUDE
+        PATTERN "gflags.dll" EXCLUDE
+        PATTERN "gmock.dll" EXCLUDE
+        PATTERN "gtest.dll" EXCLUDE
+        PATTERN "gtest_main.dll" EXCLUDE)
 
 get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
 # Returns: 1>-- -AL- CPACK_COMPONENTS_ALL before = Unspecified;arrow_compute_shared;arrow_flight_shared;arrow_flight_sql_odbc_shared;arrow_flight_sql_shared;arrow_flight_testing_shared;arrow_shared;arrow_testing_shared;library
