@@ -412,7 +412,6 @@ function(ADD_ARROW_LIB LIB_NAME)
                     COMPONENT ${LIB_NAME}_shared_runtime
             INCLUDES
             DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-            ${LIB_NAME}_shared
             COMPONENT ${LIB_NAME}_shared_includedir)
   endif()
 
