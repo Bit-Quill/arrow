@@ -126,17 +126,21 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
   set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
 
-  install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
-          DESTINATION bin
-          COMPONENT flight_sql_odbc_lib
-          FILES_MATCHING
-          PATTERN "*.dll"
-          PATTERN "arrow_flight_testing.dll" EXCLUDE
-          PATTERN "arrow_testing.dll" EXCLUDE
-          PATTERN "gflags.dll" EXCLUDE
-          PATTERN "gmock.dll" EXCLUDE
-          PATTERN "gtest.dll" EXCLUDE
-          PATTERN "gtest_main.dll" EXCLUDE)
+  # TODO: set up `flight_sql_odbc_lib` component for macOS Installer
+  # TODO: set up `flight_sql_odbc_lib` component for Linux Installer
+  if(WIN32)
+    install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
+            DESTINATION bin
+            COMPONENT flight_sql_odbc_lib
+            FILES_MATCHING
+            PATTERN "*.dll"
+            PATTERN "arrow_flight_testing.dll" EXCLUDE
+            PATTERN "arrow_testing.dll" EXCLUDE
+            PATTERN "gflags.dll" EXCLUDE
+            PATTERN "gmock.dll" EXCLUDE
+            PATTERN "gtest.dll" EXCLUDE
+            PATTERN "gtest_main.dll" EXCLUDE)
+  endif()
 
   get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
   # Returns: 1>-- -AL- CPACK_COMPONENTS_ALL before = Unspecified;arrow_compute_shared;arrow_flight_shared;arrow_flight_sql_odbc_shared;arrow_flight_sql_shared;arrow_flight_testing_shared;arrow_shared;arrow_testing_shared;library
@@ -147,12 +151,19 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
 
   message(STATUS "-AL- CPACK_COMPONENTS_ALL after = ${CPACK_COMPONENTS_ALL}")
 
-  include(CPack)
+  if(WIN32)
+    # Use WiX V.6
+    set(CPACK_GENERATOR "WIX")
+    set(CPACK_WIX_VERSION 4)
 
-  cpack_add_component(flight_sql_odbc_lib DISPLAY_NAME "ODBC library"
-      DESCRIPTION
-  "ODBC library bin, required to install"
-      REQUIRED)
+  endif()
+
+  include(CPack)
+  #-AL- todo set CPACK_WIX_UPGRADE_GUID
+  cpack_add_component(flight_sql_odbc_lib
+                      DISPLAY_NAME "ODBC library"
+                      DESCRIPTION "ODBC library bin, required to install"
+                      REQUIRED)
 
   message(STATUS "-AL- CPACK_COMPONENTS_ALL last = ${CPACK_COMPONENTS_ALL}")
 endif()
