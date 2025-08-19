@@ -109,6 +109,3 @@ java/.mvn/.develocity/
 # rat
 filtered_rat.txt
 rat.txt
-
-# odbc
-cpp/src/arrow/flight/sql/odbc/installer.nsi

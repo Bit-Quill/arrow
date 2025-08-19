@@ -109,20 +109,28 @@ message(STATUS "-AL- $BUILD_OUTPUT_ROOT_DIRECTORY$CMAKE_BUILD_TYPE = ${BUILD_OUT
 message(STATUS "-AL- CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "-AL- CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
 
-# Update nsi variables
-set(ODBC_DLL_DIR "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}")
+include(InstallRequiredSystemLibraries)
 
-configure_file(
-  "${CMAKE_CURRENT_LIST_DIR}/installer.nsi.in"
-  "${CMAKE_CURRENT_LIST_DIR}/installer.nsi"
-  @ONLY
-)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
+# Tentative version 1.0.0 (patch version is not set)
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
 
-# Create folder of dll files -AL-
-set(FILTERED_INSTALL_DIR "${BUILD_OUTPUT_ROOT_DIRECTORY}_install_odbc_filtered") # Only DLLs copied here
-file(GLOB ODBC_DLL_FILES "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/*.dll")
-file(COPY ${ODBC_DLL_FILES} DESTINATION ${FILTERED_INSTALL_DIR})
+set(CPACK_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
+set(CPACK_PACKAGE_VENDOR "Apache Arrow")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
+set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
 
-add_custom_target(build_odbc_nsis_installer
-    COMMAND makensis "${CMAKE_CURRENT_LIST_DIR}/installer.nsi"
-)
+install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
+        DESTINATION bin
+        COMPONENT library
+        FILES_MATCHING
+        PATTERN "*.dll")
+
+get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
+# Returns: 1>-- -AL- CPACK_COMPONENTS_ALL before = Unspecified;arrow_compute_shared;arrow_flight_shared;arrow_flight_sql_odbc_shared;arrow_flight_sql_shared;arrow_flight_testing_shared;arrow_shared;arrow_testing_shared;library
+message(STATUS "-AL- CPACK_COMPONENTS_ALL before = ${CPACK_COMPONENTS_ALL}")
+list(REMOVE_ITEM CPACK_COMPONENTS_ALL "arrow_compute_shared" "arrow_flight_shared" "arrow_flight_sql_odbc_shared" "arrow_flight_sql_shared" "arrow_flight_testing_shared" "arrow_shared" "arrow_testing_shared")
+message(STATUS "-AL- CPACK_COMPONENTS_ALL after = ${CPACK_COMPONENTS_ALL}")
+
+include(CPack)

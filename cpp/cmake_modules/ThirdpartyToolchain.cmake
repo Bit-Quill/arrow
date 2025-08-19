@@ -2365,7 +2365,8 @@ function(build_gtest)
           EXPORT arrow_testing_targets
           RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
           ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-          LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+          LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+          COMPONENT gtest)
   if(MSVC)
     install(FILES $<TARGET_PDB_FILE:gmock> $<TARGET_PDB_FILE:gmock_main>
                   $<TARGET_PDB_FILE:gtest> $<TARGET_PDB_FILE:gtest_main>
