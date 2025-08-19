@@ -92,8 +92,7 @@ foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
 endforeach()
 
-# Construct ODBC Windows installer
-
+# Construct ODBC Windows installer. Only Release installer is supported
 if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   # -AL- try to find the path for "release/Release"
   message(STATUS "-AL- CMAKE_INSTALL_LIBDIR = ${CMAKE_INSTALL_LIBDIR}")
@@ -152,13 +151,16 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   message(STATUS "-AL- CPACK_COMPONENTS_ALL after = ${CPACK_COMPONENTS_ALL}")
 
   if(WIN32)
-    # Use WiX V.6
+    # WiX msi installer on Windows
+    # CPack is compatible with WiX V.5 and V.6
     set(CPACK_GENERATOR "WIX")
     set(CPACK_WIX_VERSION 4)
 
     # Upgrade GUID is required to be unchanged for ODBC installer to upgrade
     set(CPACK_WIX_UPGRADE_GUID "DBF27A18-F8BF-423F-9E3A-957414D52C4B")
   endif()
+  # TODO: create macOS Installer using cpack
+  # TODO: create Linux Installer using cpack
 
   include(CPack)
   cpack_add_component(flight_sql_odbc_lib
