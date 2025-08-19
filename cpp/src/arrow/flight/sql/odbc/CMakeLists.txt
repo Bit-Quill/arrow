@@ -156,10 +156,11 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
     set(CPACK_GENERATOR "WIX")
     set(CPACK_WIX_VERSION 4)
 
+    # Upgrade GUID is required to be unchanged for ODBC installer to upgrade
+    set(CPACK_WIX_UPGRADE_GUID "DBF27A18-F8BF-423F-9E3A-957414D52C4B")
   endif()
 
   include(CPack)
-  #-AL- todo set CPACK_WIX_UPGRADE_GUID
   cpack_add_component(flight_sql_odbc_lib
                       DISPLAY_NAME "ODBC library"
                       DESCRIPTION "ODBC library bin, required to install"
