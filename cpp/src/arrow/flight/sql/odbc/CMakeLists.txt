@@ -128,6 +128,7 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
 
   install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
           DESTINATION bin
+          COMPONENT flight_sql_odbc_lib
           FILES_MATCHING
           PATTERN "*.dll"
           PATTERN "arrow_flight_testing.dll" EXCLUDE
@@ -142,7 +143,16 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   message(STATUS "-AL- CPACK_COMPONENTS_ALL before = ${CPACK_COMPONENTS_ALL}")
   # list(REMOVE_ITEM CPACK_COMPONENTS_ALL "arrow_compute_shared" "arrow_flight_shared" "arrow_flight_sql_odbc_shared" "arrow_flight_sql_shared" "arrow_flight_testing_shared" "arrow_shared" "arrow_testing_shared")
   set(CPACK_COMPONENTS_ALL Unspecified)
+  list(APPEND CPACK_COMPONENTS_ALL "flight_sql_odbc_lib")
+
   message(STATUS "-AL- CPACK_COMPONENTS_ALL after = ${CPACK_COMPONENTS_ALL}")
 
   include(CPack)
+
+  cpack_add_component(flight_sql_odbc_lib DISPLAY_NAME "ODBC library"
+      DESCRIPTION
+  "ODBC library bin, required to install"
+      REQUIRED)
+
+  message(STATUS "-AL- CPACK_COMPONENTS_ALL last = ${CPACK_COMPONENTS_ALL}")
 endif()
