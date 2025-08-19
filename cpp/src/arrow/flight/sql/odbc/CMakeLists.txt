@@ -109,6 +109,15 @@ message(STATUS "-AL- $BUILD_OUTPUT_ROOT_DIRECTORY$CMAKE_BUILD_TYPE = ${BUILD_OUT
 message(STATUS "-AL- CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "-AL- CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
 
+# Update nsi variables
+set(ODBC_DLL_DIR "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}")
+
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/installer.nsi.in"
+  "${CMAKE_CURRENT_LIST_DIR}/installer.nsi"
+  @ONLY
+)
+
 # Create folder of dll files -AL-
 set(FILTERED_INSTALL_DIR "${BUILD_OUTPUT_ROOT_DIRECTORY}_install_odbc_filtered") # Only DLLs copied here
 file(GLOB ODBC_DLL_FILES "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/*.dll")
