@@ -2365,9 +2365,9 @@ function(build_gtest)
                                        "${googletest_SOURCE_DIR}/googletest/include/")
   install(TARGETS gmock gmock_main gtest gtest_main
           EXPORT arrow_testing_targets
-          RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-          ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-          LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT gtest_target)
+          RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT gtest_runtime
+          ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT gtest_archive
+          LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT gtest_library)
   if(MSVC)
     install(FILES $<TARGET_PDB_FILE:gmock> $<TARGET_PDB_FILE:gmock_main>
                   $<TARGET_PDB_FILE:gtest> $<TARGET_PDB_FILE:gtest_main>

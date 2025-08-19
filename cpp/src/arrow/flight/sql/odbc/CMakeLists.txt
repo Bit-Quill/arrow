@@ -94,52 +94,55 @@ endforeach()
 
 # Construct ODBC Windows installer
 
-# -AL- try to find the path for "release/Release"
-message(STATUS "-AL- CMAKE_INSTALL_LIBDIR = ${CMAKE_INSTALL_LIBDIR}")
-message(STATUS "-AL- CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
-message(STATUS "-AL- CMAKE_INSTALL_INCLUDEDIR = ${CMAKE_INSTALL_INCLUDEDIR}")
-message(STATUS "-AL- CMAKE_INSTALL_BINDIR = ${CMAKE_INSTALL_BINDIR}")
-message(STATUS "-AL- ARROW_CMAKE_DIR = ${ARROW_CMAKE_DIR}")
-message(STATUS "-AL- ARROW_CMAKE_PACKAGE_NAME = ${ARROW_CMAKE_PACKAGE_NAME}")
-message(STATUS "-AL- ARROW_CMAKE_DIR/ARROW_CMAKE_PACKAGE_NAME = ${ARROW_CMAKE_DIR}/${ARROW_CMAKE_PACKAGE_NAME}"
-)
-message(STATUS "-AL- CMAKE_RUNTIME_OUTPUT_DIRECTORY = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-message(STATUS "-AL- BUILD_OUTPUT_ROOT_DIRECTORY = ${BUILD_OUTPUT_ROOT_DIRECTORY}")
-message(STATUS "-AL- CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
-message(STATUS "-AL- $BUILD_OUTPUT_ROOT_DIRECTORY$CMAKE_BUILD_TYPE = ${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}"
-)
-message(STATUS "-AL- CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
-message(STATUS "-AL- CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
+if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
+  # -AL- try to find the path for "release/Release"
+  message(STATUS "-AL- CMAKE_INSTALL_LIBDIR = ${CMAKE_INSTALL_LIBDIR}")
+  message(STATUS "-AL- CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
+  message(STATUS "-AL- CMAKE_INSTALL_INCLUDEDIR = ${CMAKE_INSTALL_INCLUDEDIR}")
+  message(STATUS "-AL- CMAKE_INSTALL_BINDIR = ${CMAKE_INSTALL_BINDIR}")
+  message(STATUS "-AL- ARROW_CMAKE_DIR = ${ARROW_CMAKE_DIR}")
+  message(STATUS "-AL- ARROW_CMAKE_PACKAGE_NAME = ${ARROW_CMAKE_PACKAGE_NAME}")
+  message(STATUS "-AL- ARROW_CMAKE_DIR/ARROW_CMAKE_PACKAGE_NAME = ${ARROW_CMAKE_DIR}/${ARROW_CMAKE_PACKAGE_NAME}"
+  )
+  message(STATUS "-AL- CMAKE_RUNTIME_OUTPUT_DIRECTORY = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+  )
+  message(STATUS "-AL- BUILD_OUTPUT_ROOT_DIRECTORY = ${BUILD_OUTPUT_ROOT_DIRECTORY}")
+  message(STATUS "-AL- CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
+  message(STATUS "-AL- $BUILD_OUTPUT_ROOT_DIRECTORY$CMAKE_BUILD_TYPE = ${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}"
+  )
+  message(STATUS "-AL- CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
+  message(STATUS "-AL- CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
 
-include(InstallRequiredSystemLibraries)
+  include(InstallRequiredSystemLibraries)
 
-set(CPACK_RESOURCE_FILE_LICENSE
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
-# Tentative version 1.0.0 (patch version is not set)
-set(CPACK_PACKAGE_VERSION_MAJOR "1")
-set(CPACK_PACKAGE_VERSION_MINOR "0")
+  set(CPACK_RESOURCE_FILE_LICENSE
+      "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
+  # Tentative version 1.0.0 (patch version is not set)
+  set(CPACK_PACKAGE_VERSION_MAJOR "1")
+  set(CPACK_PACKAGE_VERSION_MINOR "0")
 
-set(CPACK_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
-set(CPACK_PACKAGE_VENDOR "Apache Arrow")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
-set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
+  set(CPACK_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
+  set(CPACK_PACKAGE_VENDOR "Apache Arrow")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
+  set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
 
-install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
-        DESTINATION bin
-        FILES_MATCHING
-        PATTERN "*.dll"
-        PATTERN "arrow_flight_testing.dll" EXCLUDE
-        PATTERN "arrow_testing.dll" EXCLUDE
-        PATTERN "gflags.dll" EXCLUDE
-        PATTERN "gmock.dll" EXCLUDE
-        PATTERN "gtest.dll" EXCLUDE
-        PATTERN "gtest_main.dll" EXCLUDE)
+  install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
+          DESTINATION bin
+          FILES_MATCHING
+          PATTERN "*.dll"
+          PATTERN "arrow_flight_testing.dll" EXCLUDE
+          PATTERN "arrow_testing.dll" EXCLUDE
+          PATTERN "gflags.dll" EXCLUDE
+          PATTERN "gmock.dll" EXCLUDE
+          PATTERN "gtest.dll" EXCLUDE
+          PATTERN "gtest_main.dll" EXCLUDE)
 
-get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
-# Returns: 1>-- -AL- CPACK_COMPONENTS_ALL before = Unspecified;arrow_compute_shared;arrow_flight_shared;arrow_flight_sql_odbc_shared;arrow_flight_sql_shared;arrow_flight_testing_shared;arrow_shared;arrow_testing_shared;library
-message(STATUS "-AL- CPACK_COMPONENTS_ALL before = ${CPACK_COMPONENTS_ALL}")
-# list(REMOVE_ITEM CPACK_COMPONENTS_ALL "arrow_compute_shared" "arrow_flight_shared" "arrow_flight_sql_odbc_shared" "arrow_flight_sql_shared" "arrow_flight_testing_shared" "arrow_shared" "arrow_testing_shared")
-set(CPACK_COMPONENTS_ALL Unspecified)
-message(STATUS "-AL- CPACK_COMPONENTS_ALL after = ${CPACK_COMPONENTS_ALL}")
+  get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
+  # Returns: 1>-- -AL- CPACK_COMPONENTS_ALL before = Unspecified;arrow_compute_shared;arrow_flight_shared;arrow_flight_sql_odbc_shared;arrow_flight_sql_shared;arrow_flight_testing_shared;arrow_shared;arrow_testing_shared;library
+  message(STATUS "-AL- CPACK_COMPONENTS_ALL before = ${CPACK_COMPONENTS_ALL}")
+  # list(REMOVE_ITEM CPACK_COMPONENTS_ALL "arrow_compute_shared" "arrow_flight_shared" "arrow_flight_sql_odbc_shared" "arrow_flight_sql_shared" "arrow_flight_testing_shared" "arrow_shared" "arrow_testing_shared")
+  set(CPACK_COMPONENTS_ALL Unspecified)
+  message(STATUS "-AL- CPACK_COMPONENTS_ALL after = ${CPACK_COMPONENTS_ALL}")
 
-include(CPack)
+  include(CPack)
+endif()
