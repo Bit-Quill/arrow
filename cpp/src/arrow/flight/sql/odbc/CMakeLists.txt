@@ -94,23 +94,6 @@ endforeach()
 
 # Construct ODBC Windows installer. Only Release installer is supported
 if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
-  # -AL- try to find the path for "release/Release"
-  message(STATUS "-AL- CMAKE_INSTALL_LIBDIR = ${CMAKE_INSTALL_LIBDIR}")
-  message(STATUS "-AL- CMAKE_CURRENT_LIST_DIR = ${CMAKE_CURRENT_LIST_DIR}")
-  message(STATUS "-AL- CMAKE_INSTALL_INCLUDEDIR = ${CMAKE_INSTALL_INCLUDEDIR}")
-  message(STATUS "-AL- CMAKE_INSTALL_BINDIR = ${CMAKE_INSTALL_BINDIR}")
-  message(STATUS "-AL- ARROW_CMAKE_DIR = ${ARROW_CMAKE_DIR}")
-  message(STATUS "-AL- ARROW_CMAKE_PACKAGE_NAME = ${ARROW_CMAKE_PACKAGE_NAME}")
-  message(STATUS "-AL- ARROW_CMAKE_DIR/ARROW_CMAKE_PACKAGE_NAME = ${ARROW_CMAKE_DIR}/${ARROW_CMAKE_PACKAGE_NAME}"
-  )
-  message(STATUS "-AL- CMAKE_RUNTIME_OUTPUT_DIRECTORY = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-  )
-  message(STATUS "-AL- BUILD_OUTPUT_ROOT_DIRECTORY = ${BUILD_OUTPUT_ROOT_DIRECTORY}")
-  message(STATUS "-AL- CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}")
-  message(STATUS "-AL- $BUILD_OUTPUT_ROOT_DIRECTORY$CMAKE_BUILD_TYPE = ${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}"
-  )
-  message(STATUS "-AL- CMAKE_INSTALL_PREFIX = ${CMAKE_INSTALL_PREFIX}")
-  message(STATUS "-AL- CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
 
   include(InstallRequiredSystemLibraries)
 
@@ -142,13 +125,8 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   endif()
 
   get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
-  # Returns: 1>-- -AL- CPACK_COMPONENTS_ALL before = Unspecified;arrow_compute_shared;arrow_flight_shared;arrow_flight_sql_odbc_shared;arrow_flight_sql_shared;arrow_flight_testing_shared;arrow_shared;arrow_testing_shared;library
-  message(STATUS "-AL- CPACK_COMPONENTS_ALL before = ${CPACK_COMPONENTS_ALL}")
-  # list(REMOVE_ITEM CPACK_COMPONENTS_ALL "arrow_compute_shared" "arrow_flight_shared" "arrow_flight_sql_odbc_shared" "arrow_flight_sql_shared" "arrow_flight_testing_shared" "arrow_shared" "arrow_testing_shared")
   set(CPACK_COMPONENTS_ALL Unspecified)
   list(APPEND CPACK_COMPONENTS_ALL "flight_sql_odbc_lib")
-
-  message(STATUS "-AL- CPACK_COMPONENTS_ALL after = ${CPACK_COMPONENTS_ALL}")
 
   if(WIN32)
     # WiX msi installer on Windows
@@ -162,11 +140,10 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   # TODO: create macOS Installer using cpack
   # TODO: create Linux Installer using cpack
 
+  # Load CPack after all CPACK* variables are set
   include(CPack)
   cpack_add_component(flight_sql_odbc_lib
                       DISPLAY_NAME "ODBC library"
                       DESCRIPTION "ODBC library bin, required to install"
                       REQUIRED)
-
-  message(STATUS "-AL- CPACK_COMPONENTS_ALL last = ${CPACK_COMPONENTS_ALL}")
 endif()
