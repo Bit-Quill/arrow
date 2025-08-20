@@ -33,9 +33,12 @@
   </Fragment>
 
   <Fragment>
-    <Feature Id="Complete" Title="My ODBC Driver" Description="My description" Level="1"
+    <ComponentGroup Id="ComponentsGroup">
+      <ComponentRef Id="MyRegistryEntries"/>
+    </ComponentGroup>
+    <!-- <Feature Id="Complete" Title="My ODBC Driver" Description="My description" Level="1"
         ConfigurableDirectory="INSTALLDIR" AllowAbsent="no" AllowAdvertise="no" InstallDefault="local">
         <ComponentRef Id="MyRegistryEntries" />
-    </Feature>
+    </Feature> -->
   </Fragment>
 </Wix>
