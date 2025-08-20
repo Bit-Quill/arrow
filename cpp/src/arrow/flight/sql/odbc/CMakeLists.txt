@@ -122,6 +122,7 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
             PATTERN "gmock.dll" EXCLUDE
             PATTERN "gtest.dll" EXCLUDE
             PATTERN "gtest_main.dll" EXCLUDE)
+    set(CPACK_WIX_EXTRA_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/install/arrow-flight-sql-odbc.wxs")
   endif()
 
   get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
