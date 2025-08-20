@@ -20,6 +20,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
   <DirectoryRef Id="TARGETDIR">
+  <!-- -AL- Registers Computer\HKEY_CURRENT_USER\Software\MyCompany\MyApplicationName -->
       <Component Id="MyRegistryEntries" Guid="C348B9F7-5E8D-415D-A001-D92F2D4EA013">
           <RegistryKey Root="HKCU"
                       Key="Software\MyCompany\MyApplicationName">
@@ -30,15 +31,5 @@
           </RegistryKey>
       </Component>
   </DirectoryRef>
-  </Fragment>
-
-  <Fragment>
-    <ComponentGroup Id="ComponentsGroup">
-      <ComponentRef Id="MyRegistryEntries"/>
-    </ComponentGroup>
-    <!-- <Feature Id="Complete" Title="My ODBC Driver" Description="My description" Level="1"
-        ConfigurableDirectory="INSTALLDIR" AllowAbsent="no" AllowAdvertise="no" InstallDefault="local">
-        <ComponentRef Id="MyRegistryEntries" />
-    </Feature> -->
   </Fragment>
 </Wix>

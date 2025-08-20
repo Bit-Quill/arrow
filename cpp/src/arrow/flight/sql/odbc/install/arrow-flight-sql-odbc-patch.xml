@@ -1,0 +1,5 @@
+<CPackWiXPatch>
+    <CPackWiXFragment Id="#PRODUCTFEATURE">
+        <ComponentRef Id="MyRegistryEntries"/>
+    </CPackWiXFragment>
+</CPackWiXPatch>
