@@ -91,3 +91,59 @@ add_arrow_lib(arrow_flight_sql_odbc
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
 endforeach()
+
+# Construct ODBC Windows installer. Only Release installer is supported
+if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
+
+  include(InstallRequiredSystemLibraries)
+
+  set(CPACK_RESOURCE_FILE_LICENSE
+      "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
+  # Tentative version 1.0.0 (patch version is not set)
+  set(CPACK_PACKAGE_VERSION_MAJOR "1")
+  set(CPACK_PACKAGE_VERSION_MINOR "0")
+
+  set(CPACK_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
+  set(CPACK_PACKAGE_VENDOR "Apache Arrow")
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
+  set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
+
+  # TODO: set up `flight_sql_odbc_lib` component for macOS Installer
+  # TODO: set up `flight_sql_odbc_lib` component for Linux Installer
+  if(WIN32)
+    install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
+            DESTINATION bin
+            COMPONENT flight_sql_odbc_lib
+            FILES_MATCHING
+            PATTERN "*.dll"
+            PATTERN "arrow_flight_testing.dll" EXCLUDE
+            PATTERN "arrow_testing.dll" EXCLUDE
+            PATTERN "gflags.dll" EXCLUDE
+            PATTERN "gmock.dll" EXCLUDE
+            PATTERN "gtest.dll" EXCLUDE
+            PATTERN "gtest_main.dll" EXCLUDE)
+  endif()
+
+  get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
+  set(CPACK_COMPONENTS_ALL Unspecified)
+  list(APPEND CPACK_COMPONENTS_ALL "flight_sql_odbc_lib")
+
+  if(WIN32)
+    # WiX msi installer on Windows
+    # CPack is compatible with WiX V.5 and V.6
+    set(CPACK_GENERATOR "WIX")
+    set(CPACK_WIX_VERSION 4)
+
+    # Upgrade GUID is required to be unchanged for ODBC installer to upgrade
+    set(CPACK_WIX_UPGRADE_GUID "DBF27A18-F8BF-423F-9E3A-957414D52C4B")
+  endif()
+  # TODO: create macOS Installer using cpack
+  # TODO: create Linux Installer using cpack
+
+  # Load CPack after all CPACK* variables are set
+  include(CPack)
+  cpack_add_component(flight_sql_odbc_lib
+                      DISPLAY_NAME "ODBC library"
+                      DESCRIPTION "ODBC library bin, required to install"
+                      REQUIRED)
+endif()
