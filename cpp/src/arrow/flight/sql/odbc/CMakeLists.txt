@@ -57,7 +57,7 @@ arrow_install_all_headers("arrow/flight/sql/odbc")
 set(ARROW_FLIGHT_SQL_ODBC_SRCS entry_points.cc odbc_api.cc)
 
 if(WIN32)
-  list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def)
+  list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def install/versioninfo.rc)
 endif()
 
 add_arrow_lib(arrow_flight_sql_odbc
@@ -112,6 +112,9 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   # TODO: set up `flight_sql_odbc_lib` component for macOS Installer
   # TODO: set up `flight_sql_odbc_lib` component for Linux Installer
   if(WIN32)
+  # -AL- get build errors
+    # target_sources(arrow_flight_sql_odbc SHARED install/versioninfo.rc)
+
     install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
             DESTINATION bin
             COMPONENT flight_sql_odbc_lib
