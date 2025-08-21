@@ -99,9 +99,10 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
 
   set(CPACK_RESOURCE_FILE_LICENSE
       "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
-  # Tentative version 1.0.0 (patch version is not set)
+  # Tentative version 1.0.0
   set(CPACK_PACKAGE_VERSION_MAJOR "1")
   set(CPACK_PACKAGE_VERSION_MINOR "0")
+  set(CPACK_PACKAGE_VERSION_PATCH "0")
 
   set(CPACK_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
   set(CPACK_PACKAGE_VENDOR "Apache Arrow")
