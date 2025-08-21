@@ -658,7 +658,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrDescriptor) {
   this->disconnect();
 }
 
-
 #if defined _WIN32 || defined _WIN64
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnectDsn) {
@@ -1022,7 +1021,6 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
 }
 
 #endif
-
 
 }  // namespace arrow::flight::sql::odbc
 

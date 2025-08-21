@@ -88,7 +88,7 @@ target_include_directories(arrow_odbc_spi_impl PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 if(WIN32)
   target_sources(arrow_odbc_spi_impl
-                         include/flight_sql/ui/add_property_window.h
+                 PRIVATE include/flight_sql/ui/add_property_window.h
                          include/flight_sql/ui/custom_window.h
                          include/flight_sql/ui/dsn_configuration_window.h
                          include/flight_sql/ui/window.h
