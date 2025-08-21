@@ -22,12 +22,22 @@
   <DirectoryRef Id="TARGETDIR">
   <!-- -AL- Registers Computer\HKEY_CURRENT_USER\Software\MyCompany\MyApplicationName -->
       <Component Id="MyRegistryEntries" Guid="C348B9F7-5E8D-415D-A001-D92F2D4EA013">
-          <RegistryKey Root="HKCU"
-                      Key="Software\MyCompany\MyApplicationName">
+          <!-- <File Id="ArrowFlightSqlOdbcDll" Name="arrow_flight_sql_odbc.dll" DiskId="1" Source="./bin/arrow_flight_sql_odbc.dll" KeyPath="yes"/> -AL- doesn't work -->
+          <!-- <File Id="ArrowFlightSqlOdbcDll" Name="arrow_flight_sql_odbc.dll" DiskId="1" Source="./release/Release/arrow_flight_sql_odbc.dll" KeyPath="yes"/> -->
+          
+          <!-- <File Id="ArrowFlightSqlOdbcDll" Name="arrow_flight_sql_odbc.dll" DiskId="1" Source="bin\arrow_flight_sql_odbc.dll" /> -AL- doesn't compile -->
+          
+          <RegistryValue Root='HKLM' Key='Software\ODBC\ODBCINST.INI\ODBC Drivers' Name='Apache Arrow Flight SQL ODBC Driver' Type='string' Value='Installed'/>
+
+          <RegistryKey Root="HKLM"
+                      Key="Software\ODBC\ODBCINST.INI\Apache Arrow Flight SQL ODBC Driver">
                       <!-- -AL- `action=` is removed, since it is WiX 3 ONLY -->
                 <!-- -AL- here we can have multiple key-value pairs as needed -->
-              <RegistryValue Type="integer" Name="SomeIntegerValue" Value="1" KeyPath="yes"/>
-              <RegistryValue Type="string" Value="Default Value"/>
+                <!-- -AL- CM_FP_flight_sql_odbc_lib.bin.arrow_flight_sql_odbc.dll is a generated file value from release-build\_CPack_Packages\win64\WIX\files.wxs -->
+                <RegistryValue Type="string" Name="DriverODBCVer" Value="03.00"/>
+                <RegistryValue Type="string" Name="Driver" Value="[#CM_FP_flight_sql_odbc_lib.bin.arrow_flight_sql_odbc.dll]"/>
+                <RegistryValue Type="string" Name="Setup" Value="[#CM_FP_flight_sql_odbc_lib.bin.arrow_flight_sql_odbc.dll]"/>
+                <RegistryValue Type="integer" Name="UsageCount" Value="1"/>
           </RegistryKey>
       </Component>
   </DirectoryRef>
