@@ -122,14 +122,12 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
             PATTERN "arrow_flight.dll"
             PATTERN "arrow_flight_sql.dll"
             PATTERN "arrow_flight_sql_odbc.dll"
-            PATTERN "boost_filesystem*.dll"
             PATTERN "boost_locale*.dll"
             PATTERN "cares.dll"
             PATTERN "libcrypto*.dll"
             PATTERN "libprotobuf.dll"
             PATTERN "libssl*.dll"
             PATTERN "re2.dll"
-            PATTERN "sqlite3.dll"
             PATTERN "utf8proc.dll"
             PATTERN "zlib1.dll")
 
