@@ -20,7 +20,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
   <DirectoryRef Id="TARGETDIR">
-      <Component Id="MyRegistryEntries" Guid="C348B9F7-5E8D-415D-A001-D92F2D4EA013">
+      <Component Id="ODBCRegistryEntries" Guid="C348B9F7-5E8D-415D-A001-D92F2D4EA013">
           <RegistryValue Root='HKLM' Key='Software\ODBC\ODBCINST.INI\ODBC Drivers' Name='Apache Arrow Flight SQL ODBC Driver' Type='string' Value='Installed'/>
 
           <RegistryKey Root="HKLM"
