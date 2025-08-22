@@ -17,3 +17,10 @@ After the build succeeds, the ODBC DLL will be located in
 
 If the registration is successful, then Apache Arrow Flight SQL ODBC Driver 
 should show as an available ODBC driver in the x64 ODBC Driver Manager.
+
+Steps to Generate Windows Installer
+1. Build with  `ARROW_FLIGHT_SQL_ODBC=ON` and `ARROW_FLIGHT_SQL_ODBC_INSTALLER=ON`.
+2. `cd` to `build` folder.
+3. Run `cpack`. 
+
+If the generation is successful, you will find `Apache Arrow Flight SQL ODBC-<version>-win64.msi` generated under the `build` folder.
