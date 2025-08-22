@@ -99,9 +99,10 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
 
   set(CPACK_RESOURCE_FILE_LICENSE
       "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
-  # Tentative version 1.0.0 (patch version is not set)
+  # Tentative version 1.0.0
   set(CPACK_PACKAGE_VERSION_MAJOR "1")
   set(CPACK_PACKAGE_VERSION_MINOR "0")
+  set(CPACK_PACKAGE_VERSION_PATCH "0")
 
   set(CPACK_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
   set(CPACK_PACKAGE_VENDOR "Apache Arrow")
@@ -115,13 +116,26 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
             DESTINATION bin
             COMPONENT flight_sql_odbc_lib
             FILES_MATCHING
-            PATTERN "*.dll"
-            PATTERN "arrow_flight_testing.dll" EXCLUDE
-            PATTERN "arrow_testing.dll" EXCLUDE
-            PATTERN "gflags.dll" EXCLUDE
-            PATTERN "gmock.dll" EXCLUDE
-            PATTERN "gtest.dll" EXCLUDE
-            PATTERN "gtest_main.dll" EXCLUDE)
+            # Use regex for dll name patterns with versions
+            PATTERN "abseil_dll.dll"
+            PATTERN "arrow.dll"
+            PATTERN "arrow_compute.dll"
+            PATTERN "arrow_flight.dll"
+            PATTERN "arrow_flight_sql.dll"
+            PATTERN "arrow_flight_sql_odbc.dll"
+            PATTERN "boost_locale*.dll"
+            PATTERN "cares.dll"
+            PATTERN "libcrypto*.dll"
+            PATTERN "libprotobuf.dll"
+            PATTERN "libssl*.dll"
+            PATTERN "re2.dll"
+            PATTERN "utf8proc.dll"
+            PATTERN "zlib1.dll")
+
+    set(CPACK_WIX_EXTRA_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/install/arrow-flight-sql-odbc.wxs")
+    set(CPACK_WIX_PATCH_FILE
+        "${CMAKE_CURRENT_SOURCE_DIR}/install/arrow-flight-sql-odbc-patch.xml")
   endif()
 
   get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
