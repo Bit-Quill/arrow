@@ -92,6 +92,10 @@ foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
 endforeach()
 
+set(ODBC_PACKAGE_VERSION_MAJOR "1")
+set(ODBC_PACKAGE_VERSION_MINOR "0")
+set(ODBC_PACKAGE_VERSION_PATCH "0")
+
 # Construct ODBC Windows installer. Only Release installer is supported
 if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
 
@@ -100,9 +104,9 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   set(CPACK_RESOURCE_FILE_LICENSE
       "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
   # Tentative version 1.0.0
-  set(CPACK_PACKAGE_VERSION_MAJOR "1")
-  set(CPACK_PACKAGE_VERSION_MINOR "0")
-  set(CPACK_PACKAGE_VERSION_PATCH "0")
+  set(CPACK_PACKAGE_VERSION_MAJOR ${ODBC_PACKAGE_VERSION_MAJOR})
+  set(CPACK_PACKAGE_VERSION_MINOR ${ODBC_PACKAGE_VERSION_MINOR})
+  set(CPACK_PACKAGE_VERSION_PATCH ${ODBC_PACKAGE_VERSION_PATCH})
 
   set(CPACK_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
   set(CPACK_PACKAGE_VENDOR "Apache Arrow")
@@ -112,9 +116,6 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   # TODO: set up `flight_sql_odbc_lib` component for macOS Installer
   # TODO: set up `flight_sql_odbc_lib` component for Linux Installer
   if(WIN32)
-  # -AL- get build errors
-    # target_sources(arrow_flight_sql_odbc SHARED install/versioninfo.rc)
-
     install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
             DESTINATION bin
             COMPONENT flight_sql_odbc_lib
