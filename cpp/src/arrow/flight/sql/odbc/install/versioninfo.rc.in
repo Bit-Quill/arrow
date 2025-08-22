@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// -AL- todo: update version values to use a template
 #define VER_FILEVERSION             @VER_FILEVERSION@
 #define VER_FILEVERSION_STR         "@VER_FILEVERSION@\0"
 
