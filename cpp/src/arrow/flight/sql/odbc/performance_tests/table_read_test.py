@@ -13,7 +13,7 @@ import statistics
 # ARGUMENTS
 #----------------------------------
 parser = argparse.ArgumentParser(description="Benchmark ODBC Flight SQL Driver query performance against Dremio.")
-parser.add_argument("--dsn", required=True, help="ODBC DSN to use (must be pre-configured)")
+parser.add_argument("--driver", required=True, help="ODBC Driver to use (must be pre-configured)")
 parser.add_argument("--limit", type=int, default=1000, help="LIMIT for the SELECT query")
 parser.add_argument("--iterations", type=int, default=5, help="Number of iterations to run")
 args = parser.parse_args()
@@ -27,7 +27,7 @@ if not token:
 
 # Connector string
 connector = (
-    f"Driver={{{args.dsn}}};"
+    f"Driver={{{args.driver}}};"
     "ConnectionType=Direct;"
     "HOST=dremio-clients-demo.test.drem.io;"
     "PORT=32010;"
@@ -94,7 +94,7 @@ min_ms = min(times_ms)
 max_ms = max(times_ms)
 
 print("\n=== Benchmark Summary ===")
-print(f"DSN used: {args.dsn}")
+print(f"Driver used: {args.driver}")
 print(f"Iterations: {args.iterations}")
 print(f"Query LIMIT: {args.limit}")
 print(f"Average time: {avg_ms:.2f} ms")
