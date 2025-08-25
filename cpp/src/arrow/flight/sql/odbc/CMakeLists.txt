@@ -136,6 +136,8 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
         "${CMAKE_CURRENT_SOURCE_DIR}/install/arrow-flight-sql-odbc.wxs")
     set(CPACK_WIX_PATCH_FILE
         "${CMAKE_CURRENT_SOURCE_DIR}/install/arrow-flight-sql-odbc-patch.xml")
+
+    set(CPACK_WIX_UI_BANNER "${CMAKE_CURRENT_SOURCE_DIR}/install/arrow-wix-banner.bmp")
   endif()
 
   get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
