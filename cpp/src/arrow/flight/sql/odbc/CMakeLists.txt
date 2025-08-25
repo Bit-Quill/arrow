@@ -54,10 +54,28 @@ add_subdirectory(tests)
 
 arrow_install_all_headers("arrow/flight/sql/odbc")
 
+# ODBC Release information
+set(ODBC_PACKAGE_VERSION_MAJOR "1")
+set(ODBC_PACKAGE_VERSION_MINOR "0")
+set(ODBC_PACKAGE_VERSION_PATCH "0")
+set(ODBC_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
+set(ODBC_PACKAGE_VENDOR "Apache Arrow")
+
 set(ARROW_FLIGHT_SQL_ODBC_SRCS entry_points.cc odbc_api.cc)
 
 if(WIN32)
-  list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def)
+  set(VER_FILEVERSION
+      "${ODBC_PACKAGE_VERSION_MAJOR},${ODBC_PACKAGE_VERSION_MINOR},${ODBC_PACKAGE_VERSION_PATCH},0"
+  )
+  set(VER_FILEVERSION_STR
+      ${ODBC_PACKAGE_VERSION_MAJOR}.${ODBC_PACKAGE_VERSION_MINOR}.${ODBC_PACKAGE_VERSION_PATCH}
+  )
+  set(VER_COMPANYNAME_STR ${ODBC_PACKAGE_VENDOR})
+  set(VER_PRODUCTNAME_STR ${ODBC_PACKAGE_NAME})
+
+  configure_file("install/versioninfo.rc.in" "install/versioninfo.rc" @ONLY)
+
+  list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def install/versioninfo.rc)
 endif()
 
 add_arrow_lib(arrow_flight_sql_odbc
@@ -100,12 +118,12 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   set(CPACK_RESOURCE_FILE_LICENSE
       "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt")
   # Tentative version 1.0.0
-  set(CPACK_PACKAGE_VERSION_MAJOR "1")
-  set(CPACK_PACKAGE_VERSION_MINOR "0")
-  set(CPACK_PACKAGE_VERSION_PATCH "0")
+  set(CPACK_PACKAGE_VERSION_MAJOR ${ODBC_PACKAGE_VERSION_MAJOR})
+  set(CPACK_PACKAGE_VERSION_MINOR ${ODBC_PACKAGE_VERSION_MINOR})
+  set(CPACK_PACKAGE_VERSION_PATCH ${ODBC_PACKAGE_VERSION_PATCH})
 
-  set(CPACK_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
-  set(CPACK_PACKAGE_VENDOR "Apache Arrow")
+  set(CPACK_PACKAGE_NAME ${ODBC_PACKAGE_NAME})
+  set(CPACK_PACKAGE_VENDOR ${ODBC_PACKAGE_VENDOR})
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
   set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
 
