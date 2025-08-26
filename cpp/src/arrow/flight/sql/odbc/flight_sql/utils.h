@@ -41,7 +41,7 @@ inline void ThrowIfNotOK(const arrow::Status& status) {
 
 template <typename T, typename AttributeTypeT>
 inline bool CheckIfSetToOnlyValidValue(const AttributeTypeT& value, T allowed_value) {
-  return boost::get<T>(value) == allowed_value;
+  return ::boost::get<T>(value) == allowed_value;
 }
 
 template <typename BUILDER, typename T>
