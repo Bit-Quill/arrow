@@ -49,11 +49,9 @@ void checkSQLDescribeCol(SQLHSTMT stmt, const SQLUSMALLINT columnIndex,
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  EXPECT_GT(nameLength, 0);
+  EXPECT_EQ(nameLength, expectedName.size());
 
-  // returned nameLength is in bytes so convert to length in characters
-  size_t charCount = static_cast<size_t>(nameLength) / ODBC::GetSqlWCharSize();
-  std::wstring returned(columnName, columnName + charCount);
+  std::wstring returned(columnName, columnName + nameLength);
   EXPECT_EQ(returned, expectedName);
   EXPECT_EQ(columnDataType, expectedDataType);
   EXPECT_EQ(columnSize, expectedColumnSize);
