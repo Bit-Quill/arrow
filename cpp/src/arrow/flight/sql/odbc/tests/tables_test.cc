@@ -607,11 +607,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeCol) {
 
     EXPECT_EQ(ret, SQL_SUCCESS);
 
-    EXPECT_GT(nameLength, 0);
+    EXPECT_EQ(nameLength, wcslen(columnNames[i]));
 
-    // Returned nameLength is in bytes so convert to length in characters
-    size_t charCount = static_cast<size_t>(nameLength) / ODBC::GetSqlWCharSize();
-    std::wstring returned(columnName, columnName + charCount);
+    std::wstring returned(columnName, columnName + nameLength);
     EXPECT_EQ(returned, columnNames[i]);
     EXPECT_EQ(columnDataType, columnDataTypes[i]);
     EXPECT_EQ(columnSize, columnSizes[i]);
@@ -660,11 +658,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeColODBC2) {
 
     EXPECT_EQ(ret, SQL_SUCCESS);
 
-    EXPECT_GT(nameLength, 0);
+    EXPECT_EQ(nameLength, wcslen(columnNames[i]));
 
-    // Returned nameLength is in bytes so convert to length in characters
-    size_t charCount = static_cast<size_t>(nameLength) / ODBC::GetSqlWCharSize();
-    std::wstring returned(columnName, columnName + charCount);
+    std::wstring returned(columnName, columnName + nameLength);
     EXPECT_EQ(returned, columnNames[i]);
     EXPECT_EQ(columnDataType, columnDataTypes[i]);
     EXPECT_EQ(columnSize, columnSizes[i]);

@@ -1435,7 +1435,8 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNumber, SQLWCHAR* col
       ird->GetField(columnNumber, SQL_DESC_NAME, columnName, bufferLength,
                     &outputLengthInt);
       if (nameLengthPtr) {
-        *nameLengthPtr = static_cast<SQLSMALLINT>(outputLengthInt);
+        // returned length should be in characters
+        *nameLengthPtr = static_cast<SQLSMALLINT>(outputLengthInt / GetSqlWCharSize());
       }
     }
 
