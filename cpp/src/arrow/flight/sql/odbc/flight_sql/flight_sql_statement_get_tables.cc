@@ -22,6 +22,7 @@
 #include "arrow/flight/sql/odbc/flight_sql/utils.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/flight/types.h"
+#include "arrow/util/string.h"
 
 namespace driver {
 namespace flight_sql {
@@ -31,6 +32,15 @@ using arrow::flight::FlightClientOptions;
 using arrow::flight::FlightInfo;
 using arrow::flight::sql::FlightSqlClient;
 
+static void AddTableType(std::string& table_type, std::vector<std::string>& table_types) {
+  std::string trimmed_type = arrow::internal::TrimString(table_type);
+
+  // Only put the string if the trimmed result is non-empty
+  if (trimmed_type.length() > 0) {
+    table_types.emplace_back(trimmed_type);
+  }
+}
+
 void ParseTableTypes(const std::string& table_type,
                      std::vector<std::string>& table_types) {
   bool encountered = false;  // for checking if there is a single quote
@@ -39,36 +49,23 @@ void ParseTableTypes(const std::string& table_type,
   for (char temp : table_type) {  // while still in the string
     switch (temp) {               // switch depending on the character
       case '\'':                  // if the character is a single quote
-        if (encountered) {
-          encountered = false;  // if we already found a single quote, reset encountered
-        } else {
-          encountered =
-              true;  // if we haven't found a single quote, set encountered to true
-        }
+        // track when we've encountered a single opening quote
+        // and are still looking for the closing quote
+        encountered = !encountered;
         break;
-      case ',':                               // if it is a comma
-        if (!encountered) {                   // if we have not found a single quote
-          table_types.push_back(curr_parse);  // put our current string into our vector
-          curr_parse = "";                    // reset the current string
+      case ',':                                   // if it is a comma
+        if (!encountered) {                       // if we have not found a single quote
+          AddTableType(curr_parse, table_types);  // put current string into vector
+          curr_parse = "";                        // reset the current string
           break;
         }
-      default:  // if it is a normal character
-        if (encountered && isspace(temp)) {
-          curr_parse.push_back(temp);  // if we have found a single quote put the
-                                       // whitespace, we don't care
-        } else if (temp == '\'' || temp == ' ') {
-          break;  // if the current character is a single quote, trash it and go to
-                  // the next character.
-        } else {
-          curr_parse.push_back(temp);  // if all of the above failed, put the
-                                       // character into the current string
-        }
-        break;  // go to the next character
+        [[fallthrough]];
+      default:                       // if it is a normal character
+        curr_parse.push_back(temp);  // put the character into the current string
+        break;                       // go to the next character
     }
   }
-  table_types.emplace_back(
-      curr_parse);  // if we have found a single quote put the whitespace,
-  // we don't care
+  AddTableType(curr_parse, table_types);
 }
 
 std::shared_ptr<ResultSet> GetTablesForSQLAllCatalogs(
