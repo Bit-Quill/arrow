@@ -39,6 +39,7 @@ def main():
         "PORT=32010;"
         "AuthenticationType=Plain;"
         f"UID=improving;PWD={token};ssl=true;"
+        "DisableCertificateVerification=1;"
     )
 
     # Connect
