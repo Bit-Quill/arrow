@@ -62,14 +62,13 @@ def main():
     # Hardcoded queries
     # ----------------------------
     queries = {
-        "query1": 'SELECT * FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" LIMIT 100',
-        "query2": 'SELECT * FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" LIMIT 1000',
-        "query3": 'SELECT passenger_count, COUNT(*) FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" GROUP BY passenger_count',
-        "query4": 'SELECT passenger_count, AVG(fare_amount) FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" GROUP BY passenger_count',
-        "query5": 'SELECT * FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" WHERE fare_amount > 50 LIMIT 500',
-        "query6": 'SELECT passenger_count, SUM(fare_amount) FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" GROUP BY passenger_count',
-        "query7": 'SELECT passenger_count, fare_amount, COUNT(*) FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" GROUP BY passenger_count, fare_amount',
-        "query8": 'SELECT * FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" ORDER BY fare_amount DESC LIMIT 100'
+        "Limit": 'SELECT * FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" LIMIT 1000',
+        "AvgGroupBy": 'SELECT passenger_count, AVG(fare_amount) FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" GROUP BY passenger_count',
+        "SumGroupBy": 'SELECT passenger_count, SUM(fare_amount) FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" GROUP BY passenger_count',
+        "GreaterThan": 'SELECT * FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" WHERE fare_amount > 50 LIMIT 500',
+        "OrderBy": 'SELECT * FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" ORDER BY fare_amount DESC LIMIT 100',
+        "SingleCountGroupBy": 'SELECT passenger_count, COUNT(*) FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" GROUP BY passenger_count',
+        "MultiCountGroupBy": 'SELECT passenger_count, fare_amount, COUNT(*) FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" GROUP BY passenger_count, fare_amount'
     }
 
     results = []
