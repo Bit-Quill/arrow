@@ -40,6 +40,11 @@ def run_driver(driver_name):
             json_end = output.rfind("}") + 1
             json_text = output[json_start:json_end]
             data = json.loads(json_text)
+            
+            # --- PRINT INTERMEDIATE JSON RESULTS ---
+            print(f"Intermediate JSON for {driver_name} LIMIT={limit}:")
+            print(json.dumps(data, indent=2))
+            
             avg_ms = data["avg_ms"]
             min_ms = data["min_ms"]
             max_ms = data["max_ms"]
@@ -97,4 +102,3 @@ plt.yscale("log")
 plt.savefig(args.plotfile)
 print(f"Plot saved to {args.plotfile}")
 plt.show()
-
