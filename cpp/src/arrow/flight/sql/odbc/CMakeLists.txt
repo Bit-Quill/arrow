@@ -61,7 +61,8 @@ set(ODBC_PACKAGE_VERSION_PATCH "0")
 set(ODBC_PACKAGE_NAME "Apache Arrow Flight SQL ODBC")
 set(ODBC_PACKAGE_VENDOR "Apache Arrow")
 
-set(ARROW_FLIGHT_SQL_ODBC_SRCS entry_points.cc odbc_api.cc)
+# Compile entry_points.cc before odbc_api.cc due to conflict from sql.h and flight/types.h
+set(ARROW_FLIGHT_SQL_ODBC_SRCS odbc_api.cc entry_points.cc)
 
 if(WIN32)
   set(VER_FILEVERSION
