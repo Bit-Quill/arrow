@@ -2333,7 +2333,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColValidateInput) {
   SQLUSMALLINT outOfRangeColumn = 4;
   SQLUSMALLINT negativeColumn = -1;
   SQLWCHAR columnName[1024];
-  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT dataType = 0;
   SQLULEN columnSize = 0;
@@ -2378,7 +2378,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
   this->connect();
 
   SQLWCHAR columnName[1024];
-  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;
@@ -2454,7 +2454,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
   this->connect();
 
   SQLWCHAR columnName[1024];
-  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;
@@ -2537,7 +2537,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadata) {
   this->connect();
 
   SQLWCHAR columnName[1024];
-  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;
@@ -2599,7 +2599,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataODBC2) {
   this->connect(SQL_OV_ODBC2);
 
   SQLWCHAR columnName[1024];
-  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;
@@ -2661,7 +2661,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColAllTypesTableMetadata) {
   this->CreateTableAllDataType();
 
   SQLWCHAR columnName[1024];
-  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;
@@ -2717,7 +2717,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColUnicodeTableMetadata) {
   this->CreateUnicodeTable();
 
   SQLWCHAR columnName[1024];
-  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;
@@ -2761,7 +2761,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsGetMetadataBySQLDescribeCol) {
   this->connect();
 
   SQLWCHAR columnName[1024];
-  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;
@@ -2821,7 +2821,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsGetMetadataBySQLDescribeColODBC2) {
   this->connect(SQL_OV_ODBC2);
 
   SQLWCHAR columnName[1024];
-  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;

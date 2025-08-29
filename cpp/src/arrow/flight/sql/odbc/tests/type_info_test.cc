@@ -37,7 +37,7 @@ void checkSQLDescribeCol(SQLHSTMT stmt, const SQLUSMALLINT columnIndex,
                          const SQLSMALLINT& expectedDecimalDigits,
                          const SQLSMALLINT& expectedNullable) {
   SQLWCHAR columnName[1024];
-  constexpr SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;
