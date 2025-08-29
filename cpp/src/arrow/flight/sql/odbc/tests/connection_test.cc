@@ -379,6 +379,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
+#if defined _WIN32 || defined _WIN64
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnectDsn) {
   // ODBC Environment
   SQLHENV env;
@@ -440,58 +441,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnectDsn) {
   }
 
   EXPECT_EQ(ret, SQL_SUCCESS);
-
-  // Free connection handle
-  ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  // Free environment handle
-  ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-}
-
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
-  // ODBC Environment
-  SQLHENV env;
-  SQLHDBC conn;
-
-  // Allocate an environment handle
-  SQLRETURN ret = SQLAllocEnv(&env);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  // Allocate a connection using alloc handle
-  ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
-
-  EXPECT_EQ(ret, SQL_SUCCESS);
-
-  // Invalid connect string
-  std::string connect_str = getInvalidConnectionString();
-
-  ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
-                       arrow::util::UTF8ToWideString(connect_str));
-  std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
-
-  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
-  SQLSMALLINT outstrlen;
-
-  // Connecting to ODBC server.
-  ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
-
-  EXPECT_TRUE(ret == SQL_ERROR);
-
-  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_28000);
-
-  std::string out_connection_string = ODBC::SqlWcharToString(outstr, outstrlen);
-  EXPECT_TRUE(out_connection_string.empty());
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
@@ -779,6 +728,60 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
   }
 
   EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Free connection handle
+  ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Free environment handle
+  ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+}
+
+#endif
+
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
+  // ODBC Environment
+  SQLHENV env;
+  SQLHDBC conn;
+
+  // Allocate an environment handle
+  SQLRETURN ret = SQLAllocEnv(&env);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Allocate a connection using alloc handle
+  ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
+
+  EXPECT_EQ(ret, SQL_SUCCESS);
+
+  // Invalid connect string
+  std::string connect_str = getInvalidConnectionString();
+
+  ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
+                       arrow::util::UTF8ToWideString(connect_str));
+  std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
+
+  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
+  SQLSMALLINT outstrlen;
+
+  // Connecting to ODBC server.
+  ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
+                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
+                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+
+  EXPECT_TRUE(ret == SQL_ERROR);
+
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_28000);
+
+  std::string out_connection_string = ODBC::SqlWcharToString(outstr, outstrlen);
+  EXPECT_TRUE(out_connection_string.empty());
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);

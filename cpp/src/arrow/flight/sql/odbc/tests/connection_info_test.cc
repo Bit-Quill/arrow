@@ -187,6 +187,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDataSourceName) {
   this->disconnect();
 }
 
+#ifdef SQL_DRIVER_AWARE_POOLING_SUPPORTED
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverAwarePoolingSupported) {
   // A driver does not need to implement SQL_DRIVER_AWARE_POOLING_SUPPORTED and the
   // Driver Manager will not honor to the driver's return value.
@@ -197,6 +198,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverAwarePoolingSupported) {
 
   this->disconnect();
 }
+#endif
 
 // These information types are implemented by the Driver Manager alone.
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHdbc) {

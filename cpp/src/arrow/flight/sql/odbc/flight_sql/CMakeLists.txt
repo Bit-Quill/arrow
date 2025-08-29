@@ -17,6 +17,8 @@
 
 add_library(arrow_odbc_spi_impl
             include/flight_sql/flight_sql_driver.h
+            include/flight_sql/config/configuration.h
+            include/flight_sql/config/connection_string_parser.h
             accessors/binary_array_accessor.cc
             accessors/binary_array_accessor.h
             accessors/boolean_array_accessor.cc
@@ -76,8 +78,8 @@ add_library(arrow_odbc_spi_impl
             scalar_function_reporter.h
             system_trust_store.cc
             system_trust_store.h
-            system_dsn.cc
-            system_dsn.h
+            config/configuration.cc
+            config/connection_string_parser.cc
             utils.cc)
 target_include_directories(arrow_odbc_spi_impl
                            PUBLIC include include/flight_sql
@@ -86,26 +88,24 @@ target_include_directories(arrow_odbc_spi_impl PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 if(WIN32)
   target_sources(arrow_odbc_spi_impl
-                 PRIVATE include/flight_sql/config/configuration.h
-                         include/flight_sql/config/connection_string_parser.h
-                         include/flight_sql/ui/add_property_window.h
+                 PRIVATE include/flight_sql/ui/add_property_window.h
                          include/flight_sql/ui/custom_window.h
                          include/flight_sql/ui/dsn_configuration_window.h
                          include/flight_sql/ui/window.h
-                         config/configuration.cc
-                         config/connection_string_parser.cc
                          ui/custom_window.cc
                          ui/window.cc
                          ui/dsn_configuration_window.cc
                          ui/add_property_window.cc
-                         win_system_dsn.cc)
+                         win_system_dsn.cc
+                         system_dsn.cc
+                         system_dsn.h)
 endif()
 
 target_link_libraries(arrow_odbc_spi_impl PUBLIC odbcabstraction arrow_flight_sql_shared
                                                  arrow_compute_shared Boost::locale)
 
 # Link libraries on MINGW64 only
-if(MINGW AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if((MINGW AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR APPLE)
   target_link_libraries(arrow_odbc_spi_impl PUBLIC ${ODBCINST})
 endif()
 
