@@ -17,7 +17,9 @@
 
 #pragma once
 
+#include <boost/variant.hpp>
 #include <boost/xpressive/xpressive.hpp>
+
 #include <codecvt>
 #include <functional>
 #include <optional>
