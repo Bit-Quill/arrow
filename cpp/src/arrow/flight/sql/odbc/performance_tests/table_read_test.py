@@ -13,6 +13,8 @@ def main():
         description="Benchmark ODBC Flight SQL Driver query performance."
     )
     parser.add_argument("--driver", required=True, help="ODBC driver name")
+    parser.add_argument("--schema", help="Schema or space name")
+    parser.add_argument("--table", required=True, help="Table name")
     parser.add_argument("--limit", type=int, help="LIMIT for SELECT query (ignored if --query provided)")
     parser.add_argument("--iterations", type=int, default=1, help="Number of iterations to run")
     parser.add_argument("--json", action="store_true", help="Output JSON")
@@ -29,7 +31,10 @@ def main():
         sql = args.query
     else:
         limit = args.limit if args.limit else 100
-        sql = f'SELECT * FROM "Samples.samples.dremio.com"."NYC-taxi-trips-iceberg" LIMIT {limit}'
+        if args.schema:
+            sql = f'SELECT * FROM "{args.schema}"."{args.table}" LIMIT {limit}'
+        else:
+            sql = f'SELECT * FROM "{args.table}" LIMIT {limit}'
 
     # Connection string for Arrow Flight SQL ODBC
     conn_str = (
@@ -74,6 +79,8 @@ def main():
         "driver": args.driver,
         "iterations": args.iterations,
         "limit": args.limit,
+        "schema": args.schema,
+        "table": args.table,
         "query": sql,
         "avg_ms": avg_ms,
         "min_ms": min_ms,
@@ -95,6 +102,7 @@ def main():
 
     cursor.close()
     conn.close()
+
 
 if __name__ == "__main__":
     main()
