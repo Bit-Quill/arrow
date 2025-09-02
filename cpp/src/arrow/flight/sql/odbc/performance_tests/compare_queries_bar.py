@@ -87,11 +87,12 @@ def main():
         "MaxTripDistance": f'SELECT MAX(trip_distance_mi) AS max_distance FROM "{args.schema}"."{args.table}"',
 
         # Date/time functions
-        "TripsByYear": f'SELECT EXTRACT(YEAR FROM pickup_datetime) AS year, COUNT(*) AS trips FROM "{args.schema}"."{args.table}" GROUP BY year ORDER BY year',
-        "TripsByMonth": f'SELECT EXTRACT(MONTH FROM pickup_datetime) AS month, COUNT(*) AS trips FROM "{args.schema}"."{args.table}" GROUP BY month ORDER BY month',
+        "TripsByYear": f'SELECT EXTRACT(YEAR FROM pickup_datetime) "year", COUNT(*) "trips" FROM "{args.schema}"."{args.table}" GROUP BY "year" ORDER BY "year"',
+
+        "TripsByMonth": f'SELECT EXTRACT(MONTH FROM pickup_datetime) "month", COUNT(*) "trips" FROM "{args.schema}"."{args.table}" GROUP BY "month" ORDER BY "month"',
 
         # Window functions
-        "TopFaresRanked": f'SELECT fare_amount, ROW_NUMBER() OVER (ORDER BY fare_amount DESC) AS rank FROM "{args.schema}"."{args.table}" LIMIT 100',
+        "TopFaresRanked": f'SELECT fare_amount, rank_col FROM (SELECT fare_amount, ROW_NUMBER() OVER (ORDER BY fare_amount DESC) AS rank_col FROM "{args.schema}"."{args.table}") t LIMIT 100',
         "AvgFareByPassengerWindow": f'SELECT passenger_count, AVG(fare_amount) OVER (PARTITION BY passenger_count) AS avg_fare FROM "{args.schema}"."{args.table}" LIMIT 500'
     }
 
