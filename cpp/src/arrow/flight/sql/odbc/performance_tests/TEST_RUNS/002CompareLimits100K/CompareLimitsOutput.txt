@@ -1,0 +1,315 @@
+PS C:\Users\Administrator\GitHub\arrow\cpp\src\arrow\flight\sql\odbc\performance_tests> python compare_limits_plot.py --driver_a "Arrow Flight SQL ODBC Driver" --driver_b "Apache Arrow Flight SQL ODBC Driver" --iterations 5 --limits 1 10 100 1000 10000 100000 --outfile limits_results_to_100K.csv --plotfile limits_plot_to_100K.png
+
+Running Arrow Flight SQL ODBC Driver with LIMIT=1...
+Intermediate JSON for Arrow Flight SQL ODBC Driver LIMIT=1:
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 1,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 1",
+  "avg_ms": 363.750696182251,
+  "min_ms": 322.5698471069336,
+  "max_ms": 447.0713138580322,
+  "all_runs_ms": [
+    447.0713138580322,
+    390.6853199005127,
+    333.9381217956543,
+    324.48887825012207,
+    322.5698471069336
+  ],
+  "rows_returned": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
+
+Running Arrow Flight SQL ODBC Driver with LIMIT=10...
+Intermediate JSON for Arrow Flight SQL ODBC Driver LIMIT=10:
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 10,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 10",
+  "avg_ms": 611.6148471832275,
+  "min_ms": 562.8888607025146,
+  "max_ms": 669.5723533630371,
+  "all_runs_ms": [
+    562.8888607025146,
+    628.2343864440918,
+    669.5723533630371,
+    595.0183868408203,
+    602.3602485656738
+  ],
+  "rows_returned": [
+    10,
+    10,
+    10,
+    10,
+    10
+  ]
+}
+
+Running Arrow Flight SQL ODBC Driver with LIMIT=100...
+Intermediate JSON for Arrow Flight SQL ODBC Driver LIMIT=100:
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 100,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 100",
+  "avg_ms": 3315.7440662384033,
+  "min_ms": 3253.4024715423584,
+  "max_ms": 3411.7939472198486,
+  "all_runs_ms": [
+    3253.4024715423584,
+    3411.7939472198486,
+    3285.139322280884,
+    3296.3390350341797,
+    3332.045555114746
+  ],
+  "rows_returned": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ]
+}
+
+Running Arrow Flight SQL ODBC Driver with LIMIT=1000...
+Intermediate JSON for Arrow Flight SQL ODBC Driver LIMIT=1000:
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 1000,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 1000",
+  "avg_ms": 30438.987493515015,
+  "min_ms": 29623.3491897583,
+  "max_ms": 31157.08327293396,
+  "all_runs_ms": [
+    31029.332160949707,
+    29623.3491897583,
+    31157.08327293396,
+    29719.9490070343,
+    30665.223836898804
+  ],
+  "rows_returned": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+  ]
+}
+
+Running Arrow Flight SQL ODBC Driver with LIMIT=10000...
+Intermediate JSON for Arrow Flight SQL ODBC Driver LIMIT=10000:
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 10000,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 10000",
+  "avg_ms": 300643.31245422363,
+  "min_ms": 290261.10315322876,
+  "max_ms": 306783.6825847626,
+  "all_runs_ms": [
+    302672.1565723419,
+    300335.0327014923,
+    303164.5872592926,
+    290261.10315322876,
+    306783.6825847626
+  ],
+  "rows_returned": [
+    10000,
+    10000,
+    10000,
+    10000,
+    10000
+  ]
+}
+
+Running Arrow Flight SQL ODBC Driver with LIMIT=100000...
+Intermediate JSON for Arrow Flight SQL ODBC Driver LIMIT=100000:
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 100000,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 100000",
+  "avg_ms": 3036322.395181656,
+  "min_ms": 2996272.8984355927,
+  "max_ms": 3068238.5454177856,
+  "all_runs_ms": [
+    3038236.1080646515,
+    3056891.6964530945,
+    3068238.5454177856,
+    3021972.727537155,
+    2996272.8984355927
+  ],
+  "rows_returned": [
+    100000,
+    100000,
+    100000,
+    100000,
+    100000
+  ]
+}
+
+Running Apache Arrow Flight SQL ODBC Driver with LIMIT=1...
+Intermediate JSON for Apache Arrow Flight SQL ODBC Driver LIMIT=1:
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 1,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 1",
+  "avg_ms": 361.22307777404785,
+  "min_ms": 329.59818840026855,
+  "max_ms": 457.34381675720215,
+  "all_runs_ms": [
+    457.34381675720215,
+    341.2652015686035,
+    340.3174877166748,
+    337.59069442749023,
+    329.59818840026855
+  ],
+  "rows_returned": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
+
+Running Apache Arrow Flight SQL ODBC Driver with LIMIT=10...
+Intermediate JSON for Apache Arrow Flight SQL ODBC Driver LIMIT=10:
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 10,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 10",
+  "avg_ms": 609.0284824371338,
+  "min_ms": 596.207857131958,
+  "max_ms": 619.4398403167725,
+  "all_runs_ms": [
+    619.4398403167725,
+    609.3175411224365,
+    596.207857131958,
+    615.5171394348145,
+    604.6600341796875
+  ],
+  "rows_returned": [
+    10,
+    10,
+    10,
+    10,
+    10
+  ]
+}
+
+Running Apache Arrow Flight SQL ODBC Driver with LIMIT=100...
+Intermediate JSON for Apache Arrow Flight SQL ODBC Driver LIMIT=100:
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 100,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 100",
+  "avg_ms": 3322.842216491699,
+  "min_ms": 3236.36794090271,
+  "max_ms": 3433.699607849121,
+  "all_runs_ms": [
+    3396.2011337280273,
+    3236.36794090271,
+    3247.5204467773438,
+    3300.421953201294,
+    3433.699607849121
+  ],
+  "rows_returned": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ]
+}
+
+Running Apache Arrow Flight SQL ODBC Driver with LIMIT=1000...
+Intermediate JSON for Apache Arrow Flight SQL ODBC Driver LIMIT=1000:
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 1000,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 1000",
+  "avg_ms": 30824.00050163269,
+  "min_ms": 29915.04693031311,
+  "max_ms": 32180.66430091858,
+  "all_runs_ms": [
+    32180.66430091858,
+    29915.04693031311,
+    30911.401987075806,
+    29925.776720046997,
+    31187.11256980896
+  ],
+  "rows_returned": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+  ]
+}
+
+Running Apache Arrow Flight SQL ODBC Driver with LIMIT=10000...
+Intermediate JSON for Apache Arrow Flight SQL ODBC Driver LIMIT=10000:
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 10000,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 10000",
+  "avg_ms": 303659.582901001,
+  "min_ms": 300044.9962615967,
+  "max_ms": 309345.0765609741,
+  "all_runs_ms": [
+    309345.0765609741,
+    304755.68890571594,
+    300044.9962615967,
+    301692.6624774933,
+    302459.49029922485
+  ],
+  "rows_returned": [
+    10000,
+    10000,
+    10000,
+    10000,
+    10000
+  ]
+}
+
+Running Apache Arrow Flight SQL ODBC Driver with LIMIT=100000...
+Intermediate JSON for Apache Arrow Flight SQL ODBC Driver LIMIT=100000:
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "iterations": 5,
+  "limit": 100000,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 100000",
+  "avg_ms": 3027773.0962753296,
+  "min_ms": 3013334.800004959,
+  "max_ms": 3070387.4740600586,
+  "all_runs_ms": [
+    3013334.800004959,
+    3013481.8575382233,
+    3024003.721475601,
+    3070387.4740600586,
+    3017657.628297806
+  ],
+  "rows_returned": [
+    100000,
+    100000,
+    100000,
+    100000,
+    100000
+  ]
+}
+Results saved to limits_results_to_100K.csv
+Plot saved to limits_plot_to_100K.png
