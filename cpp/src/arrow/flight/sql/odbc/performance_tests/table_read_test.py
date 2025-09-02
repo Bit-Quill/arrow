@@ -4,16 +4,15 @@ import pyodbc
 import time
 import json
 import csv
-from os import environ
-import statistics
 import sys
+from os import environ
 
 def main():
     parser = argparse.ArgumentParser(
         description="Benchmark ODBC Flight SQL Driver query performance."
     )
     parser.add_argument("--driver", required=True, help="ODBC driver name")
-    parser.add_argument("--schema", help="Schema or space name")
+    parser.add_argument("--schema", required=True, help="Schema name")
     parser.add_argument("--table", required=True, help="Table name")
     parser.add_argument("--limit", type=int, help="LIMIT for SELECT query (ignored if --query provided)")
     parser.add_argument("--iterations", type=int, default=1, help="Number of iterations to run")
@@ -31,10 +30,7 @@ def main():
         sql = args.query
     else:
         limit = args.limit if args.limit else 100
-        if args.schema:
-            sql = f'SELECT * FROM "{args.schema}"."{args.table}" LIMIT {limit}'
-        else:
-            sql = f'SELECT * FROM "{args.table}" LIMIT {limit}'
+        sql = f'SELECT * FROM "{args.schema}"."{args.table}" LIMIT {limit}'
 
     # Connection string for Arrow Flight SQL ODBC
     conn_str = (
@@ -64,23 +60,28 @@ def main():
     rows_returned = []
     for i in range(args.iterations):
         start = time.time()
-        cursor.execute(sql)
-        rows = cursor.fetchall()
-        elapsed_ms = (time.time() - start) * 1000
-        timings.append(elapsed_ms)
-        rows_returned.append(len(rows))
-        print(f"Iteration {i+1}: {elapsed_ms:.2f} ms (rows returned: {len(rows)})")
+        try:
+            cursor.execute(sql)
+            rows = cursor.fetchall()
+            elapsed_ms = (time.time() - start) * 1000
+            timings.append(elapsed_ms)
+            rows_returned.append(len(rows))
+            print(f"Iteration {i+1}: {elapsed_ms:.2f} ms (rows returned: {len(rows)})")
+        except pyodbc.Error as e:
+            print(f"Query execution failed: {e}")
+            timings.append(None)
+            rows_returned.append(None)
 
-    avg_ms = statistics.mean(timings)
-    min_ms = min(timings)
-    max_ms = max(timings)
+    valid_timings = [t for t in timings if t is not None]
+    avg_ms = sum(valid_timings)/len(valid_timings) if valid_timings else None
+    min_ms = min(valid_timings) if valid_timings else None
+    max_ms = max(valid_timings) if valid_timings else None
 
     result = {
         "driver": args.driver,
-        "iterations": args.iterations,
-        "limit": args.limit,
         "schema": args.schema,
         "table": args.table,
+        "iterations": args.iterations,
         "query": sql,
         "avg_ms": avg_ms,
         "min_ms": min_ms,
@@ -102,7 +103,6 @@ def main():
 
     cursor.close()
     conn.close()
-
 
 if __name__ == "__main__":
     main()
