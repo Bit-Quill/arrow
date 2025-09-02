@@ -1,0 +1,1205 @@
+PS C:\Users\Administrator\GitHub\arrow\cpp\src\arrow\flight\sql\odbc\performance_tests> python compare_queries_bar.py --driver_a "Arrow Flight SQL ODBC Driver" --driver_b "Apache Arrow Flight SQL ODBC Driver" --schema "Samples.samples.dremio.com" --table "NYC-taxi-trips-iceberg" --iterations 5 --outfile compare_20_queries.csv --plotfile results_20_queries.png
+
+Running Limit100...
+Iteration 1: 3258.13 ms (rows returned: 100)
+Iteration 2: 3221.18 ms (rows returned: 100)
+Iteration 3: 3090.82 ms (rows returned: 100)
+Iteration 4: 3084.55 ms (rows returned: 100)
+Iteration 5: 3089.00 ms (rows returned: 100)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 100",
+  "avg_ms": 3148.7356185913086,
+  "min_ms": 3084.550380706787,
+  "max_ms": 3258.1324577331543,
+  "all_runs_ms": [
+    3258.1324577331543,
+    3221.1766242980957,
+    3090.8217430114746,
+    3084.550380706787,
+    3088.9968872070312
+  ],
+  "rows_returned": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ]
+}
+Iteration 1: 3078.05 ms (rows returned: 100)
+Iteration 2: 3135.37 ms (rows returned: 100)
+Iteration 3: 3114.44 ms (rows returned: 100)
+Iteration 4: 3110.02 ms (rows returned: 100)
+Iteration 5: 3073.05 ms (rows returned: 100)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 100",
+  "avg_ms": 3102.1849632263184,
+  "min_ms": 3073.0504989624023,
+  "max_ms": 3135.3671550750732,
+  "all_runs_ms": [
+    3078.051805496216,
+    3135.3671550750732,
+    3114.4394874572754,
+    3110.015869140625,
+    3073.0504989624023
+  ],
+  "rows_returned": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ]
+}
+
+Running Limit1000...
+Iteration 1: 28295.13 ms (rows returned: 1000)
+Iteration 2: 28336.46 ms (rows returned: 1000)
+Iteration 3: 28279.17 ms (rows returned: 1000)
+Iteration 4: 28276.08 ms (rows returned: 1000)
+Iteration 5: 28206.97 ms (rows returned: 1000)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 1000",
+  "avg_ms": 28278.762102127075,
+  "min_ms": 28206.9673538208,
+  "max_ms": 28336.461544036865,
+  "all_runs_ms": [
+    28295.12882232666,
+    28336.461544036865,
+    28279.168844223022,
+    28276.083946228027,
+    28206.9673538208
+  ],
+  "rows_returned": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+  ]
+}
+Iteration 1: 28357.74 ms (rows returned: 1000)
+Iteration 2: 28239.28 ms (rows returned: 1000)
+Iteration 3: 28254.01 ms (rows returned: 1000)
+Iteration 4: 28299.25 ms (rows returned: 1000)
+Iteration 5: 28472.38 ms (rows returned: 1000)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 1000",
+  "avg_ms": 28324.5304107666,
+  "min_ms": 28239.282846450806,
+  "max_ms": 28472.376108169556,
+  "all_runs_ms": [
+    28357.738256454468,
+    28239.282846450806,
+    28254.00972366333,
+    28299.24511909485,
+    28472.376108169556
+  ],
+  "rows_returned": [
+    1000,
+    1000,
+    1000,
+    1000,
+    1000
+  ]
+}
+
+Running AvgFareByPassenger...
+Iteration 1: 18290.48 ms (rows returned: 13)
+Iteration 2: 17481.93 ms (rows returned: 13)
+Iteration 3: 17523.29 ms (rows returned: 13)
+Iteration 4: 17411.47 ms (rows returned: 13)
+Iteration 5: 17423.48 ms (rows returned: 13)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT passenger_count, AVG(fare_amount) AS avg_fare FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY passenger_count",
+  "avg_ms": 17626.128387451172,
+  "min_ms": 17411.471366882324,
+  "max_ms": 18290.47703742981,
+  "all_runs_ms": [
+    18290.47703742981,
+    17481.927156448364,
+    17523.289442062378,
+    17411.471366882324,
+    17423.476934432983
+  ],
+  "rows_returned": [
+    13,
+    13,
+    13,
+    13,
+    13
+  ]
+}
+Iteration 1: 17427.29 ms (rows returned: 13)
+Iteration 2: 17412.03 ms (rows returned: 13)
+Iteration 3: 17631.00 ms (rows returned: 13)
+Iteration 4: 17411.21 ms (rows returned: 13)
+Iteration 5: 17423.88 ms (rows returned: 13)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT passenger_count, AVG(fare_amount) AS avg_fare FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY passenger_count",
+  "avg_ms": 17461.08193397522,
+  "min_ms": 17411.21244430542,
+  "max_ms": 17630.999088287354,
+  "all_runs_ms": [
+    17427.2882938385,
+    17412.02735900879,
+    17630.999088287354,
+    17411.21244430542,
+    17423.882484436035
+  ],
+  "rows_returned": [
+    13,
+    13,
+    13,
+    13,
+    13
+  ]
+}
+
+Running SumFareByPassenger...
+Iteration 1: 17029.83 ms (rows returned: 13)
+Iteration 2: 17219.08 ms (rows returned: 13)
+Iteration 3: 17086.83 ms (rows returned: 13)
+Iteration 4: 17048.02 ms (rows returned: 13)
+Iteration 5: 17191.18 ms (rows returned: 13)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT passenger_count, SUM(fare_amount) AS total_fare FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY passenger_count",
+  "avg_ms": 17114.98770713806,
+  "min_ms": 17029.832124710083,
+  "max_ms": 17219.08450126648,
+  "all_runs_ms": [
+    17029.832124710083,
+    17219.08450126648,
+    17086.82870864868,
+    17048.015594482422,
+    17191.17760658264
+  ],
+  "rows_returned": [
+    13,
+    13,
+    13,
+    13,
+    13
+  ]
+}
+Iteration 1: 16788.63 ms (rows returned: 13)
+Iteration 2: 16720.72 ms (rows returned: 13)
+Iteration 3: 16698.86 ms (rows returned: 13)
+Iteration 4: 16762.84 ms (rows returned: 13)
+Iteration 5: 16722.51 ms (rows returned: 13)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT passenger_count, SUM(fare_amount) AS total_fare FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY passenger_count",
+  "avg_ms": 16738.711404800415,
+  "min_ms": 16698.858499526978,
+  "max_ms": 16788.630723953247,
+  "all_runs_ms": [
+    16788.630723953247,
+    16720.719814300537,
+    16698.858499526978,
+    16762.84146308899,
+    16722.506523132324
+  ],
+  "rows_returned": [
+    13,
+    13,
+    13,
+    13,
+    13
+  ]
+}
+
+Running AvgTipByPassenger...
+Iteration 1: 17996.39 ms (rows returned: 13)
+Iteration 2: 17289.82 ms (rows returned: 13)
+Iteration 3: 17209.62 ms (rows returned: 13)
+Iteration 4: 17048.29 ms (rows returned: 13)
+Iteration 5: 17133.30 ms (rows returned: 13)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT passenger_count, AVG(tip_amount) AS avg_tip FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY passenger_count",
+  "avg_ms": 17335.482931137085,
+  "min_ms": 17048.28643798828,
+  "max_ms": 17996.389627456665,
+  "all_runs_ms": [
+    17996.389627456665,
+    17289.820194244385,
+    17209.61618423462,
+    17048.28643798828,
+    17133.302211761475
+  ],
+  "rows_returned": [
+    13,
+    13,
+    13,
+    13,
+    13
+  ]
+}
+Iteration 1: 17100.37 ms (rows returned: 13)
+Iteration 2: 17144.93 ms (rows returned: 13)
+Iteration 3: 17263.51 ms (rows returned: 13)
+Iteration 4: 17126.49 ms (rows returned: 13)
+Iteration 5: 17094.25 ms (rows returned: 13)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT passenger_count, AVG(tip_amount) AS avg_tip FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY passenger_count",
+  "avg_ms": 17145.911836624146,
+  "min_ms": 17094.25401687622,
+  "max_ms": 17263.51237297058,
+  "all_runs_ms": [
+    17100.367307662964,
+    17144.932985305786,
+    17263.51237297058,
+    17126.492500305176,
+    17094.25401687622
+  ],
+  "rows_returned": [
+    13,
+    13,
+    13,
+    13,
+    13
+  ]
+}
+
+Running TotalAmountByPassenger...
+Iteration 1: 18626.53 ms (rows returned: 13)
+Iteration 2: 17192.35 ms (rows returned: 13)
+Iteration 3: 17178.07 ms (rows returned: 13)
+Iteration 4: 17203.18 ms (rows returned: 13)
+Iteration 5: 17205.09 ms (rows returned: 13)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT passenger_count, SUM(total_amount) AS total_amount FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY passenger_count",
+  "avg_ms": 17481.04419708252,
+  "min_ms": 17178.06601524353,
+  "max_ms": 18626.532077789307,
+  "all_runs_ms": [
+    18626.532077789307,
+    17192.352533340454,
+    17178.06601524353,
+    17203.18055152893,
+    17205.089807510376
+  ],
+  "rows_returned": [
+    13,
+    13,
+    13,
+    13,
+    13
+  ]
+}
+Iteration 1: 17208.52 ms (rows returned: 13)
+Iteration 2: 17161.80 ms (rows returned: 13)
+Iteration 3: 17121.03 ms (rows returned: 13)
+Iteration 4: 17118.08 ms (rows returned: 13)
+Iteration 5: 17151.74 ms (rows returned: 13)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT passenger_count, SUM(total_amount) AS total_amount FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY passenger_count",
+  "avg_ms": 17152.232027053833,
+  "min_ms": 17118.079662322998,
+  "max_ms": 17208.51707458496,
+  "all_runs_ms": [
+    17208.51707458496,
+    17161.800146102905,
+    17121.02508544922,
+    17118.079662322998,
+    17151.738166809082
+  ],
+  "rows_returned": [
+    13,
+    13,
+    13,
+    13,
+    13
+  ]
+}
+
+Running FareGreater50...
+Iteration 1: 14541.40 ms (rows returned: 500)
+Iteration 2: 14376.75 ms (rows returned: 500)
+Iteration 3: 14375.08 ms (rows returned: 500)
+Iteration 4: 14287.94 ms (rows returned: 500)
+Iteration 5: 14298.50 ms (rows returned: 500)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" WHERE fare_amount > 50 LIMIT 500",
+  "avg_ms": 14375.934505462646,
+  "min_ms": 14287.942886352539,
+  "max_ms": 14541.397094726562,
+  "all_runs_ms": [
+    14541.397094726562,
+    14376.750469207764,
+    14375.08249282837,
+    14287.942886352539,
+    14298.499584197998
+  ],
+  "rows_returned": [
+    500,
+    500,
+    500,
+    500,
+    500
+  ]
+}
+Iteration 1: 14336.94 ms (rows returned: 500)
+Iteration 2: 14282.82 ms (rows returned: 500)
+Iteration 3: 14338.50 ms (rows returned: 500)
+Iteration 4: 14307.37 ms (rows returned: 500)
+Iteration 5: 14303.22 ms (rows returned: 500)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" WHERE fare_amount > 50 LIMIT 500",
+  "avg_ms": 14313.771390914917,
+  "min_ms": 14282.81831741333,
+  "max_ms": 14338.501691818237,
+  "all_runs_ms": [
+    14336.944103240967,
+    14282.81831741333,
+    14338.501691818237,
+    14307.369232177734,
+    14303.223609924316
+  ],
+  "rows_returned": [
+    500,
+    500,
+    500,
+    500,
+    500
+  ]
+}
+
+Running TripDistance5to10...
+Iteration 1: 14320.81 ms (rows returned: 500)
+Iteration 2: 14312.74 ms (rows returned: 500)
+Iteration 3: 14323.37 ms (rows returned: 500)
+Iteration 4: 14342.22 ms (rows returned: 500)
+Iteration 5: 14334.44 ms (rows returned: 500)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" WHERE trip_distance_mi BETWEEN 5 AND 10 LIMIT 500",
+  "avg_ms": 14326.717376708984,
+  "min_ms": 14312.744140625,
+  "max_ms": 14342.220067977905,
+  "all_runs_ms": [
+    14320.80602645874,
+    14312.744140625,
+    14323.374509811401,
+    14342.220067977905,
+    14334.442138671875
+  ],
+  "rows_returned": [
+    500,
+    500,
+    500,
+    500,
+    500
+  ]
+}
+Iteration 1: 14335.08 ms (rows returned: 500)
+Iteration 2: 14351.85 ms (rows returned: 500)
+Iteration 3: 14409.90 ms (rows returned: 500)
+Iteration 4: 14369.25 ms (rows returned: 500)
+Iteration 5: 14333.16 ms (rows returned: 500)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" WHERE trip_distance_mi BETWEEN 5 AND 10 LIMIT 500",
+  "avg_ms": 14359.848976135254,
+  "min_ms": 14333.15634727478,
+  "max_ms": 14409.904479980469,
+  "all_runs_ms": [
+    14335.081577301025,
+    14351.84907913208,
+    14409.904479980469,
+    14369.253396987915,
+    14333.15634727478
+  ],
+  "rows_returned": [
+    500,
+    500,
+    500,
+    500,
+    500
+  ]
+}
+
+Running PassengerCount2...
+Iteration 1: 14400.87 ms (rows returned: 500)
+Iteration 2: 14330.71 ms (rows returned: 500)
+Iteration 3: 14326.70 ms (rows returned: 500)
+Iteration 4: 14347.51 ms (rows returned: 500)
+Iteration 5: 14340.93 ms (rows returned: 500)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" WHERE passenger_count = 2 LIMIT 500",
+  "avg_ms": 14349.34492111206,
+  "min_ms": 14326.699256896973,
+  "max_ms": 14400.872230529785,
+  "all_runs_ms": [
+    14400.872230529785,
+    14330.707311630249,
+    14326.699256896973,
+    14347.514152526855,
+    14340.93165397644
+  ],
+  "rows_returned": [
+    500,
+    500,
+    500,
+    500,
+    500
+  ]
+}
+Iteration 1: 14389.24 ms (rows returned: 500)
+Iteration 2: 14426.34 ms (rows returned: 500)
+Iteration 3: 14356.14 ms (rows returned: 500)
+Iteration 4: 14306.25 ms (rows returned: 500)
+Iteration 5: 14299.65 ms (rows returned: 500)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" WHERE passenger_count = 2 LIMIT 500",
+  "avg_ms": 14355.523681640625,
+  "min_ms": 14299.64542388916,
+  "max_ms": 14426.344871520996,
+  "all_runs_ms": [
+    14389.240503311157,
+    14426.344871520996,
+    14356.136083602905,
+    14306.251525878906,
+    14299.64542388916
+  ],
+  "rows_returned": [
+    500,
+    500,
+    500,
+    500,
+    500
+  ]
+}
+
+Running TipGreater10...
+Iteration 1: 14351.80 ms (rows returned: 500)
+Iteration 2: 14319.90 ms (rows returned: 500)
+Iteration 3: 14294.81 ms (rows returned: 500)
+Iteration 4: 14296.91 ms (rows returned: 500)
+Iteration 5: 14397.65 ms (rows returned: 500)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" WHERE tip_amount > 10 LIMIT 500",
+  "avg_ms": 14332.215118408203,
+  "min_ms": 14294.811964035034,
+  "max_ms": 14397.649049758911,
+  "all_runs_ms": [
+    14351.803302764893,
+    14319.896459579468,
+    14294.811964035034,
+    14296.91481590271,
+    14397.649049758911
+  ],
+  "rows_returned": [
+    500,
+    500,
+    500,
+    500,
+    500
+  ]
+}
+Iteration 1: 14357.85 ms (rows returned: 500)
+Iteration 2: 14396.18 ms (rows returned: 500)
+Iteration 3: 14342.35 ms (rows returned: 500)
+Iteration 4: 14400.37 ms (rows returned: 500)
+Iteration 5: 14313.89 ms (rows returned: 500)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" WHERE tip_amount > 10 LIMIT 500",
+  "avg_ms": 14362.126731872559,
+  "min_ms": 14313.886642456055,
+  "max_ms": 14400.365591049194,
+  "all_runs_ms": [
+    14357.853174209595,
+    14396.17919921875,
+    14342.3490524292,
+    14400.365591049194,
+    14313.886642456055
+  ],
+  "rows_returned": [
+    500,
+    500,
+    500,
+    500,
+    500
+  ]
+}
+
+Running OrderByFareDesc...
+Iteration 1: 54312.90 ms (rows returned: 100)
+Iteration 2: 53397.82 ms (rows returned: 100)
+Iteration 3: 53488.77 ms (rows returned: 100)
+Iteration 4: 53777.30 ms (rows returned: 100)
+Iteration 5: 54228.48 ms (rows returned: 100)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" ORDER BY fare_amount DESC LIMIT 100",
+  "avg_ms": 53841.05463027954,
+  "min_ms": 53397.82190322876,
+  "max_ms": 54312.901735305786,
+  "all_runs_ms": [
+    54312.901735305786,
+    53397.82190322876,
+    53488.770961761475,
+    53777.30345726013,
+    54228.47509384155
+  ],
+  "rows_returned": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ]
+}
+Iteration 1: 54100.68 ms (rows returned: 100)
+Iteration 2: 53510.49 ms (rows returned: 100)
+Iteration 3: 53884.82 ms (rows returned: 100)
+Iteration 4: 53539.88 ms (rows returned: 100)
+Iteration 5: 54196.78 ms (rows returned: 100)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" ORDER BY fare_amount DESC LIMIT 100",
+  "avg_ms": 53846.53010368347,
+  "min_ms": 53510.48803329468,
+  "max_ms": 54196.778535842896,
+  "all_runs_ms": [
+    54100.68130493164,
+    53510.48803329468,
+    53884.81903076172,
+    53539.883613586426,
+    54196.778535842896
+  ],
+  "rows_returned": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ]
+}
+
+Running OrderByTripDistance...
+Iteration 1: 54123.02 ms (rows returned: 100)
+Iteration 2: 54615.67 ms (rows returned: 100)
+Iteration 3: 54261.92 ms (rows returned: 100)
+Iteration 4: 53612.34 ms (rows returned: 100)
+Iteration 5: 54194.30 ms (rows returned: 100)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" ORDER BY trip_distance_mi DESC LIMIT 100",
+  "avg_ms": 54161.45000457764,
+  "min_ms": 53612.33949661255,
+  "max_ms": 54615.665674209595,
+  "all_runs_ms": [
+    54123.01993370056,
+    54615.665674209595,
+    54261.92402839661,
+    53612.33949661255,
+    54194.30088996887
+  ],
+  "rows_returned": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ]
+}
+Iteration 1: 53885.21 ms (rows returned: 100)
+Iteration 2: 53874.51 ms (rows returned: 100)
+Iteration 3: 53506.34 ms (rows returned: 100)
+Iteration 4: 53779.29 ms (rows returned: 100)
+Iteration 5: 53635.18 ms (rows returned: 100)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT * FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" ORDER BY trip_distance_mi DESC LIMIT 100",
+  "avg_ms": 53736.1065864563,
+  "min_ms": 53506.33525848389,
+  "max_ms": 53885.21337509155,
+  "all_runs_ms": [
+    53885.21337509155,
+    53874.51457977295,
+    53506.33525848389,
+    53779.29162979126,
+    53635.178089141846
+  ],
+  "rows_returned": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ]
+}
+
+Running TotalRowCount...
+Iteration 1: 5569.19 ms (rows returned: 1)
+Iteration 2: 4449.97 ms (rows returned: 1)
+Iteration 3: 4016.96 ms (rows returned: 1)
+Iteration 4: 4170.72 ms (rows returned: 1)
+Iteration 5: 3826.20 ms (rows returned: 1)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT COUNT(*) AS total_trips FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\"",
+  "avg_ms": 4406.608629226685,
+  "min_ms": 3826.195478439331,
+  "max_ms": 5569.1938400268555,
+  "all_runs_ms": [
+    5569.1938400268555,
+    4449.97239112854,
+    4016.963243484497,
+    4170.718193054199,
+    3826.195478439331
+  ],
+  "rows_returned": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
+Iteration 1: 3837.28 ms (rows returned: 1)
+Iteration 2: 3836.22 ms (rows returned: 1)
+Iteration 3: 3894.01 ms (rows returned: 1)
+Iteration 4: 3891.32 ms (rows returned: 1)
+Iteration 5: 3926.83 ms (rows returned: 1)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT COUNT(*) AS total_trips FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\"",
+  "avg_ms": 3877.1294116973877,
+  "min_ms": 3836.2209796905518,
+  "max_ms": 3926.828145980835,
+  "all_runs_ms": [
+    3837.275981903076,
+    3836.2209796905518,
+    3894.005537033081,
+    3891.3164138793945,
+    3926.828145980835
+  ],
+  "rows_returned": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
+
+Running MaxFare...
+Iteration 1: 9391.77 ms (rows returned: 1)
+Iteration 2: 9165.55 ms (rows returned: 1)
+Iteration 3: 9127.03 ms (rows returned: 1)
+Iteration 4: 9082.91 ms (rows returned: 1)
+Iteration 5: 9111.72 ms (rows returned: 1)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT MAX(fare_amount) AS max_fare FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\"",
+  "avg_ms": 9175.795316696167,
+  "min_ms": 9082.907915115356,
+  "max_ms": 9391.76869392395,
+  "all_runs_ms": [
+    9391.76869392395,
+    9165.551900863647,
+    9127.027034759521,
+    9082.907915115356,
+    9111.72103881836
+  ],
+  "rows_returned": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
+Iteration 1: 9277.34 ms (rows returned: 1)
+Iteration 2: 9252.20 ms (rows returned: 1)
+Iteration 3: 9093.64 ms (rows returned: 1)
+Iteration 4: 9075.61 ms (rows returned: 1)
+Iteration 5: 9082.72 ms (rows returned: 1)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT MAX(fare_amount) AS max_fare FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\"",
+  "avg_ms": 9156.304168701172,
+  "min_ms": 9075.613260269165,
+  "max_ms": 9277.344703674316,
+  "all_runs_ms": [
+    9277.344703674316,
+    9252.196550369263,
+    9093.641996383667,
+    9075.613260269165,
+    9082.724332809448
+  ],
+  "rows_returned": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
+
+Running MinFare...
+Iteration 1: 9504.61 ms (rows returned: 1)
+Iteration 2: 9677.66 ms (rows returned: 1)
+Iteration 3: 9393.83 ms (rows returned: 1)
+Iteration 4: 9294.61 ms (rows returned: 1)
+Iteration 5: 9556.50 ms (rows returned: 1)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT MIN(fare_amount) AS min_fare FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\"",
+  "avg_ms": 9485.442781448364,
+  "min_ms": 9294.612646102905,
+  "max_ms": 9677.664518356323,
+  "all_runs_ms": [
+    9504.612684249878,
+    9677.664518356323,
+    9393.826484680176,
+    9294.612646102905,
+    9556.497573852539
+  ],
+  "rows_returned": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
+Iteration 1: 9221.09 ms (rows returned: 1)
+Iteration 2: 9285.73 ms (rows returned: 1)
+Iteration 3: 9213.77 ms (rows returned: 1)
+Iteration 4: 9380.58 ms (rows returned: 1)
+Iteration 5: 9288.95 ms (rows returned: 1)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT MIN(fare_amount) AS min_fare FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\"",
+  "avg_ms": 9278.022623062134,
+  "min_ms": 9213.771343231201,
+  "max_ms": 9380.575180053711,
+  "all_runs_ms": [
+    9221.086978912354,
+    9285.732746124268,
+    9213.771343231201,
+    9380.575180053711,
+    9288.946866989136
+  ],
+  "rows_returned": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
+
+Running MaxTripDistance...
+Iteration 1: 10542.72 ms (rows returned: 1)
+Iteration 2: 10567.05 ms (rows returned: 1)
+Iteration 3: 10554.66 ms (rows returned: 1)
+Iteration 4: 10329.56 ms (rows returned: 1)
+Iteration 5: 10375.75 ms (rows returned: 1)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT MAX(trip_distance_mi) AS max_distance FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\"",
+  "avg_ms": 10473.949575424194,
+  "min_ms": 10329.558372497559,
+  "max_ms": 10567.053079605103,
+  "all_runs_ms": [
+    10542.723655700684,
+    10567.053079605103,
+    10554.66103553772,
+    10329.558372497559,
+    10375.751733779907
+  ],
+  "rows_returned": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
+Iteration 1: 10339.24 ms (rows returned: 1)
+Iteration 2: 10281.62 ms (rows returned: 1)
+Iteration 3: 11202.08 ms (rows returned: 1)
+Iteration 4: 10792.55 ms (rows returned: 1)
+Iteration 5: 10545.28 ms (rows returned: 1)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT MAX(trip_distance_mi) AS max_distance FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\"",
+  "avg_ms": 10632.155895233154,
+  "min_ms": 10281.619787216187,
+  "max_ms": 11202.081203460693,
+  "all_runs_ms": [
+    10339.242935180664,
+    10281.619787216187,
+    11202.081203460693,
+    10792.552709579468,
+    10545.28284072876
+  ],
+  "rows_returned": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ]
+}
+
+Running TripsByYear...
+Iteration 1: 24763.79 ms (rows returned: 2)
+Iteration 2: 24189.83 ms (rows returned: 2)
+Iteration 3: 24179.34 ms (rows returned: 2)
+Iteration 4: 24288.34 ms (rows returned: 2)
+Iteration 5: 24510.13 ms (rows returned: 2)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT EXTRACT(YEAR FROM pickup_datetime) \"year\", COUNT(*) \"trips\" FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY \"year\" ORDER BY \"year\"",
+  "avg_ms": 24386.285734176636,
+  "min_ms": 24179.344177246094,
+  "max_ms": 24763.78583908081,
+  "all_runs_ms": [
+    24763.78583908081,
+    24189.826726913452,
+    24179.344177246094,
+    24288.337230682373,
+    24510.13469696045
+  ],
+  "rows_returned": [
+    2,
+    2,
+    2,
+    2,
+    2
+  ]
+}
+Iteration 1: 24203.49 ms (rows returned: 2)
+Iteration 2: 23960.76 ms (rows returned: 2)
+Iteration 3: 24465.03 ms (rows returned: 2)
+Iteration 4: 24695.98 ms (rows returned: 2)
+Iteration 5: 24106.13 ms (rows returned: 2)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT EXTRACT(YEAR FROM pickup_datetime) \"year\", COUNT(*) \"trips\" FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY \"year\" ORDER BY \"year\"",
+  "avg_ms": 24286.277627944946,
+  "min_ms": 23960.764408111572,
+  "max_ms": 24695.979833602905,
+  "all_runs_ms": [
+    24203.487396240234,
+    23960.764408111572,
+    24465.02923965454,
+    24695.979833602905,
+    24106.12726211548
+  ],
+  "rows_returned": [
+    2,
+    2,
+    2,
+    2,
+    2
+  ]
+}
+
+Running TripsByMonth...
+Iteration 1: 24291.11 ms (rows returned: 12)
+Iteration 2: 24134.81 ms (rows returned: 12)
+Iteration 3: 24545.46 ms (rows returned: 12)
+Iteration 4: 24278.44 ms (rows returned: 12)
+Iteration 5: 24340.06 ms (rows returned: 12)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT EXTRACT(MONTH FROM pickup_datetime) \"month\", COUNT(*) \"trips\" FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY \"month\" ORDER BY \"month\"",
+  "avg_ms": 24317.972707748413,
+  "min_ms": 24134.80544090271,
+  "max_ms": 24545.45521736145,
+  "all_runs_ms": [
+    24291.110515594482,
+    24134.80544090271,
+    24545.45521736145,
+    24278.4366607666,
+    24340.05570411682
+  ],
+  "rows_returned": [
+    12,
+    12,
+    12,
+    12,
+    12
+  ]
+}
+Iteration 1: 24174.38 ms (rows returned: 12)
+Iteration 2: 24303.72 ms (rows returned: 12)
+Iteration 3: 24389.76 ms (rows returned: 12)
+Iteration 4: 24270.72 ms (rows returned: 12)
+Iteration 5: 24196.28 ms (rows returned: 12)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT EXTRACT(MONTH FROM pickup_datetime) \"month\", COUNT(*) \"trips\" FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" GROUP BY \"month\" ORDER BY \"month\"",
+  "avg_ms": 24266.971921920776,
+  "min_ms": 24174.379348754883,
+  "max_ms": 24389.7647857666,
+  "all_runs_ms": [
+    24174.379348754883,
+    24303.71594429016,
+    24389.7647857666,
+    24270.715713500977,
+    24196.28381729126
+  ],
+  "rows_returned": [
+    12,
+    12,
+    12,
+    12,
+    12
+  ]
+}
+
+Running TopFaresRanked...
+Iteration 1: 223123.71 ms (rows returned: 100)
+Iteration 2: 225523.15 ms (rows returned: 100)
+Iteration 3: 229951.83 ms (rows returned: 100)
+Iteration 4: 222796.05 ms (rows returned: 100)
+Iteration 5: 221088.02 ms (rows returned: 100)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT fare_amount, rank_col FROM (SELECT fare_amount, ROW_NUMBER() OVER (ORDER BY fare_amount DESC) AS rank_col FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\") t LIMIT 100",
+  "avg_ms": 224496.55227661133,
+  "min_ms": 221088.01984786987,
+  "max_ms": 229951.82847976685,
+  "all_runs_ms": [
+    223123.71277809143,
+    225523.15068244934,
+    229951.82847976685,
+    222796.04959487915,
+    221088.01984786987
+  ],
+  "rows_returned": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ]
+}
+Iteration 1: 234645.46 ms (rows returned: 100)
+Iteration 2: 224257.77 ms (rows returned: 100)
+Iteration 3: 225608.64 ms (rows returned: 100)
+Iteration 4: 221247.26 ms (rows returned: 100)
+Iteration 5: 218252.25 ms (rows returned: 100)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT fare_amount, rank_col FROM (SELECT fare_amount, ROW_NUMBER() OVER (ORDER BY fare_amount DESC) AS rank_col FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\") t LIMIT 100",
+  "avg_ms": 224802.27527618408,
+  "min_ms": 218252.2463798523,
+  "max_ms": 234645.4563140869,
+  "all_runs_ms": [
+    234645.4563140869,
+    224257.76839256287,
+    225608.64353179932,
+    221247.26176261902,
+    218252.2463798523
+  ],
+  "rows_returned": [
+    100,
+    100,
+    100,
+    100,
+    100
+  ]
+}
+
+Running AvgFareByPassengerWindow...
+Iteration 1: 193259.05 ms (rows returned: 500)
+Iteration 2: 192692.28 ms (rows returned: 500)
+Iteration 3: 194490.74 ms (rows returned: 500)
+Iteration 4: 191565.32 ms (rows returned: 500)
+Iteration 5: 191919.91 ms (rows returned: 500)
+{
+  "driver": "Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT passenger_count, AVG(fare_amount) OVER (PARTITION BY passenger_count) AS avg_fare FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 500",
+  "avg_ms": 192785.4600906372,
+  "min_ms": 191565.31715393066,
+  "max_ms": 194490.74482917786,
+  "all_runs_ms": [
+    193259.05179977417,
+    192692.2812461853,
+    194490.74482917786,
+    191565.31715393066,
+    191919.90542411804
+  ],
+  "rows_returned": [
+    500,
+    500,
+    500,
+    500,
+    500
+  ]
+}
+Iteration 1: 193995.94 ms (rows returned: 500)
+Iteration 2: 191825.51 ms (rows returned: 500)
+Iteration 3: 192794.67 ms (rows returned: 500)
+Iteration 4: 192621.31 ms (rows returned: 500)
+Iteration 5: 192819.00 ms (rows returned: 500)
+{
+  "driver": "Apache Arrow Flight SQL ODBC Driver",
+  "schema": "Samples.samples.dremio.com",
+  "table": "NYC-taxi-trips-iceberg",
+  "iterations": 5,
+  "query": "SELECT passenger_count, AVG(fare_amount) OVER (PARTITION BY passenger_count) AS avg_fare FROM \"Samples.samples.dremio.com\".\"NYC-taxi-trips-iceberg\" LIMIT 500",
+  "avg_ms": 192811.2874031067,
+  "min_ms": 191825.510263443,
+  "max_ms": 193995.94283103943,
+  "all_runs_ms": [
+    193995.94283103943,
+    191825.510263443,
+    192794.67058181763,
+    192621.31428718567,
+    192818.99905204773
+  ],
+  "rows_returned": [
+    500,
+    500,
+    500,
+    500,
+    500
+  ]
+}
+
+Results written to compare_20_queries.csv
+Plot saved to results_20_queries.png
+PS C:\Users\Administrator\GitHub\arrow\cpp\src\arrow\flight\sql\odbc\performance_tests>
