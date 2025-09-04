@@ -766,10 +766,12 @@ bool NeedArrayConversion(arrow::Type::type original_type_id,
       return data_type != odbcabstraction::CDataType_BINARY;
     case arrow::Type::DECIMAL128:
       return data_type != odbcabstraction::CDataType_NUMERIC;
+    case arrow::Type::DURATION:
     case arrow::Type::LIST:
     case arrow::Type::LARGE_LIST:
     case arrow::Type::FIXED_SIZE_LIST:
     case arrow::Type::MAP:
+    case arrow::Type::STRING_VIEW:
     case arrow::Type::STRUCT:
       return data_type == odbcabstraction::CDataType_CHAR ||
              data_type == odbcabstraction::CDataType_WCHAR;
