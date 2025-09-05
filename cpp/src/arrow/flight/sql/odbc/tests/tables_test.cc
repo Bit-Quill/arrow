@@ -579,7 +579,8 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeCol) {
   this->connect();
 
   SQLWCHAR columnName[1024];
-  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLSMALLINT bufCharLen =
+      static_cast<SQLSMALLINT>(sizeof(columnName) / ODBC::GetSqlWCharSize());
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;
@@ -630,7 +631,8 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeColODBC2) {
   this->connect(SQL_OV_ODBC2);
 
   SQLWCHAR columnName[1024];
-  SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
+  SQLSMALLINT bufCharLen =
+      static_cast<SQLSMALLINT>(sizeof(columnName) / ODBC::GetSqlWCharSize());
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT columnDataType = 0;
   SQLULEN columnSize = 0;
