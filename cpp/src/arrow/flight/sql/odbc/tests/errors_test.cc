@@ -90,9 +90,12 @@ TYPED_TEST(ErrorsHandleTest, TestSQLGetDiagFieldWForConnectFailure) {
   SQLWCHAR message_text[kOdbcBufferSize];
   SQLSMALLINT message_text_length;
 
-  EXPECT_EQ(SQL_SUCCESS,
-            SQLGetDiagField(SQL_HANDLE_DBC, this->conn, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
-                            message_text, kOdbcBufferSize, &message_text_length));
+  SQLRETURN ret =
+      SQLGetDiagField(SQL_HANDLE_DBC, this->conn, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
+                      message_text, kOdbcBufferSize, &message_text_length);
+
+  // dependent on the size of the message it could output SQL_SUCCESS_WITH_INFO
+  EXPECT_TRUE(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO);
 
   EXPECT_GT(message_text_length, 100);
 
@@ -304,10 +307,10 @@ TYPED_TEST(ErrorsTest, TestSQLGetDiagRecInputData) {
   EXPECT_EQ(SQL_NO_DATA, SQLGetDiagRec(SQL_HANDLE_DBC, this->conn, 1, 0, 0, 0, 0, 0));
 
   // Invalid handle
-  EXPECT_EQ(SQL_INVALID_HANDLE, SQLGetDiagRec(0, 0, 0, 0, 0, 0, 0, 0));
+  EXPECT_EQ(SQL_INVALID_HANDLE, SQLGetDiagRec(0, this->conn, 1, 0, 0, 0, 0, 0));
 }
 
-TYPED_TEST(ErrorsTest, TestSQLErrorInputData) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorInputData) {
   // Test ODBC 2.0 API SQLError. Driver manager maps SQLError to SQLGetDiagRec.
   // SQLError does not post diagnostic records for itself.
 
@@ -316,7 +319,7 @@ TYPED_TEST(ErrorsTest, TestSQLErrorInputData) {
 
   EXPECT_EQ(SQL_NO_DATA, SQLError(0, this->conn, 0, 0, 0, 0, 0, 0));
 
-  EXPECT_EQ(SQL_NO_DATA, SQLError(0, 0, this->stmt, 0, 0, 0, 0, 0));
+  EXPECT_EQ(SQL_NO_DATA, SQLError(SQL_NULL_HENV, this->conn, this->stmt, 0, 0, 0, 0, 0));
 
   // Invalid handle
   EXPECT_EQ(SQL_INVALID_HANDLE, SQLError(0, 0, 0, 0, 0, 0, 0, 0));
@@ -391,8 +394,10 @@ TYPED_TEST(ErrorsTest, TestSQLErrorStmtError) {
   SQLINTEGER native_error = 0;
   SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
   SQLSMALLINT message_length = 0;
-  ASSERT_EQ(SQL_SUCCESS, SQLError(0, 0, this->stmt, sql_state, &native_error, message,
-                                  SQL_MAX_MESSAGE_LENGTH, &message_length));
+  SQLRETURN ret = SQLError(0, this->conn, this->stmt, sql_state, &native_error, message,
+                           SQL_MAX_MESSAGE_LENGTH, &message_length);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO);
 
   EXPECT_GT(message_length, 70);
 
@@ -426,8 +431,9 @@ TYPED_TEST(ErrorsTest, TestSQLErrorStmtWarning) {
   SQLINTEGER native_error = 0;
   SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
   SQLSMALLINT message_length = 0;
-  ASSERT_EQ(SQL_SUCCESS, SQLError(0, 0, this->stmt, sql_state, &native_error, message,
-                                  SQL_MAX_MESSAGE_LENGTH, &message_length));
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLError(SQL_NULL_HENV, this->conn, this->stmt, sql_state, &native_error,
+                     message, SQL_MAX_MESSAGE_LENGTH, &message_length));
 
   EXPECT_GT(message_length, 50);
 
@@ -508,8 +514,8 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtError) {
   SQLINTEGER native_error = 0;
   SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
   SQLSMALLINT message_length = 0;
-  ASSERT_EQ(SQL_SUCCESS, SQLError(0, 0, this->stmt, sql_state, &native_error, message,
-                                  SQL_MAX_MESSAGE_LENGTH, &message_length));
+  ASSERT_EQ(SQL_SUCCESS, SQLError(0, this->conn, this->stmt, sql_state, &native_error,
+                                  message, SQL_MAX_MESSAGE_LENGTH, &message_length));
 
   EXPECT_GT(message_length, 70);
 
@@ -544,8 +550,8 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtWarning) {
   SQLINTEGER native_error = 0;
   SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
   SQLSMALLINT message_length = 0;
-  ASSERT_EQ(SQL_SUCCESS, SQLError(0, 0, this->stmt, sql_state, &native_error, message,
-                                  SQL_MAX_MESSAGE_LENGTH, &message_length));
+  ASSERT_EQ(SQL_SUCCESS, SQLError(0, this->conn, this->stmt, sql_state, &native_error,
+                                  message, SQL_MAX_MESSAGE_LENGTH, &message_length));
 
   EXPECT_GT(message_length, 50);
 

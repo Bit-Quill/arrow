@@ -436,13 +436,16 @@ TEST_F(ConnectionRemoteTest, TestSQLConnectDSNPrecedence) {
 
 TEST_F(ConnectionRemoteTest, TestSQLDriverConnectInvalidUid) {
   // Invalid connect string
-  std::string connect_str = GetInvalidConnectionString();
+  std::string connect_str =
+      "driver={Apache Arrow Flight SQL ODBC Driver};"
+      "Host=localhost;Port=32010;PWD=12345678;UID=random_user;"
+      "useEncryption=false;UseWideChar=true";
 
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
 
-  SQLWCHAR out_str[kOdbcBufferSize];
+  SQLWCHAR out_str[kOdbcBufferSize] = {0};
   SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
