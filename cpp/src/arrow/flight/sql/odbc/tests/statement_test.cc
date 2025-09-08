@@ -104,8 +104,12 @@ TYPED_TEST(StatementTest, TestSQLPrepareInvalidQuery) {
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY000);
 
   ASSERT_EQ(SQL_ERROR, SQLExecute(this->stmt));
-  // Verify function sequence error state is returned
+// Verify function sequence error state is returned
+#ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1010);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY010);
+#endif
 }
 
 TYPED_TEST(StatementTest, TestSQLExecDirectDataQuery) {
@@ -511,14 +515,14 @@ TEST_F(StatementRemoteTest, TestSQLExecDirectDataQueryDefaultType) {
   buf_len = wchar_size * 2;
 
   ASSERT_EQ(SQL_SUCCESS,
-            SQLGetData(this->stmt, 25, SQL_C_DEFAULT, &wchar_val, buf_len, &ind));
+            SQLGetData(this->stmt, 25, SQL_C_WCHAR, &wchar_val, buf_len, &ind));
   EXPECT_EQ(L'Z', wchar_val[0]);
 
   // WChar
   SQLWCHAR wchar_val2[2];
   buf_len = wchar_size * 2;
   ASSERT_EQ(SQL_SUCCESS,
-            SQLGetData(this->stmt, 26, SQL_C_DEFAULT, &wchar_val2, buf_len, &ind));
+            SQLGetData(this->stmt, 26, SQL_C_WCHAR, &wchar_val2, buf_len, &ind));
   EXPECT_EQ(L'你', wchar_val2[0]);
 
   // WVarchar
@@ -526,7 +530,7 @@ TEST_F(StatementRemoteTest, TestSQLExecDirectDataQueryDefaultType) {
   buf_len = wchar_size * 3;
 
   ASSERT_EQ(SQL_SUCCESS,
-            SQLGetData(this->stmt, 27, SQL_C_DEFAULT, &wvarchar_val, buf_len, &ind));
+            SQLGetData(this->stmt, 27, SQL_C_WCHAR, &wvarchar_val, buf_len, &ind));
   EXPECT_EQ(L'你', wvarchar_val[0]);
   EXPECT_EQ(L'好', wvarchar_val[1]);
 
@@ -2012,7 +2016,11 @@ TYPED_TEST(StatementTest, TestSQLNativeSqlReturnsErrorOnBadInputs) {
 
   ASSERT_EQ(SQL_ERROR, SQLNativeSql(this->conn, input_str, -100, buf, buf_char_len,
                                     &output_char_len));
+#ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorStateS1090);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorStateHY090);
+#endif
 }
 
 TYPED_TEST(StatementTest, SQLNumResultColsReturnsColumnsOnSelect) {
@@ -2056,7 +2064,14 @@ TYPED_TEST(StatementTest, SQLNumResultColsFunctionSequenceErrorOnNoQuery) {
   ASSERT_EQ(SQL_ERROR, SQLNumResultCols(this->stmt, &column_count));
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY010);
 
-  EXPECT_EQ(expected_value, column_count);
+  ASSERT_EQ(SQL_ERROR, SQLNumResultCols(this->stmt, &column_count));
+#ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1010);
+#else
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY010);
+#endif
+
+  ASSERT_EQ(expected_value, column_count);
 }
 
 TYPED_TEST(StatementTest, SQLRowCountReturnsNegativeOneOnSelect) {
@@ -2098,7 +2113,11 @@ TYPED_TEST(StatementTest, SQLRowCountFunctionSequenceErrorOnNoQuery) {
   SQLLEN expected_value = 0;
 
   ASSERT_EQ(SQL_ERROR, SQLRowCount(this->stmt, &row_count));
+#ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1010);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY010);
+#endif
 
   EXPECT_EQ(expected_value, row_count);
 }

@@ -63,6 +63,8 @@ void GetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLPOINTER* value) {
             SQLGetStmtAttr(statement, attribute, value, SQL_IS_POINTER, &string_length));
 }
 
+#if defined(SQL_ATTR_ASYNC_STMT_EVENT) || defined(SQL_ATTR_ASYNC_STMT_PCALLBACK) || \
+    defined(SQL_ATTR_ASYNC_STMT_PCONTEXT)
 // Validate error return value and code
 void ValidateGetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
                                   std::string_view error_code) {
@@ -74,6 +76,7 @@ void ValidateGetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
 
   VerifyOdbcErrorState(SQL_HANDLE_STMT, statement, error_code);
 }
+#endif
 
 // Validate return value for call to SQLSetStmtAttr with SQLULEN
 void ValidateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLULEN new_value) {
@@ -383,7 +386,7 @@ TYPED_TEST(StatementAttributeTest, TestSQLGetStmtAttrRowsetSize) {
   EXPECT_EQ(static_cast<SQLULEN>(1), value);
 }
 
-TYPED_TEST(StatementAttributeTest, TestSQLSetStmtAttrAppParamDesc) {
+TYPED_TEST(StatementAttributeTest, TestSQLSetStmtAttrAppParamDescSegFault) {
   SQLULEN app_param_desc = 0;
   SQLINTEGER string_length_ptr;
 
@@ -396,7 +399,7 @@ TYPED_TEST(StatementAttributeTest, TestSQLSetStmtAttrAppParamDesc) {
                       static_cast<SQLULEN>(app_param_desc));
 }
 
-TYPED_TEST(StatementAttributeTest, TestSQLSetStmtAttrAppRowDesc) {
+TYPED_TEST(StatementAttributeTest, TestSQLSetStmtAttrAppRowDescSegFault) {
   SQLULEN app_row_desc = 0;
   SQLINTEGER string_length_ptr;
 
