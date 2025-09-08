@@ -485,7 +485,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowsetSize) {
   this->disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAppParamDesc) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAppParamDescSegFault) {
   SQLULEN app_param_desc = 0;
   SQLINTEGER stringLengthPtr;
   this->connect();
@@ -503,7 +503,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAppParamDesc) {
   this->disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAppRowDesc) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAppRowDescSegFault) {
   SQLULEN app_row_desc = 0;
   SQLINTEGER stringLengthPtr;
   this->connect();

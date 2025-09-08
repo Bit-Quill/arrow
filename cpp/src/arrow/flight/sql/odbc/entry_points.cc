@@ -297,3 +297,12 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementHandle, SQLUSMALLINT columnNu
                                nameLengthPtr, dataTypePtr, columnSizePtr,
                                decimalDigitsPtr, nullablePtr);
 }
+
+SQLRETURN SQL_API SQLGetConnectOption (
+    SQLHDBC		  ConnectionHandle,
+    SQLUSMALLINT	  Option,
+    SQLPOINTER		  Value) {
+  
+    //TODO implement ODBC2 APIs
+    return SQL_ERROR;
+}
