@@ -1655,7 +1655,7 @@ TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoDateODBCVer2) {
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 }
 
-TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTypeDateODBCVer2) {
+TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTypeDate) {
   // Pass ODBC Ver 3 data type
   ASSERT_EQ(SQL_ERROR, SQLGetTypeInfo(this->stmt, SQL_TYPE_DATE));
 
@@ -1763,7 +1763,7 @@ TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoTimeODBCVer2) {
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 }
 
-TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTypeTimeODBCVer2) {
+TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTypeTime) {
   // Pass ODBC Ver 3 data type
   ASSERT_EQ(SQL_ERROR, SQLGetTypeInfo(this->stmt, SQL_TYPE_TIME));
 
@@ -1871,7 +1871,7 @@ TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTimestampODBCVer2) {
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 }
 
-TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTypeTimestampODBCVer2) {
+TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTypeTimestamp) {
   // Pass ODBC Ver 3 data type
   ASSERT_EQ(SQL_ERROR, SQLGetTypeInfo(this->stmt, SQL_TYPE_TIMESTAMP));
 

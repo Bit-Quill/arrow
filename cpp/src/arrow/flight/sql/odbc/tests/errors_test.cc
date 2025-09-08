@@ -90,9 +90,12 @@ TYPED_TEST(ErrorsHandleTest, TestSQLGetDiagFieldWForConnectFailure) {
   SQLWCHAR message_text[kOdbcBufferSize];
   SQLSMALLINT message_text_length;
 
-  EXPECT_EQ(SQL_SUCCESS,
-            SQLGetDiagField(SQL_HANDLE_DBC, this->conn, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
-                            message_text, kOdbcBufferSize, &message_text_length));
+  SQLRETURN ret =
+      SQLGetDiagField(SQL_HANDLE_DBC, this->conn, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
+                      message_text, kOdbcBufferSize, &message_text_length);
+  EXPECT_TRUE(ret == SQL_SUCCESS ||
+              ret == SQL_SUCCESS_WITH_INFO);  // dependent on the size of the message it
+                                              // could output SQL_SUCCESS_WITH_INFO
 
   EXPECT_GT(message_text_length, 100);
 
@@ -307,7 +310,7 @@ TYPED_TEST(ErrorsTest, TestSQLGetDiagRecInputData) {
   EXPECT_EQ(SQL_INVALID_HANDLE, SQLGetDiagRec(0, 0, 0, 0, 0, 0, 0, 0));
 }
 
-TYPED_TEST(ErrorsTest, TestSQLErrorInputData) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorInputData) {
   // Test ODBC 2.0 API SQLError. Driver manager maps SQLError to SQLGetDiagRec.
   // SQLError does not post diagnostic records for itself.
 
@@ -317,6 +320,8 @@ TYPED_TEST(ErrorsTest, TestSQLErrorInputData) {
   EXPECT_EQ(SQL_NO_DATA, SQLError(0, this->conn, 0, 0, 0, 0, 0, 0));
 
   EXPECT_EQ(SQL_NO_DATA, SQLError(0, 0, this->stmt, 0, 0, 0, 0, 0));
+
+  EXPECT_EQ(SQL_NO_DATA, SQLError(SQL_NULL_HENV, this->conn, this->stmt, 0, 0, 0, 0, 0));
 
   // Invalid handle
   EXPECT_EQ(SQL_INVALID_HANDLE, SQLError(0, 0, 0, 0, 0, 0, 0, 0));
@@ -426,8 +431,8 @@ TYPED_TEST(ErrorsTest, TestSQLErrorStmtWarning) {
   SQLINTEGER native_error = 0;
   SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
   SQLSMALLINT message_length = 0;
-  ASSERT_EQ(SQL_SUCCESS, SQLError(0, 0, this->stmt, sql_state, &native_error, message,
-                                  SQL_MAX_MESSAGE_LENGTH, &message_length));
+  EXPECT_EQ(SQL_SUCCESS, SQLError(0, this->conn, this->stmt, sql_state, &native_error,
+                                  message, SQL_MAX_MESSAGE_LENGTH, &message_length));
 
   EXPECT_GT(message_length, 50);
 
@@ -466,7 +471,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorEnvErrorODBCVer2FromDriverManager) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnErrorODBCVer2) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnError) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -492,7 +497,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnErrorODBCVer2) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtErrorODBCVer2) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtError) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -521,9 +526,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtErrorODBCVer2) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtWarningODBCVer2) {
-  // Test ODBC 2.0 API SQLError.
-
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtWarning) {
   std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
