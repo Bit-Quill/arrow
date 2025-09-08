@@ -105,7 +105,11 @@ TYPED_TEST(StatementTest, TestSQLPrepareInvalidQuery) {
 
   ASSERT_EQ(SQL_ERROR, SQLExecute(this->stmt));
   // Verify function sequence error state is returned
+#ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1010);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY010);
+#endif // __APPLE__
 }
 
 TYPED_TEST(StatementTest, TestSQLExecDirectDataQuery) {
@@ -2012,7 +2016,11 @@ TYPED_TEST(StatementTest, TestSQLNativeSqlReturnsErrorOnBadInputs) {
 
   ASSERT_EQ(SQL_ERROR, SQLNativeSql(this->conn, input_str, -100, buf, buf_char_len,
                                     &output_char_len));
+#ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorStateS1090);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorStateHY090);
+#endif // __APPLE__
 }
 
 TYPED_TEST(StatementTest, SQLNumResultColsReturnsColumnsOnSelect) {
@@ -2056,7 +2064,14 @@ TYPED_TEST(StatementTest, SQLNumResultColsFunctionSequenceErrorOnNoQuery) {
   ASSERT_EQ(SQL_ERROR, SQLNumResultCols(this->stmt, &column_count));
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY010);
 
-  EXPECT_EQ(expected_value, column_count);
+  ASSERT_EQ(SQL_ERROR, SQLNumResultCols(this->stmt, &column_count));
+#ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1010);
+#else
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY010);
+#endif // __APPLE__
+
+  ASSERT_EQ(expected_value, column_count);
 }
 
 TYPED_TEST(StatementTest, SQLRowCountReturnsNegativeOneOnSelect) {
@@ -2098,7 +2113,11 @@ TYPED_TEST(StatementTest, SQLRowCountFunctionSequenceErrorOnNoQuery) {
   SQLLEN expected_value = 0;
 
   ASSERT_EQ(SQL_ERROR, SQLRowCount(this->stmt, &row_count));
+#ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1010);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY010);
+#endif // __APPLE__
 
   EXPECT_EQ(expected_value, row_count);
 }
