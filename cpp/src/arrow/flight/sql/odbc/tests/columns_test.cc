@@ -398,7 +398,7 @@ TYPED_TEST(ColumnsTest, SQLColumnsTestInputData) {
   ValidateFetch(this->stmt, SQL_SUCCESS);
 }
 
-TEST_F(ColumnsMockTest, TestSQLColumnsAllColumns) {
+TEST_F(ColumnsMockTest, TestSQLColumnsAllColumnsSegFault) {
   // Check table pattern and column pattern returns all columns
 
   // Attempt to get all columns
@@ -1101,7 +1101,7 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColumnsAllTypes) {
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 }
 
-TEST_F(ColumnsMockTest, TestSQLColumnscolumn_pattern) {
+TEST_F(ColumnsMockTest, TestSQLColumnsColumnPatternSegFault) {
   // Checks filtering table with column name pattern.
   // Only check table and column name
 
@@ -2167,7 +2167,7 @@ TYPED_TEST(ColumnsOdbcV2Test, TestSQLColAttributesUpdatable) {
   ASSERT_EQ(SQL_ATTR_READWRITE_UNKNOWN, value);
 }
 
-TEST_F(ColumnsMockTest, SQLDescribeColValidateInput) {
+TEST_F(ColumnsMockTest, TestSQLDescribeColValidateInput) {
   this->CreateTestTables();
 
   SQLWCHAR sql_query[] = L"SELECT * FROM TestTable LIMIT 1;";
@@ -2176,7 +2176,7 @@ TEST_F(ColumnsMockTest, SQLDescribeColValidateInput) {
   SQLUSMALLINT bookmark_column = 0;
   SQLUSMALLINT out_of_range_column = 4;
   SQLUSMALLINT negative_column = -1;
-  SQLWCHAR column_name[1024];
+  SQLWCHAR column_name[1024] = {0};
   SQLSMALLINT buf_char_len =
       static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
@@ -2193,7 +2193,12 @@ TEST_F(ColumnsMockTest, SQLDescribeColValidateInput) {
   EXPECT_EQ(SQL_ERROR, SQLDescribeCol(this->stmt, bookmark_column, column_name,
                                       buf_char_len, &name_length, &data_type,
                                       &column_size, &decimal_digits, &nullable));
+#ifdef __APPLE__
+  // non-standard odbc error code for invalid column index
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1002);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorState07009);
+#endif
 
   // Invalid descriptor index - index out of range
   EXPECT_EQ(SQL_ERROR, SQLDescribeCol(this->stmt, out_of_range_column, column_name,
