@@ -1101,7 +1101,7 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColumnsAllTypes) {
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 }
 
-TEST_F(ColumnsMockTest, TestSQLColumnscolumn_pattern) {
+TEST_F(ColumnsMockTest, TestSQLColumnsColumnPattern) {
   // Checks filtering table with column name pattern.
   // Only check table and column name
 
@@ -2143,6 +2143,23 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesTypeName) {
   ASSERT_EQ(std::wstring(L"TIMESTAMP"), value);
 }
 
+TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesTypeNameMock) {
+  this->CreateTableAllDataType();
+
+  std::wstring wsql = L"SELECT * from AllTypesTable;";
+  std::wstring value;
+  // Mock server doesn't return data source-dependent data type name
+  GetSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TYPE_NAME, value);
+  ASSERT_EQ(std::wstring(L""), value);
+}
+
+TYPED_TEST(ColumnsOdbcV2Test, TestSQLColAttributesTypeName) {
+  std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
+  std::wstring value;
+  GetSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TYPE_NAME, value);
+  ASSERT_EQ(std::wstring(L"INTEGER"), value);
+}
+
 TYPED_TEST(ColumnsTest, TestSQLColAttributeUnnamed) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   SQLLEN value;
@@ -2193,19 +2210,35 @@ TEST_F(ColumnsMockTest, SQLDescribeColValidateInput) {
   EXPECT_EQ(SQL_ERROR, SQLDescribeCol(this->stmt, bookmark_column, column_name,
                                       buf_char_len, &name_length, &data_type,
                                       &column_size, &decimal_digits, &nullable));
+
+#ifdef __APPLE__
+  // non-standard odbc error code for invalid column index
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1002);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorState07009);
+#endif
 
   // Invalid descriptor index - index out of range
   EXPECT_EQ(SQL_ERROR, SQLDescribeCol(this->stmt, out_of_range_column, column_name,
                                       buf_char_len, &name_length, &data_type,
                                       &column_size, &decimal_digits, &nullable));
+#ifdef __APPLE__
+  // non-standard odbc error code for invalid column index
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1002);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorState07009);
+#endif
 
   // Invalid descriptor index - index out of range
   EXPECT_EQ(SQL_ERROR, SQLDescribeCol(this->stmt, negative_column, column_name,
                                       buf_char_len, &name_length, &data_type,
                                       &column_size, &decimal_digits, &nullable));
+#ifdef __APPLE__
+  // non-standard odbc error code for invalid column index
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1002);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorState07009);
+#endif
 }
 
 TEST_F(ColumnsMockTest, SQLDescribeColQueryAllDataTypesMetadata) {
