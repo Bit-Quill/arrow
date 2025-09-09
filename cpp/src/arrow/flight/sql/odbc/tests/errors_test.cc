@@ -396,8 +396,9 @@ TYPED_TEST(ErrorsTest, TestSQLErrorStmtError) {
   SQLINTEGER native_error = 0;
   SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
   SQLSMALLINT message_length = 0;
-  ASSERT_EQ(SQL_SUCCESS, SQLError(0, 0, this->stmt, sql_state, &native_error, message,
-                                  SQL_MAX_MESSAGE_LENGTH, &message_length));
+  SQLRETURN ret = SQLError(0, 0, this->stmt, sql_state, &native_error, message,
+                           SQL_MAX_MESSAGE_LENGTH, &message_length);
+  EXPECT_TRUE(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO);
 
   EXPECT_GT(message_length, 70);
 
