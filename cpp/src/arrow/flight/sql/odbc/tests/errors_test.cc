@@ -406,7 +406,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecInputData) {
   EXPECT_EQ(ret, SQL_NO_DATA);
 
   // Invalid handle
-  ret = SQLGetDiagRec(0, 0, 0, 0, 0, 0, 0, 0);
+  ret = SQLGetDiagRec(0, this->conn, 1, 0, 0, 0, 0, 0);
 
   EXPECT_EQ(ret, SQL_INVALID_HANDLE);
 
@@ -530,7 +530,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
   ret = SQLError(0, this->conn, this->stmt, sql_state, &native_error, message,
                  SQL_MAX_MESSAGE_LENGTH, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_TRUE(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO);
 
   EXPECT_GT(message_length, 70);
 

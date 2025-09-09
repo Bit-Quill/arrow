@@ -762,7 +762,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Invalid connect string
-  std::string connect_str = getInvalidConnectionString();
+  std::string connect_str = "driver={Apache Arrow Flight SQL ODBC Driver};Host=localhost;Port=32010;PWD=12345678;UID=vic-tsang1;useEncryption=false;UseWideChar=true";
 
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
