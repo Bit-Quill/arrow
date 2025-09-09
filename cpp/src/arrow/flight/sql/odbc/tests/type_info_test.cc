@@ -1327,7 +1327,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarbinary) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarchar) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarcharSegFault) {
   this->connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_WLONGVARCHAR);
@@ -1624,7 +1624,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDouble) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarchar) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarcharSegFault) {
   this->connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_WVARCHAR);
@@ -1786,6 +1786,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDateODBCVer2) {
   this->disconnect();
 }
 
+// Hangs
 TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDateODBCVer2) {
   this->connect(SQL_OV_ODBC2);
 
@@ -1920,7 +1921,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimeODBCVer2) {
 
   this->disconnect();
 }
-
+//Hangs
 TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimeODBCVer2) {
   this->connect(SQL_OV_ODBC2);
 
@@ -1974,8 +1975,8 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestamp) {
 
   this->disconnect();
 }
-
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestamp) {
+// using ODBC2 type
+TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampODBC2) {
   this->connect();
 
   // Pass ODBC Ver 2 data type
@@ -2055,7 +2056,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampODBCVer2) {
 
   this->disconnect();
 }
-
+// Hangs
 TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestampODBCVer2) {
   this->connect(SQL_OV_ODBC2);
 

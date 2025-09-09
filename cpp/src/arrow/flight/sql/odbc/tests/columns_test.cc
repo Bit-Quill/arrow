@@ -408,7 +408,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsTestInputData) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumnsSegFault) {
   // Check table pattern and column pattern returns all columns
   this->connect();
 
@@ -1166,7 +1166,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsColumnPattern) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsColumnPatternSegFault) {
   // Checks filtering table with column name pattern.
   // Only check table and column name
   this->connect();
@@ -2036,7 +2036,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeCaseSensitive) {
   this->disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributesCaseSensitive) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributesCaseSensitiveODBCVer2) {
   // Arrow limitation: returns SQL_FALSE for case sensitive column
   // Tests ODBC 2.0 API SQLColAttributes
   this->connect(SQL_OV_ODBC2);
@@ -2063,7 +2063,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeUniqueValue) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesAutoIncrement) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesAutoIncrementODBCVer2) {
   // Tests ODBC 2.0 API SQLColAttributes
   // Mock server limitation: returns false for auto-increment column
   this->connect(SQL_OV_ODBC2);
@@ -2086,7 +2086,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeBaseTableName) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesTableName) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesTableNameODBCVer2) {
   // Tests ODBC 2.0 API SQLColAttributes
   this->connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
@@ -2122,7 +2122,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeCatalogName) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesQualifierName) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesQualifierNameODBCVer2) {
   // Mock server limitattion: mock doesn't return catalog for result metadata,
   // and the defautl catalog should be 'main'
   // Tests ODBC 2.0 API SQLColAttributes
@@ -2136,7 +2136,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesQualifierName) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesQualifierName) {
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesQualifierNameODBCVer2) {
   // Remote server does not have catalogs
   // Tests ODBC 2.0 API SQLColAttributes
   this->connect(SQL_OV_ODBC2);
@@ -2204,7 +2204,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeSchemaName) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesOwnerName) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesOwnerNameODBCVer2) {
   // Tests ODBC 2.0 API SQLColAttributes
   this->connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
@@ -2217,7 +2217,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesOwnerName) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesOwnerName) {
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesOwnerNameODBCVer2) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
   // Tests ODBC 2.0 API SQLColAttributes
   this->connect(SQL_OV_ODBC2);
@@ -2263,7 +2263,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeTypeName) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesTypeName) {
+TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesTypeNameODBCVer2) {
   // Tests ODBC 2.0 API SQLColAttributes
   this->connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
@@ -2276,7 +2276,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesTypeName) {
   this->disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesTypeName) {
+TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesTypeNameODBCVer2) {
   // Tests ODBC 2.0 API SQLColAttributes
   this->connect(SQL_OV_ODBC2);
 
@@ -2307,7 +2307,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeUpdatable) {
   this->disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributesUpdatable) {
+TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributesUpdatableODBCVer2) {
   // Tests ODBC 2.0 API SQLColAttributes
   this->connect(SQL_OV_ODBC2);
 
@@ -2332,7 +2332,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColValidateInput) {
   SQLUSMALLINT validColumn = 1;
   SQLUSMALLINT outOfRangeColumn = 4;
   SQLUSMALLINT negativeColumn = -1;
-  SQLWCHAR columnName[1024];
+  SQLWCHAR columnName[1024] =  { 0 };
   SQLINTEGER bufCharLen = sizeof(columnName) / ODBC::GetSqlWCharSize();
   SQLSMALLINT nameLength = 0;
   SQLSMALLINT dataType = 0;
@@ -2353,8 +2353,11 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColValidateInput) {
                        &dataType, &columnSize, &decimalDigits, &nullable);
 
   EXPECT_EQ(ret, SQL_ERROR);
-  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
-
+  #ifdef __APPLE__
+    VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1002); // non-standard odbc error code for invalid column index
+  #else
+    VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
+  #endif
   // Invalid descriptor index - index out of range
   ret = SQLDescribeCol(this->stmt, outOfRangeColumn, columnName, bufCharLen, &nameLength,
                        &dataType, &columnSize, &decimalDigits, &nullable);

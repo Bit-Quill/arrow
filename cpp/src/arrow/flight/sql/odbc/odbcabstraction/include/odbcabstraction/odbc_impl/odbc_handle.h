@@ -47,7 +47,16 @@ class ODBCHandle {
     try {
       GetDiagnostics().Clear();
       rc = function();
-    } catch (const driver::odbcabstraction::DriverException& ex) {
+    }
+    catch (const driver::odbcabstraction::AuthenticationException& ex) {
+      GetDiagnostics().AddError(driver::odbcabstraction::DriverException(ex.GetMessageText(), ex.GetSqlState(), ex.GetNativeError()));
+    }
+    catch (const driver::odbcabstraction::NullWithoutIndicatorException& ex) {
+      GetDiagnostics().AddError(driver::odbcabstraction::DriverException(ex.GetMessageText(), ex.GetSqlState(), ex.GetNativeError()));
+    }
+    // on the mac, DriverException doesn't catch the subclass exceptions hence we added the following above
+    // TODO investigate if there is a way to catch all the subclass exceptions under DriverException
+    catch (const driver::odbcabstraction::DriverException& ex) {
       GetDiagnostics().AddError(ex);
     } catch (const std::bad_alloc&) {
       GetDiagnostics().AddError(driver::odbcabstraction::DriverException(

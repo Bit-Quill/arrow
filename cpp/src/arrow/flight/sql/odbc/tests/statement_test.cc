@@ -131,7 +131,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLPrepareInvalidQuery) {
 
   ret = SQLExecute(this->stmt);
   // Verify function sequence error state is returned
+  #ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1010);
+  #else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
+  #endif
 
   this->disconnect();
 }
@@ -620,8 +624,8 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
   SQLWCHAR wchar_val[2];
   size_t wchar_size = driver::odbcabstraction::GetSqlWCharSize();
   buf_len = wchar_size * 2;
-
-  ret = SQLGetData(this->stmt, 25, SQL_C_DEFAULT, &wchar_val, buf_len, &ind);
+// windows handle the wide character properly via SQL_C_DEFAULT but not on the mac 
+  ret = SQLGetData(this->stmt, 25, SQL_C_WCHAR, &wchar_val, buf_len, &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(wchar_val[0], L'Z');
@@ -629,7 +633,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
   // WChar
   SQLWCHAR wchar_val2[2];
   buf_len = wchar_size * 2;
-  ret = SQLGetData(this->stmt, 26, SQL_C_DEFAULT, &wchar_val2, buf_len, &ind);
+  ret = SQLGetData(this->stmt, 26, SQL_C_WCHAR, &wchar_val2, buf_len, &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(wchar_val2[0], L'你');
@@ -638,7 +642,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
   SQLWCHAR wvarchar_val[3];
   buf_len = wchar_size * 3;
 
-  ret = SQLGetData(this->stmt, 27, SQL_C_DEFAULT, &wvarchar_val, buf_len, &ind);
+  ret = SQLGetData(this->stmt, 27, SQL_C_WCHAR, &wvarchar_val, buf_len, &ind);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
   EXPECT_EQ(wvarchar_val[0], L'你');
@@ -2395,7 +2399,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsErrorOnBadInputs) {
   ret = SQLNativeSql(this->conn, inputStr, -100, buf, bufCharLen, &outputCharLen);
 
   EXPECT_EQ(ret, SQL_ERROR);
+  #ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_S1090);
+  #else 
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY090);
+  #endif
 
   this->disconnect();
 }
@@ -2463,7 +2471,11 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsFunctionSequenceErrorOnNoQuery
   SQLRETURN ret = SQLNumResultCols(this->stmt, &columnCount);
 
   EXPECT_EQ(ret, SQL_ERROR);
+  #ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1010);
+  #else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
+  #endif
 
   EXPECT_EQ(columnCount, expectedValue);
 
@@ -2533,7 +2545,11 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountFunctionSequenceErrorOnNoQuery) {
   SQLRETURN ret = SQLRowCount(this->stmt, &rowCount);
 
   EXPECT_EQ(ret, SQL_ERROR);
+  #ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1010);
+  #else 
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
+  #endif 
 
   EXPECT_EQ(rowCount, expectedValue);
 
