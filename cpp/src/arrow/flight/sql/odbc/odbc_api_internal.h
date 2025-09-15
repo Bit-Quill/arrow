@@ -25,10 +25,10 @@
 #include <sqltypes.h>
 #include <sqlucode.h>
 
-//  @file odbc_api.h
+//  \file odbc_api_internal.h
 //
 //  Define internal ODBC API function headers.
-namespace arrow {
+namespace arrow::flight::sql::odbc {
 SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result);
 SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle);
 SQLRETURN SQLFreeStmt(SQLHSTMT stmt, SQLUSMALLINT option);

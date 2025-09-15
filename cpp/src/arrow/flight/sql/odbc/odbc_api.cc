@@ -37,9 +37,10 @@
 
 // odbc_api includes windows.h, which needs to be put behind winsock2.h.
 // odbc_environment.h includes winsock2.h
-#include "arrow/flight/sql/odbc/odbc_api.h"
+// odbc_api_internal.h includes windows.h, which needs to be put behind winsock2.h.
+#include "arrow/flight/sql/odbc/odbc_api_internal.h"
 
-namespace arrow {
+namespace arrow::flight::sql::odbc {
 SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
   LOG_DEBUG("SQLAllocHandle called with type: {}, parent: {}, result: {}", type, parent,
             fmt::ptr(result));
@@ -1518,4 +1519,4 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNumber, SQLWCHAR* col
   });
 }
 
-}  // namespace arrow
+}  // namespace arrow::flight::sql::odbc
