@@ -20,7 +20,6 @@
 #include <functional>
 #include <memory>
 #include <string>
-#include <memory>
 
 #include <spdlog/fmt/fmt.h>
 
