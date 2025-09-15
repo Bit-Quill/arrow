@@ -23,18 +23,12 @@
 
 #include <spdlog/fmt/fmt.h>
 
+#include "arrow/util/logging.h"
+
 // The logger using spdlog is deprecated and will be replaced.
 // TODO: mirgate logging to use Arrow's internal logging system
 
-#define __LAZY_LOG(LEVEL, ...)                                         \
-  do {                                                                 \
-    driver::odbcabstraction::Logger* logger =                          \
-        driver::odbcabstraction::Logger::GetInstance();                \
-    if (logger) {                                                      \
-      logger->log(driver::odbcabstraction::LogLevel::LogLevel_##LEVEL, \
-                  [&]() { return fmt::format(__VA_ARGS__); });         \
-    }                                                                  \
-  } while (0)
+#define __LAZY_LOG(LEVEL, ...) ARROW_LOG(LEVEL) << __VA_ARGS__;
 #define LOG_DEBUG(...) __LAZY_LOG(DEBUG, __VA_ARGS__)
 #define LOG_INFO(...) __LAZY_LOG(INFO, __VA_ARGS__)
 #define LOG_ERROR(...) __LAZY_LOG(ERROR, __VA_ARGS__)
