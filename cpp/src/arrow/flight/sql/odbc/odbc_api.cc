@@ -41,8 +41,9 @@
 
 namespace arrow {
 SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
-  LOG_DEBUG("SQLAllocHandle called with type: {}, parent: {}, result: {}", type, parent,
-            fmt::ptr(result));
+  LOG_DEBUG("SQLAllocHandle called with type: " << type << ", parent: " << parent
+                                                << ", result: "
+                                                << static_cast<const void*>(result););
 
   *result = nullptr;
 
