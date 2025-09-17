@@ -52,6 +52,10 @@ set(ODBC_PACKAGE_VENDOR "Apache Arrow")
 # Compile entry_points.cc before odbc_api.cc due to conflict from sql.h and flight/types.h
 set(ARROW_FLIGHT_SQL_ODBC_SRCS odbc_api.cc entry_points.cc)
 
+add_library(flightsqldriver_singleton SHARED flightsqldriver_singleton.cc
+flight_sql/flight_sql_driver.cc)
+target_link_libraries(flightsqldriver_singleton PUBLIC Boost::locale) #-AL- I think this adds boost optional?
+
 if(WIN32)
   set(VER_FILEVERSION
       "${ODBC_PACKAGE_VERSION_MAJOR},${ODBC_PACKAGE_VERSION_MINOR},${ODBC_PACKAGE_VERSION_PATCH},0"
@@ -92,7 +96,8 @@ add_arrow_lib(arrow_flight_sql_odbc
               ${ODBC_LIBRARIES}
               ${ODBCINST}
               odbcabstraction
-              arrow_odbc_spi_impl)
+              arrow_odbc_spi_impl
+              flightsqldriver_singleton)
 
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
