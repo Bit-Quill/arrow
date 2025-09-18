@@ -15,7 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-add_library(arrow_odbc_spi_impl
+#-AL- if turning to `SHARED` works, the proper solution is to turn this into an arrow lib I think?
+add_library(arrow_odbc_spi_impl SHARED
             include/flight_sql/flight_sql_driver.h
             include/flight_sql/config/configuration.h
             include/flight_sql/config/connection_string_parser.h
@@ -101,13 +102,8 @@ if(WIN32)
                          system_dsn.h)
 endif()
 
-target_link_libraries(arrow_odbc_spi_impl PUBLIC odbcabstraction arrow_flight_sql_shared
+target_link_libraries(arrow_odbc_spi_impl PUBLIC ${ODBCINST} odbcabstraction arrow_flight_sql_shared
                                                  arrow_compute_shared Boost::locale)
-
-# Link libraries on MINGW64 only
-if((MINGW AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR APPLE)
-  target_link_libraries(arrow_odbc_spi_impl PUBLIC ${ODBCINST})
-endif()
 
 set_target_properties(arrow_odbc_spi_impl
                       PROPERTIES ARCHIVE_OUTPUT_DIRECTORY
@@ -116,6 +112,10 @@ set_target_properties(arrow_odbc_spi_impl
                                  ${CMAKE_BINARY_DIR}/$<CONFIG>/lib
                                  RUNTIME_OUTPUT_DIRECTORY
                                  ${CMAKE_BINARY_DIR}/$<CONFIG>/lib)
+
+install(TARGETS arrow_odbc_spi_impl
+    EXPORT arrow_flight_sql_odbc_targets
+)
 
 # CLI
 add_executable(arrow_odbc_spi_impl_cli main.cc)

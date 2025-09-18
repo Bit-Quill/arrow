@@ -55,8 +55,10 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
       *result = SQL_NULL_HENV;
 
       try {
-        static std::shared_ptr<FlightSqlDriver> odbc_driver =
-            std::make_shared<FlightSqlDriver>();
+        //static std::shared_ptr<FlightSqlDriver> odbc_driver =
+        //    std::make_shared<FlightSqlDriver>();
+        //auto odbc_driver = FlightSqlDriver::getInstance();
+        auto odbc_driver = driver::flight_sql::getFlightSqlDriverInstance();
         *result = reinterpret_cast<SQLHENV>(new ODBCEnvironment(odbc_driver));
 
         return SQL_SUCCESS;

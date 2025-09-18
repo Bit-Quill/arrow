@@ -28,10 +28,19 @@ namespace flight_sql {
 using odbcabstraction::Connection;
 using odbcabstraction::OdbcVersion;
 
+std::shared_ptr<FlightSqlDriver> getFlightSqlDriverInstance() {
+  static auto driver = FlightSqlDriver::Make();
+  return driver;
+}
+
 FlightSqlDriver::FlightSqlDriver()
     : diagnostics_("Apache Arrow", "Flight SQL", OdbcVersion::V_3), version_("0.9.0.0") {
   // Register Kernel functions to library
   ThrowIfNotOK(arrow::compute::Initialize());
+}
+
+std::shared_ptr<FlightSqlDriver> FlightSqlDriver::Make() {
+  return std::shared_ptr<FlightSqlDriver>(new FlightSqlDriver());
 }
 
 std::shared_ptr<Connection> FlightSqlDriver::CreateConnection(OdbcVersion odbc_version) {

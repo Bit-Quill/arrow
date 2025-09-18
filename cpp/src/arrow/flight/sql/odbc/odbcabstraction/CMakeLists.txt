@@ -57,3 +57,7 @@ set_target_properties(odbcabstraction
                                  ${CMAKE_BINARY_DIR}/$<CONFIG>/lib
                                  RUNTIME_OUTPUT_DIRECTORY
                                  ${CMAKE_BINARY_DIR}/$<CONFIG>/lib)
+
+install(TARGETS odbcabstraction
+    EXPORT arrow_flight_sql_odbc_targets
+)
