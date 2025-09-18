@@ -17,7 +17,7 @@
 
 include_directories(include)
 
-add_library(odbcabstraction
+add_library(odbcabstraction SHARED
             include/odbcabstraction/calendar_utils.h
             include/odbcabstraction/diagnostics.h
             include/odbcabstraction/error_codes.h
@@ -43,6 +43,7 @@ add_library(odbcabstraction
             encoding.cc
             exceptions.cc
             utils.cc
+            visibility.h
             odbc_impl/odbc_connection.cc
             odbc_impl/odbc_descriptor.cc
             odbc_impl/odbc_environment.cc
