@@ -18,6 +18,7 @@
 #pragma once
 
 #include <locale>
+#include "arrow/flight/sql/odbc/flight_sql/visibility.h"
 #include "arrow/flight/sql/odbc/flight_sql/accessors/types.h"
 #include "arrow/flight/sql/odbc/flight_sql/utils.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/encoding.h"
@@ -35,7 +36,7 @@ using odbcabstraction::RowStatus;
 using odbcabstraction::GetSqlWCharSize;
 
 template <CDataType TARGET_TYPE, typename CHAR_TYPE>
-class StringArrayFlightSqlAccessor
+class ARROW_ODBC_SPI_IMPL_EXPORT StringArrayFlightSqlAccessor
     : public FlightSqlAccessor<StringArray, TARGET_TYPE,
                                StringArrayFlightSqlAccessor<TARGET_TYPE, CHAR_TYPE>> {
  public:

@@ -24,8 +24,8 @@
 namespace driver {
 namespace flight_sql {
 
-
-
+  // -AL- todo next: turn odbcabstraction into a dll and export Driver class
+  // ARROW_ODBC_SPI_IMPL_EXPORT
 class FlightSqlDriver : public odbcabstraction::Driver {
  private:
   odbcabstraction::Diagnostics diagnostics_;

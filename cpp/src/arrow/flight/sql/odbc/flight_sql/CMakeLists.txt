@@ -79,6 +79,7 @@ add_library(arrow_odbc_spi_impl SHARED
             scalar_function_reporter.h
             system_trust_store.cc
             system_trust_store.h
+            visibility.h
             config/configuration.cc
             config/connection_string_parser.cc
             utils.cc)

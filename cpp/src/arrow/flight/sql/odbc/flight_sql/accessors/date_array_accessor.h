@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "arrow/flight/sql/odbc/flight_sql/visibility.h"
 #include "arrow/flight/sql/odbc/flight_sql/accessors/types.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
 #include "arrow/type_fwd.h"
@@ -28,7 +29,7 @@ using arrow::Array;
 using odbcabstraction::RowStatus;
 
 template <CDataType TARGET_TYPE, typename ARROW_ARRAY>
-class DateArrayFlightSqlAccessor
+class ARROW_ODBC_SPI_IMPL_EXPORT DateArrayFlightSqlAccessor
     : public FlightSqlAccessor<ARROW_ARRAY, TARGET_TYPE,
                                DateArrayFlightSqlAccessor<TARGET_TYPE, ARROW_ARRAY>> {
  public:

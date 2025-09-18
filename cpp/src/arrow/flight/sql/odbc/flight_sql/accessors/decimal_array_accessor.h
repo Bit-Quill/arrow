@@ -18,6 +18,7 @@
 #pragma once
 
 #include <locale>
+#include "arrow/flight/sql/odbc/flight_sql/visibility.h"
 #include "arrow/flight/sql/odbc/flight_sql/accessors/types.h"
 #include "arrow/flight/sql/odbc/flight_sql/utils.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
@@ -31,7 +32,7 @@ using arrow::Decimal128Type;
 using odbcabstraction::RowStatus;
 
 template <typename ARROW_ARRAY, CDataType TARGET_TYPE>
-class DecimalArrayFlightSqlAccessor
+class ARROW_ODBC_SPI_IMPL_EXPORT DecimalArrayFlightSqlAccessor
     : public FlightSqlAccessor<ARROW_ARRAY, TARGET_TYPE,
                                DecimalArrayFlightSqlAccessor<ARROW_ARRAY, TARGET_TYPE>> {
  public:

@@ -18,6 +18,7 @@
 #pragma once
 
 #include "arrow/array.h"
+#include "arrow/flight/sql/odbc/flight_sql/visibility.h"
 #include "arrow/flight/sql/odbc/flight_sql/accessors/common.h"
 #include "arrow/flight/sql/odbc/flight_sql/accessors/types.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_result_set.h"
@@ -28,7 +29,7 @@ namespace driver {
 namespace flight_sql {
 
 template <typename ARROW_ARRAY, CDataType TARGET_TYPE>
-class PrimitiveArrayFlightSqlAccessor
+class ARROW_ODBC_SPI_IMPL_EXPORT PrimitiveArrayFlightSqlAccessor
     : public FlightSqlAccessor<
           ARROW_ARRAY, TARGET_TYPE,
           PrimitiveArrayFlightSqlAccessor<ARROW_ARRAY, TARGET_TYPE>> {

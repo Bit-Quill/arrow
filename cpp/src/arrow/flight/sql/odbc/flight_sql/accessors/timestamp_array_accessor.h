@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "arrow/flight/sql/odbc/flight_sql/visibility.h"
 #include "arrow/flight/sql/odbc/flight_sql/accessors/types.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
 #include "arrow/type_fwd.h"
@@ -30,7 +31,7 @@ using arrow::TimeUnit;
 using odbcabstraction::RowStatus;
 
 template <CDataType TARGET_TYPE, TimeUnit::type UNIT>
-class TimestampArrayFlightSqlAccessor
+class ARROW_ODBC_SPI_IMPL_EXPORT TimestampArrayFlightSqlAccessor
     : public FlightSqlAccessor<TimestampArray, TARGET_TYPE,
                                TimestampArrayFlightSqlAccessor<TARGET_TYPE, UNIT>> {
  public:

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "arrow/flight/sql/odbc/flight_sql/visibility.h"
 #include "arrow/flight/sql/odbc/flight_sql/accessors/types.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/diagnostics.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
@@ -29,7 +30,7 @@ using arrow::BooleanArray;
 using odbcabstraction::RowStatus;
 
 template <CDataType TARGET_TYPE>
-class BooleanArrayFlightSqlAccessor
+class ARROW_ODBC_SPI_IMPL_EXPORT BooleanArrayFlightSqlAccessor
     : public FlightSqlAccessor<BooleanArray, TARGET_TYPE,
                                BooleanArrayFlightSqlAccessor<TARGET_TYPE>> {
  public:

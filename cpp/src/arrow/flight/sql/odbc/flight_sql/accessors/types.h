@@ -22,6 +22,7 @@
 #include <sstream>
 
 #include "arrow/array.h"
+#include "arrow/flight/sql/odbc/flight_sql/visibility.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/diagnostics.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
@@ -57,7 +58,7 @@ struct ColumnBinding {
 
 /// \brief Accessor interface meant to provide a way of populating data of a
 /// single column to buffers bound by `ColumnarResultSet::BindColumn`.
-class Accessor {
+class ARROW_ODBC_SPI_IMPL_EXPORT Accessor {
  public:
   const CDataType target_type_;
 
@@ -76,7 +77,7 @@ class Accessor {
 };
 
 template <typename ARROW_ARRAY, CDataType TARGET_TYPE, typename DERIVED>
-class FlightSqlAccessor : public Accessor {
+class ARROW_ODBC_SPI_IMPL_EXPORT FlightSqlAccessor : public Accessor {
  public:
   explicit FlightSqlAccessor(Array* array)
       : Accessor(TARGET_TYPE),
