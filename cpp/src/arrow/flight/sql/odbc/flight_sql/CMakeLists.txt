@@ -117,6 +117,8 @@ install(TARGETS arrow_odbc_spi_impl
     EXPORT arrow_flight_sql_odbc_targets
 )
 
+target_compile_definitions(arrow_odbc_spi_impl PRIVATE ARROW_ODBC_SPI_IMPL_EXPORTING)
+
 # CLI
 add_executable(arrow_odbc_spi_impl_cli main.cc)
 set_target_properties(arrow_odbc_spi_impl_cli

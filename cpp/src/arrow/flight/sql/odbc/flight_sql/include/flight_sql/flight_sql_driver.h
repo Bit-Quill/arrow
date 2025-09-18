@@ -17,14 +17,7 @@
 
 #pragma once
 
-#ifdef ARROW_ODBC_SPI_IMPL_STATIC
-#  define ARROW_ODBC_SPI_IMPL_EXPORT
-#elif defined(ARROW_ODBC_SPI_IMPL_EXPORTING)
-#  define ARROW_ODBC_SPI_IMPL_EXPORT __declspec(dllexport)
-#else
-#  define ARROW_ODBC_SPI_IMPL_EXPORT __declspec(dllimport)
-#endif
-
+#include "arrow/flight/sql/odbc/flight_sql/visibility.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/diagnostics.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/driver.h"
 
@@ -52,8 +45,8 @@ class FlightSqlDriver : public odbcabstraction::Driver {
 };
 
   // ARROW_ODBC_SPI_IMPL_EXPORT
-//  ARROW_EXPORT might not work.
-std::shared_ptr<FlightSqlDriver> getFlightSqlDriverInstance();
+//  ARROW_EXPORT might not work. -AL-
+ARROW_ODBC_SPI_IMPL_EXPORT std::shared_ptr<FlightSqlDriver> getFlightSqlDriverInstance();
 
 };  // namespace flight_sql
 }  // namespace driver
