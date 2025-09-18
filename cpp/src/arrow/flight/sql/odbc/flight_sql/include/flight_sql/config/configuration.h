@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include <string>
+#include "arrow/flight/sql/odbc/flight_sql/visibility.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h"
 
@@ -37,7 +38,7 @@ namespace config {
 /**
  * ODBC configuration abstraction.
  */
-class Configuration {
+class ARROW_ODBC_SPI_IMPL_EXPORT Configuration {
  public:
   /**
    * Default constructor.
