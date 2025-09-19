@@ -36,10 +36,10 @@ void PostLastInstallerError() {
 
   std::wstringstream buf;
   buf << L"Message: \"" << msg << L"\", Code: " << code;
-  std::wstring errorMsg = buf.str();
+  std::wstring error_msg = buf.str();
 
-  MessageBox(NULL, errorMsg.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
-  SQLPostInstallerError(code, errorMsg.c_str());
+  MessageBox(NULL, error_msg.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
+  SQLPostInstallerError(code, error_msg.c_str());
 }
 
 /**
@@ -66,9 +66,9 @@ bool UnregisterDsn(const std::wstring& dsn) {
  */
 bool RegisterDsn(const Configuration& config, LPCWSTR driver) {
   const std::string& dsn = config.Get(FlightSqlConnection::DSN);
-  std::wstring wDsn = arrow::util::UTF8ToWideString(dsn).ValueOr(L"");
+  std::wstring wdsn = arrow::util::UTF8ToWideString(dsn).ValueOr(L"");
 
-  if (!SQLWriteDSNToIni(wDsn.c_str(), driver)) {
+  if (!SQLWriteDSNToIni(wdsn.c_str(), driver)) {
     PostLastInstallerError();
     return false;
   }
@@ -81,9 +81,9 @@ bool RegisterDsn(const Configuration& config, LPCWSTR driver) {
       continue;
     }
 
-    std::wstring wKey = arrow::util::UTF8ToWideString(key).ValueOr(L"");
-    std::wstring wValue = arrow::util::UTF8ToWideString(it->second).ValueOr(L"");
-    if (!SQLWritePrivateProfileString(wDsn.c_str(), wKey.c_str(), wValue.c_str(),
+    std::wstring wkey = arrow::util::UTF8ToWideString(key).ValueOr(L"");
+    std::wstring wvalue = arrow::util::UTF8ToWideString(it->second).ValueOr(L"");
+    if (!SQLWritePrivateProfileString(wdsn.c_str(), wkey.c_str(), wvalue.c_str(),
                                       L"ODBC.INI")) {
       PostLastInstallerError();
       return false;

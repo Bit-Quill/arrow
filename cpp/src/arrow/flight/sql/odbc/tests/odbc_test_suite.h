@@ -48,22 +48,22 @@ using driver::odbcabstraction::Connection;
 class FlightSQLODBCRemoteTestBase : public ::testing::Test {
  public:
   /// \brief Allocate environment and connection handles
-  void allocEnvConnHandles(SQLINTEGER odbc_ver = SQL_OV_ODBC3);
+  void AllocEnvConnHandles(SQLINTEGER odbc_ver = SQL_OV_ODBC3);
   /// \brief Connect to Arrow Flight SQL server using connection string defined in
   /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN", allocate statement handle.
   /// Connects using ODBC Ver 3 by default
-  void connect(SQLINTEGER odbc_ver = SQL_OV_ODBC3);
+  void Connect(SQLINTEGER odbc_ver = SQL_OV_ODBC3);
   /// \brief Connect to Arrow Flight SQL server using connection string
-  void connectWithString(std::string connection_str);
+  void ConnectWithString(std::string connection_str);
   /// \brief Disconnect from server
-  void disconnect();
+  void Disconnect();
   /// \brief Get connection string from environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
-  std::string virtual getConnectionString();
+  std::string virtual GetConnectionString();
   /// \brief Get invalid connection string based on connection string defined in
   /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
-  std::string virtual getInvalidConnectionString();
+  std::string virtual GetInvalidConnectionString();
   /// \brief Return a SQL query that selects all data types
-  std::wstring virtual getQueryAllDataTypes();
+  std::wstring virtual GetQueryAllDataTypes();
 
   /** ODBC Environment. */
   SQLHENV env = 0;
@@ -78,8 +78,8 @@ class FlightSQLODBCRemoteTestBase : public ::testing::Test {
   void SetUp() override;
 };
 
-static constexpr std::string_view kAuthHeader = "authorization";
-static constexpr std::string_view kBearerPrefix = "Bearer ";
+static constexpr std::string_view authorization_header = "authorization";
+static constexpr std::string_view bearer_prefix = "Bearer ";
 static constexpr std::string_view test_token = "t0k3n";
 
 std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers);
@@ -87,8 +87,8 @@ std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers);
 // A server middleware for validating incoming bearer header authentication.
 class MockServerMiddleware : public ServerMiddleware {
  public:
-  explicit MockServerMiddleware(const CallHeaders& incoming_headers, bool* isValid)
-      : isValid_(isValid) {
+  explicit MockServerMiddleware(const CallHeaders& incoming_headers, bool* is_valid)
+      : is_valid_(is_valid) {
     incoming_headers_ = incoming_headers;
   }
 
@@ -100,30 +100,30 @@ class MockServerMiddleware : public ServerMiddleware {
 
  private:
   CallHeaders incoming_headers_;
-  bool* isValid_;
+  bool* is_valid_;
 };
 
 // Factory for base64 header authentication testing.
 class MockServerMiddlewareFactory : public ServerMiddlewareFactory {
  public:
-  MockServerMiddlewareFactory() : isValid_(false) {}
+  MockServerMiddlewareFactory() : is_valid_(false) {}
 
   Status StartCall(const CallInfo& info, const ServerCallContext& context,
                    std::shared_ptr<ServerMiddleware>* middleware) override;
 
  private:
-  bool isValid_;
+  bool is_valid_;
 };
 
 class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   // Sets up a mock server for each test case
  public:
   /// \brief Get connection string for mock server
-  std::string getConnectionString() override;
+  std::string GetConnectionString() override;
   /// \brief Get invalid connection string for mock server
-  std::string getInvalidConnectionString() override;
+  std::string GetInvalidConnectionString() override;
   /// \brief Return a SQL query that selects all data types
-  std::wstring getQueryAllDataTypes() override;
+  std::wstring GetQueryAllDataTypes() override;
 
   /// \brief Run a SQL query to create default table for table test cases
   void CreateTestTables();
@@ -158,7 +158,7 @@ TYPED_TEST_SUITE(FlightSQLODBCTestBase, TestTypes);
 enum { ODBC_BUFFER_SIZE = 1024 };
 
 /// Compare ConnPropertyMap, key value is case-insensitive
-bool compareConnPropertyMap(Connection::ConnPropertyMap map1,
+bool CompareConnPropertyMap(Connection::ConnPropertyMap map1,
                             Connection::ConnPropertyMap map2);
 
 /// Get error message from ODBC driver using SQLGetDiagRec
@@ -194,41 +194,41 @@ void VerifyOdbcErrorState(SQLSMALLINT handle_type, SQLHANDLE handle,
 /// \brief Write connection string into DSN
 /// \param[in] connection_str the connection string.
 /// \return true on success
-bool writeDSN(std::string connection_str);
+bool WriteDSN(std::string connection_str);
 
 /// \brief Write properties map into DSN
 /// \param[in] properties map.
 /// \return true on success
-bool writeDSN(Connection::ConnPropertyMap properties);
+bool WriteDSN(Connection::ConnPropertyMap properties);
 
 /// \brief Check wide char vector and convert into wstring
-/// \param[in] strVal Vector of SQLWCHAR.
-/// \param[in] strLen length of string, in bytes.
+/// \param[in] str_val Vector of SQLWCHAR.
+/// \param[in] str_len length of string, in bytes.
 /// \return wstring
-std::wstring ConvertToWString(const std::vector<SQLWCHAR>& strVal, SQLSMALLINT strLen);
+std::wstring ConvertToWString(const std::vector<SQLWCHAR>& str_val, SQLSMALLINT str_len);
 
 /// \brief Check wide string column.
 /// \param[in] stmt Statement.
-/// \param[in] colId Column ID to check.
+/// \param[in] col_id Column ID to check.
 /// \param[in] expected Expected value.
-void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected);
+void CheckStringColumnW(SQLHSTMT stmt, int col_id, const std::wstring& expected);
 
 /// \brief Check wide string column value is null.
 /// \param[in] stmt Statement.
-/// \param[in] colId Column ID to check.
-void CheckNullColumnW(SQLHSTMT stmt, int colId);
+/// \param[in] col_id Column ID to check.
+void CheckNullColumnW(SQLHSTMT stmt, int col_id);
 
 /// \brief Check int column.
 /// \param[in] stmt Statement.
-/// \param[in] colId Column ID to check.
+/// \param[in] col_id Column ID to check.
 /// \param[in] expected Expected value.
-void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& expected);
+void CheckIntColumn(SQLHSTMT stmt, int col_id, const SQLINTEGER& expected);
 
 /// \brief Check smallint column.
 /// \param[in] stmt Statement.
-/// \param[in] colId Column ID to check.
+/// \param[in] col_id Column ID to check.
 /// \param[in] expected Expected value.
-void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& expected);
+void CheckSmallIntColumn(SQLHSTMT stmt, int col_id, const SQLSMALLINT& expected);
 
 /// \brief Check sql return against expected.
 /// \param[in] stmt Statement.

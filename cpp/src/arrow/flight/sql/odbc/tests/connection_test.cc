@@ -218,7 +218,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrOutputNTS) {
-  this->connect();
+  this->Connect();
 
   SQLINTEGER output_nts;
 
@@ -228,7 +228,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrOutputNTS) {
 
   EXPECT_EQ(output_nts, SQL_TRUE);
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrGetLength) {
@@ -236,7 +236,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrGetLength) {
   // Windows. This test case can be potentially used on macOS/Linux
   GTEST_SKIP();
 
-  this->connect();
+  this->Connect();
 
   SQLINTEGER length;
 
@@ -247,21 +247,21 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrGetLength) {
 
   EXPECT_EQ(length, sizeof(SQLINTEGER));
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrNullValuePointer) {
   // Test is disabled because call to SQLGetEnvAttr is handled by the driver manager on
   // Windows. This test case can be potentially used on macOS/Linux
   GTEST_SKIP();
-  this->connect();
+  this->Connect();
 
   SQLRETURN return_get =
       SQLGetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION, nullptr, 0, nullptr);
 
   EXPECT_TRUE(return_get == SQL_ERROR);
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSValid) {
@@ -331,18 +331,18 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
-  std::string connect_str = this->getConnectionString();
+  std::string connect_str = this->GetConnectionString();
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
 
-  SQLWCHAR outstr[ODBC_BUFFER_SIZE] = L"";
-  SQLSMALLINT outstrlen;
+  SQLWCHAR out_str[ODBC_BUFFER_SIZE] = L"";
+  SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+                         static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+                         ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
   if (ret != SQL_SUCCESS) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
@@ -350,14 +350,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  // Check that outstr has same content as connect_str
-  std::string out_connection_string = ODBC::SqlWcharToString(outstr, outstrlen);
+  // Check that out_str has same content as connect_str
+  std::string out_connection_string = ODBC::SqlWcharToString(out_str, out_str_len);
   Connection::ConnPropertyMap out_properties;
   Connection::ConnPropertyMap in_properties;
-  ODBC::ODBCConnection::getPropertiesFromConnString(out_connection_string,
+  ODBC::ODBCConnection::GetPropertiesFromConnString(out_connection_string,
                                                     out_properties);
-  ODBC::ODBCConnection::getPropertiesFromConnString(connect_str, in_properties);
-  EXPECT_TRUE(compareConnPropertyMap(out_properties, in_properties));
+  ODBC::ODBCConnection::GetPropertiesFromConnString(connect_str, in_properties);
+  EXPECT_TRUE(CompareConnPropertyMap(out_properties, in_properties));
 
   // Disconnect from ODBC
   ret = SQLDisconnect(conn);
@@ -400,11 +400,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnectDsn) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
-  std::string connect_str = this->getConnectionString();
+  std::string connect_str = this->GetConnectionString();
 
   // Write connection string content into a DSN,
   // must succeed before continuing
-  ASSERT_TRUE(writeDSN(connect_str));
+  ASSERT_TRUE(WriteDSN(connect_str));
 
   std::string dsn(TEST_DSN);
   ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
@@ -416,13 +416,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnectDsn) {
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
 
-  SQLWCHAR outstr[ODBC_BUFFER_SIZE] = L"";
-  SQLSMALLINT outstrlen;
+  SQLWCHAR out_str[ODBC_BUFFER_SIZE] = L"";
+  SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+                         static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+                         ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
   if (ret != SQL_SUCCESS) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
@@ -473,12 +473,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
-  std::string connect_str = this->getConnectionString();
+  std::string connect_str = this->GetConnectionString();
 
   // Write connection string content into a DSN,
   // must succeed before continuing
   std::string uid(""), pwd("");
-  ASSERT_TRUE(writeDSN(connect_str));
+  ASSERT_TRUE(WriteDSN(connect_str));
 
   std::string dsn(TEST_DSN);
   ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
@@ -542,11 +542,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
-  std::string connect_str = getConnectionString();
+  std::string connect_str = GetConnectionString();
 
   // Retrieve valid uid and pwd, assumes TEST_CONNECT_STR contains uid and pwd
   Connection::ConnPropertyMap properties;
-  ODBC::ODBCConnection::getPropertiesFromConnString(connect_str, properties);
+  ODBC::ODBCConnection::GetPropertiesFromConnString(connect_str, properties);
   std::string uid_key("uid");
   std::string pwd_key("pwd");
   std::string uid = properties[uid_key];
@@ -556,7 +556,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
   // must succeed before continuing
   properties.erase(uid_key);
   properties.erase(pwd_key);
-  ASSERT_TRUE(writeDSN(properties));
+  ASSERT_TRUE(WriteDSN(properties));
 
   std::string dsn(TEST_DSN);
   ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
@@ -620,11 +620,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
-  std::string connect_str = getConnectionString();
+  std::string connect_str = GetConnectionString();
 
   // Retrieve valid uid and pwd, assumes TEST_CONNECT_STR contains uid and pwd
   Connection::ConnPropertyMap properties;
-  ODBC::ODBCConnection::getPropertiesFromConnString(connect_str, properties);
+  ODBC::ODBCConnection::GetPropertiesFromConnString(connect_str, properties);
   std::string uid = properties[std::string("uid")];
   std::string pwd = properties[std::string("pwd")];
 
@@ -633,7 +633,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
 
   // Write connection string content into a DSN,
   // must succeed before continuing
-  ASSERT_TRUE(writeDSN(connect_str));
+  ASSERT_TRUE(WriteDSN(connect_str));
 
   std::string dsn(TEST_DSN);
   ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
@@ -688,7 +688,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
-  std::string connect_str = getConnectionString();
+  std::string connect_str = GetConnectionString();
 
   // Write connection string content into a DSN,
   // must succeed before continuing
@@ -696,7 +696,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
   // Pass incorrect uid and password to SQLConnect, they will be ignored.
   // Assumes TEST_CONNECT_STR contains uid and pwd
   std::string uid("non_existent_id"), pwd("non_existent_password");
-  ASSERT_TRUE(writeDSN(connect_str));
+  ASSERT_TRUE(WriteDSN(connect_str));
 
   std::string dsn(TEST_DSN);
   ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
@@ -762,25 +762,25 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Invalid connect string
-  std::string connect_str = getInvalidConnectionString();
+  std::string connect_str = GetInvalidConnectionString();
 
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
 
-  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
-  SQLSMALLINT outstrlen;
+  SQLWCHAR out_str[ODBC_BUFFER_SIZE];
+  SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+                         static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+                         ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
   EXPECT_TRUE(ret == SQL_ERROR);
 
   VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_28000);
 
-  std::string out_connection_string = ODBC::SqlWcharToString(outstr, outstrlen);
+  std::string out_connection_string = ODBC::SqlWcharToString(out_str, out_str_len);
   EXPECT_TRUE(out_connection_string.empty());
 
   // Free connection handle
@@ -834,12 +834,12 @@ TEST(SQLDisconnect, TestSQLDisconnectWithoutConnection) {
 
 TYPED_TEST(FlightSQLODBCTestBase, TestConnect) {
   // Verifies connect and disconnect works on its own
-  this->connect();
-  this->disconnect();
+  this->Connect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
-  this->connect();
+  this->Connect();
   SQLHSTMT statement;
 
   // Allocate a statement using alloc statement
@@ -862,7 +862,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
@@ -886,18 +886,18 @@ TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Connect string
-  std::string connect_str = this->getConnectionString();
+  std::string connect_str = this->GetConnectionString();
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
 
-  SQLWCHAR outstr[ODBC_BUFFER_SIZE] = L"";
-  SQLSMALLINT outstrlen;
+  SQLWCHAR out_str[ODBC_BUFFER_SIZE] = L"";
+  SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+                         static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+                         ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
@@ -923,7 +923,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeDesc) {
-  this->connect();
+  this->Connect();
   SQLHDESC descriptor;
 
   // Allocate a descriptor using alloc handle
@@ -936,11 +936,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeDesc) {
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrDescriptor) {
-  this->connect();
+  this->Connect();
 
   SQLHDESC apd_descriptor, ard_descriptor;
 
@@ -1018,7 +1018,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrDescriptor) {
 
   EXPECT_EQ(value, internal_ard);
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 }  // namespace arrow::flight::sql::odbc

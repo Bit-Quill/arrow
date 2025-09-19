@@ -90,7 +90,7 @@ FlightInfo MultipleEndpointsFlightInfo(Location location1, Location location2) {
                                        100000, false, "");
 }
 
-void verifyArraysContainIntsOnly(std::shared_ptr<Array> intArray) {
+void VerifyArraysContainIntsOnly(std::shared_ptr<Array> intArray) {
   for (int64_t i = 0; i < intArray->length(); ++i) {
     // null values are accepted
     if (!intArray->IsNull(i)) {
@@ -125,7 +125,7 @@ TEST_F(FlightStreamChunkBufferTest, TestMultipleEndpointsInt) {
       // Each array has random length
       EXPECT_GT(array->length(), 0);
 
-      verifyArraysContainIntsOnly(array);
+      VerifyArraysContainIntsOnly(array);
     }
   }
 
