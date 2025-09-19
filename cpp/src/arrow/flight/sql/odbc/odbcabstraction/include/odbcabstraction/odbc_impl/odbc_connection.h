@@ -84,8 +84,12 @@ class ODBCConnection : public ODBCHandle<ODBCConnection> {
 
   inline bool IsOdbc2Connection() const { return m_is2xConnection; }
 
-  /// @return the DSN or empty string if Driver was used.
-  static std::string getPropertiesFromConnString(
+  /// @return the DSN or an empty string if the DSN is not found or is found after the
+  /// driver
+  static std::string getDsnIfExists(const std::string& connStr);
+
+  /// Read properties from connection string, but does not read values from DSN
+  static void getPropertiesFromConnString(
       const std::string& connStr,
       driver::odbcabstraction::Connection::ConnPropertyMap& properties);
 
