@@ -686,38 +686,24 @@ std::string ODBCConnection::getDsnIfExists(const std::string& connStr) {
                                                      CONNECTION_STR_REGEX, groups),
       end;
 
-  bool dsn_first = false;
-  bool driver_first = false;
-  std::string dsn("");
-  for (auto it = regex_iter; end != regex_iter; ++regex_iter) {
-    std::string key = *regex_iter;
-    std::string value = *++regex_iter;
+  // First key in connection string should be either dsn or driver
+  auto it = regex_iter;
+  std::string key = *regex_iter;
+  std::string value = *++regex_iter;
 
-    // If the DSN shows up before driver key, load settings from the DSN.
-    // Only load values from the DSN once regardless of how many times the DSN
-    // key shows up.
-    if (boost::iequals(key, "DSN")) {
-      if (!driver_first) {
-        if (!dsn_first) {
-          dsn_first = true;
-          dsn.swap(value);
-          return dsn;
-        }
-      }
-      continue;
-    } else if (boost::iequals(key, "Driver")) {
-      if (!dsn_first) {
-        driver_first = true;
-        return dsn;
-      }
-    }
-
-    // Strip wrapping curly braces.
-    if (value.size() >= 2 && value[0] == '{' && value[value.size() - 1] == '}') {
-      value = value.substr(1, value.size() - 2);
-    }
+  // Strip wrapping curly braces.
+  if (value.size() >= 2 && value[0] == '{' && value[value.size() - 1] == '}') {
+    value = value.substr(1, value.size() - 2);
   }
-  return dsn;
+
+  if (boost::iequals(key, "DSN")) {
+    return value;
+  } else if (boost::iequals(key, "Driver")) {
+    return std::string("");
+  } else {
+    throw DriverException(
+        "Connection string is faulty. The first key should be DSN or Driver.", "HY000");
+  }
 }
 
 void ODBCConnection::getPropertiesFromConnString(
