@@ -752,6 +752,21 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER valuePtr,
   });
 }
 
+// Load properties from the given DSN. The properties loaded do _not_ overwrite existing
+// entries in the properties.
+void loadPropertiesFromDSN(const std::string& dsn,
+                           Connection::ConnPropertyMap& properties) {
+  driver::flight_sql::config::Configuration config;
+  config.LoadDsn(dsn);
+  Connection::ConnPropertyMap dsnProperties = config.GetProperties();
+  for (auto& [key, value] : dsnProperties) {
+    auto propIter = properties.find(key);
+    if (propIter == properties.end()) {
+      properties.emplace(std::make_pair(std::move(key), std::move(value)));
+    }
+  }
+}
+
 SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
                            SQLWCHAR* inConnectionString,
                            SQLSMALLINT inConnectionStringLen,
@@ -782,8 +797,11 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
     std::string connection_string =
         ODBC::SqlWcharToString(inConnectionString, inConnectionStringLen);
     Connection::ConnPropertyMap properties;
-    std::string dsn =
-        ODBCConnection::getPropertiesFromConnString(connection_string, properties);
+    std::string dsn = ODBCConnection::getDsnIfExists(connection_string);
+    if (!dsn.empty()) {
+      loadPropertiesFromDSN(dsn, properties);
+    }
+    ODBCConnection::getPropertiesFromConnString(connection_string, properties);
 
     std::vector<std::string_view> missing_properties;
 
