@@ -45,9 +45,6 @@ class Driver {
 
   /// \brief Sets the driver version.
   virtual void SetVersion(std::string version) = 0;
-
-  /// \brief Register a log to be used by the system.
-  virtual void RegisterLog() = 0;
 };
 
 }  // namespace odbcabstraction

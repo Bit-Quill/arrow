@@ -41,8 +41,9 @@
 
 namespace arrow {
 SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
-  LOG_DEBUG("SQLAllocHandle called with type: {}, parent: {}, result: {}", type, parent,
-            fmt::ptr(result));
+  LOG_DEBUG("SQLAllocHandle called with type: " << type << ", parent: " << parent
+                                                << ", result: "
+                                                << static_cast<const void*>(result));
 
   *result = nullptr;
 
@@ -136,7 +137,7 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
 }
 
 SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
-  LOG_DEBUG("SQLFreeHandle called with type: {}, handle: {}", type, handle);
+  LOG_DEBUG("SQLFreeHandle called with type: " << type << ", handle: " << handle);
 
   switch (type) {
     case SQL_HANDLE_ENV: {
@@ -203,6 +204,8 @@ SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
 }
 
 SQLRETURN SQLFreeStmt(SQLHSTMT handle, SQLUSMALLINT option) {
+  LOG_DEBUG("SQLAllocHandle called with handle: " << handle << ", option: " << option);
+
   switch (option) {
     case SQL_CLOSE: {
       using ODBC::ODBCStatement;
@@ -261,11 +264,11 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT 
                           SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr) {
   // TODO: Implement additional fields types
   // https://github.com/apache/arrow/issues/46573
-  LOG_DEBUG(
-      "SQLGetDiagFieldW called with handleType: {}, handle: {}, recNumber: {}, "
-      "diagIdentifier: {}, diagInfoPtr: {}, bufferLength: {}, stringLengthPtr: {}",
-      handleType, handle, recNumber, diagIdentifier, diagInfoPtr, bufferLength,
-      fmt::ptr(stringLengthPtr));
+  LOG_DEBUG("SQLGetDiagFieldW called with handleType: "
+            << handleType << ", handle: " << handle << ", recNumber: " << recNumber
+            << ", diagIdentifier: " << diagIdentifier << ", diagInfoPtr: " << diagInfoPtr
+            << ", bufferLength: " << bufferLength
+            << ", stringLengthPtr: " << static_cast<const void*>(stringLengthPtr));
 
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetStringAttribute;
@@ -520,12 +523,13 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT re
                         SQLWCHAR* sqlState, SQLINTEGER* nativeErrorPtr,
                         SQLWCHAR* messageText, SQLSMALLINT bufferLength,
                         SQLSMALLINT* textLengthPtr) {
-  LOG_DEBUG(
-      "SQLGetDiagRecW called with handleType: {}, handle: {}, recNumber: {}, "
-      "sqlState: {}, nativeErrorPtr: {}, messageText: {}, bufferLength: {}, "
-      "textLengthPtr: {}",
-      handleType, handle, recNumber, fmt::ptr(sqlState), fmt::ptr(nativeErrorPtr),
-      fmt::ptr(messageText), bufferLength, fmt::ptr(textLengthPtr));
+  LOG_DEBUG("SQLGetDiagRecW called with handleType: "
+            << handleType << ", handle: " << handle << ", recNumber: " << recNumber
+            << ", sqlState: " << static_cast<const void*>(sqlState)
+            << ", nativeErrorPtr: " << static_cast<const void*>(nativeErrorPtr)
+            << ", messageText: " << static_cast<const void*>(messageText)
+            << ", bufferLength: " << bufferLength
+            << ", textLengthPtr: " << static_cast<const void*>(textLengthPtr));
 
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetStringAttribute;
@@ -608,10 +612,10 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT re
 
 SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                         SQLINTEGER bufferLength, SQLINTEGER* strLenPtr) {
-  LOG_DEBUG(
-      "SQLGetEnvAttr called with env: {}, attr: {}, valuePtr: {}, "
-      "bufferLength: {}, strLenPtr: {}",
-      env, attr, valuePtr, bufferLength, fmt::ptr(strLenPtr));
+  LOG_DEBUG("SQLGetEnvAttr called with env: "
+            << env << ", attr: " << attr << ", valuePtr: " << valuePtr
+            << ", bufferLength: " << bufferLength
+            << ", strLenPtr: " << static_cast<const void*>(strLenPtr));
 
   using driver::odbcabstraction::DriverException;
   using ODBC::ODBCEnvironment;
@@ -668,10 +672,9 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
 
 SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
                         SQLINTEGER strLen) {
-  LOG_DEBUG(
-      "SQLSetEnvAttr called with env: {}, attr: {}, valuePtr: {}, "
-      "strLen: {}",
-      env, attr, valuePtr, strLen);
+  LOG_DEBUG("SQLSetEnvAttr called with env: " << env << ", attr: " << attr
+                                              << ", valuePtr: " << valuePtr
+                                              << ", strLen: " << strLen);
 
   using driver::odbcabstraction::DriverException;
   using ODBC::ODBCEnvironment;
@@ -719,10 +722,10 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER valuePtr,
 
 SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attribute, SQLPOINTER valuePtr,
                             SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr) {
-  LOG_DEBUG(
-      "SQLGetConnectAttrW called with conn: {}, attribute: {}, valuePtr: {}, "
-      "bufferLength: {}, stringLengthPtr: {}",
-      conn, attribute, valuePtr, bufferLength, fmt::ptr(stringLengthPtr));
+  LOG_DEBUG("SQLGetConnectAttrW called with conn: "
+            << conn << ", attribute: " << attribute << ", valuePtr: " << valuePtr
+            << ", bufferLength: " << bufferLength
+            << ", stringLengthPtr: " << static_cast<const void*>(stringLengthPtr));
 
   using driver::odbcabstraction::Connection;
   using ODBC::ODBCConnection;
@@ -737,9 +740,9 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attribute, SQLPOINTER value
 
 SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER valuePtr,
                             SQLINTEGER valueLen) {
-  LOG_DEBUG(
-      "SQLSetConnectAttrW called with conn: {}, attr: {}, valuePtr: {}, valueLen: {}",
-      conn, attr, valuePtr, valueLen);
+  LOG_DEBUG("SQLSetConnectAttrW called with conn: " << conn << ", attr: " << attr
+                                                    << ", valuePtr: " << valuePtr
+                                                    << ", valueLen: " << valueLen);
 
   using driver::odbcabstraction::Connection;
   using ODBC::ODBCConnection;
@@ -774,13 +777,15 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
                            SQLSMALLINT outConnectionStringBufferLen,
                            SQLSMALLINT* outConnectionStringLen,
                            SQLUSMALLINT driverCompletion) {
-  LOG_DEBUG(
-      "SQLDriverConnectW called with conn: {}, windowHandle: {}, inConnectionString: {}, "
-      "inConnectionStringLen: {}, outConnectionString: {}, outConnectionStringBufferLen: "
-      "{}, outConnectionStringLen: {}, driverCompletion: {}",
-      conn, fmt::ptr(windowHandle), fmt::ptr(inConnectionString), inConnectionStringLen,
-      fmt::ptr(outConnectionString), outConnectionStringBufferLen,
-      fmt::ptr(outConnectionStringLen), driverCompletion);
+  LOG_DEBUG("SQLDriverConnectW called with conn: "
+            << conn << ", windowHandle: " << static_cast<const void*>(windowHandle)
+            << ", inConnectionString: " << static_cast<const void*>(inConnectionString)
+            << ", inConnectionStringLen: " << inConnectionStringLen
+            << ", outConnectionString: " << static_cast<const void*>(outConnectionString)
+            << ", outConnectionStringBufferLen: " << outConnectionStringBufferLen
+            << ", outConnectionStringLen: "
+            << static_cast<const void*>(outConnectionStringLen)
+            << ", driverCompletion: " << driverCompletion);
 
   // TODO: Implement FILEDSN and SAVEFILE keywords according to the spec
   // https://github.com/apache/arrow/issues/46449
@@ -853,11 +858,12 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND windowHandle,
 SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* dsnName, SQLSMALLINT dsnNameLen,
                      SQLWCHAR* userName, SQLSMALLINT userNameLen, SQLWCHAR* password,
                      SQLSMALLINT passwordLen) {
-  LOG_DEBUG(
-      "SQLConnectW called with conn: {}, dsnName: {}, dsnNameLen: {}, userName: {}, "
-      "userNameLen: {}, password: {}, passwordLen: {}",
-      conn, fmt::ptr(dsnName), dsnNameLen, fmt::ptr(userName), userNameLen,
-      fmt::ptr(password), passwordLen);
+  LOG_DEBUG("SQLConnectW called with conn: "
+            << conn << ", dsnName: " << static_cast<const void*>(dsnName)
+            << ", dsnNameLen: " << dsnNameLen << ", userName: "
+            << static_cast<const void*>(userName) << ", userNameLen: " << userNameLen
+            << ", password: " << static_cast<const void*>(password)
+            << ", passwordLen: " << passwordLen);
 
   using driver::flight_sql::FlightSqlConnection;
   using driver::flight_sql::config::Configuration;
@@ -891,7 +897,7 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* dsnName, SQLSMALLINT dsnNameLen,
 }
 
 SQLRETURN SQLDisconnect(SQLHDBC conn) {
-  LOG_DEBUG("SQLDisconnect called with conn: {}", conn);
+  LOG_DEBUG("SQLDisconnect called with conn: " << conn);
 
   using ODBC::ODBCConnection;
 
@@ -906,10 +912,10 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
 
 SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePtr,
                      SQLSMALLINT bufLen, SQLSMALLINT* stringLengthPtr) {
-  LOG_DEBUG(
-      "SQLGetInfo called with conn: {}, infoType: {}, infoValuePtr: {}, bufLen: {}, "
-      "stringLengthPtr: {}",
-      conn, infoType, infoValuePtr, bufLen, fmt::ptr(stringLengthPtr));
+  LOG_DEBUG("SQLGetInfo called with conn: "
+            << conn << ", infoType: " << infoType << ", infoValuePtr: " << infoValuePtr
+            << ", bufLen: " << bufLen
+            << ", stringLengthPtr: " << static_cast<const void*>(stringLengthPtr));
 
   using ODBC::ODBCConnection;
 
@@ -930,10 +936,11 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT infoType, SQLPOINTER infoValuePt
 
 SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
                          SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr) {
-  LOG_DEBUG(
-      "SQLGetStmtAttrW called with stmt: {}, attribute: {}, valuePtr: {}, "
-      "bufferLength: {}, stringLengthPtr: {}",
-      stmt, attribute, valuePtr, bufferLength, fmt::ptr(stringLengthPtr));
+  LOG_DEBUG("SQLGetStmtAttrW called with stmt: "
+            << stmt << ", attribute: " << attribute << ", valuePtr: " << valuePtr
+            << ", bufferLength: " << bufferLength
+            << ", stringLengthPtr: " << static_cast<const void*>(stringLengthPtr));
+
   using ODBC::ODBCStatement;
 
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -949,10 +956,10 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePt
 
 SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePtr,
                          SQLINTEGER stringLength) {
-  LOG_DEBUG(
-      "SQLSetStmtAttrW called with stmt: {}, attribute: {}, valuePtr: {}, "
-      "stringLength: {}",
-      stmt, attribute, valuePtr, stringLength);
+  LOG_DEBUG("SQLSetStmtAttrW called with stmt: " << stmt << ", attribute: " << attribute
+                                                 << ", valuePtr: " << valuePtr
+                                                 << ", stringLength: " << stringLength);
+
   using ODBC::ODBCStatement;
 
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -967,8 +974,10 @@ SQLRETURN SQLSetStmtAttr(SQLHSTMT stmt, SQLINTEGER attribute, SQLPOINTER valuePt
 }
 
 SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) {
-  LOG_DEBUG("SQLExecDirectW called with stmt: {}, queryText: {}, textLength: {}", stmt,
-            fmt::ptr(queryText), textLength);
+  LOG_DEBUG("SQLExecDirectW called with stmt: " << stmt << ", queryText: "
+                                                << static_cast<const void*>(queryText)
+                                                << ", textLength: " << textLength);
+
   using ODBC::ODBCStatement;
   // The driver is built to handle SELECT statements only.
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -983,8 +992,10 @@ SQLRETURN SQLExecDirect(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLengt
 }
 
 SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) {
-  LOG_DEBUG("SQLPrepareW called with stmt: {}, queryText: {}, textLength: {}", stmt,
-            fmt::ptr(queryText), textLength);
+  LOG_DEBUG("SQLPrepareW called with stmt: " << stmt << ", queryText: "
+                                             << static_cast<const void*>(queryText)
+                                             << ", textLength: " << textLength);
+
   using ODBC::ODBCStatement;
   // The driver is built to handle SELECT statements only.
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -998,7 +1009,7 @@ SQLRETURN SQLPrepare(SQLHSTMT stmt, SQLWCHAR* queryText, SQLINTEGER textLength) 
 }
 
 SQLRETURN SQLExecute(SQLHSTMT stmt) {
-  LOG_DEBUG("SQLExecute called with stmt: {}", stmt);
+  LOG_DEBUG("SQLExecute called with stmt: " << stmt);
 
   using ODBC::ODBCStatement;
   // The driver is built to handle SELECT statements only.
@@ -1012,7 +1023,7 @@ SQLRETURN SQLExecute(SQLHSTMT stmt) {
 }
 
 SQLRETURN SQLFetch(SQLHSTMT stmt) {
-  LOG_DEBUG("SQLFetch called with stmt: {}", stmt);
+  LOG_DEBUG("SQLFetch called with stmt: " << stmt);
 
   using ODBC::ODBCDescriptor;
   using ODBC::ODBCStatement;
@@ -1038,11 +1049,11 @@ SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
                            SQLUSMALLINT* rowStatusArray) {
   // GH-47110: SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for certain diag
   // states
-  LOG_DEBUG(
-      "SQLExtendedFetch called with stmt: {}, fetchOrientation: {}, fetchOffset: {}, "
-      "rowCountPtr: {}, rowStatusArray: {}",
-      stmt, fetchOrientation, fetchOffset, fmt::ptr(rowCountPtr),
-      fmt::ptr(rowStatusArray));
+  LOG_DEBUG("SQLExtendedFetch called with stmt: "
+            << stmt << ", fetchOrientation: " << fetchOrientation << ", fetchOffset: "
+            << fetchOffset << ", rowCountPtr: " << static_cast<const void*>(rowCountPtr)
+            << ", rowStatusArray: " << static_cast<const void*>(rowStatusArray));
+
   using ODBC::ODBCDescriptor;
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -1056,7 +1067,8 @@ SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
     // The SQL_ROWSET_SIZE statement attribute specifies the number of rows in the
     // rowset.
     SQLULEN rowSetSize = statement->GetRowsetSize();
-    LOG_DEBUG("SQL_ROWSET_SIZE value for SQLExtendedFetch: {}", rowSetSize);
+    LOG_DEBUG("SQL_ROWSET_SIZE value for SQLExtendedFetch: " << rowSetSize);
+
     if (statement->Fetch(static_cast<size_t>(rowSetSize), rowCountPtr, rowStatusArray)) {
       return SQL_SUCCESS;
     } else {
@@ -1068,8 +1080,10 @@ SQLRETURN SQLExtendedFetch(SQLHSTMT stmt, SQLUSMALLINT fetchOrientation,
 
 SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT fetchOrientation,
                          SQLLEN fetchOffset) {
-  LOG_DEBUG("SQLFetchScroll called with stmt: {}, fetchOrientation: {}, fetchOffset: {}",
-            stmt, fetchOrientation, fetchOffset);
+  LOG_DEBUG("SQLFetchScroll called with stmt: " << stmt << ", fetchOrientation: "
+                                                << fetchOrientation
+                                                << ", fetchOffset: " << fetchOffset);
+
   using ODBC::ODBCDescriptor;
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -1095,10 +1109,11 @@ SQLRETURN SQLFetchScroll(SQLHSTMT stmt, SQLSMALLINT fetchOrientation,
 
 SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType,
                      SQLPOINTER dataPtr, SQLLEN bufferLength, SQLLEN* indicatorPtr) {
-  LOG_DEBUG(
-      "SQLBindCol called with stmt: {}, recordNumber: {}, cType: {}, "
-      "dataPtr: {}, bufferLength: {}, strLen_or_IndPtr: {}",
-      stmt, recordNumber, cType, dataPtr, bufferLength, fmt::ptr(indicatorPtr));
+  LOG_DEBUG("SQLBindCol called with stmt: "
+            << stmt << ", recordNumber: " << recordNumber << ", cType: " << cType
+            << ", dataPtr: " << dataPtr << ", bufferLength: " << bufferLength
+            << ", strLen_or_IndPtr: " << static_cast<const void*>(indicatorPtr));
+
   using ODBC::ODBCDescriptor;
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -1111,7 +1126,8 @@ SQLRETURN SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
 }
 
 SQLRETURN SQLCloseCursor(SQLHSTMT stmt) {
-  LOG_DEBUG("SQLCloseCursor called with stmt: {}", stmt);
+  LOG_DEBUG("SQLCloseCursor called with stmt: " << stmt);
+
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
@@ -1128,10 +1144,10 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
   // GH-46979: support SQL_C_GUID data type
   // GH-46980: support Interval data types
   // GH-46985: return warning message instead of error on float truncation case
-  LOG_DEBUG(
-      "SQLGetData called with stmt: {}, recordNumber: {}, cType: {}, "
-      "dataPtr: {}, bufferLength: {}, indicatorPtr: {}",
-      stmt, recordNumber, cType, dataPtr, bufferLength, fmt::ptr(indicatorPtr));
+  LOG_DEBUG("SQLGetData called with stmt: "
+            << stmt << ", recordNumber: " << recordNumber << ", cType: " << cType
+            << ", dataPtr: " << dataPtr << ", bufferLength: " << bufferLength
+            << ", indicatorPtr: " << static_cast<const void*>(indicatorPtr));
 
   using ODBC::ODBCStatement;
 
@@ -1142,7 +1158,8 @@ SQLRETURN SQLGetData(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLINT cType
 }
 
 SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
-  LOG_DEBUG("SQLMoreResults called with stmt: {}", stmt);
+  LOG_DEBUG("SQLMoreResults called with stmt: " << stmt);
+
   using ODBC::ODBCStatement;
   // Multiple result sets not supported. Return SQL_NO_DATA by default.
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -1152,8 +1169,9 @@ SQLRETURN SQLMoreResults(SQLHSTMT stmt) {
 }
 
 SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
-  LOG_DEBUG("SQLNumResultCols called with stmt: {}, columnCountPtr: {}", stmt,
-            fmt::ptr(columnCountPtr));
+  LOG_DEBUG("SQLNumResultCols called with stmt: "
+            << stmt << ", columnCountPtr: " << static_cast<const void*>(columnCountPtr));
+
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
@@ -1163,8 +1181,9 @@ SQLRETURN SQLNumResultCols(SQLHSTMT stmt, SQLSMALLINT* columnCountPtr) {
 }
 
 SQLRETURN SQLRowCount(SQLHSTMT stmt, SQLLEN* rowCountPtr) {
-  LOG_DEBUG("SQLRowCount called with stmt: {}, columnCountPtr: {}", stmt,
-            fmt::ptr(rowCountPtr));
+  LOG_DEBUG("SQLRowCount called with stmt: " << stmt << ", columnCountPtr: "
+                                             << static_cast<const void*>(rowCountPtr));
+
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
@@ -1177,15 +1196,16 @@ SQLRETURN SQLTables(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNam
                     SQLWCHAR* schemaName, SQLSMALLINT schemaNameLength,
                     SQLWCHAR* tableName, SQLSMALLINT tableNameLength, SQLWCHAR* tableType,
                     SQLSMALLINT tableTypeLength) {
-  LOG_DEBUG(
-      "SQLTables called with stmt: {}, catalogName: {}, catalogNameLength: "
-      "{}, "
-      "schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}, "
-      "tableType: {}, "
-      "tableTypeLength: {}",
-      stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
-      schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(tableType),
-      tableTypeLength);
+  LOG_DEBUG("SQLTables called with stmt: "
+            << stmt << ", catalogName: " << static_cast<const void*>(catalogName)
+            << ", catalogNameLength: " << catalogNameLength
+            << ", schemaName: " << static_cast<const void*>(schemaName)
+            << ", schemaNameLength: " << schemaNameLength
+            << ", tableName: " << static_cast<const void*>(tableName)
+            << ", tableNameLength: " << tableNameLength
+            << ", tableType: " << static_cast<const void*>(tableType)
+            << ", tableTypeLength: " << tableTypeLength);
+
   using ODBC::ODBCStatement;
   using ODBC::SqlWcharToString;
 
@@ -1210,15 +1230,15 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalogName, SQLSMALLINT catalogNa
                      SQLWCHAR* columnName, SQLSMALLINT columnNameLength) {
   // GH-47159: Return NUM_PREC_RADIX based on whether COLUMN_SIZE contains number of
   // digits or bits
-  LOG_DEBUG(
-      "SQLColumnsW called with stmt: {}, catalogName: {}, catalogNameLength: "
-      "{}, "
-      "schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}, "
-      "columnName: {}, "
-      "columnNameLength: {}",
-      stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
-      schemaNameLength, fmt::ptr(tableName), tableNameLength, fmt::ptr(columnName),
-      columnNameLength);
+  LOG_DEBUG("SQLColumnsW called with stmt: "
+            << stmt << ", catalogName: " << static_cast<const void*>(catalogName)
+            << ", catalogNameLength: " << catalogNameLength
+            << ", schemaName: " << static_cast<const void*>(schemaName)
+            << ", schemaNameLength: " << schemaNameLength
+            << ", tableName: " << static_cast<const void*>(tableName)
+            << ", tableNameLength: " << tableNameLength
+            << ", columnName: " << static_cast<const void*>(columnName)
+            << ", columnNameLength: " << columnNameLength);
 
   using ODBC::ODBCStatement;
   using ODBC::SqlWcharToString;
@@ -1243,12 +1263,13 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
                           SQLUSMALLINT fieldIdentifier, SQLPOINTER characterAttributePtr,
                           SQLSMALLINT bufferLength, SQLSMALLINT* outputLength,
                           SQLLEN* numericAttributePtr) {
-  LOG_DEBUG(
-      "SQLColAttributeW called with stmt: {}, recordNumber: {}, "
-      "fieldIdentifier: {}, characterAttributePtr: {}, bufferLength: {}, "
-      "outputLength: {}, numericAttributePtr: {}",
-      stmt, recordNumber, fieldIdentifier, characterAttributePtr, bufferLength,
-      fmt::ptr(outputLength), fmt::ptr(numericAttributePtr));
+  LOG_DEBUG("SQLColAttributeW called with stmt: "
+            << stmt << ", recordNumber: " << recordNumber << ", fieldIdentifier: "
+            << fieldIdentifier << ", characterAttributePtr: " << characterAttributePtr
+            << ", bufferLength: " << bufferLength << ", outputLength: "
+            << static_cast<const void*>(outputLength) << ", numericAttributePtr: "
+            << static_cast<const void*>(numericAttributePtr));
+
   using ODBC::ODBCDescriptor;
   using ODBC::ODBCStatement;
   return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
@@ -1337,7 +1358,8 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT recordNumber,
 SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT dataType) {
   // GH-47237 return SQL_PRED_CHAR and SQL_PRED_BASIC for
   // appropriate data types in `SEARCHABLE` field
-  LOG_DEBUG("SQLGetTypeInfoW called with stmt: {} dataType: {}", stmt, dataType);
+  LOG_DEBUG("SQLGetTypeInfoW called with stmt: " << stmt << " dataType: " << dataType);
+
   using ODBC::ODBCStatement;
   return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
@@ -1396,12 +1418,13 @@ SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT dataType) {
 SQLRETURN SQLNativeSql(SQLHDBC connectionHandle, SQLWCHAR* inStatementText,
                        SQLINTEGER inStatementTextLength, SQLWCHAR* outStatementText,
                        SQLINTEGER bufferLength, SQLINTEGER* outStatementTextLength) {
-  LOG_DEBUG(
-      "SQLNativeSqlW called with connectionHandle: {}, inStatementText: {}, "
-      "inStatementTextLength: {}, outStatementText: {}, bufferLength: {}, "
-      "outStatementTextLength: {}",
-      connectionHandle, fmt::ptr(inStatementText), inStatementTextLength,
-      fmt::ptr(outStatementText), bufferLength, fmt::ptr(outStatementTextLength));
+  LOG_DEBUG("SQLNativeSqlW called with connectionHandle: "
+            << connectionHandle
+            << ", inStatementText: " << static_cast<const void*>(inStatementText)
+            << ", inStatementTextLength: " << inStatementTextLength
+            << ", outStatementText: " << static_cast<const void*>(outStatementText)
+            << ", bufferLength: " << bufferLength << ", outStatementTextLength: "
+            << static_cast<const void*>(outStatementTextLength));
 
   using driver::odbcabstraction::Diagnostics;
   using ODBC::GetAttributeSQLWCHAR;
@@ -1425,13 +1448,15 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT columnNumber, SQLWCHAR* col
                          SQLSMALLINT bufferLength, SQLSMALLINT* nameLengthPtr,
                          SQLSMALLINT* dataTypePtr, SQLULEN* columnSizePtr,
                          SQLSMALLINT* decimalDigitsPtr, SQLSMALLINT* nullablePtr) {
-  LOG_DEBUG(
-      "SQLDescribeColW called with stmt: {}, columnNumber: {}, "
-      "columnName: {}, bufferLength: {}, nameLengthPtr: {}, dataTypePtr: {}, "
-      "columnSizePtr: {}, decimalDigitsPtr: {}, nullablePtr: {}",
-      stmt, columnNumber, fmt::ptr(columnName), bufferLength, fmt::ptr(nameLengthPtr),
-      fmt::ptr(dataTypePtr), fmt::ptr(columnSizePtr), fmt::ptr(decimalDigitsPtr),
-      fmt::ptr(nullablePtr));
+  LOG_DEBUG("SQLDescribeColW called with stmt: "
+            << stmt << ", columnNumber: " << columnNumber << ", columnName: "
+            << static_cast<const void*>(columnName) << ", bufferLength: " << bufferLength
+            << ", nameLengthPtr: " << static_cast<const void*>(nameLengthPtr)
+            << ", dataTypePtr: " << static_cast<const void*>(dataTypePtr)
+            << ", columnSizePtr: " << static_cast<const void*>(columnSizePtr)
+            << ", decimalDigitsPtr: " << static_cast<const void*>(decimalDigitsPtr)
+            << ", nullablePtr: " << static_cast<const void*>(nullablePtr));
+
   using ODBC::ODBCDescriptor;
   using ODBC::ODBCStatement;
 

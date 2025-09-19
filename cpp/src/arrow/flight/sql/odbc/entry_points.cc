@@ -178,7 +178,7 @@ SQLRETURN SQL_API SQLBindCol(SQLHSTMT stmt, SQLUSMALLINT recordNumber, SQLSMALLI
 }
 
 SQLRETURN SQL_API SQLCancel(SQLHSTMT stmt) {
-  LOG_DEBUG("SQLCancel called with stmt: {}", stmt);
+  LOG_DEBUG("SQLCancel called with stmt: " << stmt);
   return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     throw driver::odbcabstraction::DriverException("SQLCancel is not implemented",
                                                    "IM001");
@@ -225,18 +225,19 @@ SQLRETURN SQL_API SQLForeignKeys(SQLHSTMT stmt, SQLWCHAR* pKCatalogName,
                                  SQLSMALLINT fKCatalogNameLength, SQLWCHAR* fKSchemaName,
                                  SQLSMALLINT fKSchemaNameLength, SQLWCHAR* fKTableName,
                                  SQLSMALLINT fKTableNameLength) {
-  LOG_DEBUG(
-      "SQLForeignKeysW called with stmt: {}, pKCatalogName: {}, "
-      "pKCatalogNameLength: "
-      "{}, pKSchemaName: {}, pKSchemaNameLength: {}, pKTableName: {}, pKTableNameLength: "
-      "{}, "
-      "fKCatalogName: {}, fKCatalogNameLength: {}, fKSchemaName: {}, fKSchemaNameLength: "
-      "{}, "
-      "fKTableName: {}, fKTableNameLength : {}",
-      stmt, fmt::ptr(pKCatalogName), pKCatalogNameLength, fmt::ptr(pKSchemaName),
-      pKSchemaNameLength, fmt::ptr(pKTableName), pKTableNameLength,
-      fmt::ptr(fKCatalogName), fKCatalogNameLength, fmt::ptr(fKSchemaName),
-      fKSchemaNameLength, fmt::ptr(fKTableName), fKTableNameLength);
+  LOG_DEBUG("SQLForeignKeysW called with stmt: "
+            << stmt << ", pKCatalogName: " << static_cast<const void*>(pKCatalogName)
+            << ", pKCatalogNameLength: " << pKCatalogNameLength
+            << ", pKSchemaName: " << static_cast<const void*>(pKSchemaName)
+            << ", pKSchemaNameLength: " << pKSchemaNameLength
+            << ", pKTableName: " << static_cast<const void*>(pKTableName)
+            << ", pKTableNameLength: " << pKTableNameLength
+            << ", fKCatalogName: " << static_cast<const void*>(fKCatalogName)
+            << ", fKCatalogNameLength: " << fKCatalogNameLength
+            << ", fKSchemaName: " << static_cast<const void*>(fKSchemaName)
+            << ", fKSchemaNameLength: " << fKSchemaNameLength
+            << ", fKTableName: " << static_cast<const void*>(fKTableName)
+            << ", fKTableNameLength: " << fKTableNameLength);
   return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     throw driver::odbcabstraction::DriverException("SQLForeignKeysW is not implemented",
                                                    "IM001");
@@ -270,12 +271,13 @@ SQLRETURN SQL_API SQLPrimaryKeys(SQLHSTMT stmt, SQLWCHAR* catalogName,
                                  SQLSMALLINT catalogNameLength, SQLWCHAR* schemaName,
                                  SQLSMALLINT schemaNameLength, SQLWCHAR* tableName,
                                  SQLSMALLINT tableNameLength) {
-  LOG_DEBUG(
-      "SQLPrimaryKeysW called with stmt: {}, catalogName: {}, "
-      "catalogNameLength: "
-      "{}, schemaName: {}, schemaNameLength: {}, tableName: {}, tableNameLength: {}",
-      stmt, fmt::ptr(catalogName), catalogNameLength, fmt::ptr(schemaName),
-      schemaNameLength, fmt::ptr(tableName), tableNameLength);
+  LOG_DEBUG("SQLPrimaryKeysW called with stmt: "
+            << stmt << ", catalogName: " << static_cast<const void*>(catalogName)
+            << ", catalogNameLength: " << catalogNameLength
+            << ", schemaName: " << static_cast<const void*>(schemaName)
+            << ", schemaNameLength: " << schemaNameLength
+            << ", tableName: " << static_cast<const void*>(tableName)
+            << ", tableNameLength: " << tableNameLength);
   return ODBC::ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
     throw driver::odbcabstraction::DriverException("SQLPrimaryKeysW is not implemented",
                                                    "IM001");
