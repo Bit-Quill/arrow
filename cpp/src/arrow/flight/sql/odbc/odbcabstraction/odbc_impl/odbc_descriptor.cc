@@ -482,6 +482,8 @@ void ODBCDescriptor::PopulateFromResultSetMetadata(ResultSetMetadata* rsmd) {
 
   for (size_t i = 0; i < m_records.size(); ++i) {
     size_t oneBasedIndex = i + 1;
+    int16_t concise_type = rsmd->GetConciseType(oneBasedIndex);
+
     m_records[i].m_baseColumnName = rsmd->GetBaseColumnName(oneBasedIndex);
     m_records[i].m_baseTableName = rsmd->GetBaseTableName(oneBasedIndex);
     m_records[i].m_catalogName = rsmd->GetCatalogName(oneBasedIndex);
@@ -492,9 +494,8 @@ void ODBCDescriptor::PopulateFromResultSetMetadata(ResultSetMetadata* rsmd) {
     m_records[i].m_name = rsmd->GetName(oneBasedIndex);
     m_records[i].m_schemaName = rsmd->GetSchemaName(oneBasedIndex);
     m_records[i].m_tableName = rsmd->GetTableName(oneBasedIndex);
-    m_records[i].m_typeName = rsmd->GetTypeName(oneBasedIndex);
-    m_records[i].m_conciseType =
-        GetSqlTypeForODBCVersion(rsmd->GetConciseType(oneBasedIndex), m_is2xConnection);
+    m_records[i].m_typeName = rsmd->GetTypeName(oneBasedIndex, concise_type);
+    m_records[i].m_conciseType = GetSqlTypeForODBCVersion(concise_type, m_is2xConnection);
     m_records[i].m_dataPtr = nullptr;
     m_records[i].m_indicatorPtr = nullptr;
     m_records[i].m_displaySize = rsmd->GetColumnDisplaySize(oneBasedIndex);
