@@ -213,11 +213,14 @@ size_t FlightSqlResultSetMetadata::GetOctetLength(int column_position) {
       .value_or(DefaultLengthForVariableLengthColumns);
 }
 
-std::string FlightSqlResultSetMetadata::GetTypeName(int column_position) {
+std::string FlightSqlResultSetMetadata::GetTypeName(int column_position, int data_type) {
   arrow::flight::sql::ColumnMetadata metadata =
       GetMetadata(schema_->field(column_position - 1));
 
-  return metadata.GetTypeName().ValueOrElse([] { return ""; });
+  return metadata.GetTypeName().ValueOrElse([data_type] {
+    // If we get an empty type name, figure out the type name from the data_type.
+    return driver::flight_sql::GetTypeNameFromSqlDataType(data_type);
+  });
 }
 
 driver::odbcabstraction::Updatability FlightSqlResultSetMetadata::GetUpdatable(

@@ -79,7 +79,7 @@ class FlightSqlResultSetMetadata : public odbcabstraction::ResultSetMetadata {
 
   size_t GetOctetLength(int column_position) override;
 
-  std::string GetTypeName(int column_position) override;
+  std::string GetTypeName(int column_position, int data_type) override;
 
   odbcabstraction::Updatability GetUpdatable(int column_position) override;
 
