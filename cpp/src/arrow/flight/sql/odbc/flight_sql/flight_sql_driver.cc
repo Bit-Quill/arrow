@@ -59,8 +59,7 @@ using odbcabstraction::OdbcVersion;
 FlightSqlDriver::FlightSqlDriver()
     : diagnostics_("Apache Arrow", "Flight SQL", OdbcVersion::V_3), version_("0.9.0.0") {
   RegisterLog();
-  // Register Kernel functions to library
-  ThrowIfNotOK(arrow::compute::Initialize());
+  RegisterComputeKernels();
 }
 
 std::shared_ptr<Connection> FlightSqlDriver::CreateConnection(OdbcVersion odbc_version) {
@@ -70,6 +69,17 @@ std::shared_ptr<Connection> FlightSqlDriver::CreateConnection(OdbcVersion odbc_v
 odbcabstraction::Diagnostics& FlightSqlDriver::GetDiagnostics() { return diagnostics_; }
 
 void FlightSqlDriver::SetVersion(std::string version) { version_ = std::move(version); }
+
+void FlightSqlDriver::RegisterComputeKernels() {
+  auto registry = arrow::compute::GetFunctionRegistry();
+
+  // strptime is one of the required compute functions
+  auto strptime_func = registry->GetFunction("strptime");
+  if (!strptime_func.ok()) {
+    // Register Kernel functions to library
+    ThrowIfNotOK(arrow::compute::Initialize());
+  }
+}
 
 void FlightSqlDriver::RegisterLog() {
   std::string log_level_str = arrow::internal::GetEnvVar(ODBC_LOG_LEVEL).ValueOr("");

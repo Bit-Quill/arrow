@@ -38,6 +38,9 @@ class FlightSqlDriver : public odbcabstraction::Driver {
 
   void SetVersion(std::string version) override;
 
+  /// Register Arrow Compute kernels once.
+  void RegisterComputeKernels();
+
   void RegisterLog() override;
 };
 
