@@ -111,6 +111,9 @@ macro(resolve_option_dependencies)
   if(NOT WIN32 AND NOT APPLE)
     set(ARROW_FLIGHT_SQL_ODBC OFF)
   endif()
+  if(MSVC_TOOLCHAIN)
+    set(ARROW_USE_GLOG OFF)
+  endif()
   # Tests are crashed with mold + sanitizer checks.
   if(ARROW_USE_ASAN
      OR ARROW_USE_TSAN
