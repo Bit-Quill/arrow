@@ -19,8 +19,36 @@
 #include "arrow/compute/api.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
 #include "arrow/flight/sql/odbc/flight_sql/utils.h"
+#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/logger.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/util/io_util.h"
+
+#define ODBC_LOG_PATH "ARROW_ODBC_LOG_PATH"
+#define ODBC_LOG_LEVEL "ARROW_ODBC_LOG_LEVEL"
+
+using arrow::util::ArrowLogLevel;
+
+namespace {
+/// Return the corresponding ArrowLogLevel. Debug level is returned by default.
+ArrowLogLevel ToLogLevel(int64_t level) {
+  switch (level) {
+    case -2:
+      return ArrowLogLevel::ARROW_TRACE;
+    case -1:
+      return ArrowLogLevel::ARROW_DEBUG;
+    case 0:
+      return ArrowLogLevel::ARROW_INFO;
+    case 1:
+      return ArrowLogLevel::ARROW_WARNING;
+    case 2:
+      return ArrowLogLevel::ARROW_ERROR;
+    case 3:
+      return ArrowLogLevel::ARROW_FATAL;
+    default:
+      return ArrowLogLevel::ARROW_DEBUG;
+  }
+}
+}  // namespace
 
 namespace driver {
 namespace flight_sql {
@@ -30,6 +58,7 @@ using odbcabstraction::OdbcVersion;
 
 FlightSqlDriver::FlightSqlDriver()
     : diagnostics_("Apache Arrow", "Flight SQL", OdbcVersion::V_3), version_("0.9.0.0") {
+  RegisterLog();
   // Register Kernel functions to library
   ThrowIfNotOK(arrow::compute::Initialize());
 }
@@ -41,6 +70,19 @@ std::shared_ptr<Connection> FlightSqlDriver::CreateConnection(OdbcVersion odbc_v
 odbcabstraction::Diagnostics& FlightSqlDriver::GetDiagnostics() { return diagnostics_; }
 
 void FlightSqlDriver::SetVersion(std::string version) { version_ = std::move(version); }
+
+void FlightSqlDriver::RegisterLog() {
+  std::string log_level_str = arrow::internal::GetEnvVar(ODBC_LOG_LEVEL).ValueOr("");
+  if (log_level_str.empty()) {
+    return;
+  }
+  std::string log_path = arrow::internal::GetEnvVar(ODBC_LOG_PATH).ValueOr("");
+  auto log_level = ToLogLevel(std::stoi(log_level_str));
+
+  // Enable driver logging. Log files are not supported on Windows yet, since GLOG is not
+  // tested fully on Windows.
+  arrow::util::ArrowLog::StartArrowLog("arrow-flight-sql-odbc", log_level, log_path);
+}
 
 }  // namespace flight_sql
 }  // namespace driver
