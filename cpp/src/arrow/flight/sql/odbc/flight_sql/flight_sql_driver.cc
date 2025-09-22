@@ -23,7 +23,6 @@
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/util/io_util.h"
 
-#define ODBC_LOG_PATH "ARROW_ODBC_LOG_PATH"
 #define ODBC_LOG_LEVEL "ARROW_ODBC_LOG_LEVEL"
 
 using arrow::util::ArrowLogLevel;
@@ -86,12 +85,11 @@ void FlightSqlDriver::RegisterLog() {
   if (log_level_str.empty()) {
     return;
   }
-  std::string log_path = arrow::internal::GetEnvVar(ODBC_LOG_PATH).ValueOr("");
   auto log_level = ToLogLevel(std::stoi(log_level_str));
 
   // Enable driver logging. Log files are not supported on Windows yet, since GLOG is not
   // tested fully on Windows.
-  arrow::util::ArrowLog::StartArrowLog("arrow-flight-sql-odbc", log_level, log_path);
+  arrow::util::ArrowLog::StartArrowLog("arrow-flight-sql-odbc", log_level);
 }
 
 }  // namespace flight_sql

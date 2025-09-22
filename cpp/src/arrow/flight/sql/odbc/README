@@ -40,4 +40,4 @@ Arrow Flight SQL ODBC driver uses Arrow's internal logging framework. By default
 | 3 | FATAL |
 | Empty String or not set | No log messages displayed.|
 
-2. On non-Windows platform, set `ARROW_ODBC_LOG_PATH` to a valid path for log files. `ARROW_USE_GLOG=ON` is required for driver to write into log files. Note that `ARROW_USE_GLOG` is disabled on Windows platform since plasma using `glog` is not fully tested on windows.
+The Windows ODBC driver currently does not support writing log files. `ARROW_USE_GLOG` is required to write log files, and `ARROW_USE_GLOG` is disabled on Windows platform since plasma using `glog` is not fully tested on windows.
