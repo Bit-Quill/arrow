@@ -43,6 +43,7 @@ add_library(odbcabstraction
             encoding.cc
             exceptions.cc
             utils.cc
+            ../../../../vendored/whereami/whereami.cc
             odbc_impl/odbc_connection.cc
             odbc_impl/odbc_descriptor.cc
             odbc_impl/odbc_environment.cc

@@ -14,6 +14,9 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
+#include "arrow/vendored/whereami/whereami.h"
+
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/utils.h"
 
 #include <boost/algorithm/string/predicate.hpp>
@@ -56,5 +59,21 @@ boost::optional<int32_t> AsInt32(int32_t min_value,
   }
   return boost::none;
 }
+
+std::string GetModulePath() {
+  std::vector<char> path;
+  int length, dirname_length;
+  length = wai_getModulePath(NULL, 0, &dirname_length);
+
+  if (length != 0) {
+    path.resize(length);
+    wai_getModulePath(path.data(), length, &dirname_length);
+  } else {
+    throw DriverException("Could not find module path.");
+  }
+
+  return std::string(path.begin(), path.begin() + dirname_length);
+}
+
 }  // namespace odbcabstraction
 }  // namespace driver
