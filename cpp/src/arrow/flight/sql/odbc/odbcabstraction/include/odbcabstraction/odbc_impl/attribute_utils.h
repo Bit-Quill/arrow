@@ -50,7 +50,7 @@ inline SQLRETURN GetAttributeUTF8(const std::string_view& attribute_value,
   if (output) {
     size_t output_len_before_null =
         std::min(static_cast<O>(attribute_value.size()), static_cast<O>(output_size - 1));
-    memcpy(output, attribute_value.data(), output_len_before_null);
+    std::memcpy(output, attribute_value.data(), output_len_before_null);
     reinterpret_cast<char*>(output)[output_len_before_null] = '\0';
   }
 
