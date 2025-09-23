@@ -125,7 +125,7 @@ set_target_properties(arrow_odbc_spi_impl_cli
 target_link_libraries(arrow_odbc_spi_impl_cli arrow_odbc_spi_impl)
 
 # Unit tests
-add_arrow_test(arrow_odbc_spi_impl_test
+add_arrow_test(odbc_spi_impl_test
                SOURCES
                accessors/boolean_array_accessor_test.cc
                accessors/binary_array_accessor_test.cc
