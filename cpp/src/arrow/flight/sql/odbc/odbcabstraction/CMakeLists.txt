@@ -22,9 +22,7 @@ add_library(odbcabstraction
             include/odbcabstraction/diagnostics.h
             include/odbcabstraction/error_codes.h
             include/odbcabstraction/exceptions.h
-            include/odbcabstraction/logger.h
             include/odbcabstraction/platform.h
-            include/odbcabstraction/spd_logger.h
             include/odbcabstraction/types.h
             include/odbcabstraction/utils.h
             include/odbcabstraction/odbc_impl/attribute_utils.h
@@ -44,8 +42,6 @@ add_library(odbcabstraction
             diagnostics.cc
             encoding.cc
             exceptions.cc
-            logger.cc
-            spd_logger.cc
             utils.cc
             ../../../../vendored/whereami/whereami.cc
             odbc_impl/odbc_connection.cc
@@ -62,5 +58,3 @@ set_target_properties(odbcabstraction
                                  ${CMAKE_BINARY_DIR}/$<CONFIG>/lib
                                  RUNTIME_OUTPUT_DIRECTORY
                                  ${CMAKE_BINARY_DIR}/$<CONFIG>/lib)
-
-target_link_libraries(odbcabstraction PUBLIC spdlog::spdlog)

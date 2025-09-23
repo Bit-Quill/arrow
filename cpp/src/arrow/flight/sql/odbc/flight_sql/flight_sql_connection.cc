@@ -151,6 +151,7 @@ std::shared_ptr<FlightSqlSslConfig> LoadFlightSslConfigs(
       AsBool(connPropertyMap, FlightSqlConnection::USE_SYSTEM_TRUST_STORE)
           .value_or(SYSTEM_TRUST_STORE_DEFAULT);
 
+  // GH-47630: find co-located TLS certificate if `trusted certs` path is not specified
   auto trusted_certs_iterator =
       connPropertyMap.find(std::string(FlightSqlConnection::TRUSTED_CERTS));
   auto trusted_certs = trusted_certs_iterator != connPropertyMap.end()
