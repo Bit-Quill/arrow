@@ -42,7 +42,7 @@ add_arrow_test(flight_sql_odbc_test
                type_info_test.cc
                # Connection test needs to be put last to resolve segfault issue
                # -AL- tests should still run without connection_test
-               # connection_test.cc
+               connection_test.cc
                odbc_test_suite.cc
                odbc_test_suite.h
                # Enable Protobuf cleanup after test execution
