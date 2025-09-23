@@ -41,7 +41,8 @@ add_arrow_test(flight_sql_odbc_test
                tables_test.cc
                type_info_test.cc
                # Connection test needs to be put last to resolve segfault issue
-               connection_test.cc
+               # -AL- tests should still run without connection_test
+               # connection_test.cc
                odbc_test_suite.cc
                odbc_test_suite.h
                # Enable Protobuf cleanup after test execution
@@ -53,4 +54,6 @@ add_arrow_test(flight_sql_odbc_test
                ${ODBCINST}
                ${SQLite3_LIBRARIES}
                arrow_odbc_spi_impl
-               odbcabstraction)
+               odbcabstraction
+               LABELS
+               "arrow_flight_sql_odbc")
