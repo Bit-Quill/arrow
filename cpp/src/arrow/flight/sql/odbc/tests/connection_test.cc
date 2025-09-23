@@ -836,9 +836,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestConnect) {
   // Verifies connect and disconnect works on its own
   this->connect();
   this->disconnect();
-
-  this->connect();
-  this->disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {

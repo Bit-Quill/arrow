@@ -19,9 +19,9 @@
 #include "arrow/compute/api.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
 #include "arrow/flight/sql/odbc/flight_sql/utils.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/logger.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/util/io_util.h"
+#include "arrow/util/logging.h"
 
 #define ODBC_LOG_LEVEL "ARROW_ODBC_LOG_LEVEL"
 
