@@ -141,7 +141,7 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   void TearDown() override;
 
  private:
-  std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server;
+  std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server_;
 };
 
 template <typename T>
