@@ -24,7 +24,6 @@
 #include <sqltypes.h>
 #include <sqlucode.h>
 
-#include "google/protobuf/message_lite.h"
 #include "gtest/gtest.h"
 
 namespace arrow::flight::sql::odbc {
@@ -1022,8 +1021,3 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrDescriptor) {
 }
 
 }  // namespace arrow::flight::sql::odbc
-
-int main(int argc, char** argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

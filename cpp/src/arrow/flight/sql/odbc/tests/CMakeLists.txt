@@ -32,6 +32,7 @@ set(ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS
 add_arrow_test(flight_sql_odbc_test
                SOURCES
                columns_test.cc
+               connection_test.cc
                connection_attr_test.cc
                connection_info_test.cc
                errors_test.cc
@@ -40,8 +41,6 @@ add_arrow_test(flight_sql_odbc_test
                statement_test.cc
                tables_test.cc
                type_info_test.cc
-               # Connection test needs to be put last to resolve segfault issue
-               connection_test.cc
                odbc_test_suite.cc
                odbc_test_suite.h
                # Enable Protobuf cleanup after test execution
