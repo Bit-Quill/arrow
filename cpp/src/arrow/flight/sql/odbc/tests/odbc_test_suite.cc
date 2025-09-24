@@ -27,7 +27,7 @@
 
 namespace arrow::flight::sql::odbc {
 
-void FlightSQLODBCRemoteTestBase::allocEnvConnHandles(SQLINTEGER odbc_ver) {
+void FlightSQLODBCRemoteTestBase::AllocEnvConnHandles(SQLINTEGER odbc_ver) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
@@ -44,23 +44,23 @@ void FlightSQLODBCRemoteTestBase::allocEnvConnHandles(SQLINTEGER odbc_ver) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
-void FlightSQLODBCRemoteTestBase::connect(SQLINTEGER odbc_ver) {
-  allocEnvConnHandles(odbc_ver);
-  std::string connect_str = getConnectionString();
-  connectWithString(connect_str);
+void FlightSQLODBCRemoteTestBase::Connect(SQLINTEGER odbc_ver) {
+  AllocEnvConnHandles(odbc_ver);
+  std::string connect_str = GetConnectionString();
+  ConnectWithString(connect_str);
 }
 
-void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
+void FlightSQLODBCRemoteTestBase::ConnectWithString(std::string connect_str) {
   // Connect string
   std::vector<SQLWCHAR> connect_str0(connect_str.begin(), connect_str.end());
 
-  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
-  SQLSMALLINT outstrlen;
+  SQLWCHAR out_str[ODBC_BUFFER_SIZE];
+  SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   SQLRETURN ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                                   static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                                   ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+                                   static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+                                   ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
   if (ret != SQL_SUCCESS) {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
@@ -75,7 +75,7 @@ void FlightSQLODBCRemoteTestBase::connectWithString(std::string connect_str) {
   ASSERT_TRUE(ret == SQL_SUCCESS);
 }
 
-void FlightSQLODBCRemoteTestBase::disconnect() {
+void FlightSQLODBCRemoteTestBase::Disconnect() {
   // Close statement
   SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 
@@ -101,19 +101,19 @@ void FlightSQLODBCRemoteTestBase::disconnect() {
   EXPECT_EQ(ret, SQL_SUCCESS);
 }
 
-std::string FlightSQLODBCRemoteTestBase::getConnectionString() {
+std::string FlightSQLODBCRemoteTestBase::GetConnectionString() {
   std::string connect_str = arrow::internal::GetEnvVar(TEST_CONNECT_STR).ValueOrDie();
   return connect_str;
 }
 
-std::string FlightSQLODBCRemoteTestBase::getInvalidConnectionString() {
-  std::string connect_str = getConnectionString();
+std::string FlightSQLODBCRemoteTestBase::GetInvalidConnectionString() {
+  std::string connect_str = GetConnectionString();
   // Append invalid uid to connection string
   connect_str += std::string("uid=non_existent_id;");
   return connect_str;
 }
 
-std::wstring FlightSQLODBCRemoteTestBase::getQueryAllDataTypes() {
+std::wstring FlightSQLODBCRemoteTestBase::GetQueryAllDataTypes() {
   std::wstring wsql =
       LR"( SELECT
            -- Numeric types
@@ -177,13 +177,13 @@ std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
   };
 
   std::string bearer_token("");
-  auto authHeader = incoming_headers.find(kAuthHeader);
-  if (authHeader != incoming_headers.end()) {
-    const std::string auth_val(authHeader->second);
-    if (auth_val.size() > kBearerPrefix.length()) {
-      if (std::equal(auth_val.begin(), auth_val.begin() + kBearerPrefix.length(),
-                     kBearerPrefix.begin(), char_compare)) {
-        bearer_token = auth_val.substr(kBearerPrefix.length());
+  auto auth_header = incoming_headers.find(authorization_header);
+  if (auth_header != incoming_headers.end()) {
+    const std::string auth_val(auth_header->second);
+    if (auth_val.size() > bearer_prefix.length()) {
+      if (std::equal(auth_val.begin(), auth_val.begin() + bearer_prefix.length(),
+                     bearer_prefix.begin(), char_compare)) {
+        bearer_token = auth_val.substr(bearer_prefix.length());
       }
     }
   }
@@ -192,7 +192,7 @@ std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
 
 void MockServerMiddleware::SendingHeaders(AddCallHeaders* outgoing_headers) {
   std::string bearer_token = FindTokenInCallHeaders(incoming_headers_);
-  *isValid_ = (bearer_token == std::string(test_token));
+  *is_valid_ = (bearer_token == std::string(test_token));
 }
 
 Status MockServerMiddlewareFactory::StartCall(
@@ -201,7 +201,7 @@ Status MockServerMiddlewareFactory::StartCall(
   std::string bearer_token = FindTokenInCallHeaders(context.incoming_headers());
   if (bearer_token == std::string(test_token)) {
     *middleware =
-        std::make_shared<MockServerMiddleware>(context.incoming_headers(), &isValid_);
+        std::make_shared<MockServerMiddleware>(context.incoming_headers(), &is_valid_);
   } else {
     return MakeFlightError(FlightStatusCode::Unauthenticated,
                            "Invalid token for mock server");
@@ -210,7 +210,7 @@ Status MockServerMiddlewareFactory::StartCall(
   return Status::OK();
 }
 
-std::string FlightSQLODBCMockTestBase::getConnectionString() {
+std::string FlightSQLODBCMockTestBase::GetConnectionString() {
   std::string connect_str(
       "driver={Apache Arrow Flight SQL ODBC Driver};HOST=localhost;port=" +
       std::to_string(port) + ";token=" + std::string(test_token) +
@@ -218,14 +218,14 @@ std::string FlightSQLODBCMockTestBase::getConnectionString() {
   return connect_str;
 }
 
-std::string FlightSQLODBCMockTestBase::getInvalidConnectionString() {
-  std::string connect_str = getConnectionString();
+std::string FlightSQLODBCMockTestBase::GetInvalidConnectionString() {
+  std::string connect_str = GetConnectionString();
   // Append invalid token to connection string
   connect_str += std::string("token=invalid_token;");
   return connect_str;
 }
 
-std::wstring FlightSQLODBCMockTestBase::getQueryAllDataTypes() {
+std::wstring FlightSQLODBCMockTestBase::GetQueryAllDataTypes() {
   std::wstring wsql =
       LR"( SELECT
       -- Numeric types
@@ -340,7 +340,7 @@ void FlightSQLODBCMockTestBase::SetUp() {
 
 void FlightSQLODBCMockTestBase::TearDown() { ASSERT_OK(server->Shutdown()); }
 
-bool compareConnPropertyMap(Connection::ConnPropertyMap map1,
+bool CompareConnPropertyMap(Connection::ConnPropertyMap map1,
                             Connection::ConnPropertyMap map2) {
   if (map1.size() != map2.size()) return false;
 
@@ -359,12 +359,12 @@ void VerifyOdbcErrorState(SQLSMALLINT handle_type, SQLHANDLE handle,
   SQLINTEGER native_code;
 
   SQLWCHAR message[ODBC_BUFFER_SIZE] = {};
-  SQLSMALLINT reallen = 0;
+  SQLSMALLINT real_len = 0;
 
-  // On Windows, reallen is in bytes. On Linux, reallen is in chars.
-  // So, not using reallen
+  // On Windows, real_len is in bytes. On Linux, real_len is in chars.
+  // So, not using real_len
   SQLGetDiagRec(handle_type, handle, 1, sql_state, &native_code, message,
-                ODBC_BUFFER_SIZE, &reallen);
+                ODBC_BUFFER_SIZE, &real_len);
 
   std::string res = SqlWcharToString(sql_state);
 
@@ -378,12 +378,12 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle) {
   SQLINTEGER native_code;
 
   SQLWCHAR message[ODBC_BUFFER_SIZE] = {};
-  SQLSMALLINT reallen = 0;
+  SQLSMALLINT real_len = 0;
 
-  // On Windows, reallen is in bytes. On Linux, reallen is in chars.
-  // So, not using reallen
+  // On Windows, real_len is in bytes. On Linux, real_len is in chars.
+  // So, not using real_len
   SQLGetDiagRec(handle_type, handle, 1, sql_state, &native_code, message,
-                ODBC_BUFFER_SIZE, &reallen);
+                ODBC_BUFFER_SIZE, &real_len);
 
   std::string res = SqlWcharToString(sql_state);
 
@@ -399,14 +399,14 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle) {
 // TODO: once RegisterDsn is implemented in Mac and Linux, the following can be
 // re-enabled.
 #if defined _WIN32 || defined _WIN64
-bool writeDSN(std::string connection_str) {
+bool WriteDSN(std::string connection_str) {
   Connection::ConnPropertyMap properties;
 
-  ODBC::ODBCConnection::getPropertiesFromConnString(connection_str, properties);
-  return writeDSN(properties);
+  ODBC::ODBCConnection::GetPropertiesFromConnString(connection_str, properties);
+  return WriteDSN(properties);
 }
 
-bool writeDSN(Connection::ConnPropertyMap properties) {
+bool WriteDSN(Connection::ConnPropertyMap properties) {
   using driver::flight_sql::FlightSqlConnection;
   using driver::flight_sql::config::Configuration;
   using driver::odbcabstraction::Connection;
@@ -420,74 +420,74 @@ bool writeDSN(Connection::ConnPropertyMap properties) {
   }
 
   std::string driver = config.Get(FlightSqlConnection::DRIVER);
-  std::wstring wDriver = arrow::util::UTF8ToWideString(driver).ValueOr(L"");
-  return RegisterDsn(config, wDriver.c_str());
+  std::wstring w_driver = arrow::util::UTF8ToWideString(driver).ValueOr(L"");
+  return RegisterDsn(config, w_driver.c_str());
 }
 #endif
 
-std::wstring ConvertToWString(const std::vector<SQLWCHAR>& strVal, SQLSMALLINT strLen) {
-  std::wstring attrStr;
-  if (strLen == 0) {
-    attrStr = std::wstring(&strVal[0]);
+std::wstring ConvertToWString(const std::vector<SQLWCHAR>& str_val, SQLSMALLINT str_len) {
+  std::wstring attr_str;
+  if (str_len == 0) {
+    attr_str = std::wstring(&str_val[0]);
   } else {
-    EXPECT_GT(strLen, 0);
-    EXPECT_LE(strLen, static_cast<SQLSMALLINT>(ODBC_BUFFER_SIZE));
-    attrStr =
-        std::wstring(strVal.begin(), strVal.begin() + strLen / ODBC::GetSqlWCharSize());
+    EXPECT_GT(str_len, 0);
+    EXPECT_LE(str_len, static_cast<SQLSMALLINT>(ODBC_BUFFER_SIZE));
+    attr_str = std::wstring(str_val.begin(),
+                            str_val.begin() + str_len / ODBC::GetSqlWCharSize());
   }
-  return attrStr;
+  return attr_str;
 }
 
-void CheckStringColumnW(SQLHSTMT stmt, int colId, const std::wstring& expected) {
+void CheckStringColumnW(SQLHSTMT stmt, int col_id, const std::wstring& expected) {
   SQLWCHAR buf[1024];
-  SQLLEN bufLen = sizeof(buf) * ODBC::GetSqlWCharSize();
+  SQLLEN buf_len = sizeof(buf) * ODBC::GetSqlWCharSize();
 
-  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
+  SQLRETURN ret = SQLGetData(stmt, col_id, SQL_C_WCHAR, buf, buf_len, &buf_len);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  EXPECT_GT(bufLen, 0);
+  EXPECT_GT(buf_len, 0);
 
-  // returned bufLen is in bytes so convert to length in characters
-  size_t charCount = static_cast<size_t>(bufLen) / ODBC::GetSqlWCharSize();
-  std::wstring returned(buf, buf + charCount);
+  // returned buf_len is in bytes so convert to length in characters
+  size_t char_count = static_cast<size_t>(buf_len) / ODBC::GetSqlWCharSize();
+  std::wstring returned(buf, buf + char_count);
 
   EXPECT_EQ(returned, expected);
 }
 
-void CheckNullColumnW(SQLHSTMT stmt, int colId) {
+void CheckNullColumnW(SQLHSTMT stmt, int col_id) {
   SQLWCHAR buf[1024];
-  SQLLEN bufLen = sizeof(buf);
+  SQLLEN buf_len = sizeof(buf);
 
-  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, bufLen, &bufLen);
+  SQLRETURN ret = SQLGetData(stmt, col_id, SQL_C_WCHAR, buf, buf_len, &buf_len);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  EXPECT_EQ(bufLen, SQL_NULL_DATA);
+  EXPECT_EQ(buf_len, SQL_NULL_DATA);
 }
 
-void CheckIntColumn(SQLHSTMT stmt, int colId, const SQLINTEGER& expected) {
+void CheckIntColumn(SQLHSTMT stmt, int col_id, const SQLINTEGER& expected) {
   SQLINTEGER buf;
-  SQLLEN bufLen = sizeof(buf);
+  SQLLEN buf_len = sizeof(buf);
 
-  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_LONG, &buf, sizeof(buf), &bufLen);
+  SQLRETURN ret = SQLGetData(stmt, col_id, SQL_C_LONG, &buf, sizeof(buf), &buf_len);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_EQ(buf, expected);
 }
 
-void CheckSmallIntColumn(SQLHSTMT stmt, int colId, const SQLSMALLINT& expected) {
+void CheckSmallIntColumn(SQLHSTMT stmt, int col_id, const SQLSMALLINT& expected) {
   SQLSMALLINT buf;
-  SQLLEN bufLen = sizeof(buf);
+  SQLLEN buf_len = sizeof(buf);
 
-  SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_SSHORT, &buf, sizeof(buf), &bufLen);
+  SQLRETURN ret = SQLGetData(stmt, col_id, SQL_C_SSHORT, &buf, sizeof(buf), &buf_len);
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   EXPECT_EQ(buf, expected);
 }
 
-void ValidateFetch(SQLHSTMT stmt, SQLRETURN expectedReturn) {
+void ValidateFetch(SQLHSTMT stmt, SQLRETURN expected_return) {
   SQLRETURN ret = SQLFetch(stmt);
 
-  EXPECT_EQ(ret, expectedReturn);
+  EXPECT_EQ(ret, expected_return);
 }
 
 }  // namespace arrow::flight::sql::odbc

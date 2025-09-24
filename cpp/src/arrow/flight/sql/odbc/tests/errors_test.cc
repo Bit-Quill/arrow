@@ -48,19 +48,19 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Invalid connect string
-  std::string connect_str = this->getInvalidConnectionString();
+  std::string connect_str = this->GetInvalidConnectionString();
 
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
 
-  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
-  SQLSMALLINT outstrlen;
+  SQLWCHAR out_str[ODBC_BUFFER_SIZE];
+  SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+                         static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+                         ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
   EXPECT_EQ(ret, SQL_ERROR);
 
@@ -156,19 +156,19 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Invalid connect string
-  std::string connect_str = this->getInvalidConnectionString();
+  std::string connect_str = this->GetInvalidConnectionString();
 
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
 
-  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
-  SQLSMALLINT outstrlen;
+  SQLWCHAR out_str[ODBC_BUFFER_SIZE];
+  SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+                         static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+                         ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
   EXPECT_EQ(ret, SQL_ERROR);
 
@@ -201,7 +201,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
 
 TYPED_TEST(FlightSQLODBCTestBase,
            TestSQLGetDiagFieldWForDescriptorFailureFromDriverManager) {
-  this->connect();
+  this->Connect();
   SQLHDESC descriptor;
 
   // Allocate a descriptor using alloc handle
@@ -276,12 +276,12 @@ TYPED_TEST(FlightSQLODBCTestBase,
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase,
            TestSQLGetDiagRecForDescriptorFailureFromDriverManager) {
-  this->connect();
+  this->Connect();
   SQLHDESC descriptor;
 
   // Allocate a descriptor using alloc handle
@@ -317,7 +317,7 @@ TYPED_TEST(FlightSQLODBCTestBase,
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
@@ -340,19 +340,19 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   EXPECT_EQ(ret, SQL_SUCCESS);
 
   // Invalid connect string
-  std::string connect_str = this->getInvalidConnectionString();
+  std::string connect_str = this->GetInvalidConnectionString();
 
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
 
-  SQLWCHAR outstr[ODBC_BUFFER_SIZE];
-  SQLSMALLINT outstrlen;
+  SQLWCHAR out_str[ODBC_BUFFER_SIZE];
+  SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ret = SQLDriverConnect(conn, NULL, &connect_str0[0],
-                         static_cast<SQLSMALLINT>(connect_str0.size()), outstr,
-                         ODBC_BUFFER_SIZE, &outstrlen, SQL_DRIVER_NOPROMPT);
+                         static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+                         ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
   EXPECT_EQ(ret, SQL_ERROR);
 
@@ -387,7 +387,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecInputData) {
   // SQLGetDiagRec does not post diagnostic records for itself.
-  this->connect();
+  this->Connect();
 
   SQLWCHAR sql_state[6];
   SQLINTEGER native_error;
@@ -410,13 +410,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecInputData) {
 
   EXPECT_EQ(ret, SQL_INVALID_HANDLE);
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorInputData) {
   // Test ODBC 2.0 API SQLError. Driver manager maps SQLError to SQLGetDiagRec.
   // SQLError does not post diagnostic records for itself.
-  this->connect();
+  this->Connect();
 
   // Pass valid handles with null inputs
   SQLRETURN ret = SQLError(this->env, 0, 0, 0, 0, 0, 0, 0);
@@ -436,7 +436,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorInputData) {
 
   EXPECT_EQ(ret, SQL_INVALID_HANDLE);
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
@@ -444,7 +444,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->connect();
+  this->Connect();
 
   // Attempt to set environment attribute after connection handle allocation
   SQLRETURN ret = SQLSetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION,
@@ -470,7 +470,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
@@ -478,7 +478,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->connect();
+  this->Connect();
 
   // Attempt to set unsupported attribute
   SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, 0);
@@ -503,7 +503,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
@@ -511,7 +511,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->connect();
+  this->Connect();
 
   std::wstring wsql = L"1";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -538,12 +538,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarning) {
   // Test ODBC 2.0 API SQLError.
-  this->connect();
+  this->Connect();
 
   std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -588,7 +588,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorODBCVer2FromDriverManager)
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->connect(SQL_OV_ODBC2);
+  this->Connect(SQL_OV_ODBC2);
 
   // Attempt to set environment attribute after connection handle allocation
   SQLRETURN ret = SQLSetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION,
@@ -614,7 +614,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorODBCVer2FromDriverManager)
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnErrorODBCVer2) {
@@ -622,7 +622,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnErrorODBCVer2) {
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->connect(SQL_OV_ODBC2);
+  this->Connect(SQL_OV_ODBC2);
 
   // Attempt to set unsupported attribute
   SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, 0);
@@ -647,7 +647,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnErrorODBCVer2) {
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtErrorODBCVer2) {
@@ -655,7 +655,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtErrorODBCVer2) {
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->connect(SQL_OV_ODBC2);
+  this->Connect(SQL_OV_ODBC2);
 
   std::wstring wsql = L"1";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -683,12 +683,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtErrorODBCVer2) {
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarningODBCVer2) {
   // Test ODBC 2.0 API SQLError.
-  this->connect(SQL_OV_ODBC2);
+  this->Connect(SQL_OV_ODBC2);
 
   std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());

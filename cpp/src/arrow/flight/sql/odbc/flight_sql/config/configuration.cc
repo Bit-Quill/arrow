@@ -37,26 +37,26 @@ static const char DEFAULT_DISABLE_CERT_VERIFICATION[] = FALSE_STR;
 namespace {
 std::string ReadDsnString(const std::string& dsn, const std::string_view& key,
                           const std::string& dflt = "") {
-  std::wstring wDsn = arrow::util::UTF8ToWideString(dsn).ValueOr(L"");
-  std::wstring wKey = arrow::util::UTF8ToWideString(key).ValueOr(L"");
-  std::wstring wDflt = arrow::util::UTF8ToWideString(dflt).ValueOr(L"");
+  std::wstring wdsn = arrow::util::UTF8ToWideString(dsn).ValueOr(L"");
+  std::wstring wkey = arrow::util::UTF8ToWideString(key).ValueOr(L"");
+  std::wstring wdflt = arrow::util::UTF8ToWideString(dflt).ValueOr(L"");
 
 #define BUFFER_SIZE (1024)
   std::vector<wchar_t> buf(BUFFER_SIZE);
   int ret =
-      SQLGetPrivateProfileString(wDsn.c_str(), wKey.c_str(), wDflt.c_str(), buf.data(),
+      SQLGetPrivateProfileString(wdsn.c_str(), wkey.c_str(), wdflt.c_str(), buf.data(),
                                  static_cast<int>(buf.size()), L"ODBC.INI");
 
   if (ret > BUFFER_SIZE) {
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
     ret =
-        SQLGetPrivateProfileString(wDsn.c_str(), wKey.c_str(), wDflt.c_str(), buf.data(),
+        SQLGetPrivateProfileString(wdsn.c_str(), wkey.c_str(), wdflt.c_str(), buf.data(),
                                    static_cast<int>(buf.size()), L"ODBC.INI");
   }
 
-  std::wstring wResult = std::wstring(buf.data(), ret);
-  std::string result = arrow::util::WideStringToUTF8(wResult).ValueOr("");
+  std::wstring wresult = std::wstring(buf.data(), ret);
+  std::string result = arrow::util::WideStringToUTF8(wresult).ValueOr("");
   return result;
 }
 
@@ -189,12 +189,12 @@ const driver::odbcabstraction::Connection::ConnPropertyMap& Configuration::GetPr
 }
 
 std::vector<std::string> Configuration::GetCustomKeys() const {
-  driver::odbcabstraction::Connection::ConnPropertyMap copyProps(properties);
+  driver::odbcabstraction::Connection::ConnPropertyMap copy_props(properties);
   for (auto& key : FlightSqlConnection::ALL_KEYS) {
-    copyProps.erase(std::string(key));
+    copy_props.erase(std::string(key));
   }
   std::vector<std::string> keys;
-  boost::copy(copyProps | boost::adaptors::map_keys, std::back_inserter(keys));
+  boost::copy(copy_props | boost::adaptors::map_keys, std::back_inserter(keys));
   return keys;
 }
 }  // namespace config

@@ -75,7 +75,7 @@ class FlightSqlResultSet : public ResultSet {
   void Cancel() override;
 
   SQLRETURN GetData(int column_n, int16_t target_type, int precision, int scale,
-                    void* buffer, size_t buffer_length, ssize_t* strlen_buffer) override;
+                    void* buffer, size_t buffer_length, ssize_t* str_len_buffer) override;
 
   size_t Move(size_t rows, size_t bind_offset, size_t bind_type,
               uint16_t* row_status_array) override;
@@ -83,7 +83,7 @@ class FlightSqlResultSet : public ResultSet {
   std::shared_ptr<ResultSetMetadata> GetMetadata() override;
 
   void BindColumn(int column_n, int16_t target_type, int precision, int scale,
-                  void* buffer, size_t buffer_length, ssize_t* strlen_buffer) override;
+                  void* buffer, size_t buffer_length, ssize_t* str_len_buffer) override;
 };
 
 }  // namespace flight_sql

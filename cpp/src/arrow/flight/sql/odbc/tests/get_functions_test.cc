@@ -30,7 +30,7 @@ namespace arrow::flight::sql::odbc {
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsAllFunctions) {
   // Verify driver manager return values for SQLGetFunctions
-  this->connect();
+  this->Connect();
 
   SQLUSMALLINT api_exists[SQL_API_ODBC3_ALL_FUNCTIONS_SIZE];
   const std::vector<int> supported_functions = {
@@ -75,12 +75,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsAllFunctions) {
     EXPECT_EQ(SQL_FUNC_EXISTS(api_exists, api), SQL_FALSE);
   }
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsAllFunctionsODBCVer2) {
   // Verify driver manager return values for SQLGetFunctions
-  this->connect(SQL_OV_ODBC2);
+  this->Connect(SQL_OV_ODBC2);
 
   // ODBC 2.0 SQLGetFunctions returns 100 elements according to spec
   SQLUSMALLINT api_exists[100];
@@ -116,11 +116,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsAllFunctionsODBCVer2) {
     EXPECT_EQ(api_exists[api], SQL_FALSE);
   }
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsSupportedSingleAPI) {
-  this->connect();
+  this->Connect();
 
   const std::vector<SQLUSMALLINT> supported_functions = {
       SQL_API_SQLALLOCHANDLE, SQL_API_SQLBINDCOL, SQL_API_SQLGETDIAGFIELD,
@@ -154,11 +154,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsSupportedSingleAPI) {
     api_exists = -1;
   }
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsUnsupportedSingleAPI) {
-  this->connect();
+  this->Connect();
 
   const std::vector<SQLUSMALLINT> unsupported_functions = {
       SQL_API_SQLPUTDATA,        SQL_API_SQLGETDESCFIELD,     SQL_API_SQLGETDESCREC,
@@ -180,11 +180,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsUnsupportedSingleAPI) {
     api_exists = -1;
   }
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsSupportedSingleAPIODBCVer2) {
-  this->connect(SQL_OV_ODBC2);
+  this->Connect(SQL_OV_ODBC2);
 
   const std::vector<SQLUSMALLINT> supported_functions = {
       SQL_API_SQLCONNECT, SQL_API_SQLGETINFO, SQL_API_SQLDESCRIBECOL,
@@ -210,11 +210,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsSupportedSingleAPIODBCVer2)
     api_exists = -1;
   }
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsUnsupportedSingleAPIODBCVer2) {
-  this->connect(SQL_OV_ODBC2);
+  this->Connect(SQL_OV_ODBC2);
 
   const std::vector<SQLUSMALLINT> unsupported_functions = {
       SQL_API_SQLPUTDATA,        SQL_API_SQLPARAMDATA,        SQL_API_SQLSETCURSORNAME,
@@ -234,7 +234,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsUnsupportedSingleAPIODBCVer
     api_exists = -1;
   }
 
-  this->disconnect();
+  this->Disconnect();
 }
 
 }  // namespace arrow::flight::sql::odbc

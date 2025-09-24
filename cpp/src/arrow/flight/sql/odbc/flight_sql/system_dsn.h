@@ -27,23 +27,23 @@ using driver::odbcabstraction::Connection;
 /**
  * Display connection window for user to configure connection parameters.
  *
- * @param windowParent Parent window handle.
+ * @param window_parent Parent window handle.
  * @param config Output configuration.
  * @return True on success and false on fail.
  */
-bool DisplayConnectionWindow(void* windowParent, Configuration& config);
+bool DisplayConnectionWindow(void* window_parent, Configuration& config);
 
 /**
  * For SQLDriverConnect.
  * Display connection window for user to configure connection parameters.
  *
- * @param windowParent Parent window handle.
+ * @param window_parent Parent window handle.
  * @param config Output configuration, presumed to be empty, it will be using values from
  * properties.
  * @param properties Output properties.
  * @return True on success and false on fail.
  */
-bool DisplayConnectionWindow(void* windowParent, Configuration& config,
+bool DisplayConnectionWindow(void* window_parent, Configuration& config,
                              Connection::ConnPropertyMap& properties);
 #endif
 
