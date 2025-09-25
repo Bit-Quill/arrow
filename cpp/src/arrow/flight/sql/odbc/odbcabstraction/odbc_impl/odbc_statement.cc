@@ -251,7 +251,7 @@ void ODBCStatement::CopyAttributesFromConnection(ODBCConnection& connection) {
   ODBCStatement& tracking_statement = connection.GetTrackingStatement();
 
   // Get abstraction attributes and copy to this spi_statement_.
-  // Possible ODBC attributes are below, but many of these are not supported by warpdrive
+  // Possible ODBC attributes are below, but many of these are not supported by Arrow ODBC
   // or ODBCAbstaction:
   // SQL_ATTR_ASYNC_ENABLE:
   // SQL_ATTR_METADATA_ID:

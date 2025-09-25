@@ -954,21 +954,21 @@ bool GetInfoCache::LoadInfoFromServer() {
               break;
             }
             case SqlInfoOptions::SQL_SUPPORTED_RESULT_SET_TYPES:
-              // Ignored. Warpdrive supports forward-only only.
+              // Ignored. Arrow ODBC supports forward-only only.
               break;
             case SqlInfoOptions::SQL_SUPPORTED_CONCURRENCIES_FOR_RESULT_SET_UNSPECIFIED:
-              // Ignored. Warpdrive supports forward-only only.
+              // Ignored. Arrow ODBC supports forward-only only.
               break;
             case SqlInfoOptions::SQL_SUPPORTED_CONCURRENCIES_FOR_RESULT_SET_FORWARD_ONLY:
-              // Ignored. Warpdrive supports forward-only only.
+              // Ignored. Arrow ODBC supports forward-only only.
               break;
             case SqlInfoOptions::
                 SQL_SUPPORTED_CONCURRENCIES_FOR_RESULT_SET_SCROLL_SENSITIVE:
-              // Ignored. Warpdrive supports forward-only only.
+              // Ignored. Arrow ODBC supports forward-only only.
               break;
             case SqlInfoOptions::
                 SQL_SUPPORTED_CONCURRENCIES_FOR_RESULT_SET_SCROLL_INSENSITIVE:
-              // Ignored. Warpdrive supports forward-only only.
+              // Ignored. Arrow ODBC supports forward-only only.
               break;
 
             // List<string> properties
