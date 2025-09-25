@@ -275,7 +275,7 @@ std::wstring FlightSQLODBCMockTestBase::GetQueryAllDataTypes() {
 }
 
 void FlightSQLODBCMockTestBase::CreateTestTables() {
-  ASSERT_OK(server->ExecuteSql(R"(
+  ASSERT_OK(server_->ExecuteSql(R"(
     CREATE TABLE TestTable (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     keyName varchar(100),
@@ -291,7 +291,7 @@ void FlightSQLODBCMockTestBase::CreateTableAllDataType() {
   // Limitation on mock SQLite server:
   // Only int64, float64, binary, and utf8 Arrow Types are supported by
   // SQLiteFlightSqlServer::Impl::DoGetTables
-  ASSERT_OK(server->ExecuteSql(R"(
+  ASSERT_OK(server_->ExecuteSql(R"(
     CREATE TABLE AllTypesTable(
     bigint_col INTEGER PRIMARY KEY AUTOINCREMENT,
     char_col varchar(100),
@@ -320,7 +320,7 @@ void FlightSQLODBCMockTestBase::CreateUnicodeTable() {
     INSERT INTO 数据 (资料) VALUES ('3rd Row');
   )")
                                .ValueOr("");
-  ASSERT_OK(server->ExecuteSql(unicodeSql));
+  ASSERT_OK(server_->ExecuteSql(unicodeSql));
 }
 
 void FlightSQLODBCMockTestBase::SetUp() {
@@ -329,16 +329,16 @@ void FlightSQLODBCMockTestBase::SetUp() {
   options.auth_handler = std::make_unique<NoOpAuthHandler>();
   options.middleware.push_back(
       {"bearer-auth-server", std::make_shared<MockServerMiddlewareFactory>()});
-  ASSERT_OK_AND_ASSIGN(server,
+  ASSERT_OK_AND_ASSIGN(server_,
                        arrow::flight::sql::example::SQLiteFlightSqlServer::Create());
-  ASSERT_OK(server->Init(options));
+  ASSERT_OK(server_->Init(options));
 
-  port = server->port();
+  port = server_->port();
   ASSERT_OK_AND_ASSIGN(location, Location::ForGrpcTcp("localhost", port));
   ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
 }
 
-void FlightSQLODBCMockTestBase::TearDown() { ASSERT_OK(server->Shutdown()); }
+void FlightSQLODBCMockTestBase::TearDown() { ASSERT_OK(server_->Shutdown()); }
 
 bool CompareConnPropertyMap(Connection::ConnPropertyMap map1,
                             Connection::ConnPropertyMap map2) {

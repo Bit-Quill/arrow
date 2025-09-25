@@ -66,7 +66,7 @@ class Configuration {
   std::vector<std::string> GetCustomKeys() const;
 
  private:
-  driver::odbcabstraction::Connection::ConnPropertyMap properties;
+  driver::odbcabstraction::Connection::ConnPropertyMap properties_;
 };
 
 }  // namespace config

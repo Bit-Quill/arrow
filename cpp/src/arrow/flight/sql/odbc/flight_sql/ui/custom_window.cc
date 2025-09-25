@@ -107,7 +107,7 @@ CustomWindow::CustomWindow(Window* parent, const wchar_t* class_name,
   }
 }
 
-CustomWindow::~CustomWindow() { UnregisterClass(class_name.c_str(), GetHInstance()); }
+CustomWindow::~CustomWindow() { UnregisterClass(class_name_.c_str(), GetHInstance()); }
 
 }  // namespace config
 }  // namespace flight_sql
