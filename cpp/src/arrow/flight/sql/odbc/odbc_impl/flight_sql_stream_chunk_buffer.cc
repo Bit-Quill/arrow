@@ -69,9 +69,13 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
       // call. temp_flight_sql_client is intentionally null if the list of endpoint
       // Locations is empty.
       // After all data is fetched from reader, the temp client is closed.
-      return boost::make_optional(
-          is_not_ok || is_not_empty,
-          std::make_pair(std::move(result), temp_flight_sql_client));
+      if (is_not_ok || is_not_empty) {
+        return std::make_optional(
+            std::make_pair(std::move(result), temp_flight_sql_client));
+      } else {
+        return std::optional<
+            std::pair<Result<FlightStreamChunk>, std::shared_ptr<FlightSqlClient>>>{};
+      }
     };
     queue_.AddProducer(std::move(supplier));
   }
