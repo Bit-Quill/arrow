@@ -44,7 +44,7 @@ inline size_t CopyFromArrayValuesToBinding(ARRAY_TYPE* array, ColumnBinding* bin
       }
     }
   } else {
-    // Duplicate above for loop to exit early when null value is found
+    // Duplicate above for-loop to exit early when null value is found
     for (int64_t i = starting_row; i < starting_row + cells; ++i) {
       if (array->IsNull(i)) {
         throw odbcabstraction::NullWithoutIndicatorException();
