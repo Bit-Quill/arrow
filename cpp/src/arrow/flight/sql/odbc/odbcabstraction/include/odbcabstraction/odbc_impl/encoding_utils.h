@@ -46,7 +46,7 @@ inline size_t ConvertToSqlWChar(const std::string_view& str, SQLWCHAR* buffer,
 
   if (buffer) {
     std::memcpy(buffer, wstr.data(),
-           std::min(static_cast<SQLLEN>(wstr.size()), buffer_size_in_bytes));
+                std::min(static_cast<SQLLEN>(wstr.size()), buffer_size_in_bytes));
 
     // Write a NUL terminator
     if (buffer_size_in_bytes >=
