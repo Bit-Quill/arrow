@@ -26,8 +26,7 @@
 
 #include <sqltypes.h>
 
-namespace driver {
-namespace odbcabstraction {
+namespace arrow::flight::sql::odbc {
 
 class ResultSetMetadata;
 
@@ -96,5 +95,4 @@ class ResultSet {
                             ssize_t* strlen_buffer) = 0;
 };
 
-}  // namespace odbcabstraction
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc

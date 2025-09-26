@@ -39,13 +39,13 @@
 #include <locale>
 #include <sstream>
 
-using driver::flight_sql::FlightSqlConnection;
-using driver::flight_sql::config::Configuration;
-using driver::flight_sql::config::ConnectionStringParser;
-using driver::flight_sql::config::DsnConfigurationWindow;
-using driver::flight_sql::config::Result;
-using driver::flight_sql::config::Window;
-using driver::odbcabstraction::DriverException;
+using arrow::flight::sql::odbc::DriverException;
+using arrow::flight::sql::odbc::FlightSqlConnection;
+using arrow::flight::sql::odbc::config::Configuration;
+using arrow::flight::sql::odbc::config::ConnectionStringParser;
+using arrow::flight::sql::odbc::config::DsnConfigurationWindow;
+using arrow::flight::sql::odbc::config::Result;
+using arrow::flight::sql::odbc::config::Window;
 
 bool DisplayConnectionWindow(void* window_parent, Configuration& config) {
   HWND hwnd_parent = (HWND)window_parent;

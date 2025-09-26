@@ -21,15 +21,14 @@
 #include "arrow/flight/sql/client.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/blocking_queue.h"
 
-namespace driver {
-namespace flight_sql {
+namespace arrow::flight::sql::odbc {
 
 using arrow::Result;
 using arrow::flight::FlightInfo;
 using arrow::flight::FlightStreamChunk;
 using arrow::flight::FlightStreamReader;
 using arrow::flight::sql::FlightSqlClient;
-using driver::odbcabstraction::BlockingQueue;
+using arrow::flight::sql::odbc::BlockingQueue;
 
 class FlightStreamChunkBuffer {
   BlockingQueue<std::pair<Result<FlightStreamChunk>, std::shared_ptr<FlightSqlClient>>>
@@ -49,5 +48,4 @@ class FlightStreamChunkBuffer {
   bool GetNext(FlightStreamChunk* chunk);
 };
 
-}  // namespace flight_sql
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc

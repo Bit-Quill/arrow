@@ -407,9 +407,9 @@ bool WriteDSN(std::string connection_str) {
 }
 
 bool WriteDSN(Connection::ConnPropertyMap properties) {
-  using driver::flight_sql::FlightSqlConnection;
-  using driver::flight_sql::config::Configuration;
-  using driver::odbcabstraction::Connection;
+  using arrow::flight::sql::odbc::Connection;
+  using arrow::flight::sql::odbc::FlightSqlConnection;
+  using arrow::flight::sql::odbc::config::Configuration;
   using ODBC::ODBCConnection;
 
   Configuration config;

@@ -26,8 +26,7 @@
 #include <iterator>
 #include <sstream>
 
-namespace driver {
-namespace flight_sql {
+namespace arrow::flight::sql::odbc {
 namespace config {
 static const char DEFAULT_DSN[] = "Apache Arrow Flight SQL";
 static const char DEFAULT_ENABLE_ENCRYPTION[] = TRUE_STR;
@@ -183,13 +182,13 @@ void Configuration::Emplace(const std::string_view& key, std::string&& value) {
   }
 }
 
-const driver::odbcabstraction::Connection::ConnPropertyMap& Configuration::GetProperties()
-    const {
+const arrow::flight::sql::odbc::Connection::ConnPropertyMap&
+Configuration::GetProperties() const {
   return this->properties_;
 }
 
 std::vector<std::string> Configuration::GetCustomKeys() const {
-  driver::odbcabstraction::Connection::ConnPropertyMap copy_props(properties_);
+  arrow::flight::sql::odbc::Connection::ConnPropertyMap copy_props(properties_);
   for (auto& key : FlightSqlConnection::ALL_KEYS) {
     copy_props.erase(std::string(key));
   }
@@ -198,5 +197,4 @@ std::vector<std::string> Configuration::GetCustomKeys() const {
   return keys;
 }
 }  // namespace config
-}  // namespace flight_sql
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc

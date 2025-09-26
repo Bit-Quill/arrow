@@ -24,7 +24,7 @@
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_statement_get_tables.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_statement_get_type_info.h"
 #include "arrow/flight/sql/odbc/flight_sql/record_batch_transformer.h"
-#include "arrow/flight/sql/odbc/flight_sql/utils.h"
+#include "arrow/flight/sql/odbc/flight_sql/util.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/io/memory.h"
 
@@ -32,10 +32,7 @@
 #include <utility>
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
 
-namespace driver {
-namespace flight_sql {
-
-using namespace utils;
+namespace arrow::flight::sql::odbc {
 
 using arrow::Result;
 using arrow::Status;
@@ -46,10 +43,12 @@ using arrow::flight::Location;
 using arrow::flight::TimeoutDuration;
 using arrow::flight::sql::FlightSqlClient;
 using arrow::flight::sql::PreparedStatement;
-using driver::odbcabstraction::DriverException;
-using driver::odbcabstraction::ResultSet;
-using driver::odbcabstraction::ResultSetMetadata;
-using driver::odbcabstraction::Statement;
+using arrow::flight::sql::odbc::DriverException;
+using arrow::flight::sql::odbc::ResultSet;
+using arrow::flight::sql::odbc::ResultSetMetadata;
+using arrow::flight::sql::odbc::Statement;
+using util::CheckIfSetToOnlyValidValue;
+using util::ThrowIfNotOK;
 
 namespace {
 
@@ -64,10 +63,11 @@ void ClosePreparedStatementIfAny(
 
 }  // namespace
 
-FlightSqlStatement::FlightSqlStatement(
-    const odbcabstraction::Diagnostics& diagnostics, FlightSqlClient& sql_client,
-    arrow::flight::FlightClientOptions client_options, FlightCallOptions call_options,
-    const odbcabstraction::MetadataSettings& metadata_settings)
+FlightSqlStatement::FlightSqlStatement(const Diagnostics& diagnostics,
+                                       FlightSqlClient& sql_client,
+                                       arrow::flight::FlightClientOptions client_options,
+                                       FlightCallOptions call_options,
+                                       const MetadataSettings& metadata_settings)
     : diagnostics_("Apache Arrow", diagnostics.GetDataSourceComponent(),
                    diagnostics.GetOdbcVersion()),
       sql_client_(sql_client),
@@ -163,7 +163,7 @@ std::shared_ptr<ResultSet> FlightSqlStatement::GetResultSet() {
 
 int64_t FlightSqlStatement::GetUpdateCount() { return -1; }
 
-std::shared_ptr<odbcabstraction::ResultSet> FlightSqlStatement::GetTables(
+std::shared_ptr<ResultSet> FlightSqlStatement::GetTables(
     const std::string* catalog_name, const std::string* schema_name,
     const std::string* table_name, const std::string* table_type,
     const ColumnNames& column_names) {
@@ -231,7 +231,7 @@ std::shared_ptr<ResultSet> FlightSqlStatement::GetColumns_V2(
   auto flight_info = result.ValueOrDie();
 
   auto transformer = std::make_shared<GetColumns_Transformer>(
-      metadata_settings_, odbcabstraction::V_2, column_name);
+      metadata_settings_, OdbcVersion::V_2, column_name);
 
   current_result_set_ = std::make_shared<FlightSqlResultSet>(
       sql_client_, client_options_, call_options_, flight_info, transformer, diagnostics_,
@@ -252,7 +252,7 @@ std::shared_ptr<ResultSet> FlightSqlStatement::GetColumns_V3(
   auto flight_info = result.ValueOrDie();
 
   auto transformer = std::make_shared<GetColumns_Transformer>(
-      metadata_settings_, odbcabstraction::V_3, column_name);
+      metadata_settings_, OdbcVersion::V_3, column_name);
 
   current_result_set_ = std::make_shared<FlightSqlResultSet>(
       sql_client_, client_options_, call_options_, flight_info, transformer, diagnostics_,
@@ -270,7 +270,7 @@ std::shared_ptr<ResultSet> FlightSqlStatement::GetTypeInfo_V2(int16_t data_type)
   auto flight_info = result.ValueOrDie();
 
   auto transformer = std::make_shared<GetTypeInfoTransformer>(
-      metadata_settings_, odbcabstraction::V_2, data_type);
+      metadata_settings_, OdbcVersion::V_2, data_type);
 
   current_result_set_ = std::make_shared<FlightSqlResultSet>(
       sql_client_, client_options_, call_options_, flight_info, transformer, diagnostics_,
@@ -288,7 +288,7 @@ std::shared_ptr<ResultSet> FlightSqlStatement::GetTypeInfo_V3(int16_t data_type)
   auto flight_info = result.ValueOrDie();
 
   auto transformer = std::make_shared<GetTypeInfoTransformer>(
-      metadata_settings_, odbcabstraction::V_3, data_type);
+      metadata_settings_, OdbcVersion::V_3, data_type);
 
   current_result_set_ = std::make_shared<FlightSqlResultSet>(
       sql_client_, client_options_, call_options_, flight_info, transformer, diagnostics_,
@@ -297,14 +297,11 @@ std::shared_ptr<ResultSet> FlightSqlStatement::GetTypeInfo_V3(int16_t data_type)
   return current_result_set_;
 }
 
-odbcabstraction::Diagnostics& FlightSqlStatement::GetDiagnostics() {
-  return diagnostics_;
-}
+Diagnostics& FlightSqlStatement::GetDiagnostics() { return diagnostics_; }
 
 void FlightSqlStatement::Cancel() {
   if (!current_result_set_) return;
   current_result_set_->Cancel();
 }
 
-}  // namespace flight_sql
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc

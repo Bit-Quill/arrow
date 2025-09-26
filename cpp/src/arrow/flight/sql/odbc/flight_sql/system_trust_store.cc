@@ -22,8 +22,7 @@
 
 #if defined _WIN32 || defined _WIN64
 
-namespace driver {
-namespace flight_sql {
+namespace arrow::flight::sql::odbc {
 bool SystemTrustStore::HasNext() {
   p_context_ = CertEnumCertificatesInStore(h_store_, p_context_);
 
@@ -59,7 +58,6 @@ SystemTrustStore::~SystemTrustStore() {
     CertCloseStore(h_store_, 0);
   }
 }
-}  // namespace flight_sql
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc
 
 #endif

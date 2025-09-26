@@ -18,7 +18,7 @@
 #include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/flight_sql_driver.h"
 #include "arrow/compute/api.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
-#include "arrow/flight/sql/odbc/flight_sql/utils.h"
+#include "arrow/flight/sql/odbc/flight_sql/util.h"
 #include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/util/io_util.h"
 #include "arrow/util/logging.h"
@@ -49,11 +49,7 @@ ArrowLogLevel ToLogLevel(int64_t level) {
 }
 }  // namespace
 
-namespace driver {
-namespace flight_sql {
-
-using odbcabstraction::Connection;
-using odbcabstraction::OdbcVersion;
+namespace arrow::flight::sql::odbc {
 
 FlightSqlDriver::FlightSqlDriver()
     : diagnostics_("Apache Arrow", "Flight SQL", OdbcVersion::V_3), version_("0.9.0.0") {
@@ -65,7 +61,7 @@ std::shared_ptr<Connection> FlightSqlDriver::CreateConnection(OdbcVersion odbc_v
   return std::make_shared<FlightSqlConnection>(odbc_version, version_);
 }
 
-odbcabstraction::Diagnostics& FlightSqlDriver::GetDiagnostics() { return diagnostics_; }
+Diagnostics& FlightSqlDriver::GetDiagnostics() { return diagnostics_; }
 
 void FlightSqlDriver::SetVersion(std::string version) { version_ = std::move(version); }
 
@@ -76,7 +72,7 @@ void FlightSqlDriver::RegisterComputeKernels() {
   auto strptime_func = registry->GetFunction("strptime");
   if (!strptime_func.ok()) {
     // Register Kernel functions to library
-    utils::ThrowIfNotOK(arrow::compute::Initialize());
+    util::ThrowIfNotOK(arrow::compute::Initialize());
   }
 }
 
@@ -92,5 +88,4 @@ void FlightSqlDriver::RegisterLog() {
   arrow::util::ArrowLog::StartArrowLog("arrow-flight-sql-odbc", log_level);
 }
 
-}  // namespace flight_sql
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc

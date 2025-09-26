@@ -49,7 +49,7 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
 
   switch (type) {
     case SQL_HANDLE_ENV: {
-      using driver::flight_sql::FlightSqlDriver;
+      using arrow::flight::sql::odbc::FlightSqlDriver;
       using ODBC::ODBCEnvironment;
 
       *result = SQL_NULL_HENV;
@@ -274,7 +274,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handle_type, SQLHANDLE handle,
                    << ", buffer_length: " << buffer_length << ", string_length_ptr: "
                    << static_cast<const void*>(string_length_ptr);
 
-  using driver::odbcabstraction::Diagnostics;
+  using arrow::flight::sql::odbc::Diagnostics;
   using ODBC::GetStringAttribute;
   using ODBC::ODBCConnection;
   using ODBC::ODBCDescriptor;
@@ -292,7 +292,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handle_type, SQLHANDLE handle,
   // If buffer length derived from null terminated string
   if (diag_info_ptr && buffer_length == SQL_NTS) {
     const wchar_t* str = reinterpret_cast<wchar_t*>(diag_info_ptr);
-    buffer_length = wcslen(str) * driver::odbcabstraction::GetSqlWCharSize();
+    buffer_length = wcslen(str) * arrow::flight::sql::odbc::GetSqlWCharSize();
   }
 
   // Set character type to be Unicode by default
@@ -540,7 +540,7 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handle_type, SQLHANDLE handle, SQLSMALLINT r
                    << ", buffer_length: " << buffer_length
                    << ", text_length_ptr: " << static_cast<const void*>(text_length_ptr);
 
-  using driver::odbcabstraction::Diagnostics;
+  using arrow::flight::sql::odbc::Diagnostics;
   using ODBC::GetStringAttribute;
   using ODBC::ODBCConnection;
   using ODBC::ODBCDescriptor;
@@ -625,7 +625,7 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value_ptr,
                    << ", value_ptr: " << value_ptr << ", buffer_length: " << buffer_length
                    << ", str_len_ptr: " << static_cast<const void*>(str_len_ptr);
 
-  using driver::odbcabstraction::DriverException;
+  using arrow::flight::sql::odbc::DriverException;
   using ODBC::ODBCEnvironment;
 
   ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
@@ -683,7 +683,7 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value_ptr,
   ARROW_LOG(DEBUG) << "SQLSetEnvAttr called with env: " << env << ", attr: " << attr
                    << ", value_ptr: " << value_ptr << ", str_len: " << str_len;
 
-  using driver::odbcabstraction::DriverException;
+  using arrow::flight::sql::odbc::DriverException;
   using ODBC::ODBCEnvironment;
 
   ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
@@ -734,7 +734,7 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attribute, SQLPOINTER value
                    << ", buffer_length: " << buffer_length << ", string_length_ptr: "
                    << static_cast<const void*>(string_length_ptr);
 
-  using driver::odbcabstraction::Connection;
+  using arrow::flight::sql::odbc::Connection;
   using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
@@ -751,7 +751,7 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value_ptr,
                    << ", attr: " << attr << ", value_ptr: " << value_ptr
                    << ", value_len: " << value_len;
 
-  using driver::odbcabstraction::Connection;
+  using arrow::flight::sql::odbc::Connection;
   using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
@@ -766,7 +766,7 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value_ptr,
 // entries in the properties.
 void LoadPropertiesFromDSN(const std::string& dsn,
                            Connection::ConnPropertyMap& properties) {
-  driver::flight_sql::config::Configuration config;
+  arrow::flight::sql::odbc::config::Configuration config;
   config.LoadDsn(dsn);
   Connection::ConnPropertyMap dsn_properties = config.GetProperties();
   for (auto& [key, value] : dsn_properties) {
@@ -802,8 +802,8 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
   // TODO: Copy connection string properly in SQLDriverConnect according to the
   // spec https://github.com/apache/arrow/issues/46560
 
-  using driver::odbcabstraction::Connection;
-  using driver::odbcabstraction::DriverException;
+  using arrow::flight::sql::odbc::Connection;
+  using arrow::flight::sql::odbc::DriverException;
   using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
@@ -825,7 +825,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
     // Load the DSN window according to driver_completion
     if (driver_completion == SQL_DRIVER_PROMPT) {
       // Load DSN window before first attempt to connect
-      driver::flight_sql::config::Configuration config;
+      arrow::flight::sql::odbc::config::Configuration config;
       if (!DisplayConnectionWindow(window_handle, config, properties)) {
         return static_cast<SQLRETURN>(SQL_NO_DATA);
       }
@@ -838,7 +838,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
         // If first connection fails due to missing attributes, load
         // the DSN window and try to connect again
         if (!missing_properties.empty()) {
-          driver::flight_sql::config::Configuration config;
+          arrow::flight::sql::odbc::config::Configuration config;
           missing_properties.clear();
 
           if (!DisplayConnectionWindow(window_handle, config, properties)) {
@@ -876,8 +876,8 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* dsn_name, SQLSMALLINT dsn_name_len,
                    << ", password: " << static_cast<const void*>(password)
                    << ", password_len: " << password_len;
 
-  using driver::flight_sql::FlightSqlConnection;
-  using driver::flight_sql::config::Configuration;
+  using arrow::flight::sql::odbc::FlightSqlConnection;
+  using arrow::flight::sql::odbc::config::Configuration;
   using ODBC::ODBCConnection;
 
   using ODBC::SqlWcharToString;
@@ -1452,7 +1452,7 @@ SQLRETURN SQLNativeSql(SQLHDBC conn, SQLWCHAR* in_statement_text,
                    << ", out_statement_text_length: "
                    << static_cast<const void*>(out_statement_text_length);
 
-  using driver::odbcabstraction::Diagnostics;
+  using arrow::flight::sql::odbc::Diagnostics;
   using ODBC::GetAttributeSQLWCHAR;
   using ODBC::ODBCConnection;
   using ODBC::SqlWcharToString;
