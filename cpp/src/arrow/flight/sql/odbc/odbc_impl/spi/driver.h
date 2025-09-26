@@ -17,15 +17,36 @@
 
 #pragma once
 
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#include <memory>
 
-#include <sql.h>
-#include <sqltypes.h>
-#include <sqlucode.h>
+#include "arrow/flight/sql/odbc/odbc_impl/diagnostics.h"
+#include "arrow/flight/sql/odbc/odbc_impl/types.h"
 
-//  \file odbc_api_internal.h
-//
-//  Define internal ODBC API function headers.
 namespace arrow::flight::sql::odbc {
-SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result);
+
+class Connection;
+
+/// \brief High-level representation of an ODBC driver.
+class Driver {
+ protected:
+  Driver() = default;
+
+ public:
+  virtual ~Driver() = default;
+
+  /// \brief Create a connection using given ODBC version.
+  /// \param odbc_version ODBC version to be used.
+  virtual std::shared_ptr<Connection> CreateConnection(OdbcVersion odbc_version) = 0;
+
+  /// \brief Gets the diagnostics for this connection.
+  /// \return the diagnostics
+  virtual Diagnostics& GetDiagnostics() = 0;
+
+  /// \brief Sets the driver version.
+  virtual void SetVersion(std::string version) = 0;
+
+  /// \brief Register a log to be used by the system.
+  virtual void RegisterLog() = 0;
+};
+
 }  // namespace arrow::flight::sql::odbc

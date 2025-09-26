@@ -17,15 +17,30 @@
 
 #pragma once
 
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#include <map>
+#include <memory>
+#include <string>
+#include "arrow/flight/client.h"
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
+#include "arrow/flight/sql/odbc/odbc_impl/spi/connection.h"
 
-#include <sql.h>
-#include <sqltypes.h>
-#include <sqlucode.h>
-
-//  \file odbc_api_internal.h
-//
-//  Define internal ODBC API function headers.
 namespace arrow::flight::sql::odbc {
-SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result);
+
+class FlightSqlAuthMethod {
+ public:
+  virtual ~FlightSqlAuthMethod() = default;
+
+  virtual void Authenticate(FlightSqlConnection& connection,
+                            arrow::flight::FlightCallOptions& call_options) = 0;
+
+  virtual std::string GetUser() { return std::string(); }
+
+  static std::unique_ptr<FlightSqlAuthMethod> FromProperties(
+      const std::unique_ptr<arrow::flight::FlightClient>& client,
+      const Connection::ConnPropertyMap& properties);
+
+ protected:
+  FlightSqlAuthMethod() = default;
+};
+
 }  // namespace arrow::flight::sql::odbc

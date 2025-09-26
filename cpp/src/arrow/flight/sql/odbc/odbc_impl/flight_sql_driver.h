@@ -15,24 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// platform.h includes windows.h, so it needs to be included first
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#pragma once
 
-#include <sql.h>
-#include <sqlext.h>
-#include <sqltypes.h>
-#include <sqlucode.h>
+#include "arrow/flight/sql/odbc/odbc_impl/diagnostics.h"
+#include "arrow/flight/sql/odbc/odbc_impl/spi/driver.h"
 
-#include "arrow/flight/sql/odbc/odbc_api_internal.h"
-#include "arrow/flight/sql/odbc/visibility.h"
+namespace arrow::flight::sql::odbc {
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_environment.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
+class FlightSqlDriver : public Driver {
+ private:
+  Diagnostics diagnostics_;
+  std::string version_;
 
-#include "arrow/util/logging.h"
+ public:
+  FlightSqlDriver();
+  ~FlightSqlDriver();
 
-SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
-  return SQL_INVALID_HANDLE;
-}
+  std::shared_ptr<Connection> CreateConnection(OdbcVersion odbc_version) override;
+
+  Diagnostics& GetDiagnostics() override;
+
+  void SetVersion(std::string version) override;
+
+  /// Register Arrow Compute kernels once.
+  void RegisterComputeKernels();
+
+  void RegisterLog() override;
+};
+
+}  // namespace arrow::flight::sql::odbc

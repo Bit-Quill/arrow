@@ -15,24 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// platform.h includes windows.h, so it needs to be included first
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#include <optional>
+#include "arrow/flight/sql/odbc/odbc_impl/record_batch_transformer.h"
 
-#include <sql.h>
-#include <sqlext.h>
-#include <sqltypes.h>
-#include <sqlucode.h>
+namespace arrow::flight::sql::odbc {
 
-#include "arrow/flight/sql/odbc/odbc_api_internal.h"
-#include "arrow/flight/sql/odbc/visibility.h"
+using arrow::RecordBatch;
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_environment.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
+using std::optional;
 
-#include "arrow/util/logging.h"
+class GetTablesReader {
+ private:
+  std::shared_ptr<RecordBatch> record_batch_;
+  int64_t current_row_;
 
-SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
-  return SQL_INVALID_HANDLE;
-}
+ public:
+  explicit GetTablesReader(std::shared_ptr<RecordBatch> record_batch);
+
+  bool Next();
+
+  optional<std::string> GetCatalogName();
+
+  optional<std::string> GetDbSchemaName();
+
+  std::string GetTableName();
+
+  std::string GetTableType();
+
+  std::shared_ptr<Schema> GetSchema();
+};
+
+}  // namespace arrow::flight::sql::odbc

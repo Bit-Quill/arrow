@@ -17,15 +17,27 @@
 
 #pragma once
 
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#include "arrow/flight/sql/odbc/odbc_impl/accessors/types.h"
+#include "arrow/flight/sql/odbc/odbc_impl/diagnostics.h"
+#include "arrow/flight/sql/odbc/odbc_impl/types.h"
+#include "arrow/type_fwd.h"
 
-#include <sql.h>
-#include <sqltypes.h>
-#include <sqlucode.h>
-
-//  \file odbc_api_internal.h
-//
-//  Define internal ODBC API function headers.
 namespace arrow::flight::sql::odbc {
-SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result);
+
+using arrow::BooleanArray;
+
+template <CDataType TARGET_TYPE>
+class BooleanArrayFlightSqlAccessor
+    : public FlightSqlAccessor<BooleanArray, TARGET_TYPE,
+                               BooleanArrayFlightSqlAccessor<TARGET_TYPE>> {
+ public:
+  explicit BooleanArrayFlightSqlAccessor(Array* array);
+
+  RowStatus MoveSingleCellImpl(ColumnBinding* binding, int64_t arrow_row, int64_t i,
+                               int64_t& value_offset, bool update_value_offset,
+                               Diagnostics& diagnostics);
+
+  size_t GetCellLengthImpl(ColumnBinding* binding) const;
+};
+
 }  // namespace arrow::flight::sql::odbc

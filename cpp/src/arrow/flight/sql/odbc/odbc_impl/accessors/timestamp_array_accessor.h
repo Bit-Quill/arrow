@@ -17,15 +17,28 @@
 
 #pragma once
 
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#include "arrow/flight/sql/odbc/odbc_impl/accessors/types.h"
+#include "arrow/flight/sql/odbc/odbc_impl/types.h"
+#include "arrow/type_fwd.h"
 
-#include <sql.h>
-#include <sqltypes.h>
-#include <sqlucode.h>
-
-//  \file odbc_api_internal.h
-//
-//  Define internal ODBC API function headers.
 namespace arrow::flight::sql::odbc {
-SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result);
+
+using arrow::Array;
+using arrow::TimestampArray;
+using arrow::TimeUnit;
+
+template <CDataType TARGET_TYPE, TimeUnit::type UNIT>
+class TimestampArrayFlightSqlAccessor
+    : public FlightSqlAccessor<TimestampArray, TARGET_TYPE,
+                               TimestampArrayFlightSqlAccessor<TARGET_TYPE, UNIT>> {
+ public:
+  explicit TimestampArrayFlightSqlAccessor(Array* array);
+
+  RowStatus MoveSingleCellImpl(ColumnBinding* binding, int64_t arrow_row,
+                               int64_t cell_counter, int64_t& value_offset,
+                               bool update_value_offset, Diagnostics& diagnostics);
+
+  size_t GetCellLengthImpl(ColumnBinding* binding) const;
+};
+
 }  // namespace arrow::flight::sql::odbc

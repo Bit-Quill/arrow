@@ -17,15 +17,33 @@
 
 #pragma once
 
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#include "arrow/flight/client.h"
+#include "arrow/flight/sql/client.h"
+#include "arrow/flight/sql/odbc/odbc_impl/blocking_queue.h"
 
-#include <sql.h>
-#include <sqltypes.h>
-#include <sqlucode.h>
-
-//  \file odbc_api_internal.h
-//
-//  Define internal ODBC API function headers.
 namespace arrow::flight::sql::odbc {
-SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result);
+
+using arrow::Result;
+using arrow::flight::FlightInfo;
+using arrow::flight::FlightStreamChunk;
+using arrow::flight::FlightStreamReader;
+using arrow::flight::sql::FlightSqlClient;
+using arrow::flight::sql::odbc::BlockingQueue;
+
+class FlightStreamChunkBuffer {
+  BlockingQueue<Result<FlightStreamChunk>> queue_;
+
+ public:
+  FlightStreamChunkBuffer(FlightSqlClient& flight_sql_client,
+                          const arrow::flight::FlightCallOptions& call_options,
+                          const std::shared_ptr<FlightInfo>& flight_info,
+                          size_t queue_capacity = 5);
+
+  ~FlightStreamChunkBuffer();
+
+  void Close();
+
+  bool GetNext(FlightStreamChunk* chunk);
+};
+
 }  // namespace arrow::flight::sql::odbc

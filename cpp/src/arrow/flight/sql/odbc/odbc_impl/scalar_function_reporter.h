@@ -15,24 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// platform.h includes windows.h, so it needs to be included first
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#pragma once
 
-#include <sql.h>
-#include <sqlext.h>
-#include <sqltypes.h>
-#include <sqlucode.h>
+#include <arrow/type.h>
 
-#include "arrow/flight/sql/odbc/odbc_api_internal.h"
-#include "arrow/flight/sql/odbc/visibility.h"
+namespace arrow::flight::sql::odbc {
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_environment.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
+void ReportSystemFunction(const std::string& function, uint32_t& current_sys_functions,
+                          uint32_t& current_convert_functions);
+void ReportNumericFunction(const std::string& function, uint32_t& current_functions);
+void ReportStringFunction(const std::string& function, uint32_t& current_functions);
+void ReportDatetimeFunction(const std::string& function, uint32_t& current_functions);
 
-#include "arrow/util/logging.h"
-
-SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
-  return SQL_INVALID_HANDLE;
-}
+}  // namespace arrow::flight::sql::odbc

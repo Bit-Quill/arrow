@@ -15,24 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// platform.h includes windows.h, so it needs to be included first
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#pragma once
 
-#include <sql.h>
-#include <sqlext.h>
-#include <sqltypes.h>
-#include <sqlucode.h>
+#include <cstdint>
 
-#include "arrow/flight/sql/odbc/odbc_api_internal.h"
-#include "arrow/flight/sql/odbc/visibility.h"
+namespace arrow::flight::sql::odbc {
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_environment.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
-
-#include "arrow/util/logging.h"
-
-SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
-  return SQL_INVALID_HANDLE;
-}
+enum ODBCErrorCodes : int32_t {
+  ODBCErrorCodes_GENERAL_ERROR = 100,
+  ODBCErrorCodes_AUTH = 200,
+  ODBCErrorCodes_TLS = 300,
+  ODBCErrorCodes_FRACTIONAL_TRUNCATION_ERROR = 400,
+  ODBCErrorCodes_COMMUNICATION = 500,
+  ODBCErrorCodes_GENERAL_WARNING = 1000000,
+  ODBCErrorCodes_TRUNCATION_WARNING = 1000100,
+  ODBCErrorCodes_FRACTIONAL_TRUNCATION_WARNING = 1000100,
+  ODBCErrorCodes_INDICATOR_NEEDED = 1000200
+};
+}  // namespace arrow::flight::sql::odbc

@@ -15,24 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// platform.h includes windows.h, so it needs to be included first
+#pragma once
+
+#include <string>
+
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
-#include <sql.h>
-#include <sqlext.h>
-#include <sqltypes.h>
-#include <sqlucode.h>
+#include <sys/types.h>
+#if !_WIN32
+#  include <netdb.h>
+#endif
 
-#include "arrow/flight/sql/odbc/odbc_api_internal.h"
-#include "arrow/flight/sql/odbc/visibility.h"
+namespace driver {
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_environment.h"
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
+class AddressInfo {
+ private:
+  struct addrinfo* addrinfo_result_;
 
-#include "arrow/util/logging.h"
+ public:
+  AddressInfo();
 
-SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
-  return SQL_INVALID_HANDLE;
-}
+  ~AddressInfo();
+
+  bool GetAddressInfo(const std::string& host, char* host_name_info, int64_t max_host);
+};
+}  // namespace driver
