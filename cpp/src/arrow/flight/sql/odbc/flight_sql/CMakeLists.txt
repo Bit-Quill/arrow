@@ -80,7 +80,8 @@ add_library(arrow_odbc_spi_impl
             system_trust_store.h
             config/configuration.cc
             config/connection_string_parser.cc
-            utils.cc)
+            utils.cc
+            utils.h)
 target_include_directories(arrow_odbc_spi_impl
                            PUBLIC include include/flight_sql
                                   ${CMAKE_SOURCE_DIR}/odbcabstraction/include)

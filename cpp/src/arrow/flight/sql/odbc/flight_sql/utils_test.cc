@@ -28,6 +28,8 @@
 namespace driver {
 namespace flight_sql {
 
+using namespace utils;
+
 class UtilTestsWithCompute : public ::testing::Test {
  public:
   // This must be done before using the compute kernels in order to

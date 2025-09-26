@@ -50,14 +50,14 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
       // connection's Location and skip creating a FlightClient in that scenario.
 
       std::unique_ptr<FlightClient> temp_flight_client;
-      ThrowIfNotOK(FlightClient::Connect(endpoint_locations[0], client_options)
-                       .Value(&temp_flight_client));
+      utils::ThrowIfNotOK(FlightClient::Connect(endpoint_locations[0], client_options)
+                              .Value(&temp_flight_client));
       temp_flight_sql_client.reset(new FlightSqlClient(std::move(temp_flight_client)));
 
       result = temp_flight_sql_client->DoGet(call_options, ticket);
     }
 
-    ThrowIfNotOK(result.status());
+    utils::ThrowIfNotOK(result.status());
     std::shared_ptr<FlightStreamReader> stream_reader_ptr(std::move(result.ValueOrDie()));
 
     BlockingQueue<std::pair<Result<FlightStreamChunk>,
