@@ -27,7 +27,7 @@
 #include <commdlg.h>
 #include <sql.h>
 #include <sstream>
-#include "arrow/flight/sql/odbc/flight_sql/utils.h"
+#include "arrow/flight/sql/odbc/flight_sql/util.h"
 
 #include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/ui/add_property_window.h"
 
@@ -35,9 +35,10 @@
 #define ADVANCED_TAB 1
 
 namespace {
-std::string TestConnection(const driver::flight_sql::config::Configuration& config) {
-  std::unique_ptr<driver::flight_sql::FlightSqlConnection> flight_sql_conn(
-      new driver::flight_sql::FlightSqlConnection(driver::odbcabstraction::V_3));
+std::string TestConnection(
+    const arrow::flight::sql::odbc::config::Configuration& config) {
+  std::unique_ptr<arrow::flight::sql::odbc::FlightSqlConnection> flight_sql_conn(
+      new arrow::flight::sql::odbc::FlightSqlConnection(arrow::flight::sql::odbc::V_3));
 
   std::vector<std::string_view> missing_properties;
   flight_sql_conn->Connect(config.GetProperties(), missing_properties);
@@ -52,8 +53,7 @@ std::string TestConnection(const driver::flight_sql::config::Configuration& conf
 }
 }  // namespace
 
-namespace driver {
-namespace flight_sql {
+namespace arrow::flight::sql::odbc {
 namespace config {
 
 DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
@@ -93,7 +93,7 @@ void DsnConfigurationWindow::Create() {
   if (!handle_) {
     std::stringstream buf;
     buf << "Can not create window, error code: " << GetLastError();
-    throw odbcabstraction::DriverException(buf.str());
+    throw DriverException(buf.str());
   }
 }
 
@@ -252,7 +252,7 @@ int DsnConfigurationWindow::CreateEncryptionSettingsGroup(int pos_x, int pos_y,
   std::string val = config_.Get(FlightSqlConnection::USE_ENCRYPTION);
 
   // Enable encryption default value is true
-  const bool enable_encryption = utils::AsBool(val).value_or(true);
+  const bool enable_encryption = util::AsBool(val).value_or(true);
   labels_.push_back(CreateLabel(label_pos_x, row_pos, LABEL_WIDTH, ROW_HEIGHT,
                                 L"Use Encryption:", ChildId::ENABLE_ENCRYPTION_LABEL));
   enable_encryption_check_box_ =
@@ -277,7 +277,7 @@ int DsnConfigurationWindow::CreateEncryptionSettingsGroup(int pos_x, int pos_y,
   val = config_.Get(FlightSqlConnection::USE_SYSTEM_TRUST_STORE).c_str();
 
   // System trust store default value is true
-  const bool use_system_cert_store = utils::AsBool(val).value_or(true);
+  const bool use_system_cert_store = util::AsBool(val).value_or(true);
   labels_.push_back(CreateLabel(label_pos_x, row_pos, LABEL_WIDTH, 2 * ROW_HEIGHT,
                                 L"Use System Certificate Store:",
                                 ChildId::USE_SYSTEM_CERT_STORE_LABEL));
@@ -289,7 +289,7 @@ int DsnConfigurationWindow::CreateEncryptionSettingsGroup(int pos_x, int pos_y,
 
   const int right_pos_x = label_pos_x + (size_x - (2 * INTERVAL)) / 2;
   const int right_check_pos_x = right_pos_x + (edit_pos_x - label_pos_x);
-  const bool disable_cert_verification = utils::AsBool(val).value_or(false);
+  const bool disable_cert_verification = util::AsBool(val).value_or(false);
   labels_.push_back(CreateLabel(right_pos_x, row_pos, LABEL_WIDTH, 2 * ROW_HEIGHT,
                                 L"Disable Certificate Verification:",
                                 ChildId::DISABLE_CERT_VERIFICATION_LABEL));
@@ -419,13 +419,13 @@ void DsnConfigurationWindow::SaveParameters(Configuration& target_config) {
   try {
     const int port_int = std::stoi(text);
     if (0 > port_int || USHRT_MAX < port_int) {
-      throw odbcabstraction::DriverException("Invalid port value.");
+      throw DriverException("Invalid port value.");
     }
     target_config.Set(FlightSqlConnection::PORT, text);
-  } catch (odbcabstraction::DriverException&) {
+  } catch (DriverException&) {
     throw;
   } catch (std::exception&) {
-    throw odbcabstraction::DriverException("Invalid port value.");
+    throw DriverException("Invalid port value.");
   }
 
   if (0 == auth_type_combo_box_->GetSelection()) {
@@ -498,7 +498,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wparam, LPARAM lparam) {
             std::wstring w_test_message =
                 arrow::util::UTF8ToWideString(test_message).ValueOr(L"");
             MessageBox(NULL, w_test_message.c_str(), L"Test Connection Success", MB_OK);
-          } catch (odbcabstraction::DriverException& err) {
+          } catch (DriverException& err) {
             std::wstring w_message_text =
                 arrow::util::UTF8ToWideString(err.GetMessageText()).ValueOr(L"");
             MessageBox(NULL, w_message_text.c_str(), L"Error!",
@@ -512,7 +512,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wparam, LPARAM lparam) {
             SaveParameters(config_);
             accepted_ = true;
             PostMessage(GetHandle(), WM_CLOSE, 0, 0);
-          } catch (odbcabstraction::DriverException& err) {
+          } catch (DriverException& err) {
             std::wstring w_message_text =
                 arrow::util::UTF8ToWideString(err.GetMessageText()).ValueOr(L"");
             MessageBox(NULL, w_message_text.c_str(), L"Error!",
@@ -633,5 +633,4 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wparam, LPARAM lparam) {
 }
 
 }  // namespace config
-}  // namespace flight_sql
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc

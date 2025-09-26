@@ -20,8 +20,8 @@
 
 #include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/configuration.h"
 
-using driver::flight_sql::config::Configuration;
-using driver::odbcabstraction::Connection;
+using arrow::flight::sql::odbc::Connection;
+using arrow::flight::sql::odbc::config::Configuration;
 
 #if defined _WIN32 || defined _WIN64
 /**

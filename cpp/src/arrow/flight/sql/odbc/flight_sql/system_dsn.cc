@@ -25,8 +25,8 @@
 #include <odbcinst.h>
 #include <sstream>
 
-using driver::flight_sql::FlightSqlConnection;
-using driver::flight_sql::config::Configuration;
+using arrow::flight::sql::odbc::FlightSqlConnection;
+using arrow::flight::sql::odbc::config::Configuration;
 
 void PostLastInstallerError() {
 #define BUFFER_SIZE (1024)

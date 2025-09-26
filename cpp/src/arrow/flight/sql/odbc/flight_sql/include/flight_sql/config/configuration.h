@@ -27,8 +27,7 @@
 #  include <winuser.h>
 #endif
 
-namespace driver {
-namespace flight_sql {
+namespace arrow::flight::sql::odbc {
 namespace config {
 
 #define TRUE_STR "true"
@@ -61,14 +60,13 @@ class Configuration {
   /**
    * Get properties map.
    */
-  const driver::odbcabstraction::Connection::ConnPropertyMap& GetProperties() const;
+  const arrow::flight::sql::odbc::Connection::ConnPropertyMap& GetProperties() const;
 
   std::vector<std::string> GetCustomKeys() const;
 
  private:
-  driver::odbcabstraction::Connection::ConnPropertyMap properties_;
+  arrow::flight::sql::odbc::Connection::ConnPropertyMap properties_;
 };
 
 }  // namespace config
-}  // namespace flight_sql
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc

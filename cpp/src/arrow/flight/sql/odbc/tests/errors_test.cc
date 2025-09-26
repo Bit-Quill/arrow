@@ -115,7 +115,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   SQLWCHAR sql_state[sql_state_size];
   SQLSMALLINT sql_state_length;
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, RECORD_1, SQL_DIAG_SQLSTATE, sql_state,
-                        sql_state_size * driver::odbcabstraction::GetSqlWCharSize(),
+                        sql_state_size * arrow::flight::sql::odbc::GetSqlWCharSize(),
                         &sql_state_length);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
@@ -265,7 +265,7 @@ TYPED_TEST(FlightSQLODBCTestBase,
   SQLSMALLINT sql_state_length;
   ret = SQLGetDiagField(
       SQL_HANDLE_DESC, descriptor, RECORD_1, SQL_DIAG_SQLSTATE, sql_state,
-      sql_state_size * driver::odbcabstraction::GetSqlWCharSize(), &sql_state_length);
+      sql_state_size * arrow::flight::sql::odbc::GetSqlWCharSize(), &sql_state_length);
 
   EXPECT_EQ(ret, SQL_SUCCESS);
 

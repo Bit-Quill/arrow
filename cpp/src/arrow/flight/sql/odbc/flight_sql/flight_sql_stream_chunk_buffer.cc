@@ -16,10 +16,9 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_stream_chunk_buffer.h"
-#include "arrow/flight/sql/odbc/flight_sql/utils.h"
+#include "arrow/flight/sql/odbc/flight_sql/util.h"
 
-namespace driver {
-namespace flight_sql {
+namespace arrow::flight::sql::odbc {
 
 using arrow::flight::FlightClient;
 using arrow::flight::FlightEndpoint;
@@ -50,14 +49,14 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
       // connection's Location and skip creating a FlightClient in that scenario.
 
       std::unique_ptr<FlightClient> temp_flight_client;
-      utils::ThrowIfNotOK(FlightClient::Connect(endpoint_locations[0], client_options)
-                              .Value(&temp_flight_client));
+      util::ThrowIfNotOK(FlightClient::Connect(endpoint_locations[0], client_options)
+                             .Value(&temp_flight_client));
       temp_flight_sql_client.reset(new FlightSqlClient(std::move(temp_flight_client)));
 
       result = temp_flight_sql_client->DoGet(call_options, ticket);
     }
 
-    utils::ThrowIfNotOK(result.status());
+    util::ThrowIfNotOK(result.status());
     std::shared_ptr<FlightStreamReader> stream_reader_ptr(std::move(result.ValueOrDie()));
 
     BlockingQueue<std::pair<Result<FlightStreamChunk>,
@@ -88,7 +87,7 @@ bool FlightStreamChunkBuffer::GetNext(FlightStreamChunk* chunk) {
   Result<FlightStreamChunk> result = closeable_endpoint_stream_pair.first;
   if (!result.status().ok()) {
     Close();
-    throw odbcabstraction::DriverException(result.status().message());
+    throw DriverException(result.status().message());
   }
   *chunk = std::move(result.ValueOrDie());
   return chunk->data != nullptr;
@@ -98,5 +97,4 @@ void FlightStreamChunkBuffer::Close() { queue_.Close(); }
 
 FlightStreamChunkBuffer::~FlightStreamChunkBuffer() { Close(); }
 
-}  // namespace flight_sql
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc

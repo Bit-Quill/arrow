@@ -22,11 +22,9 @@
 #include <cstring>
 #include "arrow/array.h"
 
-namespace driver {
-namespace flight_sql {
+namespace arrow::flight::sql::odbc {
 
 using arrow::BinaryArray;
-using odbcabstraction::RowStatus;
 
 namespace {
 
@@ -34,8 +32,8 @@ inline RowStatus MoveSingleCellToBinaryBuffer(ColumnBinding* binding, BinaryArra
                                               int64_t arrow_row, int64_t i,
                                               int64_t& value_offset,
                                               bool update_value_offset,
-                                              odbcabstraction::Diagnostics& diagnostics) {
-  RowStatus result = odbcabstraction::RowStatus_SUCCESS;
+                                              Diagnostics& diagnostics) {
+  RowStatus result = RowStatus_SUCCESS;
 
   const char* value = array->Value(arrow_row).data();
   size_t size_in_bytes = array->value_length(arrow_row);
@@ -48,7 +46,7 @@ inline RowStatus MoveSingleCellToBinaryBuffer(ColumnBinding* binding, BinaryArra
   std::memcpy(byte_buffer, ((char*)value) + value_offset, value_length);
 
   if (remaining_length > binding->buffer_length) {
-    result = odbcabstraction::RowStatus_SUCCESS_WITH_INFO;
+    result = RowStatus_SUCCESS_WITH_INFO;
     diagnostics.AddTruncationWarning();
     if (update_value_offset) {
       value_offset += value_length;
@@ -72,10 +70,9 @@ BinaryArrayFlightSqlAccessor<TARGET_TYPE>::BinaryArrayFlightSqlAccessor(Array* a
                         BinaryArrayFlightSqlAccessor<TARGET_TYPE>>(array) {}
 
 template <>
-RowStatus
-BinaryArrayFlightSqlAccessor<odbcabstraction::CDataType_BINARY>::MoveSingleCellImpl(
+RowStatus BinaryArrayFlightSqlAccessor<CDataType_BINARY>::MoveSingleCellImpl(
     ColumnBinding* binding, int64_t arrow_row, int64_t i, int64_t& value_offset,
-    bool update_value_offset, odbcabstraction::Diagnostics& diagnostics) {
+    bool update_value_offset, Diagnostics& diagnostics) {
   return MoveSingleCellToBinaryBuffer(binding, this->GetArray(), arrow_row, i,
                                       value_offset, update_value_offset, diagnostics);
 }
@@ -86,7 +83,6 @@ size_t BinaryArrayFlightSqlAccessor<TARGET_TYPE>::GetCellLengthImpl(
   return binding->buffer_length;
 }
 
-template class BinaryArrayFlightSqlAccessor<odbcabstraction::CDataType_BINARY>;
+template class BinaryArrayFlightSqlAccessor<CDataType_BINARY>;
 
-}  // namespace flight_sql
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc

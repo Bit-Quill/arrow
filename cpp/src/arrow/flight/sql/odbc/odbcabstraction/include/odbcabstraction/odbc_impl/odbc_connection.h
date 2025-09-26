@@ -45,9 +45,9 @@ class ODBCConnection : public ODBCHandle<ODBCConnection> {
   /// \param[in] environment the parent environment.
   /// \param[in] spi_connection the underlying spi connection.
   ODBCConnection(ODBCEnvironment& environment,
-                 std::shared_ptr<driver::odbcabstraction::Connection> spi_connection);
+                 std::shared_ptr<arrow::flight::sql::odbc::Connection> spi_connection);
 
-  driver::odbcabstraction::Diagnostics& GetDiagnosticsImpl();
+  arrow::flight::sql::odbc::Diagnostics& GetDiagnosticsImpl();
 
   const std::string& GetDSN() const;
   bool IsConnected() const;
@@ -57,7 +57,7 @@ class ODBCConnection : public ODBCHandle<ODBCConnection> {
   /// \param[in] properties the connection property map extracted from connection string.
   /// \param[out] missing_properties report the properties that are missing
   void Connect(std::string dsn,
-               const driver::odbcabstraction::Connection::ConnPropertyMap& properties,
+               const arrow::flight::sql::odbc::Connection::ConnPropertyMap& properties,
                std::vector<std::string_view>& missing_properties);
 
   SQLRETURN GetInfo(SQLUSMALLINT info_type, SQLPOINTER value, SQLSMALLINT buffer_length,
@@ -91,11 +91,11 @@ class ODBCConnection : public ODBCHandle<ODBCConnection> {
   /// Read properties from connection string, but does not read values from DSN
   static void GetPropertiesFromConnString(
       const std::string& conn_str,
-      driver::odbcabstraction::Connection::ConnPropertyMap& properties);
+      arrow::flight::sql::odbc::Connection::ConnPropertyMap& properties);
 
  private:
   ODBCEnvironment& environment_;
-  std::shared_ptr<driver::odbcabstraction::Connection> spi_connection_;
+  std::shared_ptr<arrow::flight::sql::odbc::Connection> spi_connection_;
   // Extra ODBC statement that's used to track and validate when statement attributes are
   // set through the connection handle. These attributes get copied to new ODBC statements
   // when they are allocated.

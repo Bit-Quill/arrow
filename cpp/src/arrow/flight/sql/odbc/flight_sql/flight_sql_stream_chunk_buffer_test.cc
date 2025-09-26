@@ -25,8 +25,7 @@
 #include "arrow/flight/test_util.h"
 #include "gtest/gtest.h"
 
-namespace driver {
-namespace flight_sql {
+namespace arrow::flight::sql::odbc {
 
 using arrow::Array;
 using arrow::flight::FlightCallOptions;
@@ -133,5 +132,4 @@ TEST_F(FlightStreamChunkBufferTest, TestMultipleEndpointsInt) {
   // In total 10 batches should be returned.
   EXPECT_EQ(num_chunks, 10);
 }
-}  // namespace flight_sql
-}  // namespace driver
+}  // namespace arrow::flight::sql::odbc

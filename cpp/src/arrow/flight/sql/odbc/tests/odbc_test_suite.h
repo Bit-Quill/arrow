@@ -43,7 +43,7 @@
 #define TEST_DSN "Apache Arrow Flight SQL Test DSN"
 
 namespace arrow::flight::sql::odbc {
-using driver::odbcabstraction::Connection;
+using arrow::flight::sql::odbc::Connection;
 
 class FlightSQLODBCRemoteTestBase : public ::testing::Test {
  public:
