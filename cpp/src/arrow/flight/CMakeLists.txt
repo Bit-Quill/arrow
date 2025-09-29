@@ -271,7 +271,9 @@ if(ARROW_TESTING)
          ArrowTesting::arrow_testing_static)
   endif()
   list(APPEND ARROW_FLIGHT_TESTING_SHARED_LINK_LIBS ${ARROW_FLIGHT_TEST_INTERFACE_LIBS})
+  list(APPEND ARROW_FLIGHT_TESTING_SHARED_LINK_LIBS ${ARROW_GTEST_GMOCK})
   list(APPEND ARROW_FLIGHT_TESTING_STATIC_LINK_LIBS ${ARROW_FLIGHT_TEST_INTERFACE_LIBS})
+  list(APPEND ARROW_FLIGHT_TESTING_STATIC_LINK_LIBS ${ARROW_GTEST_GMOCK})
   add_arrow_lib(arrow_flight_testing
                 CMAKE_PACKAGE_NAME
                 ArrowFlightTesting
@@ -295,9 +297,7 @@ if(ARROW_TESTING)
                 STATIC_INSTALL_INTERFACE_LIBS
                 ${ARROW_FLIGHT_TESTING_STATIC_INSTALL_INTERFACE_LIBS}
                 PRIVATE_INCLUDES
-                "${Protobuf_INCLUDE_DIRS}"
-                SHARED_PRIVATE_LINK_LIBS
-                ${ARROW_GTEST_GMOCK})
+                "${Protobuf_INCLUDE_DIRS}")
 
   foreach(LIB_TARGET ${ARROW_FLIGHT_TESTING_LIBRARIES})
     target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_EXPORTING)
