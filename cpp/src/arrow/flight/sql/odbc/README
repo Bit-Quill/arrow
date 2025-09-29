@@ -58,3 +58,5 @@ The characters are case-insensitive.
 - FATAL
 
 The Windows ODBC driver currently does not support writing log files. `ARROW_USE_GLOG` is required to write log files, and `ARROW_USE_GLOG` is disabled on Windows platform since plasma using `glog` is not fully tested on windows.
+
+Note: GH-47670 running more than 1 tests with logging enabled is not fully supported. 
