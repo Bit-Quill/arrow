@@ -39,6 +39,7 @@
 #include "arrow/util/checked_cast.h"
 #include "arrow/util/config.h"
 #include "arrow/util/logging.h"
+#include "gmock/gmock.h"
 
 #if defined(ARROW_CUDA)
 #  include "arrow/gpu/cuda_api.h"
