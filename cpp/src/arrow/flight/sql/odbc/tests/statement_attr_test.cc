@@ -16,8 +16,8 @@
 // under the License.
 #include "arrow/flight/sql/odbc/tests/odbc_test_suite.h"
 
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_statement.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/statement.h"
+#include "arrow/flight/sql/odbc/flight_sql/odbc_impl/odbc_statement.h"
+#include "arrow/flight/sql/odbc/flight_sql/spi/statement.h"
 
 #ifdef _WIN32
 #  include <windows.h>

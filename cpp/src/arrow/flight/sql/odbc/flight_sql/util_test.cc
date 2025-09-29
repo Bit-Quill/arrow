@@ -17,7 +17,7 @@
 
 #include "arrow/flight/sql/odbc/flight_sql/util.h"
 
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/calendar_utils.h"
+#include "arrow/flight/sql/odbc/flight_sql/calendar_utils.h"
 
 #include "arrow/compute/initialize.h"
 #include "arrow/testing/builder.h"

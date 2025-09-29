@@ -17,10 +17,10 @@
 
 #include "arrow/flight/sql/odbc/flight_sql/util.h"
 
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/calendar_utils.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/encoding.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
+#include "arrow/flight/sql/odbc/flight_sql/calendar_utils.h"
+#include "arrow/flight/sql/odbc/flight_sql/encoding.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
+#include "arrow/flight/sql/odbc/flight_sql/types.h"
 
 #include "arrow/builder.h"
 #include "arrow/compute/api.h"

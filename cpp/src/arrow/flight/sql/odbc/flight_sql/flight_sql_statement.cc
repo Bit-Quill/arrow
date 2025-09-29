@@ -16,6 +16,7 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_statement.h"
+
 #include <sql.h>
 #include <sqlext.h>
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_result_set.h"
@@ -23,14 +24,14 @@
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_statement_get_columns.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_statement_get_tables.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_statement_get_type_info.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 #include "arrow/flight/sql/odbc/flight_sql/record_batch_transformer.h"
 #include "arrow/flight/sql/odbc/flight_sql/util.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/io/memory.h"
 
 #include <boost/optional.hpp>
 #include <utility>
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
+#include "arrow/flight/sql/odbc/flight_sql/exceptions.h"
 
 namespace arrow::flight::sql::odbc {
 

@@ -22,7 +22,7 @@
 #include <mutex>
 #include <unordered_map>
 #include "arrow/flight/sql/client.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h"
+#include "arrow/flight/sql/odbc/flight_sql/spi/connection.h"
 
 namespace arrow::flight::sql::odbc {
 

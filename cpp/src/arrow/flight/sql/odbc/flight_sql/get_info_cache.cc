@@ -17,14 +17,14 @@
 
 #include "arrow/flight/sql/odbc/flight_sql/get_info_cache.h"
 
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 
 #include <sql.h>
 #include <sqlext.h>
 #include "arrow/array.h"
 #include "arrow/array/array_nested.h"
 #include "arrow/flight/sql/api.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
+#include "arrow/flight/sql/odbc/flight_sql/exceptions.h"
 #include "arrow/scalar.h"
 #include "arrow/type_fwd.h"
 

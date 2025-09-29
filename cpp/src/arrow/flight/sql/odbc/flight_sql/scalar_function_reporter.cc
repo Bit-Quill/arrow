@@ -17,7 +17,7 @@
 
 #include "arrow/flight/sql/odbc/flight_sql/scalar_function_reporter.h"
 
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 
 #include <sqlext.h>
 #include <string>

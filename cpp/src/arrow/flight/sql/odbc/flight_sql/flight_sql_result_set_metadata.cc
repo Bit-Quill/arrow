@@ -16,14 +16,15 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_result_set_metadata.h"
+
 #include "arrow/flight/sql/column_metadata.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 #include "arrow/flight/sql/odbc/flight_sql/util.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/util/key_value_metadata.h"
 
 #include <utility>
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
+#include "arrow/flight/sql/odbc/flight_sql/exceptions.h"
+#include "arrow/flight/sql/odbc/flight_sql/types.h"
 
 namespace arrow::flight::sql::odbc {
 

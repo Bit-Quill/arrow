@@ -18,7 +18,7 @@
 #pragma once
 
 #include <memory>
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
+#include "arrow/flight/sql/odbc/flight_sql/types.h"
 #include "arrow/type_fwd.h"
 
 namespace arrow::flight::sql::odbc {

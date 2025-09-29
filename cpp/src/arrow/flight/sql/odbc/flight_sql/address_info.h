@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 
 #include <sys/types.h>
 #include <cstdint>

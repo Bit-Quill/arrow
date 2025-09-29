@@ -20,7 +20,7 @@
 #include <boost/locale.hpp>
 #include <cstring>
 #include "arrow/array.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/encoding.h"
+#include "arrow/flight/sql/odbc/flight_sql/encoding.h"
 
 namespace arrow::flight::sql::odbc {
 

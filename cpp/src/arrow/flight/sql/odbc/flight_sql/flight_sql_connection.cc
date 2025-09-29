@@ -17,7 +17,7 @@
 
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
 
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 
 #include "arrow/flight/client_cookie_middleware.h"
 #include "arrow/flight/sql/odbc/flight_sql/address_info.h"
@@ -32,7 +32,7 @@
 #include <boost/asio/ip/address.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
+#include "arrow/flight/sql/odbc/flight_sql/exceptions.h"
 
 #include <sql.h>
 #include <sqlext.h>

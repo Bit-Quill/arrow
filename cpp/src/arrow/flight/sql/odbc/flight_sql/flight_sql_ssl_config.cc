@@ -15,11 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+#include "arrow/flight/sql/odbc/flight_sql/flight_sql_ssl_config.h"
+
 #include <fstream>
 #include <sstream>
 
-#include "arrow/flight/sql/odbc/flight_sql/flight_sql_ssl_config.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
+#include "arrow/flight/sql/odbc/flight_sql/exceptions.h"
 
 namespace arrow::flight::sql::odbc {
 

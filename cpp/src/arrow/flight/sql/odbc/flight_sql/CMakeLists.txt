@@ -16,9 +16,6 @@
 # under the License.
 
 add_library(arrow_odbc_spi_impl
-            include/flight_sql/flight_sql_driver.h
-            include/flight_sql/config/configuration.h
-            include/flight_sql/config/connection_string_parser.h
             accessors/binary_array_accessor.cc
             accessors/binary_array_accessor.h
             accessors/boolean_array_accessor.cc
@@ -39,11 +36,26 @@ add_library(arrow_odbc_spi_impl
             accessors/timestamp_array_accessor.h
             address_info.cc
             address_info.h
+            blocking_queue.h
+            calendar_utils.cc
+            calendar_utils.h
+            config/configuration.cc
+            config/configuration.h
+            config/connection_string_parser.cc
+            config/connection_string_parser.h
+            diagnostics.cc
+            diagnostics.h
+            error_codes.h
+            encoding.cc
+            encoding.h
+            exceptions.cc
+            exceptions.h
             flight_sql_auth_method.cc
             flight_sql_auth_method.h
             flight_sql_connection.cc
             flight_sql_connection.h
             flight_sql_driver.cc
+            flight_sql_driver.h
             flight_sql_get_tables_reader.cc
             flight_sql_get_tables_reader.h
             flight_sql_get_type_info_reader.cc
@@ -72,37 +84,53 @@ add_library(arrow_odbc_spi_impl
             get_info_cache.h
             json_converter.cc
             json_converter.h
+            odbc_impl/attribute_utils.h
+            odbc_impl/encoding_utils.h
+            odbc_impl/odbc_connection.cc
+            odbc_impl/odbc_connection.h
+            odbc_impl/odbc_descriptor.cc
+            odbc_impl/odbc_descriptor.h
+            odbc_impl/odbc_environment.cc
+            odbc_impl/odbc_environment.h
+            odbc_impl/odbc_handle.h
+            odbc_impl/odbc_statement.cc
+            odbc_impl/odbc_statement.h
+            odbc_impl/type_utilities.h
+            platform.h
             record_batch_transformer.cc
             record_batch_transformer.h
             scalar_function_reporter.cc
             scalar_function_reporter.h
+            spi/connection.h
+            spi/driver.h
+            spi/result_set.h
+            spi/result_set_metadata.h
+            spi/statement.h
             system_trust_store.cc
             system_trust_store.h
-            config/configuration.cc
-            config/connection_string_parser.cc
+            types.h
             util.cc
             util.h)
 target_include_directories(arrow_odbc_spi_impl
-                           PUBLIC include include/flight_sql
-                                  ${CMAKE_SOURCE_DIR}/odbcabstraction/include)
+                           PUBLIC include include/flight_sql)
 target_include_directories(arrow_odbc_spi_impl PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 if(WIN32)
   target_sources(arrow_odbc_spi_impl
-                 PRIVATE include/flight_sql/ui/add_property_window.h
-                         include/flight_sql/ui/custom_window.h
-                         include/flight_sql/ui/dsn_configuration_window.h
-                         include/flight_sql/ui/window.h
+                 PRIVATE ui/add_property_window.cc
+                         ui/add_property_window.h
                          ui/custom_window.cc
-                         ui/window.cc
+                         ui/custom_window.h
                          ui/dsn_configuration_window.cc
-                         ui/add_property_window.cc
+                         ui/dsn_configuration_window.h
+                         ui/window.cc
+                         ui/window.h
                          win_system_dsn.cc
                          system_dsn.cc
                          system_dsn.h)
 endif()
 
-target_link_libraries(arrow_odbc_spi_impl PUBLIC odbcabstraction arrow_flight_sql_shared
+target_link_libraries(arrow_odbc_spi_impl PUBLIC arrow_flight_sql_shared
                                                  arrow_compute_shared Boost::locale)
 
 # Link libraries on MINGW64 only

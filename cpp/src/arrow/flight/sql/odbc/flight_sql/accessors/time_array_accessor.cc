@@ -16,7 +16,8 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/accessors/time_array_accessor.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/calendar_utils.h"
+
+#include "arrow/flight/sql/odbc/flight_sql/calendar_utils.h"
 
 namespace arrow::flight::sql::odbc {
 

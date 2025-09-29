@@ -17,8 +17,8 @@
 
 #include "arrow/flight/sql/odbc/flight_sql/system_dsn.h"
 
+#include "arrow/flight/sql/odbc/flight_sql/config/configuration.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/configuration.h"
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
 

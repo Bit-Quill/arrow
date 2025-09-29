@@ -16,7 +16,8 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/accessors/primitive_array_accessor.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/diagnostics.h"
+
+#include "arrow/flight/sql/odbc/flight_sql/diagnostics.h"
 #include "arrow/testing/builder.h"
 #include "gtest/gtest.h"
 

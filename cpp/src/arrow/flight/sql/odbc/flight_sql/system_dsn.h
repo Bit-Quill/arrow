@@ -16,9 +16,9 @@
 // under the License.
 
 // platform.h includes windows.h, so it needs to be included first
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/configuration.h"
+#include "arrow/flight/sql/odbc/flight_sql/config/configuration.h"
 
 using arrow::flight::sql::odbc::Connection;
 using arrow::flight::sql::odbc::config::Configuration;

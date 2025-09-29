@@ -17,7 +17,7 @@
 
 // platform.h includes windows.h, so it needs to be included
 // before Windowsx.h and commctrl.h
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 
 #include <Windowsx.h>
 #include <commctrl.h>
@@ -26,8 +26,8 @@
 
 #include <boost/algorithm/string/trim.hpp>
 #include <sstream>
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/ui/window.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
+#include "arrow/flight/sql/odbc/flight_sql/exceptions.h"
+#include "arrow/flight/sql/odbc/flight_sql/ui/window.h"
 
 namespace arrow::flight::sql::odbc {
 namespace config {

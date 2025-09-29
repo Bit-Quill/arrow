@@ -17,10 +17,10 @@
 
 #pragma once
 
+#include "arrow/flight/sql/odbc/flight_sql/diagnostics.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_statement_get_tables.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/diagnostics.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/statement.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
+#include "arrow/flight/sql/odbc/flight_sql/spi/statement.h"
+#include "arrow/flight/sql/odbc/flight_sql/types.h"
 
 #include "arrow/flight/api.h"
 #include "arrow/flight/sql/api.h"

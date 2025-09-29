@@ -18,11 +18,11 @@
 #pragma once
 
 #include "arrow/flight/sql/client.h"
+#include "arrow/flight/sql/odbc/flight_sql/diagnostics.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
 #include "arrow/flight/sql/odbc/flight_sql/record_batch_transformer.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/diagnostics.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/result_set.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
+#include "arrow/flight/sql/odbc/flight_sql/spi/result_set.h"
+#include "arrow/flight/sql/odbc/flight_sql/types.h"
 #include "arrow/flight/types.h"
 #include "arrow/type.h"
 

@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/result_set_metadata.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
+#include "arrow/flight/sql/odbc/flight_sql/spi/result_set_metadata.h"
+#include "arrow/flight/sql/odbc/flight_sql/types.h"
 #include "arrow/flight/types.h"
 #include "arrow/type.h"
 

@@ -23,9 +23,9 @@
 #include <codecvt>
 #include <functional>
 #include <optional>
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/spi/connection.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
+#include "arrow/flight/sql/odbc/flight_sql/exceptions.h"
+#include "arrow/flight/sql/odbc/flight_sql/spi/connection.h"
+#include "arrow/flight/sql/odbc/flight_sql/types.h"
 #include "arrow/flight/types.h"
 
 namespace arrow::flight::sql::odbc {

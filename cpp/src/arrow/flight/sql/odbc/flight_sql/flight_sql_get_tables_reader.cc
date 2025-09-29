@@ -16,10 +16,11 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_get_tables_reader.h"
+
 #include "arrow/array/builder_binary.h"
 #include "arrow/array/builder_primitive.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 #include "arrow/flight/sql/odbc/flight_sql/util.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/io/memory.h"
 #include "arrow/status.h"
 

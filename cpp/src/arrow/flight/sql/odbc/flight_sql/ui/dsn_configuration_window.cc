@@ -19,7 +19,7 @@
 #include "arrow/util/utf8.h"
 
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/ui/dsn_configuration_window.h"
+#include "arrow/flight/sql/odbc/flight_sql/ui/dsn_configuration_window.h"
 
 #include <Shlwapi.h>
 #include <Windowsx.h>
@@ -29,7 +29,7 @@
 #include <sstream>
 #include "arrow/flight/sql/odbc/flight_sql/util.h"
 
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/ui/add_property_window.h"
+#include "arrow/flight/sql/odbc/flight_sql/ui/add_property_window.h"
 
 #define COMMON_TAB 0
 #define ADVANCED_TAB 1

@@ -21,7 +21,7 @@
 #include "arrow/array/builder_binary.h"
 #include "arrow/array/builder_primitive.h"
 #include "arrow/flight/sql/odbc/flight_sql/record_batch_transformer.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
+#include "arrow/flight/sql/odbc/flight_sql/types.h"
 #include "arrow/status.h"
 
 namespace arrow::flight::sql::odbc {

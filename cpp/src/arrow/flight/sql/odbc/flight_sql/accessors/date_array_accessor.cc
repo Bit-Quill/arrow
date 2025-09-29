@@ -16,8 +16,10 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/accessors/date_array_accessor.h"
+
+#include "arrow/flight/sql/odbc/flight_sql/calendar_utils.h"
+
 #include <time.h>
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/calendar_utils.h"
 
 using arrow::Date32Array;
 using arrow::Date64Array;

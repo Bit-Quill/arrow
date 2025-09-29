@@ -16,7 +16,8 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/record_batch_transformer.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
+
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 #include "arrow/record_batch.h"
 #include "arrow/testing/builder.h"
 #include "gtest/gtest.h"

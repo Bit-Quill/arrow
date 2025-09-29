@@ -37,7 +37,6 @@ endif()
 add_definitions(-DUNICODE=1)
 
 add_subdirectory(flight_sql)
-add_subdirectory(odbcabstraction)
 add_subdirectory(tests)
 
 arrow_install_all_headers("arrow/flight/sql/odbc")
@@ -91,7 +90,6 @@ add_arrow_lib(arrow_flight_sql_odbc
               SHARED_PRIVATE_LINK_LIBS
               ${ODBC_LIBRARIES}
               ${ODBCINST}
-              odbcabstraction
               arrow_odbc_spi_impl)
 
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})

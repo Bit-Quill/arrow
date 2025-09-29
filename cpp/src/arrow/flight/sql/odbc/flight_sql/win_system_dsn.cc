@@ -17,7 +17,7 @@
 
 // platform.h includes windows.h, so it needs to be included
 // before winuser.h
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 
 #include <winuser.h>
 #include <utility>
@@ -25,13 +25,13 @@
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
 
+#include "arrow/flight/sql/odbc/flight_sql/config/configuration.h"
+#include "arrow/flight/sql/odbc/flight_sql/config/connection_string_parser.h"
+#include "arrow/flight/sql/odbc/flight_sql/exceptions.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/configuration.h"
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/connection_string_parser.h"
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/ui/dsn_configuration_window.h"
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/ui/window.h"
 #include "arrow/flight/sql/odbc/flight_sql/system_dsn.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/exceptions.h"
+#include "arrow/flight/sql/odbc/flight_sql/ui/dsn_configuration_window.h"
+#include "arrow/flight/sql/odbc/flight_sql/ui/window.h"
 #include "arrow/util/logging.h"
 
 #include <odbcinst.h>

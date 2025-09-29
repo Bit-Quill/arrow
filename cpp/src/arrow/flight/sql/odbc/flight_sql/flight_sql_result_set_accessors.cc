@@ -16,10 +16,10 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_result_set_accessors.h"
-#include "arrow/flight/sql/odbc/flight_sql/accessors/main.h"
 
 #include <boost/functional/hash.hpp>
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
+#include "arrow/flight/sql/odbc/flight_sql/accessors/main.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 
 namespace arrow::flight::sql::odbc {
 

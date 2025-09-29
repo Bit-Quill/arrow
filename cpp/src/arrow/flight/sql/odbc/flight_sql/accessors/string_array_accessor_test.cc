@@ -16,7 +16,8 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/accessors/string_array_accessor.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/encoding.h"
+
+#include "arrow/flight/sql/odbc/flight_sql/encoding.h"
 #include "arrow/testing/builder.h"
 #include "gtest/gtest.h"
 

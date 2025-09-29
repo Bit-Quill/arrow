@@ -16,8 +16,9 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/accessors/date_array_accessor.h"
+
 #include "arrow/flight/sql/odbc/flight_sql/accessors/boolean_array_accessor.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/calendar_utils.h"
+#include "arrow/flight/sql/odbc/flight_sql/calendar_utils.h"
 #include "arrow/testing/builder.h"
 #include "gtest/gtest.h"
 

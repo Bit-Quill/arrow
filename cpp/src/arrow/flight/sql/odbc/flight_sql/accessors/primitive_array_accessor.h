@@ -21,7 +21,7 @@
 #include "arrow/flight/sql/odbc/flight_sql/accessors/common.h"
 #include "arrow/flight/sql/odbc/flight_sql/accessors/types.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_result_set.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
+#include "arrow/flight/sql/odbc/flight_sql/types.h"
 #include "arrow/scalar.h"
 
 namespace arrow::flight::sql::odbc {

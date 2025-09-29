@@ -16,11 +16,12 @@
 // under the License.
 
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_statement_get_tables.h"
+
 #include "arrow/flight/api.h"
 #include "arrow/flight/sql/odbc/flight_sql/flight_sql_result_set.h"
+#include "arrow/flight/sql/odbc/flight_sql/platform.h"
 #include "arrow/flight/sql/odbc/flight_sql/record_batch_transformer.h"
 #include "arrow/flight/sql/odbc/flight_sql/util.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/platform.h"
 #include "arrow/flight/types.h"
 #include "arrow/util/string.h"
 

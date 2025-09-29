@@ -19,7 +19,7 @@
 
 #include "arrow/flight/client.h"
 #include "arrow/flight/sql/client.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/blocking_queue.h"
+#include "arrow/flight/sql/odbc/flight_sql/blocking_queue.h"
 
 namespace arrow::flight::sql::odbc {
 

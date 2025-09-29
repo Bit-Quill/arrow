@@ -18,8 +18,8 @@
 #pragma once
 
 #include "arrow/flight/sql/odbc/flight_sql/accessors/types.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/diagnostics.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/types.h"
+#include "arrow/flight/sql/odbc/flight_sql/diagnostics.h"
+#include "arrow/flight/sql/odbc/flight_sql/types.h"
 #include "arrow/type_fwd.h"
 
 namespace arrow::flight::sql::odbc {

@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/connection_string_parser.h"
+#include "arrow/flight/sql/odbc/flight_sql/config/connection_string_parser.h"
 
 #include <stdint.h>
 #include <iostream>
