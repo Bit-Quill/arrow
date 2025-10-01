@@ -47,7 +47,7 @@ If the generation is successful, you will find `Apache Arrow Flight SQL ODBC-<ve
 
 ## Steps to Enable Logging
 Arrow Flight SQL ODBC driver uses Arrow's internal logging framework. By default, the log messages are printed to the terminal.
-1. Set environment variable `ARROW_ODBC_LOG_LEVEL` to any of the following valid value to enable logging. If `ARROW_ODBC_LOG_LEVEL` is set to a non-empty string that does not match the following value, `DEBUG` level is used by default. 
+1. Set environment variable `ARROW_ODBC_LOG_LEVEL` to any of the following valid values to enable logging. If `ARROW_ODBC_LOG_LEVEL` is set to a non-empty string that does not match any of the following values, `DEBUG` level is used by default. 
 
 The characters are case-insensitive.
 - TRACE
