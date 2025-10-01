@@ -31,8 +31,9 @@ static constexpr const char* kODBCLogLevel = "ARROW_ODBC_LOG_LEVEL";
 
 FlightSqlDriver::FlightSqlDriver()
     : diagnostics_("Apache Arrow", "Flight SQL", OdbcVersion::V_3), version_("0.9.0.0") {
-  RegisterLog();
   RegisterComputeKernels();
+  // Register log after compute kernels check to avoid segfaults
+  RegisterLog();
 }
 
 FlightSqlDriver::~FlightSqlDriver() {
