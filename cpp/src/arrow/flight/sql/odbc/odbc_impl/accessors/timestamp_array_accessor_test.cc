@@ -28,7 +28,7 @@ using arrow::ArrayFromVector;
 using arrow::TimestampType;
 using arrow::TimeUnit;
 
-TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_MILLI) {
+TEST(TestTimestamp, TimestampWithMilli) {
   std::vector<int64_t> values = {86400370,        172800000,      259200000,
                                  1649793238110LL, 345600000,      432000000,
                                  518400000,       -86399000,      0,
@@ -92,7 +92,7 @@ TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_MILLI) {
   }
 }
 
-TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_SECONDS) {
+TEST(TestTimestamp, TimestampWithSeconds) {
   std::vector<int64_t> values = {86400,  172800, 259200, 1649793238,
                                  345600, 432000, 518400};
 
@@ -134,7 +134,7 @@ TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_SECONDS) {
   }
 }
 
-TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_MICRO) {
+TEST(TestTimestamp, TimestampWithMicro) {
   std::vector<int64_t> values = {86400000000, 1649793238000000};
 
   std::shared_ptr<Array> timestamp_array;
@@ -178,7 +178,7 @@ TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_MICRO) {
   }
 }
 
-TEST(TEST_TIMESTAMP, TIMESTAMP_WITH_NANO) {
+TEST(TestTimestamp, TimestampWithNano) {
   std::vector<int64_t> values = {86400000010000, 1649793238000000000};
 
   std::shared_ptr<Array> timestamp_array;

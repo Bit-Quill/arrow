@@ -25,7 +25,7 @@ namespace arrow::flight::sql::odbc {
 using arrow::ArrayFromVector;
 using arrow::BinaryType;
 
-TEST(BinaryArrayAccessor, Test_CDataType_BINARY_Basic) {
+TEST(BinaryArrayAccessor, TestCDataTypeBinaryBasic) {
   std::vector<std::string> values = {"foo", "barx", "baz123"};
   std::shared_ptr<Array> array;
   ArrayFromVector<BinaryType, std::string>(values, &array);
@@ -56,7 +56,7 @@ TEST(BinaryArrayAccessor, Test_CDataType_BINARY_Basic) {
   }
 }
 
-TEST(BinaryArrayAccessor, Test_CDataType_BINARY_Truncation) {
+TEST(BinaryArrayAccessor, TestCDataTypeBinaryTruncation) {
   std::vector<std::string> values = {"ABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEF"};
   std::shared_ptr<Array> array;
   ArrayFromVector<BinaryType, std::string>(values, &array);
