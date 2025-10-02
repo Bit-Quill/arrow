@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <optional>
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
