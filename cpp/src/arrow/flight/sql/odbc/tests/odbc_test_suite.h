@@ -22,7 +22,7 @@
 #include "arrow/flight/server_middleware.h"
 #include "arrow/flight/sql/client.h"
 #include "arrow/flight/sql/example/sqlite_server.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/encoding_utils.h"
+#include "arrow/flight/sql/odbc/odbc_impl/encoding_utils.h"
 
 #ifdef _WIN32
 #  include <windows.h>
@@ -34,10 +34,10 @@
 
 #include <type_traits>
 
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
+#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 
 // For DSN registration
-#include "arrow/flight/sql/odbc/flight_sql/system_dsn.h"
+#include "arrow/flight/sql/odbc/odbc_impl/system_dsn.h"
 
 #define TEST_CONNECT_STR "ARROW_FLIGHT_SQL_ODBC_CONN"
 #define TEST_DSN "Apache Arrow Flight SQL Test DSN"

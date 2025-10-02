@@ -17,13 +17,13 @@
 
 // For DSN registration. flight_sql_connection.h needs to included first due to conflicts
 // with windows.h
-#include "arrow/flight/sql/odbc/flight_sql/flight_sql_connection.h"
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
 
 #include "arrow/flight/sql/odbc/tests/odbc_test_suite.h"
 
 // For DSN registration
-#include "arrow/flight/sql/odbc/flight_sql/include/flight_sql/config/configuration.h"
-#include "arrow/flight/sql/odbc/odbcabstraction/include/odbcabstraction/odbc_impl/odbc_connection.h"
+#include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
+#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 
 namespace arrow::flight::sql::odbc {
 
