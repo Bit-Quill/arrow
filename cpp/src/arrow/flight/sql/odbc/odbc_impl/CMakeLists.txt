@@ -133,7 +133,7 @@ target_link_libraries(arrow_odbc_spi_impl PUBLIC arrow_flight_sql_shared
                                                  arrow_compute_shared Boost::locale)
 
 # Link libraries on MINGW64 only
-if((MINGW AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR APPLE)
+if(MINGW OR APPLE)
   target_link_libraries(arrow_odbc_spi_impl PUBLIC ${ODBCINST})
 endif()
 
