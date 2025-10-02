@@ -24,6 +24,7 @@
 #include <sqltypes.h>
 #include <sqlucode.h>
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 namespace arrow::flight::sql::odbc {
@@ -35,7 +36,7 @@ TEST(SQLAllocHandle, TestSQLAllocHandleEnv) {
   // Allocate an environment handle
   SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
 
-  EXPECT_TRUE(env != NULL);
+  EXPECT_THAT(env, ::testing::NotNull());
 }
 
 TEST(SQLAllocEnv, TestSQLAllocEnv) {
@@ -45,7 +46,7 @@ TEST(SQLAllocEnv, TestSQLAllocEnv) {
   // Allocate an environment handle
   SQLRETURN return_value = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_value == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_value);
 }
 
 TEST(SQLAllocHandle, TestSQLAllocHandleConnect) {
@@ -56,12 +57,12 @@ TEST(SQLAllocHandle, TestSQLAllocHandleConnect) {
   // Allocate an environment handle
   SQLRETURN return_value = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_value == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_value);
 
   // Allocate a connection using alloc handle
   SQLRETURN return_alloc_handle = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(return_alloc_handle == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_alloc_handle);
 }
 
 TEST(SQLAllocConnect, TestSQLAllocHandleConnect) {
@@ -72,12 +73,12 @@ TEST(SQLAllocConnect, TestSQLAllocHandleConnect) {
   // Allocate an environment handle
   SQLRETURN return_value = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_value == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_value);
 
   // Allocate a connection using alloc handle
   SQLRETURN return_alloc_connect = SQLAllocConnect(env, &conn);
 
-  EXPECT_TRUE(return_alloc_connect == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_alloc_connect);
 }
 
 TEST(SQLFreeHandle, TestSQLFreeHandleEnv) {
@@ -90,7 +91,7 @@ TEST(SQLFreeHandle, TestSQLFreeHandleEnv) {
   // Free an environment handle
   SQLRETURN return_value = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_TRUE(return_value == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_value);
 }
 
 TEST(SQLFreeEnv, TestSQLFreeEnv) {
@@ -103,7 +104,7 @@ TEST(SQLFreeEnv, TestSQLFreeEnv) {
   // Free an environment handle
   SQLRETURN return_value = SQLFreeEnv(env);
 
-  EXPECT_TRUE(return_value == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_value);
 }
 
 TEST(SQLFreeHandle, TestSQLFreeHandleConnect) {
@@ -114,17 +115,17 @@ TEST(SQLFreeHandle, TestSQLFreeHandleConnect) {
   // Allocate an environment handle
   SQLRETURN return_value = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_value == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_value);
 
   // Allocate a connection using alloc handle
   SQLRETURN return_alloc_handle = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(return_alloc_handle == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_alloc_handle);
 
   // Free the created connection using free handle
   SQLRETURN return_free_handle = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_TRUE(return_free_handle == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_free_handle);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestFreeNullHandles) {
@@ -153,17 +154,17 @@ TEST(SQLFreeConnect, TestSQLFreeConnect) {
   // Allocate an environment handle
   SQLRETURN return_env = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_env == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_env);
 
   // Allocate a connection using alloc handle
   SQLRETURN return_alloc_handle = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_TRUE(return_alloc_handle == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_alloc_handle);
 
   // Free the created connection using free connect
   SQLRETURN return_free_connect = SQLFreeConnect(conn);
 
-  EXPECT_TRUE(return_free_connect == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_free_connect);
 }
 
 TEST(SQLGetEnvAttr, TestSQLGetEnvAttrODBCVersion) {
@@ -175,11 +176,11 @@ TEST(SQLGetEnvAttr, TestSQLGetEnvAttrODBCVersion) {
   // Allocate an environment handle
   SQLRETURN return_env = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_env == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_env);
 
   SQLRETURN return_get = SQLGetEnvAttr(env, SQL_ATTR_ODBC_VERSION, &version, 0, 0);
 
-  EXPECT_TRUE(return_get == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_get);
 
   EXPECT_EQ(version, SQL_OV_ODBC2);
 }
@@ -191,13 +192,13 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionValid) {
   // Allocate an environment handle
   SQLRETURN return_env = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_env == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_env);
 
   // Attempt to set to unsupported version
   SQLRETURN return_set =
       SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(SQL_OV_ODBC2), 0);
 
-  EXPECT_TRUE(return_set == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_set);
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
@@ -207,13 +208,13 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
   // Allocate an environment handle
   SQLRETURN return_env = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_env == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_env);
 
   // Attempt to set to unsupported version
   SQLRETURN return_set =
       SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(1), 0);
 
-  EXPECT_TRUE(return_set == SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, return_set);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrOutputNTS) {
@@ -223,7 +224,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrOutputNTS) {
 
   SQLRETURN return_get = SQLGetEnvAttr(this->env, SQL_ATTR_OUTPUT_NTS, &output_nts, 0, 0);
 
-  EXPECT_TRUE(return_get == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_get);
 
   EXPECT_EQ(output_nts, SQL_TRUE);
 
@@ -242,7 +243,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrGetLength) {
   SQLRETURN return_get =
       SQLGetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION, nullptr, 0, &length);
 
-  EXPECT_TRUE(return_get == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_get);
 
   EXPECT_EQ(length, sizeof(SQLINTEGER));
 
@@ -258,7 +259,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrNullValuePointer) {
   SQLRETURN return_get =
       SQLGetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION, nullptr, 0, nullptr);
 
-  EXPECT_TRUE(return_get == SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, return_get);
 
   this->Disconnect();
 }
@@ -270,13 +271,13 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSValid) {
   // Allocate an environment handle
   SQLRETURN return_env = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_env == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_env);
 
   // Attempt to set to output nts to supported version
   SQLRETURN return_set =
       SQLSetEnvAttr(env, SQL_ATTR_OUTPUT_NTS, reinterpret_cast<void*>(SQL_TRUE), 0);
 
-  EXPECT_TRUE(return_set == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_set);
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSInvalid) {
@@ -286,13 +287,13 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSInvalid) {
   // Allocate an environment handle
   SQLRETURN return_env = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_env == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_env);
 
   // Attempt to set to output nts to unsupported false
   SQLRETURN return_set =
       SQLSetEnvAttr(env, SQL_ATTR_OUTPUT_NTS, reinterpret_cast<void*>(SQL_FALSE), 0);
 
-  EXPECT_TRUE(return_set == SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, return_set);
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
@@ -302,12 +303,12 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
   // Allocate an environment handle
   SQLRETURN return_env = SQLAllocEnv(&env);
 
-  EXPECT_TRUE(return_env == SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, return_env);
 
   // Attempt to set using bad data pointer
   SQLRETURN return_set = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0);
 
-  EXPECT_TRUE(return_set == SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, return_set);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
@@ -649,7 +650,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
 
   // UID specified in DSN will take precedence,
   // so connection still fails despite passing valid uid in SQLConnect call
-  EXPECT_TRUE(ret == SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_28000);
 
@@ -775,7 +776,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
                          static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
                          ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
-  EXPECT_TRUE(ret == SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_28000);
 
@@ -815,7 +816,7 @@ TEST(SQLDisconnect, TestSQLDisconnectWithoutConnection) {
   // Attempt to disconnect without a connection, expect to fail
   ret = SQLDisconnect(conn);
 
-  EXPECT_TRUE(ret == SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   // Expect ODBC driver manager to return error state
   VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, error_state_08003);
