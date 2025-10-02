@@ -38,7 +38,8 @@ add_subdirectory(odbcabstraction)
 
 arrow_install_all_headers("arrow/flight/sql/odbc")
 
-set(ARROW_FLIGHT_SQL_ODBC_SRCS entry_points.cc odbc_api.cc)
+# Compile entry_points.cc before odbc_api.cc due to conflict from sql.h and flight/types.h
+set(ARROW_FLIGHT_SQL_ODBC_SRCS odbc_api.cc entry_points.cc)
 
 if(WIN32)
   list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def)
