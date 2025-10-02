@@ -1120,7 +1120,7 @@ std::optional<bool> AsBool(const std::string& value) {
 }
 
 std::optional<bool> AsBool(const Connection::ConnPropertyMap& conn_property_map,
-                             const std::string_view& property_name) {
+                           const std::string_view& property_name) {
   auto extracted_property = conn_property_map.find(std::string(property_name));
 
   if (extracted_property != conn_property_map.end()) {
@@ -1131,8 +1131,8 @@ std::optional<bool> AsBool(const Connection::ConnPropertyMap& conn_property_map,
 }
 
 std::optional<int32_t> AsInt32(int32_t min_value,
-                                 const Connection::ConnPropertyMap& conn_property_map,
-                                 const std::string_view& property_name) {
+                               const Connection::ConnPropertyMap& conn_property_map,
+                               const std::string_view& property_name) {
   auto extracted_property = conn_property_map.find(std::string(property_name));
 
   if (extracted_property != conn_property_map.end()) {
