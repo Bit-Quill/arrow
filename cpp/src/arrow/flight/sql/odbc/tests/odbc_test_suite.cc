@@ -31,17 +31,17 @@ void FlightSQLODBCRemoteTestBase::AllocEnvConnHandles(SQLINTEGER odbc_ver) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION,
                       reinterpret_cast<SQLPOINTER>(static_cast<intptr_t>(odbc_ver)), 0);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
 void FlightSQLODBCRemoteTestBase::Connect(SQLINTEGER odbc_ver) {
@@ -79,7 +79,7 @@ void FlightSQLODBCRemoteTestBase::Disconnect() {
   // Close statement
   SQLRETURN ret = SQLFreeHandle(SQL_HANDLE_STMT, stmt);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Disconnect from ODBC
   ret = SQLDisconnect(conn);
@@ -88,17 +88,17 @@ void FlightSQLODBCRemoteTestBase::Disconnect() {
     std::cerr << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn) << std::endl;
   }
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
 std::string FlightSQLODBCRemoteTestBase::GetConnectionString() {
@@ -368,7 +368,7 @@ void VerifyOdbcErrorState(SQLSMALLINT handle_type, SQLHANDLE handle,
 
   std::string res = SqlWcharToString(sql_state);
 
-  EXPECT_EQ(res, expected_state);
+  EXPECT_EQ(expected_state, res);
 }
 
 std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle) {
@@ -443,7 +443,7 @@ void CheckStringColumnW(SQLHSTMT stmt, int col_id, const std::wstring& expected)
   SQLLEN buf_len = sizeof(buf) * ODBC::GetSqlWCharSize();
 
   SQLRETURN ret = SQLGetData(stmt, col_id, SQL_C_WCHAR, buf, buf_len, &buf_len);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(buf_len, 0);
 
@@ -451,7 +451,7 @@ void CheckStringColumnW(SQLHSTMT stmt, int col_id, const std::wstring& expected)
   size_t char_count = static_cast<size_t>(buf_len) / ODBC::GetSqlWCharSize();
   std::wstring returned(buf, buf + char_count);
 
-  EXPECT_EQ(returned, expected);
+  EXPECT_EQ(expected, returned);
 }
 
 void CheckNullColumnW(SQLHSTMT stmt, int col_id) {
@@ -459,9 +459,9 @@ void CheckNullColumnW(SQLHSTMT stmt, int col_id) {
   SQLLEN buf_len = sizeof(buf);
 
   SQLRETURN ret = SQLGetData(stmt, col_id, SQL_C_WCHAR, buf, buf_len, &buf_len);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
-  EXPECT_EQ(buf_len, SQL_NULL_DATA);
+  EXPECT_EQ(SQL_NULL_DATA, buf_len);
 }
 
 void CheckIntColumn(SQLHSTMT stmt, int col_id, const SQLINTEGER& expected) {
@@ -469,9 +469,9 @@ void CheckIntColumn(SQLHSTMT stmt, int col_id, const SQLINTEGER& expected) {
   SQLLEN buf_len = sizeof(buf);
 
   SQLRETURN ret = SQLGetData(stmt, col_id, SQL_C_LONG, &buf, sizeof(buf), &buf_len);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
-  EXPECT_EQ(buf, expected);
+  EXPECT_EQ(expected, buf);
 }
 
 void CheckSmallIntColumn(SQLHSTMT stmt, int col_id, const SQLSMALLINT& expected) {
@@ -479,15 +479,15 @@ void CheckSmallIntColumn(SQLHSTMT stmt, int col_id, const SQLSMALLINT& expected)
   SQLLEN buf_len = sizeof(buf);
 
   SQLRETURN ret = SQLGetData(stmt, col_id, SQL_C_SSHORT, &buf, sizeof(buf), &buf_len);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
-  EXPECT_EQ(buf, expected);
+  EXPECT_EQ(expected, buf);
 }
 
 void ValidateFetch(SQLHSTMT stmt, SQLRETURN expected_return) {
   SQLRETURN ret = SQLFetch(stmt);
 
-  EXPECT_EQ(ret, expected_return);
+  EXPECT_EQ(expected_return, ret);
 }
 
 }  // namespace arrow::flight::sql::odbc

@@ -117,7 +117,7 @@ TEST_F(FlightStreamChunkBufferTest, TestMultipleEndpointsInt) {
     num_chunks++;
 
     int num_cols = current_chunk.data->num_columns();
-    EXPECT_EQ(num_cols, 8);
+    EXPECT_EQ(8, num_cols);
 
     for (int i = 0; i < num_cols; i++) {
       auto array = current_chunk.data->column(i);
@@ -130,6 +130,6 @@ TEST_F(FlightStreamChunkBufferTest, TestMultipleEndpointsInt) {
 
   // Verify 5 batches of data is returned by each of the two endpoints.
   // In total 10 batches should be returned.
-  EXPECT_EQ(num_chunks, 10);
+  EXPECT_EQ(10, num_chunks);
 }
 }  // namespace arrow::flight::sql::odbc
