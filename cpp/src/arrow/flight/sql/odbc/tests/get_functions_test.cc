@@ -65,14 +65,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsAllFunctions) {
       SQL_API_SQLTABLEPRIVILEGES};
   SQLRETURN ret = SQLGetFunctions(this->conn, SQL_API_ODBC3_ALL_FUNCTIONS, api_exists);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   for (int api : supported_functions) {
-    EXPECT_EQ(SQL_FUNC_EXISTS(api_exists, api), SQL_TRUE);
+    EXPECT_EQ(SQL_TRUE, SQL_FUNC_EXISTS(api_exists, api));
   }
 
   for (int api : unsupported_functions) {
-    EXPECT_EQ(SQL_FUNC_EXISTS(api_exists, api), SQL_FALSE);
+    EXPECT_EQ(SQL_FALSE, SQL_FUNC_EXISTS(api_exists, api));
   }
 
   this->Disconnect();
@@ -106,14 +106,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsAllFunctionsODBCVer2) {
       SQL_API_SQLTABLEPRIVILEGES};
   SQLRETURN ret = SQLGetFunctions(this->conn, SQL_API_ALL_FUNCTIONS, api_exists);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   for (int api : supported_functions) {
-    EXPECT_EQ(api_exists[api], SQL_TRUE);
+    EXPECT_EQ(SQL_TRUE, api_exists[api]);
   }
 
   for (int api : unsupported_functions) {
-    EXPECT_EQ(api_exists[api], SQL_FALSE);
+    EXPECT_EQ(SQL_FALSE, api_exists[api]);
   }
 
   this->Disconnect();
@@ -147,9 +147,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsSupportedSingleAPI) {
   for (SQLUSMALLINT api : supported_functions) {
     SQLRETURN ret = SQLGetFunctions(this->conn, api, &api_exists);
 
-    EXPECT_EQ(ret, SQL_SUCCESS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
 
-    EXPECT_EQ(api_exists, SQL_TRUE);
+    EXPECT_EQ(SQL_TRUE, api_exists);
 
     api_exists = -1;
   }
@@ -173,9 +173,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsUnsupportedSingleAPI) {
   for (SQLUSMALLINT api : unsupported_functions) {
     SQLRETURN ret = SQLGetFunctions(this->conn, api, &api_exists);
 
-    EXPECT_EQ(ret, SQL_SUCCESS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
 
-    EXPECT_EQ(api_exists, SQL_FALSE);
+    EXPECT_EQ(SQL_FALSE, api_exists);
 
     api_exists = -1;
   }
@@ -203,9 +203,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsSupportedSingleAPIODBCVer2)
   for (SQLUSMALLINT api : supported_functions) {
     SQLRETURN ret = SQLGetFunctions(this->conn, api, &api_exists);
 
-    EXPECT_EQ(ret, SQL_SUCCESS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
 
-    EXPECT_EQ(api_exists, SQL_TRUE);
+    EXPECT_EQ(SQL_TRUE, api_exists);
 
     api_exists = -1;
   }
@@ -227,9 +227,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsUnsupportedSingleAPIODBCVer
   for (SQLUSMALLINT api : unsupported_functions) {
     SQLRETURN ret = SQLGetFunctions(this->conn, api, &api_exists);
 
-    EXPECT_EQ(ret, SQL_SUCCESS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
 
-    EXPECT_EQ(api_exists, SQL_FALSE);
+    EXPECT_EQ(SQL_FALSE, api_exists);
 
     api_exists = -1;
   }

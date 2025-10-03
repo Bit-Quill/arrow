@@ -49,16 +49,16 @@ void CheckSQLDescribeCol(SQLHSTMT stmt, const SQLUSMALLINT column_index,
       SQLDescribeCol(stmt, column_index, column_name, buf_char_len, &name_length,
                      &column_data_type, &column_size, &decimal_digits, &nullable);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_EQ(name_length, expected_name.size());
 
   std::wstring returned(column_name, column_name + name_length);
-  EXPECT_EQ(returned, expected_name);
-  EXPECT_EQ(column_data_type, expected_data_type);
-  EXPECT_EQ(column_size, expected_column_size);
-  EXPECT_EQ(decimal_digits, expected_decimal_digits);
-  EXPECT_EQ(nullable, expected_nullable);
+  EXPECT_EQ(expected_name, returned);
+  EXPECT_EQ(expected_data_type, column_data_type);
+  EXPECT_EQ(expected_column_size, column_size);
+  EXPECT_EQ(expected_decimal_digits, decimal_digits);
+  EXPECT_EQ(expected_nullable, nullable);
 }
 
 void CheckSQLDescribeColODBC2(SQLHSTMT stmt) {
@@ -192,11 +192,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_ALL_TYPES);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check bit data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"bit"),  // expected_type_name
@@ -223,7 +223,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check tinyint data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"tinyint"),  // expected_type_name
@@ -250,7 +250,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check bigint data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"bigint"),  // expected_type_name
@@ -277,7 +277,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check longvarbinary data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"longvarbinary"),  // expected_type_name
@@ -304,7 +304,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check varbinary data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"varbinary"),  // expected_type_name
@@ -331,7 +331,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check text data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Driver returns SQL_WLONGVARCHAR since unicode is enabled
   CheckSQLGetTypeInfo(this->stmt,
@@ -359,7 +359,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check longvarchar data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"longvarchar"),  // expected_type_name
@@ -386,7 +386,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check char data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Driver returns SQL_WCHAR since unicode is enabled
   CheckSQLGetTypeInfo(this->stmt,
@@ -414,7 +414,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check integer data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"integer"),  // expected_type_name
@@ -441,7 +441,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check smallint data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"smallint"),  // expected_type_name
@@ -468,7 +468,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check float data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"float"),  // expected_type_name
@@ -495,7 +495,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check double data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"double"),  // expected_type_name
@@ -522,7 +522,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check numeric data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Mock server treats numeric data type as a double type
   CheckSQLGetTypeInfo(this->stmt,
@@ -550,7 +550,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check varchar data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Driver returns SQL_WVARCHAR since unicode is enabled
   CheckSQLGetTypeInfo(this->stmt,
@@ -578,7 +578,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check date data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"date"),  // expected_type_name
@@ -605,7 +605,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check time data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"time"),  // expected_type_name
@@ -632,7 +632,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
 
   // Check timestamp data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"timestamp"),  // expected_type_name
@@ -664,11 +664,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
   this->Connect(SQL_OV_ODBC2);
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_ALL_TYPES);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check bit data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"bit"),  // expected_type_name
@@ -695,7 +695,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check tinyint data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"tinyint"),  // expected_type_name
@@ -722,7 +722,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check bigint data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"bigint"),  // expected_type_name
@@ -749,7 +749,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check longvarbinary data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"longvarbinary"),  // expected_type_name
@@ -776,7 +776,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check varbinary data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"varbinary"),  // expected_type_name
@@ -803,7 +803,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check text data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Driver returns SQL_WLONGVARCHAR since unicode is enabled
   CheckSQLGetTypeInfo(this->stmt,
@@ -831,7 +831,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check longvarchar data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"longvarchar"),  // expected_type_name
@@ -858,7 +858,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check char data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Driver returns SQL_WCHAR since unicode is enabled
   CheckSQLGetTypeInfo(this->stmt,
@@ -886,7 +886,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check integer data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"integer"),  // expected_type_name
@@ -913,7 +913,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check smallint data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"smallint"),  // expected_type_name
@@ -940,7 +940,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check float data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"float"),  // expected_type_name
@@ -967,7 +967,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check double data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"double"),  // expected_type_name
@@ -994,7 +994,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check numeric data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Mock server treats numeric data type as a double type
   CheckSQLGetTypeInfo(this->stmt,
@@ -1022,7 +1022,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check varchar data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Driver returns SQL_WVARCHAR since unicode is enabled
   CheckSQLGetTypeInfo(this->stmt,
@@ -1050,7 +1050,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check date data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"date"),  // expected_type_name
@@ -1077,7 +1077,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check time data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"time"),  // expected_type_name
@@ -1104,7 +1104,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
 
   // Check timestamp data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"timestamp"),  // expected_type_name
@@ -1136,11 +1136,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBit) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_BIT);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check bit data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"bit"),  // expected_type_name
@@ -1167,7 +1167,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBit) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1176,11 +1176,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTinyInt) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TINYINT);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check tinyint data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"tinyint"),  // expected_type_name
@@ -1207,7 +1207,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTinyInt) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1216,11 +1216,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBigInt) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_BIGINT);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check bigint data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"bigint"),  // expected_type_name
@@ -1247,7 +1247,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBigInt) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1256,11 +1256,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarbinary) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_LONGVARBINARY);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check longvarbinary data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"longvarbinary"),  // expected_type_name
@@ -1287,7 +1287,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarbinary) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1296,11 +1296,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarbinary) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_VARBINARY);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check varbinary data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"varbinary"),  // expected_type_name
@@ -1325,7 +1325,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarbinary) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1334,11 +1334,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarchar) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_WLONGVARCHAR);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check text data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Driver returns SQL_WLONGVARCHAR since unicode is enabled
   CheckSQLGetTypeInfo(this->stmt,
@@ -1366,7 +1366,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarchar) {
 
   // Check longvarchar data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"longvarchar"),  // expected_type_name
@@ -1393,7 +1393,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarchar) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1402,11 +1402,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoChar) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_WCHAR);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check char data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Driver returns SQL_WCHAR since unicode is enabled
   CheckSQLGetTypeInfo(this->stmt,
@@ -1434,7 +1434,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoChar) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1443,11 +1443,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoInteger) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_INTEGER);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check integer data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"integer"),  // expected_type_name
@@ -1474,7 +1474,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoInteger) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1483,11 +1483,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSmallInt) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_SMALLINT);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check smallint data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"smallint"),  // expected_type_name
@@ -1514,7 +1514,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSmallInt) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1523,11 +1523,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoFloat) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_FLOAT);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check float data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"float"),  // expected_type_name
@@ -1554,7 +1554,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoFloat) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1563,11 +1563,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDouble) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_DOUBLE);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check double data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"double"),  // expected_type_name
@@ -1594,7 +1594,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDouble) {
 
   // Check numeric data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Mock server treats numeric data type as a double type
   CheckSQLGetTypeInfo(this->stmt,
@@ -1622,7 +1622,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDouble) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1631,11 +1631,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarchar) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_WVARCHAR);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check varchar data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Driver returns SQL_WVARCHAR since unicode is enabled
   CheckSQLGetTypeInfo(this->stmt,
@@ -1663,7 +1663,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarchar) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1672,11 +1672,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDate) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_DATE);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check date data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"date"),  // expected_type_name
@@ -1703,7 +1703,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDate) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1713,11 +1713,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLDate) {
 
   // Pass ODBC Ver 2 data type
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_DATE);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check date data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"date"),  // expected_type_name
@@ -1744,7 +1744,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLDate) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1753,11 +1753,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDateODBCVer2) {
   this->Connect(SQL_OV_ODBC2);
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_DATE);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check date data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"date"),  // expected_type_name
@@ -1784,7 +1784,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDateODBCVer2) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1795,7 +1795,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDateODBCVer2) {
   // Pass ODBC Ver 3 data type
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_DATE);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   // Driver manager returns SQL data type out of range error state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1004);
@@ -1807,11 +1807,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTime) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_TIME);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check time data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"time"),  // expected_type_name
@@ -1838,7 +1838,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTime) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1848,11 +1848,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTime) {
 
   // Pass ODBC Ver 2 data type
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TIME);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check time data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"time"),  // expected_type_name
@@ -1879,7 +1879,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTime) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1888,11 +1888,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimeODBCVer2) {
   this->Connect(SQL_OV_ODBC2);
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TIME);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check time data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"time"),  // expected_type_name
@@ -1919,7 +1919,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimeODBCVer2) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1930,7 +1930,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimeODBCVer2) {
   // Pass ODBC Ver 3 data type
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_TIME);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   // Driver manager returns SQL data type out of range error state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1004);
@@ -1942,11 +1942,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestamp) {
   this->Connect();
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_TIMESTAMP);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check timestamp data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"timestamp"),  // expected_type_name
@@ -1973,7 +1973,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestamp) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -1983,11 +1983,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestamp) {
 
   // Pass ODBC Ver 2 data type
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TIMESTAMP);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check timestamp data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"timestamp"),  // expected_type_name
@@ -2014,7 +2014,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestamp) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -2023,11 +2023,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampODBCVer2) {
   this->Connect(SQL_OV_ODBC2);
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TIMESTAMP);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Check timestamp data type
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   CheckSQLGetTypeInfo(this->stmt,
                       std::wstring(L"timestamp"),  // expected_type_name
@@ -2054,7 +2054,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampODBCVer2) {
 
   // No more data
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
@@ -2065,7 +2065,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestampODBCVer2) {
   // Pass ODBC Ver 3 data type
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_TYPE_TIMESTAMP);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   // Driver manager returns SQL data type out of range error state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1004);
@@ -2079,7 +2079,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoInvalidDataType) {
   SQLSMALLINT invalid_data_type = -114;
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, invalid_data_type);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY004);
 
   this->Disconnect();
@@ -2091,11 +2091,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetTypeInfoUnsupportedDataType) {
 
   SQLRETURN ret = SQLGetTypeInfo(this->stmt, SQL_GUID);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Result set is empty with valid data type that is unsupported by the server
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   this->Disconnect();
 }
