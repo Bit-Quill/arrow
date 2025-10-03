@@ -411,7 +411,7 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle) {
   return res;
 }
 
-// TODO: once RegisterDsn is implemented in Mac and Linux, the following can be
+// GH-47822 TODO: once RegisterDsn is implemented in Mac and Linux, the following can be
 // re-enabled.
 #if defined _WIN32
 bool WriteDSN(std::string connection_str) {
