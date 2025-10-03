@@ -522,7 +522,7 @@ void ODBCStatement::GetStmtAttr(SQLINTEGER statement_attribute, SQLPOINTER outpu
   }
 
   if (spi_attribute) {
-    GetAttribute(static_cast<SQLULEN>(boost::get<size_t>(*spi_attribute)), output,
+    GetAttribute(static_cast<SQLULEN>(std::get<size_t>(*spi_attribute)), output,
                  buffer_size, str_len_ptr);
     return;
   }

@@ -46,9 +46,9 @@ std::string TestConnection(
   // This should have been checked before enabling the Test button.
   assert(missing_properties.empty());
   std::string server_name =
-      boost::get<std::string>(flight_sql_conn->GetInfo(SQL_SERVER_NAME));
+      std::get<std::string>(flight_sql_conn->GetInfo(SQL_SERVER_NAME));
   std::string server_version =
-      boost::get<std::string>(flight_sql_conn->GetInfo(SQL_DBMS_VER));
+      std::get<std::string>(flight_sql_conn->GetInfo(SQL_DBMS_VER));
   return "Server Name: " + server_name + "\n" + "Server Version: " + server_version;
 }
 }  // namespace

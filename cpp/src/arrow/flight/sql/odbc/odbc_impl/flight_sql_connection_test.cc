@@ -38,7 +38,7 @@ TEST(AttributeTests, SetAndGetAttribute) {
 
   EXPECT_TRUE(first_value);
 
-  EXPECT_EQ(boost::get<uint32_t>(*first_value), static_cast<uint32_t>(200));
+  EXPECT_EQ(std::get<uint32_t>(*first_value), static_cast<uint32_t>(200));
 
   connection.SetAttribute(Connection::CONNECTION_TIMEOUT, static_cast<uint32_t>(300));
 
@@ -46,7 +46,7 @@ TEST(AttributeTests, SetAndGetAttribute) {
       connection.GetAttribute(Connection::CONNECTION_TIMEOUT);
 
   EXPECT_TRUE(change_value);
-  EXPECT_EQ(boost::get<uint32_t>(*change_value), static_cast<uint32_t>(300));
+  EXPECT_EQ(std::get<uint32_t>(*change_value), static_cast<uint32_t>(300));
 
   connection.Close();
 }
@@ -58,7 +58,7 @@ TEST(AttributeTests, GetAttributeWithoutSetting) {
       connection.GetAttribute(Connection::CONNECTION_TIMEOUT);
   connection.SetClosed(false);
 
-  EXPECT_EQ(0, boost::get<uint32_t>(*optional));
+  EXPECT_EQ(0, std::get<uint32_t>(*optional));
 
   connection.Close();
 }
