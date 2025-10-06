@@ -77,10 +77,10 @@ class UserPasswordAuthMethod : public FlightSqlAuthMethod {
     FlightCallOptions auth_call_options;
     const std::optional<Connection::Attribute>& login_timeout =
         connection.GetAttribute(Connection::LOGIN_TIMEOUT);
-    if (login_timeout && boost::get<uint32_t>(*login_timeout) > 0) {
+    if (login_timeout && std::get<uint32_t>(*login_timeout) > 0) {
       // ODBC's LOGIN_TIMEOUT attribute and FlightCallOptions.timeout use
       // seconds as time unit.
-      double timeout_seconds = static_cast<double>(boost::get<uint32_t>(*login_timeout));
+      double timeout_seconds = static_cast<double>(std::get<uint32_t>(*login_timeout));
       if (timeout_seconds > 0) {
         auth_call_options.timeout = TimeoutDuration{timeout_seconds};
       }
