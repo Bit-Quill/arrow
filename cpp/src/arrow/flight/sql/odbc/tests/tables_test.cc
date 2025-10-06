@@ -36,7 +36,7 @@ std::wstring GetStringColumnW(SQLHSTMT stmt, int colId) {
 
   SQLRETURN ret = SQLGetData(stmt, colId, SQL_C_WCHAR, buf, sizeof(buf), &len_indicator);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   if (len_indicator == SQL_NULL_DATA) {
     return L"";
@@ -62,7 +62,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesTestInputData) {
                             sizeof(schema_name), table_name, sizeof(table_name),
                             table_type, sizeof(table_type));
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
@@ -70,7 +70,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesTestInputData) {
   ret = SQLTables(this->stmt, catalog_name, 0, schema_name, 0, table_name, 0, table_type,
                   0);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
@@ -78,7 +78,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesTestInputData) {
   ret = SQLTables(this->stmt, 0, sizeof(catalog_name), 0, sizeof(schema_name), 0,
                   sizeof(table_name), 0, sizeof(table_type));
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_SUCCESS);
   // Close statement cursor to avoid leaving in an invalid state
@@ -87,7 +87,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesTestInputData) {
   // All values and sizes are nulls
   ret = SQLTables(this->stmt, 0, 0, 0, 0, 0, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_SUCCESS);
 
@@ -105,7 +105,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForAllCatalogs) {
   SQLRETURN ret = SQLTables(this->stmt, SQL_ALL_CATALOGS_W, SQL_NTS, empty, SQL_NTS,
                             empty, SQL_NTS, empty, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_SUCCESS);
 
@@ -135,7 +135,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForNamedCatalog) {
   SQLRETURN ret = SQLTables(this->stmt, catalog_name, SQL_NTS, nullptr, SQL_NTS, nullptr,
                             SQL_NTS, nullptr, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   for (size_t i = 0; i < sizeof(table_names) / sizeof(*table_names); ++i) {
     ValidateFetch(this->stmt, SQL_SUCCESS);
@@ -162,7 +162,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetSchemaHasNoData) {
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, SQL_ALL_SCHEMAS_W, SQL_NTS,
                             nullptr, SQL_NTS, nullptr, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
@@ -250,7 +250,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestFilterByAllSchema) {
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, SQL_ALL_SCHEMAS_W, SQL_NTS,
                             nullptr, SQL_NTS, nullptr, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   for (size_t i = 0; i < sizeof(schema_names) / sizeof(*schema_names); ++i) {
     ValidateFetch(this->stmt, SQL_SUCCESS);
@@ -285,7 +285,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForNamedSchema) {
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, schema_name, SQL_NTS, nullptr,
                             SQL_NTS, nullptr, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_SUCCESS);
 
@@ -315,7 +315,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForAllTables) {
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
                             SQL_ALL_TABLES_W, SQL_NTS, nullptr, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   for (size_t i = 0; i < sizeof(table_names) / sizeof(*table_names); ++i) {
     ValidateFetch(this->stmt, SQL_SUCCESS);
@@ -347,7 +347,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForTableName) {
     SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
                               table_names[i], SQL_NTS, nullptr, SQL_NTS);
 
-    EXPECT_EQ(ret, SQL_SUCCESS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
 
     ValidateFetch(this->stmt, SQL_SUCCESS);
 
@@ -377,7 +377,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForUnicodeTableByTable
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
                             unicodetable_name, SQL_NTS, nullptr, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_SUCCESS);
 
@@ -403,7 +403,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForInvalidTableNameNoD
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
                             invalid_table_name, SQL_NTS, nullptr, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
@@ -429,21 +429,21 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetMetadataForTableType) {
   ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
                   table_type_table_uppercase, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
   ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
                   table_type_view, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
   ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
                   table_type_table_view, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
@@ -451,7 +451,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetMetadataForTableType) {
   ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
                   table_type_table_lowercase, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   for (size_t i = 0; i < sizeof(table_names) / sizeof(*table_names); ++i) {
     ValidateFetch(this->stmt, SQL_SUCCESS);
@@ -483,7 +483,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForTableTypeTable) {
     ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
                     type_list[i], SQL_NTS);
 
-    EXPECT_EQ(ret, SQL_SUCCESS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
 
     ValidateFetch(this->stmt, SQL_SUCCESS);
 
@@ -508,14 +508,14 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForTableTypeViewHasNoDat
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, empty,
                             SQL_NTS, type_view, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
   ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS,
                   type_view, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
@@ -533,7 +533,7 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetSupportedTableTypes) {
   SQLRETURN ret = SQLTables(this->stmt, empty, SQL_NTS, empty, SQL_NTS, empty, SQL_NTS,
                             SQL_ALL_TABLE_TYPES_W, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ValidateFetch(this->stmt, SQL_SUCCESS);
 
@@ -559,7 +559,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetSupportedTableTypes) {
   SQLRETURN ret = SQLTables(this->stmt, empty, SQL_NTS, empty, SQL_NTS, empty, SQL_NTS,
                             SQL_ALL_TABLE_TYPES_W, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   for (size_t i = 0; i < sizeof(type_lists) / sizeof(*type_lists); ++i) {
     ValidateFetch(this->stmt, SQL_SUCCESS);
@@ -599,7 +599,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeCol) {
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr,
                             SQL_NTS, nullptr, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
     column_index = i + 1;
@@ -608,16 +608,16 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeCol) {
         SQLDescribeCol(this->stmt, column_index, column_name, buf_char_len, &name_length,
                        &column_data_type, &column_size, &decimal_digits, &nullable);
 
-    EXPECT_EQ(ret, SQL_SUCCESS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
 
-    EXPECT_EQ(name_length, wcslen(column_names[i]));
+    EXPECT_EQ(wcslen(column_names[i]), name_length);
 
     std::wstring returned(column_name, column_name + name_length);
-    EXPECT_EQ(returned, column_names[i]);
-    EXPECT_EQ(column_data_type, column_data_types[i]);
-    EXPECT_EQ(column_size, column_sizes[i]);
-    EXPECT_EQ(decimal_digits, 0);
-    EXPECT_EQ(nullable, SQL_NULLABLE);
+    EXPECT_EQ(column_names[i], returned);
+    EXPECT_EQ(column_data_types[i], column_data_type);
+    EXPECT_EQ(column_sizes[i], column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
 
     name_length = 0;
     column_data_type = 0;
@@ -652,7 +652,7 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeColODBC2) {
   SQLRETURN ret = SQLTables(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS, nullptr,
                             SQL_NTS, nullptr, SQL_NTS);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
     column_index = i + 1;
@@ -661,16 +661,16 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeColODBC2) {
         SQLDescribeCol(this->stmt, column_index, column_name, buf_char_len, &name_length,
                        &column_data_type, &column_size, &decimal_digits, &nullable);
 
-    EXPECT_EQ(ret, SQL_SUCCESS);
+    EXPECT_EQ(SQL_SUCCESS, ret);
 
-    EXPECT_EQ(name_length, wcslen(column_names[i]));
+    EXPECT_EQ(wcslen(column_names[i]), name_length);
 
     std::wstring returned(column_name, column_name + name_length);
-    EXPECT_EQ(returned, column_names[i]);
-    EXPECT_EQ(column_data_type, column_data_types[i]);
-    EXPECT_EQ(column_size, column_sizes[i]);
-    EXPECT_EQ(decimal_digits, 0);
-    EXPECT_EQ(nullable, SQL_NULLABLE);
+    EXPECT_EQ(column_names[i], returned);
+    EXPECT_EQ(column_data_types[i], column_data_type);
+    EXPECT_EQ(column_sizes[i], column_size);
+    EXPECT_EQ(0, decimal_digits);
+    EXPECT_EQ(SQL_NULLABLE, nullable);
 
     name_length = 0;
     column_data_type = 0;

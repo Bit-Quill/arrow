@@ -36,16 +36,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Invalid connect string
   std::string connect_str = this->GetInvalidConnectionString();
@@ -62,7 +62,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
                          static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
                          ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   // Retrieve all supported header level and record level data
   SQLSMALLINT HEADER_LEVEL = 0;
@@ -75,9 +75,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, HEADER_LEVEL, SQL_DIAG_NUMBER, &diag_number,
                         sizeof(SQLINTEGER), &diag_number_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
-  EXPECT_EQ(diag_number, 1);
+  EXPECT_EQ(1, diag_number);
 
   // SQL_DIAG_SERVER_NAME
   SQLWCHAR server_name[ODBC_BUFFER_SIZE];
@@ -86,7 +86,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, RECORD_1, SQL_DIAG_SERVER_NAME, server_name,
                         ODBC_BUFFER_SIZE, &server_name_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // SQL_DIAG_MESSAGE_TEXT
   SQLWCHAR message_text[ODBC_BUFFER_SIZE];
@@ -95,7 +95,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
                         message_text, ODBC_BUFFER_SIZE, &message_text_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_text_length, 100);
 
@@ -106,9 +106,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, RECORD_1, SQL_DIAG_NATIVE, &diag_native,
                         sizeof(diag_native), &diag_native_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
-  EXPECT_EQ(diag_native, 200);
+  EXPECT_EQ(200, diag_native);
 
   // SQL_DIAG_SQLSTATE
   const SQLSMALLINT sql_state_size = 6;
@@ -118,19 +118,19 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
                         sql_state_size * arrow::flight::sql::odbc::GetSqlWCharSize(),
                         &sql_state_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"28000"));
+  EXPECT_EQ(std::wstring(L"28000"), std::wstring(sql_state));
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
@@ -144,16 +144,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Invalid connect string
   std::string connect_str = this->GetInvalidConnectionString();
@@ -170,7 +170,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
                          static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
                          ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   // Retrieve all supported header level and record level data
   SQLSMALLINT RECORD_1 = 1;
@@ -184,19 +184,19 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
   ret = SQLGetDiagField(SQL_HANDLE_DBC, conn, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
                         message_text, SQL_NTS, &message_text_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_text_length, 100);
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase,
@@ -207,11 +207,11 @@ TYPED_TEST(FlightSQLODBCTestBase,
   // Allocate a descriptor using alloc handle
   SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_DESC, this->conn, &descriptor);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ret = SQLGetDescField(descriptor, 1, SQL_DESC_DATETIME_INTERVAL_CODE, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   // Retrieve all supported header level and record level data
   SQLSMALLINT HEADER_LEVEL = 0;
@@ -224,9 +224,9 @@ TYPED_TEST(FlightSQLODBCTestBase,
   ret = SQLGetDiagField(SQL_HANDLE_DESC, descriptor, HEADER_LEVEL, SQL_DIAG_NUMBER,
                         &diag_number, sizeof(SQLINTEGER), &diag_number_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
-  EXPECT_EQ(diag_number, 1);
+  EXPECT_EQ(1, diag_number);
 
   // SQL_DIAG_SERVER_NAME
   SQLWCHAR server_name[ODBC_BUFFER_SIZE];
@@ -235,7 +235,7 @@ TYPED_TEST(FlightSQLODBCTestBase,
   ret = SQLGetDiagField(SQL_HANDLE_DESC, descriptor, RECORD_1, SQL_DIAG_SERVER_NAME,
                         server_name, ODBC_BUFFER_SIZE, &server_name_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // SQL_DIAG_MESSAGE_TEXT
   SQLWCHAR message_text[ODBC_BUFFER_SIZE];
@@ -244,7 +244,7 @@ TYPED_TEST(FlightSQLODBCTestBase,
   ret = SQLGetDiagField(SQL_HANDLE_DESC, descriptor, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
                         message_text, ODBC_BUFFER_SIZE, &message_text_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_text_length, 100);
 
@@ -255,9 +255,9 @@ TYPED_TEST(FlightSQLODBCTestBase,
   ret = SQLGetDiagField(SQL_HANDLE_DESC, descriptor, RECORD_1, SQL_DIAG_NATIVE,
                         &diag_native, sizeof(diag_native), &diag_native_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
-  EXPECT_EQ(diag_native, 0);
+  EXPECT_EQ(0, diag_native);
 
   // SQL_DIAG_SQLSTATE
   const SQLSMALLINT sql_state_size = 6;
@@ -267,14 +267,14 @@ TYPED_TEST(FlightSQLODBCTestBase,
       SQL_HANDLE_DESC, descriptor, RECORD_1, SQL_DIAG_SQLSTATE, sql_state,
       sql_state_size * arrow::flight::sql::odbc::GetSqlWCharSize(), &sql_state_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"IM001"));
+  EXPECT_EQ(std::wstring(L"IM001"), std::wstring(sql_state));
 
   // Free descriptor handle
   ret = SQLFreeHandle(SQL_HANDLE_DESC, descriptor);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   this->Disconnect();
 }
@@ -287,11 +287,11 @@ TYPED_TEST(FlightSQLODBCTestBase,
   // Allocate a descriptor using alloc handle
   SQLRETURN ret = SQLAllocHandle(SQL_HANDLE_DESC, this->conn, &descriptor);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ret = SQLGetDescField(descriptor, 1, SQL_DESC_DATETIME_INTERVAL_CODE, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   SQLWCHAR sql_state[6];
   SQLINTEGER native_error;
@@ -301,21 +301,21 @@ TYPED_TEST(FlightSQLODBCTestBase,
   ret = SQLGetDiagRec(SQL_HANDLE_DESC, descriptor, 1, sql_state, &native_error, message,
                       ODBC_BUFFER_SIZE, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_length, 60);
 
-  EXPECT_EQ(native_error, 0);
+  EXPECT_EQ(0, native_error);
 
   // API not implemented error from driver manager
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"IM001"));
+  EXPECT_EQ(std::wstring(L"IM001"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
   // Free descriptor handle
   ret = SQLFreeHandle(SQL_HANDLE_DESC, descriptor);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   this->Disconnect();
 }
@@ -328,16 +328,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   // Allocate an environment handle
   SQLRETURN ret = SQLAllocEnv(&env);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ret = SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Allocate a connection using alloc handle
   ret = SQLAllocHandle(SQL_HANDLE_DBC, env, &conn);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Invalid connect string
   std::string connect_str = this->GetInvalidConnectionString();
@@ -354,7 +354,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
                          static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
                          ODBC_BUFFER_SIZE, &out_str_len, SQL_DRIVER_NOPROMPT);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   SQLWCHAR sql_state[6];
   SQLINTEGER native_error;
@@ -364,25 +364,25 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   ret = SQLGetDiagRec(SQL_HANDLE_DBC, conn, 1, sql_state, &native_error, message,
                       ODBC_BUFFER_SIZE, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_length, 120);
 
-  EXPECT_EQ(native_error, 200);
+  EXPECT_EQ(200, native_error);
 
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"28000"));
+  EXPECT_EQ(std::wstring(L"28000"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
   // Free connection handle
   ret = SQLFreeHandle(SQL_HANDLE_DBC, conn);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   // Free environment handle
   ret = SQLFreeHandle(SQL_HANDLE_ENV, env);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecInputData) {
@@ -398,17 +398,17 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecInputData) {
   SQLRETURN ret = SQLGetDiagRec(SQL_HANDLE_DBC, this->conn, 0, sql_state, &native_error,
                                 message, ODBC_BUFFER_SIZE, &message_length);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   // Pass valid record number with null inputs
   ret = SQLGetDiagRec(SQL_HANDLE_DBC, this->conn, 1, 0, 0, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   // Invalid handle
   ret = SQLGetDiagRec(0, 0, 0, 0, 0, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_INVALID_HANDLE);
+  EXPECT_EQ(SQL_INVALID_HANDLE, ret);
 
   this->Disconnect();
 }
@@ -421,20 +421,20 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorInputData) {
   // Pass valid handles with null inputs
   SQLRETURN ret = SQLError(this->env, 0, 0, 0, 0, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   ret = SQLError(0, this->conn, 0, 0, 0, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   ret = SQLError(0, 0, this->stmt, 0, 0, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_NO_DATA);
+  EXPECT_EQ(SQL_NO_DATA, ret);
 
   // Invalid handle
   ret = SQLError(0, 0, 0, 0, 0, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_INVALID_HANDLE);
+  EXPECT_EQ(SQL_INVALID_HANDLE, ret);
 
   this->Disconnect();
 }
@@ -450,7 +450,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
   SQLRETURN ret = SQLSetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION,
                                 reinterpret_cast<void*>(SQL_OV_ODBC2), 0);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   SQLWCHAR sql_state[6] = {0};
   SQLINTEGER native_error = 0;
@@ -459,14 +459,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
   ret = SQLError(this->env, 0, 0, sql_state, &native_error, message,
                  SQL_MAX_MESSAGE_LENGTH, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_length, 50);
 
-  EXPECT_EQ(native_error, 0);
+  EXPECT_EQ(0, native_error);
 
   // Function sequence error state from driver manager
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"HY010"));
+  EXPECT_EQ(std::wstring(L"HY010"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
@@ -483,7 +483,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
   // Attempt to set unsupported attribute
   SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   SQLWCHAR sql_state[6] = {0};
   SQLINTEGER native_error = 0;
@@ -492,14 +492,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
   ret = SQLError(0, this->conn, 0, sql_state, &native_error, message,
                  SQL_MAX_MESSAGE_LENGTH, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_length, 60);
 
-  EXPECT_EQ(native_error, 100);
+  EXPECT_EQ(100, native_error);
 
   // optional feature not supported error state
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"HYC00"));
+  EXPECT_EQ(std::wstring(L"HYC00"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
@@ -519,7 +519,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
   SQLRETURN ret =
       SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   SQLWCHAR sql_state[6] = {0};
   SQLINTEGER native_error = 0;
@@ -528,13 +528,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
   ret = SQLError(0, 0, this->stmt, sql_state, &native_error, message,
                  SQL_MAX_MESSAGE_LENGTH, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_length, 70);
 
-  EXPECT_EQ(native_error, 100);
+  EXPECT_EQ(100, native_error);
 
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"HY000"));
+  EXPECT_EQ(std::wstring(L"HY000"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
@@ -550,10 +550,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarning) {
 
   SQLRETURN ret =
       SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   const int len = 17;
   SQLCHAR char_val[len];
@@ -562,7 +562,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarning) {
 
   ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val, buf_len, &ind);
 
-  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
 
   SQLWCHAR sql_state[6] = {0};
   SQLINTEGER native_error = 0;
@@ -571,14 +571,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarning) {
   ret = SQLError(0, 0, this->stmt, sql_state, &native_error, message,
                  SQL_MAX_MESSAGE_LENGTH, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_length, 50);
 
-  EXPECT_EQ(native_error, 1000100);
+  EXPECT_EQ(1000100, native_error);
 
   // Verify string truncation warning is reported
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"01004"));
+  EXPECT_EQ(std::wstring(L"01004"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 }
@@ -594,7 +594,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorODBCVer2FromDriverManager)
   SQLRETURN ret = SQLSetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION,
                                 reinterpret_cast<void*>(SQL_OV_ODBC2), 0);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   SQLWCHAR sql_state[6] = {0};
   SQLINTEGER native_error = 0;
@@ -603,14 +603,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorODBCVer2FromDriverManager)
   ret = SQLError(this->env, 0, 0, sql_state, &native_error, message,
                  SQL_MAX_MESSAGE_LENGTH, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_length, 50);
 
-  EXPECT_EQ(native_error, 0);
+  EXPECT_EQ(0, native_error);
 
   // Function sequence error state from driver manager
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"S1010"));
+  EXPECT_EQ(std::wstring(L"S1010"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
@@ -627,7 +627,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnErrorODBCVer2) {
   // Attempt to set unsupported attribute
   SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, 0);
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   SQLWCHAR sql_state[6] = {0};
   SQLINTEGER native_error = 0;
@@ -636,14 +636,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnErrorODBCVer2) {
   ret = SQLError(0, this->conn, 0, sql_state, &native_error, message,
                  SQL_MAX_MESSAGE_LENGTH, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_length, 60);
 
-  EXPECT_EQ(native_error, 100);
+  EXPECT_EQ(100, native_error);
 
   // optional feature not supported error state. Driver Manager maps state to S1C00
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"S1C00"));
+  EXPECT_EQ(std::wstring(L"S1C00"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
@@ -663,7 +663,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtErrorODBCVer2) {
   SQLRETURN ret =
       SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
 
-  EXPECT_EQ(ret, SQL_ERROR);
+  EXPECT_EQ(SQL_ERROR, ret);
 
   SQLWCHAR sql_state[6] = {0};
   SQLINTEGER native_error = 0;
@@ -672,14 +672,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtErrorODBCVer2) {
   ret = SQLError(0, 0, this->stmt, sql_state, &native_error, message,
                  SQL_MAX_MESSAGE_LENGTH, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_length, 70);
 
-  EXPECT_EQ(native_error, 100);
+  EXPECT_EQ(100, native_error);
 
   // Driver Manager maps error state to S1000
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"S1000"));
+  EXPECT_EQ(std::wstring(L"S1000"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 
@@ -695,10 +695,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarningODBCVer2) {
 
   SQLRETURN ret =
       SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   ret = SQLFetch(this->stmt);
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   const int len = 17;
   SQLCHAR char_val[len];
@@ -707,7 +707,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarningODBCVer2) {
 
   ret = SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val, buf_len, &ind);
 
-  EXPECT_EQ(ret, SQL_SUCCESS_WITH_INFO);
+  EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
 
   SQLWCHAR sql_state[6] = {0};
   SQLINTEGER native_error = 0;
@@ -716,14 +716,14 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarningODBCVer2) {
   ret = SQLError(0, 0, this->stmt, sql_state, &native_error, message,
                  SQL_MAX_MESSAGE_LENGTH, &message_length);
 
-  EXPECT_EQ(ret, SQL_SUCCESS);
+  EXPECT_EQ(SQL_SUCCESS, ret);
 
   EXPECT_GT(message_length, 50);
 
-  EXPECT_EQ(native_error, 1000100);
+  EXPECT_EQ(1000100, native_error);
 
   // Verify string truncation warning is reported
-  EXPECT_EQ(std::wstring(sql_state), std::wstring(L"01004"));
+  EXPECT_EQ(std::wstring(L"01004"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
 }
