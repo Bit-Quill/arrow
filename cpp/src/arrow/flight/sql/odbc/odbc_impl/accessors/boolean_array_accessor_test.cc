@@ -25,7 +25,7 @@ using arrow::BooleanType;
 
 using arrow::ArrayFromVector;
 
-TEST(BooleanArrayFlightSqlAccessor, Test_BooleanArray_CDataType_BIT) {
+TEST(BooleanArrayFlightSqlAccessor, TestBooleanArrayCDataTypeBit) {
   const std::vector<bool> values = {true, false, true};
   std::shared_ptr<Array> array;
   ArrayFromVector<BooleanType>(values, &array);
