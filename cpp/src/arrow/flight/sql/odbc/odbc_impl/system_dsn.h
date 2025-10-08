@@ -19,12 +19,12 @@
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
+#include "arrow/result.h"
 
-namespace arrow::flight::sql::odbc {
+using arrow::flight::sql::odbc::Connection;
+using arrow::flight::sql::odbc::config::Configuration;
 
-using config::Configuration;
-
-#if defined _WIN32
+#if defined _WIN32 || defined _WIN64
 /**
  * Display connection window for user to configure connection parameters.
  *
@@ -65,4 +65,6 @@ bool RegisterDsn(const Configuration& config, LPCWSTR driver);
  */
 bool UnregisterDsn(const std::wstring& dsn);
 
-}  // namespace arrow::flight::sql::odbc
+void PostError(DWORD error_code, LPCWSTR error_msg);
+
+void PostArrowUtilError(arrow::Status error_status);
