@@ -497,7 +497,9 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wparam, LPARAM lparam) {
 
             MessageBox(NULL, w_test_message.c_str(), L"Test Connection Success", MB_OK);
           } catch (DriverException& err) {
-            CONVERT_WIDE_STR(const std::wstring w_message_text, err.GetMessageText());
+            const std::wstring w_message_text =
+                arrow::util::UTF8ToWideString(err.GetMessageText())
+                    .ValueOr(L"Test failed");
             MessageBox(NULL, w_message_text.c_str(), L"Error!",
                        MB_ICONEXCLAMATION | MB_OK);
           }
@@ -510,7 +512,9 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wparam, LPARAM lparam) {
             accepted_ = true;
             PostMessage(GetHandle(), WM_CLOSE, 0, 0);
           } catch (DriverException& err) {
-            CONVERT_WIDE_STR(const std::wstring w_message_text, err.GetMessageText());
+            const std::wstring w_message_text =
+                arrow::util::UTF8ToWideString(err.GetMessageText())
+                    .ValueOr(L"Error when saving DSN");
             MessageBox(NULL, w_message_text.c_str(), L"Error!",
                        MB_ICONEXCLAMATION | MB_OK);
           }
