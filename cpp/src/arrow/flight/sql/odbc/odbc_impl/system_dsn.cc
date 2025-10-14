@@ -155,7 +155,9 @@ BOOL INSTAPI ConfigDSNW(HWND hwnd_parent, WORD req, LPCWSTR wdriver,
 
     case ODBC_CONFIG_DSN: {
       const std::string& dsn = config.Get(FlightSqlConnection::DSN);
-      CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
+      auto wdsn_result = arrow::util::UTF8ToWideString(dsn);
+      if (!wdsn_result.status().ok()) return FALSE;
+      std::wstring wdsn = wdsn_result.ValueOrDie();
       if (!SQLValidDSN(wdsn.c_str())) return FALSE;
 
       Configuration loaded(config);
@@ -170,7 +172,9 @@ BOOL INSTAPI ConfigDSNW(HWND hwnd_parent, WORD req, LPCWSTR wdriver,
 
     case ODBC_REMOVE_DSN: {
       const std::string& dsn = config.Get(FlightSqlConnection::DSN);
-      CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
+      auto wdsn_result = arrow::util::UTF8ToWideString(dsn);
+      if (!wdsn_result.status().ok()) return FALSE;
+      std::wstring wdsn = wdsn_result.ValueOrDie();
       if (!SQLValidDSN(wdsn.c_str()) || !UnregisterDsn(wdsn)) return FALSE;
 
       break;
