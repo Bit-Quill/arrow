@@ -30,6 +30,19 @@ using arrow::flight::sql::odbc::DriverException;
 using arrow::flight::sql::odbc::FlightSqlConnection;
 using arrow::flight::sql::odbc::config::Configuration;
 
+void PostError(DWORD error_code, LPCWSTR error_msg) {
+  MessageBox(NULL, error_msg, L"Error!", MB_ICONEXCLAMATION | MB_OK);
+  SQLPostInstallerError(error_code, error_msg);
+}
+
+void PostArrowUtilError(arrow::Status error_status) {
+  std::string error_msg = error_status.message();
+  std::wstring werror_msg = arrow::util::UTF8ToWideString(error_msg).ValueOr(
+      L"Error during utf8 to wide string conversion");
+
+  PostError(ODBC_ERROR_GENERAL_ERR, werror_msg.c_str());
+}
+
 void PostLastInstallerError() {
 #define BUFFER_SIZE (1024)
   DWORD code;
@@ -40,8 +53,7 @@ void PostLastInstallerError() {
   buf << L"Message: \"" << msg << L"\", Code: " << code;
   std::wstring error_msg = buf.str();
 
-  MessageBox(NULL, error_msg.c_str(), L"Error!", MB_ICONEXCLAMATION | MB_OK);
-  SQLPostInstallerError(code, error_msg.c_str());
+  PostError(code, error_msg.c_str());
 }
 
 /**
@@ -68,7 +80,12 @@ bool UnregisterDsn(const std::wstring& dsn) {
  */
 bool RegisterDsn(const Configuration& config, LPCWSTR driver) {
   const std::string& dsn = config.Get(FlightSqlConnection::DSN);
-  CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
+  auto wdsn_result = arrow::util::UTF8ToWideString(dsn);
+  if (!wdsn_result.status().ok()) {
+    PostArrowUtilError(wdsn_result.status());
+    return false;
+  }
+  std::wstring wdsn = wdsn_result.ValueOrDie();
 
   if (!SQLWriteDSNToIni(wdsn.c_str(), driver)) {
     PostLastInstallerError();
@@ -83,8 +100,20 @@ bool RegisterDsn(const Configuration& config, LPCWSTR driver) {
       continue;
     }
 
-    CONVERT_WIDE_STR(const std::wstring wkey, key);
-    CONVERT_WIDE_STR(const std::wstring wvalue, it->second);
+    auto wkey_result = arrow::util::UTF8ToWideString(key);
+    if (!wkey_result.status().ok()) {
+      PostArrowUtilError(wkey_result.status());
+      return false;
+    }
+    std::wstring wkey = wkey_result.ValueOrDie();
+
+    auto wvalue_result = arrow::util::UTF8ToWideString(it->second);
+    if (!wvalue_result.status().ok()) {
+      PostArrowUtilError(wvalue_result.status());
+      return false;
+    }
+    std::wstring wvalue = wvalue_result.ValueOrDie();
+
     if (!SQLWritePrivateProfileString(wdsn.c_str(), wkey.c_str(), wvalue.c_str(),
                                       L"ODBC.INI")) {
       PostLastInstallerError();

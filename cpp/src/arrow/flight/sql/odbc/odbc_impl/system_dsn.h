@@ -19,6 +19,7 @@
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
+#include "arrow/result.h"
 
 using arrow::flight::sql::odbc::Connection;
 using arrow::flight::sql::odbc::config::Configuration;
@@ -63,3 +64,7 @@ bool RegisterDsn(const Configuration& config, LPCWSTR driver);
  * @return True on success and false on fail.
  */
 bool UnregisterDsn(const std::wstring& dsn);
+
+void PostError(DWORD error_code, LPCWSTR error_msg);
+
+void PostArrowUtilError(arrow::Status error_status);
