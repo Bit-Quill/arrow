@@ -555,7 +555,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
   // Check for negative decimal_val value
   EXPECT_EQ(0, decimal_val.sign);
   EXPECT_EQ(0, decimal_val.scale);
-  EXPECT_EQ(0, decimal_val.precision);
+  EXPECT_EQ(38, decimal_val.precision);
   EXPECT_THAT(decimal_val.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0, 0,
                                                       0, 0, 0, 0, 0, 0, 0, 0));
 
@@ -566,7 +566,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
   // Check for positive decimal_val value
   EXPECT_EQ(1, decimal_val.sign);
   EXPECT_EQ(0, decimal_val.scale);
-  EXPECT_EQ(0, decimal_val.precision);
+  EXPECT_EQ(38, decimal_val.precision);
   EXPECT_THAT(decimal_val.val, ::testing::ElementsAre(0xFF, 0xC9, 0x9A, 0x3B, 0, 0, 0, 0,
                                                       0, 0, 0, 0, 0, 0, 0, 0));
 
