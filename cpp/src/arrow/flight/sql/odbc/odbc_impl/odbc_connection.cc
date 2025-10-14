@@ -28,6 +28,7 @@
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/connection.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/statement.h"
+#include "arrow/flight/sql/odbc/odbc_impl/util.h"
 
 #include <odbcinst.h>
 #include <sql.h>

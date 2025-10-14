@@ -54,8 +54,7 @@ std::string TestConnection(const config::Configuration& config) {
 
 namespace config {
 
-DsnConfigurationWindow::DsnConfigurationWindow(Window* parent,
-                                               config::Configuration& config)
+DsnConfigurationWindow::DsnConfigurationWindow(Window* parent, Configuration& config)
     : CustomWindow(parent, L"FlightConfigureDSN", L"Configure Apache Arrow Flight SQL"),
       width_(480),
       height_(375),
@@ -142,29 +141,29 @@ int DsnConfigurationWindow::CreateConnectionSettingsGroup(int pos_x, int pos_y,
 
   int row_pos = pos_y + 2 * INTERVAL;
 
-  std::string val = config_.Get(FlightSqlConnection::DSN);
-  std::wstring wval = arrow::util::UTF8ToWideString(val).ValueOr(L"");
+  std::string dsn = config_.Get(FlightSqlConnection::DSN);
+  CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
   labels_.push_back(CreateLabel(label_pos_x, row_pos, LABEL_WIDTH, ROW_HEIGHT,
                                 L"Data Source Name:", ChildId::NAME_LABEL));
-  name_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT, wval.c_str(),
+  name_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT, wdsn.c_str(),
                           ChildId::NAME_EDIT);
 
   row_pos += INTERVAL + ROW_HEIGHT;
 
-  val = config_.Get(FlightSqlConnection::HOST);
-  wval = arrow::util::UTF8ToWideString(val).ValueOr(L"");
+  std::string host = config_.Get(FlightSqlConnection::HOST);
+  CONVERT_WIDE_STR(const std::wstring whost, host);
   labels_.push_back(CreateLabel(label_pos_x, row_pos, LABEL_WIDTH, ROW_HEIGHT,
                                 L"Host Name:", ChildId::SERVER_LABEL));
-  server_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT, wval.c_str(),
+  server_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT, whost.c_str(),
                             ChildId::SERVER_EDIT);
 
   row_pos += INTERVAL + ROW_HEIGHT;
 
-  val = config_.Get(FlightSqlConnection::PORT);
-  wval = arrow::util::UTF8ToWideString(val).ValueOr(L"");
+  std::string port = config_.Get(FlightSqlConnection::PORT);
+  CONVERT_WIDE_STR(const std::wstring wport, port);
   labels_.push_back(CreateLabel(label_pos_x, row_pos, LABEL_WIDTH, ROW_HEIGHT, L"Port:",
                                 ChildId::PORT_LABEL));
-  port_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT, wval.c_str(),
+  port_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT, wport.c_str(),
                           ChildId::PORT_EDIT, ES_NUMBER);
 
   row_pos += INTERVAL + ROW_HEIGHT;
@@ -196,31 +195,31 @@ int DsnConfigurationWindow::CreateAuthSettingsGroup(int pos_x, int pos_y, int si
 
   row_pos += INTERVAL + ROW_HEIGHT;
 
-  std::string val = config_.Get(FlightSqlConnection::UID);
-  std::wstring wval = arrow::util::UTF8ToWideString(val).ValueOr(L"");
+  std::string uid = config_.Get(FlightSqlConnection::UID);
+  CONVERT_WIDE_STR(const std::wstring wuid, uid);
 
   labels_.push_back(CreateLabel(label_pos_x, row_pos, LABEL_WIDTH, ROW_HEIGHT, L"User:",
                                 ChildId::USER_LABEL));
-  user_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT, wval.c_str(),
+  user_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT, wuid.c_str(),
                           ChildId::USER_EDIT);
 
   row_pos += INTERVAL + ROW_HEIGHT;
 
-  val = config_.Get(FlightSqlConnection::PWD);
-  wval = arrow::util::UTF8ToWideString(val).ValueOr(L"");
+  std::string pwd = config_.Get(FlightSqlConnection::PWD);
+  CONVERT_WIDE_STR(const std::wstring wpwd, pwd);
   labels_.push_back(CreateLabel(label_pos_x, row_pos, LABEL_WIDTH, ROW_HEIGHT,
                                 L"Password:", ChildId::PASSWORD_LABEL));
-  password_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT, wval.c_str(),
+  password_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT, wpwd.c_str(),
                               ChildId::USER_EDIT, ES_PASSWORD);
 
   row_pos += INTERVAL + ROW_HEIGHT;
 
   const auto& token = config_.Get(FlightSqlConnection::TOKEN);
-  wval = arrow::util::UTF8ToWideString(token).ValueOr(L"");
+  CONVERT_WIDE_STR(const std::wstring wtoken, token);
   labels_.push_back(CreateLabel(label_pos_x, row_pos, LABEL_WIDTH, ROW_HEIGHT,
                                 L"Authentication Token:", ChildId::AUTH_TOKEN_LABEL));
   auth_token_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x, ROW_HEIGHT,
-                                wval.c_str(), ChildId::AUTH_TOKEN_EDIT);
+                                wtoken.c_str(), ChildId::AUTH_TOKEN_EDIT);
   auth_token_edit_->SetEnabled(false);
 
   // Ensure the right elements are selected.
@@ -259,13 +258,14 @@ int DsnConfigurationWindow::CreateEncryptionSettingsGroup(int pos_x, int pos_y,
 
   row_pos += INTERVAL + ROW_HEIGHT;
 
-  val = config_.Get(FlightSqlConnection::TRUSTED_CERTS);
-  std::wstring wval = arrow::util::UTF8ToWideString(val).ValueOr(L"");
+  std::string trusted_certs = config_.Get(FlightSqlConnection::TRUSTED_CERTS);
+  CONVERT_WIDE_STR(const std::wstring wtrusted_certs, trusted_certs);
 
   labels_.push_back(CreateLabel(label_pos_x, row_pos, LABEL_WIDTH, ROW_HEIGHT,
                                 L"Certificate:", ChildId::CERTIFICATE_LABEL));
-  certificate_edit_ = CreateEdit(edit_pos_x, row_pos, edit_size_x - MARGIN - BUTTON_WIDTH,
-                                 ROW_HEIGHT, wval.c_str(), ChildId::CERTIFICATE_EDIT);
+  certificate_edit_ =
+      CreateEdit(edit_pos_x, row_pos, edit_size_x - MARGIN - BUTTON_WIDTH, ROW_HEIGHT,
+                 wtrusted_certs.c_str(), ChildId::CERTIFICATE_EDIT);
   certificate_browse_button_ =
       CreateButton(edit_pos_x + edit_size_x - BUTTON_WIDTH, row_pos - 2, BUTTON_WIDTH,
                    BUTTON_HEIGHT, L"Browse", ChildId::CERTIFICATE_BROWSE_BUTTON);
@@ -326,8 +326,8 @@ int DsnConfigurationWindow::CreatePropertiesGroup(int pos_x, int pos_y, int size
 
   const auto keys = config_.GetCustomKeys();
   for (const auto& key : keys) {
-    std::wstring wkey = arrow::util::UTF8ToWideString(key).ValueOr(L"");
-    std::wstring wval = arrow::util::UTF8ToWideString(config_.Get(key)).ValueOr(L"");
+    CONVERT_WIDE_STR(const std::wstring wkey, key);
+    CONVERT_WIDE_STR(const std::wstring wval, config_.Get(key));
 
     property_list_->ListAddItem({wkey, wval});
   }
@@ -493,12 +493,11 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wparam, LPARAM lparam) {
             SaveParameters(test_config);
             std::string test_message = TestConnection(test_config);
 
-            std::wstring w_test_message =
-                arrow::util::UTF8ToWideString(test_message).ValueOr(L"");
+            CONVERT_WIDE_STR(const std::wstring w_test_message, test_message);
+
             MessageBox(NULL, w_test_message.c_str(), L"Test Connection Success", MB_OK);
           } catch (DriverException& err) {
-            std::wstring w_message_text =
-                arrow::util::UTF8ToWideString(err.GetMessageText()).ValueOr(L"");
+            CONVERT_WIDE_STR(const std::wstring w_message_text, err.GetMessageText());
             MessageBox(NULL, w_message_text.c_str(), L"Error!",
                        MB_ICONEXCLAMATION | MB_OK);
           }
@@ -511,8 +510,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wparam, LPARAM lparam) {
             accepted_ = true;
             PostMessage(GetHandle(), WM_CLOSE, 0, 0);
           } catch (DriverException& err) {
-            std::wstring w_message_text =
-                arrow::util::UTF8ToWideString(err.GetMessageText()).ValueOr(L"");
+            CONVERT_WIDE_STR(const std::wstring w_message_text, err.GetMessageText());
             MessageBox(NULL, w_message_text.c_str(), L"Error!",
                        MB_ICONEXCLAMATION | MB_OK);
           }

@@ -19,12 +19,14 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
+#include "arrow/flight/sql/odbc/odbc_impl/util.h"
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
 
 #include <odbcinst.h>
 #include <sstream>
 
+using arrow::flight::sql::odbc::DriverException;
 using arrow::flight::sql::odbc::FlightSqlConnection;
 using arrow::flight::sql::odbc::config::Configuration;
 
@@ -66,7 +68,7 @@ bool UnregisterDsn(const std::wstring& dsn) {
  */
 bool RegisterDsn(const Configuration& config, LPCWSTR driver) {
   const std::string& dsn = config.Get(FlightSqlConnection::DSN);
-  std::wstring wdsn = arrow::util::UTF8ToWideString(dsn).ValueOr(L"");
+  CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
 
   if (!SQLWriteDSNToIni(wdsn.c_str(), driver)) {
     PostLastInstallerError();
@@ -81,8 +83,8 @@ bool RegisterDsn(const Configuration& config, LPCWSTR driver) {
       continue;
     }
 
-    std::wstring wkey = arrow::util::UTF8ToWideString(key).ValueOr(L"");
-    std::wstring wvalue = arrow::util::UTF8ToWideString(it->second).ValueOr(L"");
+    CONVERT_WIDE_STR(const std::wstring wkey, key);
+    CONVERT_WIDE_STR(const std::wstring wvalue, it->second);
     if (!SQLWritePrivateProfileString(wdsn.c_str(), wkey.c_str(), wvalue.c_str(),
                                       L"ODBC.INI")) {
       PostLastInstallerError();
