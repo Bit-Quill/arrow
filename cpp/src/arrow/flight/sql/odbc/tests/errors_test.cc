@@ -133,11 +133,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_EQ(SQL_SUCCESS, ret);
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailureNTS) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetDiagFieldWForConnectFailureNTS) {
   // Test is disabled because driver manager on Windows does not pass through SQL_NTS
   // This test case can be potentially used on macOS/Linux
-  GTEST_SKIP();
-  //  ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 

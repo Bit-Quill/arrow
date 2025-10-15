@@ -398,9 +398,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoOdbcInterfaceConformance) {
 
 // case SQL_ODBC_STANDARD_CLI_CONFORMANCE: - mentioned in SQLGetInfo spec with no
 // description and there is no constant for this.
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoOdbcStandardCliConformance) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetInfoOdbcStandardCliConformance) {
   // Type commented out in odbc_connection.cc
-  GTEST_SKIP();
   this->Connect();
 
   // Type does not exist in sql.h
@@ -712,9 +711,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAlterDomain) {
   this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAlterSchema) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetInfoAlterSchema) {
   // Type commented out in odbc_connection.cc
-  GTEST_SKIP();
   this->Connect();
 
   // Type does not exist in sql.h
@@ -731,9 +729,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAlterTable) {
   this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAnsiSqlDatetimeLiterals) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetInfoAnsiSqlDatetimeLiterals) {
   // Type commented out in odbc_connection.cc
-  GTEST_SKIP();
   this->Connect();
 
   // Type does not exist in sql.h

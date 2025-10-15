@@ -1164,10 +1164,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectVarbinaryTruncation) {
   this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectFloatTruncation) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLExecDirectFloatTruncation) {
   // Test is disabled until float truncation is supported.
   // GH-46985: return warning message instead of error on float truncation case
-  GTEST_SKIP();
   this->Connect();
 
   std::wstring wsql;
@@ -2064,9 +2063,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowArraySize) {
   this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnly) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLBindColIndicatorOnly) {
   // GH-47021: implement driver to return indicator value when data pointer is null
-  GTEST_SKIP();
+
   // Verify driver supports null data pointer with valid indicator pointer
   this->Connect();
 
@@ -2207,11 +2206,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExtendedFetchRowFetching) {
   this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExtendedFetchQueryNullIndicator) {
+TEST_F(FlightSQLODBCRemoteTestBase, DISABLED_TestSQLExtendedFetchQueryNullIndicator) {
   // GH-47110: SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for 22002
   // Limitation on mock test server prevents null from working properly, so use remote
   // server instead. Mock server has type `DENSE_UNION` for null column data.
-  GTEST_SKIP();
   this->Connect();
 
   SQLINTEGER val;
