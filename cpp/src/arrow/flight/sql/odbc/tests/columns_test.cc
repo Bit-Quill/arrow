@@ -142,61 +142,53 @@ void CheckSQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT idx,
   SQLLEN searchable = 0;
   SQLLEN unsigned_col = 0;
 
-  SQLRETURN ret = SQLColAttribute(stmt, idx, SQL_DESC_NAME, &name[0],
-                                  (SQLSMALLINT)name.size(), &name_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, SQL_DESC_NAME, &name[0],
+                                         (SQLSMALLINT)name.size(), &name_len, 0));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_BASE_COLUMN_NAME, &base_column_name[0],
-                        (SQLSMALLINT)base_column_name.size(), &column_name_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(stmt, idx, SQL_DESC_BASE_COLUMN_NAME, &base_column_name[0],
+                            (SQLSMALLINT)base_column_name.size(), &column_name_len, 0));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_LABEL, &label[0], (SQLSMALLINT)label.size(),
-                        &label_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, SQL_DESC_LABEL, &label[0],
+                                         (SQLSMALLINT)label.size(), &label_len, 0));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_TYPE, 0, 0, 0, &data_type);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, SQL_DESC_TYPE, 0, 0, 0, &data_type));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_CONCISE_TYPE, 0, 0, 0, &concise_type);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(stmt, idx, SQL_DESC_CONCISE_TYPE, 0, 0, 0, &concise_type));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_DISPLAY_SIZE, 0, 0, 0, &display_size);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(stmt, idx, SQL_DESC_DISPLAY_SIZE, 0, 0, 0, &display_size));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_FIXED_PREC_SCALE, 0, 0, 0, &prec_scale);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(stmt, idx, SQL_DESC_FIXED_PREC_SCALE, 0, 0, 0, &prec_scale));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_LENGTH, 0, 0, 0, &length);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, SQL_DESC_LENGTH, 0, 0, 0, &length));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_LITERAL_PREFIX, &prefix[0],
-                        (SQLSMALLINT)prefix.size(), &prefix_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, SQL_DESC_LITERAL_PREFIX, &prefix[0],
+                                         (SQLSMALLINT)prefix.size(), &prefix_len, 0));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_LITERAL_SUFFIX, &suffix[0],
-                        (SQLSMALLINT)suffix.size(), &suffix_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, SQL_DESC_LITERAL_SUFFIX, &suffix[0],
+                                         (SQLSMALLINT)suffix.size(), &suffix_len, 0));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_PRECISION, 0, 0, 0, &size);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, SQL_DESC_PRECISION, 0, 0, 0, &size));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_SCALE, 0, 0, 0, &scale);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, SQL_DESC_SCALE, 0, 0, 0, &scale));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_NULLABLE, 0, 0, 0, &nullability);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(stmt, idx, SQL_DESC_NULLABLE, 0, 0, 0, &nullability));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_NUM_PREC_RADIX, 0, 0, 0, &num_prec_radix);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, SQL_DESC_NUM_PREC_RADIX, 0, 0, 0,
+                                         &num_prec_radix));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_OCTET_LENGTH, 0, 0, 0, &octet_length);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(stmt, idx, SQL_DESC_OCTET_LENGTH, 0, 0, 0, &octet_length));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_SEARCHABLE, 0, 0, 0, &searchable);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(stmt, idx, SQL_DESC_SEARCHABLE, 0, 0, 0, &searchable));
 
-  ret = SQLColAttribute(stmt, idx, SQL_DESC_UNSIGNED, 0, 0, 0, &unsigned_col);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(stmt, idx, SQL_DESC_UNSIGNED, 0, 0, 0, &unsigned_col));
 
   std::wstring name_str = ConvertToWString(name, name_len);
   std::wstring base_column_name_str = ConvertToWString(base_column_name, column_name_len);
@@ -243,40 +235,37 @@ void CheckSQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT idx,
   SQLLEN searchable = 0;
   SQLLEN unsigned_col = 0;
 
-  SQLRETURN ret = SQLColAttributes(stmt, idx, SQL_COLUMN_NAME, &name[0],
-                                   (SQLSMALLINT)name.size(), &name_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttributes(stmt, idx, SQL_COLUMN_NAME, &name[0],
+                                          (SQLSMALLINT)name.size(), &name_len, 0));
 
-  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_LABEL, &label[0],
-                         (SQLSMALLINT)label.size(), &label_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttributes(stmt, idx, SQL_COLUMN_LABEL, &label[0],
+                                          (SQLSMALLINT)label.size(), &label_len, 0));
 
-  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_TYPE, 0, 0, 0, &data_type);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttributes(stmt, idx, SQL_COLUMN_TYPE, 0, 0, 0, &data_type));
 
-  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_DISPLAY_SIZE, 0, 0, 0, &display_size);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttributes(stmt, idx, SQL_COLUMN_DISPLAY_SIZE, 0, 0, 0, &display_size));
 
-  ret = SQLColAttribute(stmt, idx, SQL_COLUMN_MONEY, 0, 0, 0, &prec_scale);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(stmt, idx, SQL_COLUMN_MONEY, 0, 0, 0, &prec_scale));
 
-  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_LENGTH, 0, 0, 0, &length);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttributes(stmt, idx, SQL_COLUMN_LENGTH, 0, 0, 0, &length));
 
-  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_PRECISION, 0, 0, 0, &size);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttributes(stmt, idx, SQL_COLUMN_PRECISION, 0, 0, 0, &size));
 
-  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_SCALE, 0, 0, 0, &scale);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttributes(stmt, idx, SQL_COLUMN_SCALE, 0, 0, 0, &scale));
 
-  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_NULLABLE, 0, 0, 0, &nullability);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttributes(stmt, idx, SQL_COLUMN_NULLABLE, 0, 0, 0, &nullability));
 
-  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_SEARCHABLE, 0, 0, 0, &searchable);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttributes(stmt, idx, SQL_COLUMN_SEARCHABLE, 0, 0, 0, &searchable));
 
-  ret = SQLColAttributes(stmt, idx, SQL_COLUMN_UNSIGNED, 0, 0, 0, &unsigned_col);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttributes(stmt, idx, SQL_COLUMN_UNSIGNED, 0, 0, 0, &unsigned_col));
 
   std::wstring name_str = ConvertToWString(name, name_len);
   std::wstring label_str = ConvertToWString(label, label_len);
@@ -296,27 +285,24 @@ void CheckSQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT idx,
 void CheckSQLColAttributeString(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
                                 SQLUSMALLINT field_identifier,
                                 const std::wstring& expected_attr_string) {
-  SQLRETURN ret;
   if (!wsql.empty()) {
     // Execute query
     std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
-    ret = SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS,
+              SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-    ret = SQLFetch(stmt);
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, SQLFetch(stmt));
   }
 
   // check SQLColAttribute string attribute
   std::vector<SQLWCHAR> str_val(ODBC_BUFFER_SIZE);
   SQLSMALLINT str_len = 0;
 
-  ret = SQLColAttribute(stmt, idx, field_identifier, &str_val[0],
-                        (SQLSMALLINT)str_val.size(), &str_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, field_identifier, &str_val[0],
+                                         (SQLSMALLINT)str_val.size(), &str_len, 0));
 
   std::wstring attr_str = ConvertToWString(str_val, str_len);
-  EXPECT_EQ(expected_attr_string, attr_str);
+  ASSERT_EQ(expected_attr_string, attr_str);
 }
 
 void CheckSQLColAttributeNumeric(SQLHSTMT stmt, const std::wstring& wsql,
@@ -324,43 +310,37 @@ void CheckSQLColAttributeNumeric(SQLHSTMT stmt, const std::wstring& wsql,
                                  SQLLEN expected_attr_numeric) {
   // Execute query and check SQLColAttribute numeric attribute
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
-  SQLRETURN ret = SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(stmt));
 
   SQLLEN num_val = 0;
-  ret = SQLColAttribute(stmt, idx, field_identifier, 0, 0, 0, &num_val);
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  EXPECT_EQ(expected_attr_numeric, num_val);
+  ASSERT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, field_identifier, 0, 0, 0, &num_val));
+  ASSERT_EQ(expected_attr_numeric, num_val);
 }
 
 void CheckSQLColAttributesString(SQLHSTMT stmt, const std::wstring& wsql,
                                  SQLUSMALLINT idx, SQLUSMALLINT field_identifier,
                                  const std::wstring& expected_attr_string) {
-  SQLRETURN ret;
   if (!wsql.empty()) {
     // Execute query
     std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
-    ret = SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS,
+              SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-    ret = SQLFetch(stmt);
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, SQLFetch(stmt));
   }
 
   // check ODBC 2.0 API SQLColAttributes string attribute
   std::vector<SQLWCHAR> str_val(ODBC_BUFFER_SIZE);
   SQLSMALLINT str_len = 0;
 
-  ret = SQLColAttributes(stmt, idx, field_identifier, &str_val[0],
-                         (SQLSMALLINT)str_val.size(), &str_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLColAttributes(stmt, idx, field_identifier, &str_val[0],
+                                          (SQLSMALLINT)str_val.size(), &str_len, 0));
 
   std::wstring attr_str = ConvertToWString(str_val, str_len);
-  EXPECT_EQ(expected_attr_string, attr_str);
+  ASSERT_EQ(expected_attr_string, attr_str);
 }
 
 void CheckSQLColAttributesNumeric(SQLHSTMT stmt, const std::wstring& wsql,
@@ -368,17 +348,15 @@ void CheckSQLColAttributesNumeric(SQLHSTMT stmt, const std::wstring& wsql,
                                   SQLLEN expected_attr_numeric) {
   // Execute query and check ODBC 2.0 API SQLColAttributes numeric attribute
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
-  SQLRETURN ret = SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(stmt));
 
   SQLLEN num_val = 0;
-  ret = SQLColAttributes(stmt, idx, field_identifier, 0, 0, 0, &num_val);
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  EXPECT_EQ(expected_attr_numeric, num_val);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLColAttributes(stmt, idx, field_identifier, 0, 0, 0, &num_val));
+  ASSERT_EQ(expected_attr_numeric, num_val);
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsTestInputData) {
@@ -390,37 +368,27 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsTestInputData) {
   SQLWCHAR column_name[] = L"";
 
   // All values populated
-  SQLRETURN ret = SQLColumns(this->stmt, catalog_name, sizeof(catalog_name), schema_name,
-                             sizeof(schema_name), table_name, sizeof(table_name),
-                             column_name, sizeof(column_name));
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColumns(this->stmt, catalog_name, sizeof(catalog_name), schema_name,
+                       sizeof(schema_name), table_name, sizeof(table_name), column_name,
+                       sizeof(column_name)));
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
   // Sizes are nulls
-  ret = SQLColumns(this->stmt, catalog_name, 0, schema_name, 0, table_name, 0,
-                   column_name, 0);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
+  EXPECT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, catalog_name, 0, schema_name, 0,
+                                    table_name, 0, column_name, 0));
   ValidateFetch(this->stmt, SQL_NO_DATA);
 
   // Values are nulls
-  ret = SQLColumns(this->stmt, 0, sizeof(catalog_name), 0, sizeof(schema_name), 0,
-                   sizeof(table_name), 0, sizeof(column_name));
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColumns(this->stmt, 0, sizeof(catalog_name), 0, sizeof(schema_name), 0,
+                       sizeof(table_name), 0, sizeof(column_name)));
   ValidateFetch(this->stmt, SQL_SUCCESS);
   // Close statement cursor to avoid leaving in an invalid state
   SQLFreeStmt(this->stmt, SQL_CLOSE);
 
   // All values and sizes are nulls
-  ret = SQLColumns(this->stmt, 0, 0, 0, 0, 0, 0, 0, 0);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
+  EXPECT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, 0, 0, 0, 0, 0, 0, 0, 0));
   ValidateFetch(this->stmt, SQL_SUCCESS);
 
   this->Disconnect();
@@ -434,13 +402,10 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
   SQLWCHAR table_pattern[] = L"%";
   SQLWCHAR column_pattern[] = L"%";
 
-  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                             table_pattern, SQL_NTS, column_pattern, SQL_NTS);
+  ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   // mock limitation: SQLite mock server returns 10 for bigint size when spec indicates
   // should be 19
@@ -465,8 +430,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 2nd Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),          // expected_catalog
@@ -487,8 +451,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 3rd Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),          // expected_catalog
@@ -508,8 +471,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 4th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),      // expected_catalog
@@ -529,8 +491,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 5th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),      // expected_catalog
@@ -551,8 +512,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 6th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),      // expected_catalog
@@ -572,8 +532,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 7th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),       // expected_catalog
@@ -608,14 +567,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
   SQLWCHAR table_pattern[] = L"AllTypesTable";
   SQLWCHAR column_pattern[] = L"%";
 
-  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                             table_pattern, SQL_NTS, column_pattern, SQL_NTS);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
   // Fetch SQLColumn data for 1st column in AllTypesTable
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),           // expected_catalog
@@ -637,8 +593,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check SQLColumn data for 2nd column in AllTypesTable
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),           // expected_catalog
@@ -659,8 +614,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check SQLColumn data for 3rd column in AllTypesTable
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),           // expected_catalog
@@ -681,8 +635,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check SQLColumn data for 4th column in AllTypesTable
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),           // expected_catalog
@@ -702,8 +655,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
                       std::wstring(L"YES"));           // expected_is_nullable
 
   // There should be no more column data
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_NO_DATA, ret);
+  ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 
   this->Disconnect();
 }
@@ -719,14 +671,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsUnicode) {
   SQLWCHAR table_pattern[] = L"数据";
   SQLWCHAR column_pattern[] = L"%";
 
-  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                             table_pattern, SQL_NTS, column_pattern, SQL_NTS);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
   // Check SQLColumn data for 1st column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),      // expected_catalog
@@ -747,8 +696,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsUnicode) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // There should be no more column data
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_NO_DATA, ret);
+  EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 
   this->Disconnect();
 }
@@ -761,14 +709,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
   SQLWCHAR table_pattern[] = L"ODBCTest";
   SQLWCHAR column_pattern[] = L"%";
 
-  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                             table_pattern, SQL_NTS, column_pattern, SQL_NTS);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
   // Check 1st Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(
       this->stmt,
@@ -789,8 +734,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 2nd Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(
       this->stmt,
@@ -811,8 +755,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 3rd Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(this->stmt,
                         std::wstring(L"$scratch"),          // expected_schema
@@ -832,8 +775,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
                         std::wstring(L"YES"));              // expected_is_nullable
 
   // Check 4th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(this->stmt,
                         std::wstring(L"$scratch"),   // expected_schema
@@ -853,8 +795,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
                         std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 5th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(this->stmt,
                         std::wstring(L"$scratch"),    // expected_schema
@@ -874,8 +815,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
                         std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 6th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(this->stmt,
                         std::wstring(L"$scratch"),  // expected_schema
@@ -899,8 +839,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
   // DATA_TYPE field
 
   // Check 7th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(
       this->stmt,
@@ -921,8 +860,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 8th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(
       this->stmt,
@@ -943,8 +881,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 9th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(
       this->stmt,
@@ -965,8 +902,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
       std::wstring(L"YES"));  // expected_is_nullable
 
   // There is no more column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_NO_DATA, ret);
+  EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 
   this->Disconnect();
 }
@@ -979,14 +915,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
   SQLWCHAR table_pattern[] = L"ODBCTest";
   SQLWCHAR column_pattern[] = L"%";
 
-  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                             table_pattern, SQL_NTS, column_pattern, SQL_NTS);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
   // Check 1st Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(
       this->stmt,
@@ -1007,8 +940,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 2nd Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(
       this->stmt,
@@ -1029,8 +961,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 3rd Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(this->stmt,
                         std::wstring(L"$scratch"),          // expected_schema
@@ -1050,8 +981,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
                         std::wstring(L"YES"));              // expected_is_nullable
 
   // Check 4th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(this->stmt,
                         std::wstring(L"$scratch"),   // expected_schema
@@ -1071,8 +1001,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
                         std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 5th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(this->stmt,
                         std::wstring(L"$scratch"),    // expected_schema
@@ -1092,8 +1021,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
                         std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 6th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(this->stmt,
                         std::wstring(L"$scratch"),  // expected_schema
@@ -1116,8 +1044,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
   // ODBC ver 2 returns SQL_DATE, SQL_TIME, and SQL_TIMESTAMP in the DATA_TYPE field
 
   // Check 7th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(
       this->stmt,
@@ -1138,8 +1065,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 8th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(
       this->stmt,
@@ -1160,8 +1086,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 9th Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   checkRemoteSQLColumns(
       this->stmt,
@@ -1182,8 +1107,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
       std::wstring(L"YES"));  // expected_is_nullable
 
   // There is no more column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_NO_DATA, ret);
+  EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 
   this->Disconnect();
 }
@@ -1196,14 +1120,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnscolumn_pattern) {
   SQLWCHAR table_pattern[] = L"%";
   SQLWCHAR column_pattern[] = L"id";
 
-  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                             table_pattern, SQL_NTS, column_pattern, SQL_NTS);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
   // Check 1st Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),          // expected_catalog
@@ -1223,8 +1144,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnscolumn_pattern) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // Check 2nd Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),      // expected_catalog
@@ -1244,8 +1164,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnscolumn_pattern) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // There is no more column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_NO_DATA, ret);
+  EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 
   this->Disconnect();
 }
@@ -1258,14 +1177,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsTablecolumn_pattern) {
   SQLWCHAR table_pattern[] = L"foreignTable";
   SQLWCHAR column_pattern[] = L"id";
 
-  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                             table_pattern, SQL_NTS, column_pattern, SQL_NTS);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
   // Check 1st Column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckMockSQLColumns(this->stmt,
                       std::wstring(L"main"),          // expected_catalog
@@ -1285,8 +1201,7 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsTablecolumn_pattern) {
                       std::wstring(L"YES"));  // expected_is_nullable
 
   // There is no more column
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_NO_DATA, ret);
+  EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 
   this->Disconnect();
 }
@@ -1297,14 +1212,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsInvalidtable_pattern) {
   SQLWCHAR table_pattern[] = L"non-existent-table";
   SQLWCHAR column_pattern[] = L"%";
 
-  SQLRETURN ret = SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                             table_pattern, SQL_NTS, column_pattern, SQL_NTS);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
   // There is no column from filter
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_NO_DATA, ret);
+  EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 
   this->Disconnect();
 }
@@ -1315,12 +1227,10 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeTestInputData) {
   std::wstring wsql = L"SELECT 1 as col1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   SQLUSMALLINT idx = 1;
   std::vector<SQLWCHAR> character_attr(ODBC_BUFFER_SIZE);
@@ -1328,21 +1238,19 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeTestInputData) {
   SQLLEN numeric_attr = 0;
 
   // All character values populated
-  ret = SQLColAttribute(this->stmt, idx, SQL_DESC_NAME, &character_attr[0],
-                        (SQLSMALLINT)character_attr.size(), &character_attr_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(this->stmt, idx, SQL_DESC_NAME, &character_attr[0],
+                            (SQLSMALLINT)character_attr.size(), &character_attr_len, 0));
 
   // All numeric values populated
-  ret = SQLColAttribute(this->stmt, idx, SQL_DESC_COUNT, 0, 0, 0, &numeric_attr);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(this->stmt, idx, SQL_DESC_COUNT, 0, 0, 0, &numeric_attr));
 
   // Pass null values, driver should not throw error
-  ret = SQLColAttribute(this->stmt, idx, SQL_COLUMN_TABLE_NAME, 0, 0, 0, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLColAttribute(this->stmt, idx, SQL_COLUMN_TABLE_NAME, 0, 0, 0, 0));
 
-  ret = SQLColAttribute(this->stmt, idx, SQL_DESC_COUNT, 0, 0, 0, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(this->stmt, idx, SQL_DESC_COUNT, 0, 0, 0, 0));
 
   this->Disconnect();
 }
@@ -1353,20 +1261,16 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeGetCharacterLen) {
   std::wstring wsql = L"SELECT 1 as col1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   SQLSMALLINT character_attr_len = 0;
 
   // Check length of character attribute
-  ret = SQLColAttribute(this->stmt, 1, SQL_DESC_BASE_COLUMN_NAME, 0, 0,
-                        &character_attr_len, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
+  ASSERT_EQ(SQL_SUCCESS, SQLColAttribute(this->stmt, 1, SQL_DESC_BASE_COLUMN_NAME, 0, 0,
+                                         &character_attr_len, 0));
   EXPECT_EQ(4 * ODBC::GetSqlWCharSize(), character_attr_len);
 
   this->Disconnect();
@@ -1378,12 +1282,10 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeInvalidFieldId) {
   std::wstring wsql = L"SELECT 1 as col1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   SQLUSMALLINT invalid_field_id = -100;
   SQLUSMALLINT idx = 1;
@@ -1391,9 +1293,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeInvalidFieldId) {
   SQLSMALLINT character_attr_len = 0;
   SQLLEN numeric_attr = 0;
 
-  ret = SQLColAttribute(this->stmt, idx, invalid_field_id, &character_attr[0],
-                        (SQLSMALLINT)character_attr.size(), &character_attr_len, 0);
-  EXPECT_EQ(SQL_ERROR, ret);
+  ASSERT_EQ(SQL_ERROR,
+            SQLColAttribute(this->stmt, idx, invalid_field_id, &character_attr[0],
+                            (SQLSMALLINT)character_attr.size(), &character_attr_len, 0));
   // Verify invalid descriptor field identifier error state is returned
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY091);
 
@@ -1406,21 +1308,19 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeInvalidColId) {
   std::wstring wsql = L"SELECT 1 as col1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   SQLUSMALLINT invalid_col_id = 2;
   std::vector<SQLWCHAR> character_attr(ODBC_BUFFER_SIZE);
   SQLSMALLINT character_attr_len = 0;
 
-  ret = SQLColAttribute(this->stmt, invalid_col_id, SQL_DESC_BASE_COLUMN_NAME,
-                        &character_attr[0], (SQLSMALLINT)character_attr.size(),
-                        &character_attr_len, 0);
-  EXPECT_EQ(SQL_ERROR, ret);
+  ASSERT_EQ(SQL_ERROR,
+            SQLColAttribute(this->stmt, invalid_col_id, SQL_DESC_BASE_COLUMN_NAME,
+                            &character_attr[0], (SQLSMALLINT)character_attr.size(),
+                            &character_attr_len, 0));
   // Verify invalid descriptor index error state is returned
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
 
@@ -1434,12 +1334,10 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeAllTypes) {
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckSQLColAttribute(this->stmt, 1,
                        std::wstring(L"bigint_col"),  // expected_column_name
@@ -1520,12 +1418,10 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesAllTypesODBCVer2) {
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
   CheckSQLColAttributes(this->stmt, 1,
                         std::wstring(L"bigint_col"),  // expected_column_name
                         SQL_BIGINT,                   // expected_data_type
@@ -1584,12 +1480,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckSQLColAttribute(this->stmt, 1,
                        std::wstring(L"sinteger_max"),  // expected_column_name
@@ -1754,12 +1648,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckSQLColAttribute(this->stmt, 1,
                        std::wstring(L"sinteger_max"),  // expected_column_name
@@ -1925,12 +1817,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  ret = SQLFetch(this->stmt);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   CheckSQLColAttributes(this->stmt, 1,
                         std::wstring(L"sinteger_max"),  // expected_column_name
@@ -2403,36 +2293,26 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColValidateInput) {
   SQLSMALLINT decimal_digits = 0;
   SQLSMALLINT nullable = 0;
 
-  SQLRETURN ret = SQLExecDirect(this->stmt, sql_query, query_length);
+  ASSERT_EQ(SQL_SUCCESS, SQLExecDirect(this->stmt, sql_query, query_length));
 
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  ret = SQLFetch(this->stmt);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   // Invalid descriptor index - Bookmarks are not supported
-  ret =
-      SQLDescribeCol(this->stmt, bookmark_column, column_name, buf_char_len, &name_length,
-                     &data_type, &column_size, &decimal_digits, &nullable);
-
-  EXPECT_EQ(SQL_ERROR, ret);
+  EXPECT_EQ(SQL_ERROR, SQLDescribeCol(this->stmt, bookmark_column, column_name,
+                                      buf_char_len, &name_length, &data_type,
+                                      &column_size, &decimal_digits, &nullable));
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
 
   // Invalid descriptor index - index out of range
-  ret =
-      SQLDescribeCol(this->stmt, out_of_range_column, column_name, buf_char_len,
-                     &name_length, &data_type, &column_size, &decimal_digits, &nullable);
-
-  EXPECT_EQ(SQL_ERROR, ret);
+  EXPECT_EQ(SQL_ERROR, SQLDescribeCol(this->stmt, out_of_range_column, column_name,
+                                      buf_char_len, &name_length, &data_type,
+                                      &column_size, &decimal_digits, &nullable));
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
 
   // Invalid descriptor index - index out of range
-  ret =
-      SQLDescribeCol(this->stmt, negative_column, column_name, buf_char_len, &name_length,
-                     &data_type, &column_size, &decimal_digits, &nullable);
-
-  EXPECT_EQ(SQL_ERROR, ret);
+  EXPECT_EQ(SQL_ERROR, SQLDescribeCol(this->stmt, negative_column, column_name,
+                                      buf_char_len, &name_length, &data_type,
+                                      &column_size, &decimal_digits, &nullable));
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
 
   this->Disconnect();
@@ -2481,23 +2361,16 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
       SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR,
       SQL_WVARCHAR, SQL_WVARCHAR};
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  ret = SQLFetch(this->stmt);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
     column_index = i + 1;
 
-    ret =
-        SQLDescribeCol(this->stmt, column_index, column_name, buf_char_len, &name_length,
-                       &column_data_type, &column_size, &decimal_digits, &nullable);
-
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, SQLDescribeCol(this->stmt, column_index, column_name,
+                                          buf_char_len, &name_length, &column_data_type,
+                                          &column_size, &decimal_digits, &nullable));
 
     EXPECT_EQ(wcslen(column_names[i]), name_length);
 
@@ -2565,23 +2438,17 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
   SQLULEN column_decimal_digits[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0,  0,
                                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 23, 23};
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  ret = SQLFetch(this->stmt);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
     column_index = i + 1;
 
-    ret =
-        SQLDescribeCol(this->stmt, column_index, column_name, buf_char_len, &name_length,
-                       &column_data_type, &column_size, &decimal_digits, &nullable);
-
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, SQLDescribeCol(this->stmt, column_index, column_name,
+                                          buf_char_len, &name_length, &column_data_type,
+                                          &column_size, &decimal_digits, &nullable));
 
     EXPECT_EQ(wcslen(column_names[i]), name_length);
 
@@ -2630,22 +2497,16 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadata) {
   SQLULEN column_sizes[] = {4, 8, 19, 8, 8, 1, 10, 12, 23};
   SQLULEN columndecimal_digits[] = {0, 0, 0, 0, 0, 0, 10, 12, 23};
 
-  SQLRETURN ret = SQLExecDirect(this->stmt, sql_query, query_length);
+  ASSERT_EQ(SQL_SUCCESS, SQLExecDirect(this->stmt, sql_query, query_length));
 
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  ret = SQLFetch(this->stmt);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
     column_index = i + 1;
 
-    ret =
-        SQLDescribeCol(this->stmt, column_index, column_name, buf_char_len, &name_length,
-                       &column_data_type, &column_size, &decimal_digits, &nullable);
-
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, SQLDescribeCol(this->stmt, column_index, column_name,
+                                          buf_char_len, &name_length, &column_data_type,
+                                          &column_size, &decimal_digits, &nullable));
 
     EXPECT_EQ(wcslen(column_names[i]), name_length);
 
@@ -2694,22 +2555,16 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataODBC2) {
   SQLULEN column_sizes[] = {4, 8, 19, 8, 8, 1, 10, 12, 23};
   SQLULEN columndecimal_digits[] = {0, 0, 0, 0, 0, 0, 10, 12, 23};
 
-  SQLRETURN ret = SQLExecDirect(this->stmt, sql_query, query_length);
+  ASSERT_EQ(SQL_SUCCESS, SQLExecDirect(this->stmt, sql_query, query_length));
 
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  ret = SQLFetch(this->stmt);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
     column_index = i + 1;
 
-    ret =
-        SQLDescribeCol(this->stmt, column_index, column_name, buf_char_len, &name_length,
-                       &column_data_type, &column_size, &decimal_digits, &nullable);
-
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, SQLDescribeCol(this->stmt, column_index, column_name,
+                                          buf_char_len, &name_length, &column_data_type,
+                                          &column_size, &decimal_digits, &nullable));
 
     EXPECT_EQ(wcslen(column_names[i]), name_length);
 
@@ -2752,22 +2607,16 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColAllTypesTableMetadata) {
   SQLSMALLINT column_data_types[] = {SQL_BIGINT, SQL_WVARCHAR, SQL_BINARY, SQL_DOUBLE};
   SQLULEN column_sizes[] = {8, 0, 0, 8};
 
-  SQLRETURN ret = SQLExecDirect(this->stmt, sql_query, query_length);
+  ASSERT_EQ(SQL_SUCCESS, SQLExecDirect(this->stmt, sql_query, query_length));
 
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  ret = SQLFetch(this->stmt);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
     column_index = i + 1;
 
-    ret =
-        SQLDescribeCol(this->stmt, column_index, column_name, buf_char_len, &name_length,
-                       &column_data_type, &column_size, &decimal_digits, &nullable);
-
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, SQLDescribeCol(this->stmt, column_index, column_name,
+                                          buf_char_len, &name_length, &column_data_type,
+                                          &column_size, &decimal_digits, &nullable));
 
     EXPECT_EQ(wcslen(column_names[i]), name_length);
 
@@ -2809,18 +2658,13 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColUnicodeTableMetadata) {
   SQLSMALLINT expected_column_data_type = SQL_WVARCHAR;
   SQLULEN expected_column_size = 0;
 
-  SQLRETURN ret = SQLExecDirect(this->stmt, sql_query, query_length);
+  ASSERT_EQ(SQL_SUCCESS, SQLExecDirect(this->stmt, sql_query, query_length));
 
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  ret = SQLFetch(this->stmt);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  ret = SQLDescribeCol(this->stmt, column_index, column_name, buf_char_len, &name_length,
-                       &column_data_type, &column_size, &decimal_digits, &nullable);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLDescribeCol(this->stmt, column_index, column_name,
+                                        buf_char_len, &name_length, &column_data_type,
+                                        &column_size, &decimal_digits, &nullable));
 
   EXPECT_EQ(name_length, wcslen(expected_column_name));
 
@@ -2864,18 +2708,15 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsGetMetadataBySQLDescribeCol) {
   SQLULEN column_sizes[] = {1024, 1024, 1024, 1024, 2, 1024, 4, 4, 2,
                             2,    2,    1024, 1024, 2, 2,    4, 4, 1024};
 
-  SQLRETURN ret = SQLColumns(this->stmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLColumns(this->stmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0));
 
   for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
     column_index = i + 1;
 
-    ret =
-        SQLDescribeCol(this->stmt, column_index, column_name, buf_char_len, &name_length,
-                       &column_data_type, &column_size, &decimal_digits, &nullable);
-
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, SQLDescribeCol(this->stmt, column_index, column_name,
+                                          buf_char_len, &name_length, &column_data_type,
+                                          &column_size, &decimal_digits, &nullable));
 
     EXPECT_EQ(wcslen(column_names[i]), name_length);
 
@@ -2934,18 +2775,15 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsGetMetadataBySQLDescribeColODBC2) {
   SQLULEN column_sizes[] = {1024, 1024, 1024, 1024, 2, 1024, 4, 4, 2,
                             2,    2,    1024, 1024, 2, 2,    4, 4, 1024};
 
-  SQLRETURN ret = SQLColumns(this->stmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLColumns(this->stmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0));
 
   for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
     column_index = i + 1;
 
-    ret =
-        SQLDescribeCol(this->stmt, column_index, column_name, buf_char_len, &name_length,
-                       &column_data_type, &column_size, &decimal_digits, &nullable);
-
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, SQLDescribeCol(this->stmt, column_index, column_name,
+                                          buf_char_len, &name_length, &column_data_type,
+                                          &column_size, &decimal_digits, &nullable));
 
     EXPECT_EQ(wcslen(column_names[i]), name_length);
 
