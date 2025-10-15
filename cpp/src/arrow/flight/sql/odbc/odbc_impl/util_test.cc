@@ -23,7 +23,8 @@
 #include "arrow/testing/builder.h"
 #include "arrow/testing/gtest_util.h"
 #include "arrow/testing/util.h"
-#include "gtest/gtest.h"
+
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
 

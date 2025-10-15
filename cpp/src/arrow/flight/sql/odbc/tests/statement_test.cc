@@ -26,8 +26,8 @@
 
 #include <limits>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {

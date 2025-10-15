@@ -18,7 +18,8 @@
 #include "arrow/flight/sql/odbc/odbc_impl/accessors/binary_array_accessor.h"
 #include "arrow/testing/builder.h"
 #include "arrow/testing/gtest_util.h"
-#include "gtest/gtest.h"
+
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
 

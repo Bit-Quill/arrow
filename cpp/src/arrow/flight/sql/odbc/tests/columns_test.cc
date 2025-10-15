@@ -24,7 +24,7 @@
 #include <sqltypes.h>
 #include <sqlucode.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
 // Helper functions

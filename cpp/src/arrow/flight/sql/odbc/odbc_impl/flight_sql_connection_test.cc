@@ -19,7 +19,8 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 #include "arrow/flight/types.h"
-#include "gtest/gtest.h"
+
+#include <gtest/gtest.h>
 
 #include <optional>
 

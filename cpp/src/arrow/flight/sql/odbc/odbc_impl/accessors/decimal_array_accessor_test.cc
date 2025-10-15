@@ -19,7 +19,8 @@
 #include "arrow/builder.h"
 #include "arrow/testing/builder.h"
 #include "arrow/util/decimal.h"
-#include "gtest/gtest.h"
+
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
 namespace {
