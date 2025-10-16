@@ -25,8 +25,6 @@
 #include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
-// -AL- TODO wait for Justin's fixes to address the remaining comments.
-// Need to remove the tests with just the allocation, all allocation should be freed
 TEST(SQLAllocHandle, TestSQLAllocHandleEnv) {
   SQLHENV env;
 
