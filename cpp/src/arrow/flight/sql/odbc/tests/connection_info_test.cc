@@ -212,12 +212,21 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHdbc) {
 
 // These information types are implemented by the Driver Manager alone.
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHdesc) {
-  // TODO This is failing due to no descriptor being created
-  // enable after SQL_HANDLE_DESC is supported
-  GTEST_SKIP();
   this->Connect();
 
-  Validate(this->conn, SQL_DRIVER_HDESC, static_cast<SQLULEN>(0));
+  SQLHDESC descriptor;
+
+  // Allocate a descriptor using alloc handle
+  ASSERT_EQ(SQL_SUCCESS, SQLAllocHandle(SQL_HANDLE_DESC, this->conn, &descriptor));
+
+  // Value returned from driver manager is the desc address
+  SQLHDESC local_desc = descriptor;
+  SQLRETURN ret = SQLGetInfo(this->conn, SQL_HANDLE_DESC, &local_desc, 0, 0);
+  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_GT(local_desc, static_cast<SQLHSTMT>(0));
+
+  // Free descriptor handle
+  ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_DESC, descriptor));
 
   this->Disconnect();
 }
@@ -389,9 +398,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoOdbcInterfaceConformance) {
 
 // case SQL_ODBC_STANDARD_CLI_CONFORMANCE: - mentioned in SQLGetInfo spec with no
 // description and there is no constant for this.
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoOdbcStandardCliConformance) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetInfoOdbcStandardCliConformance) {
   // Type commented out in odbc_connection.cc
-  GTEST_SKIP();
   this->Connect();
 
   // Type does not exist in sql.h
@@ -703,9 +711,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAlterDomain) {
   this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAlterSchema) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetInfoAlterSchema) {
   // Type commented out in odbc_connection.cc
-  GTEST_SKIP();
   this->Connect();
 
   // Type does not exist in sql.h
@@ -722,9 +729,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAlterTable) {
   this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAnsiSqlDatetimeLiterals) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetInfoAnsiSqlDatetimeLiterals) {
   // Type commented out in odbc_connection.cc
-  GTEST_SKIP();
   this->Connect();
 
   // Type does not exist in sql.h

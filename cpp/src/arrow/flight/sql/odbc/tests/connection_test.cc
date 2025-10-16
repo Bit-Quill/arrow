@@ -231,11 +231,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrOutputNTS) {
   this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrGetLength) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetEnvAttrGetLength) {
   // Test is disabled because call to SQLGetEnvAttr is handled by the driver manager on
   // Windows. This test case can be potentially used on macOS/Linux
-  GTEST_SKIP();
-
   this->Connect();
 
   SQLINTEGER length;
@@ -250,10 +248,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrGetLength) {
   this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrNullValuePointer) {
+TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetEnvAttrNullValuePointer) {
   // Test is disabled because call to SQLGetEnvAttr is handled by the driver manager on
   // Windows. This test case can be potentially used on macOS/Linux
-  GTEST_SKIP();
   this->Connect();
 
   SQLRETURN return_get =
