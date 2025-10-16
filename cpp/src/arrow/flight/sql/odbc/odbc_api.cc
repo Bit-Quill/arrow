@@ -449,7 +449,7 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalog_name,
                      SQLSMALLINT schema_name_length, SQLWCHAR* table_name,
                      SQLSMALLINT table_name_length, SQLWCHAR* column_name,
                      SQLSMALLINT column_name_length) {
-  // GH-47159 TODO: Return NUM_PREC_RADIX based on whether COLUMN_SIZE contains number of
+  // GH-47159: Return NUM_PREC_RADIX based on whether COLUMN_SIZE contains number of
   // digits or bits
   ARROW_LOG(DEBUG) << "SQLColumnsW called with stmt: " << stmt
                    << ", catalog_name: " << static_cast<const void*>(catalog_name)
@@ -460,8 +460,24 @@ SQLRETURN SQLColumns(SQLHSTMT stmt, SQLWCHAR* catalog_name,
                    << ", table_name_length: " << table_name_length
                    << ", column_name: " << static_cast<const void*>(column_name)
                    << ", column_name_length: " << column_name_length;
-  // GH-47720 TODO: Implement SQLColumns
-  return SQL_INVALID_HANDLE;
+
+  using ODBC::ODBCStatement;
+  using ODBC::SqlWcharToString;
+
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+
+    std::string catalog = SqlWcharToString(catalog_name, catalog_name_length);
+    std::string schema = SqlWcharToString(schema_name, schema_name_length);
+    std::string table = SqlWcharToString(table_name, table_name_length);
+    std::string column = SqlWcharToString(column_name, column_name_length);
+
+    statement->GetColumns(catalog_name ? &catalog : nullptr,
+                          schema_name ? &schema : nullptr, table_name ? &table : nullptr,
+                          column_name ? &column : nullptr);
+
+    return SQL_SUCCESS;
+  });
 }
 
 SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT record_number,
