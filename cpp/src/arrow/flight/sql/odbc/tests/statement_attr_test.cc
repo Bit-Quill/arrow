@@ -39,10 +39,8 @@ void ValidateGetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute,
   SQLULEN value = 0;
   SQLINTEGER string_length = 0;
 
-  SQLRETURN ret =
-      SQLGetStmtAttr(statement, attribute, &value, sizeof(value), &string_length);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLGetStmtAttr(statement, attribute, &value, sizeof(value), &string_length));
 
   EXPECT_EQ(expected_value, value);
 }
@@ -53,10 +51,8 @@ void ValidateGetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute,
   SQLLEN value = 0;
   SQLINTEGER string_length = 0;
 
-  SQLRETURN ret =
-      SQLGetStmtAttr(statement, attribute, &value, sizeof(value), &string_length);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLGetStmtAttr(statement, attribute, &value, sizeof(value), &string_length));
 
   EXPECT_EQ(expected_value, value);
 }
@@ -67,10 +63,8 @@ void ValidateGetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute,
   SQLPOINTER value = nullptr;
   SQLINTEGER string_length = 0;
 
-  SQLRETURN ret =
-      SQLGetStmtAttr(statement, attribute, &value, sizeof(value), &string_length);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLGetStmtAttr(statement, attribute, &value, sizeof(value), &string_length));
 
   EXPECT_EQ(expected_value, value);
 }
@@ -81,9 +75,8 @@ void ValidateGetStmtAttrGreaterThan(SQLHSTMT statement, SQLINTEGER attribute,
   SQLULEN value = 0;
   SQLINTEGER string_length_ptr;
 
-  SQLRETURN ret = SQLGetStmtAttr(statement, attribute, &value, 0, &string_length_ptr);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLGetStmtAttr(statement, attribute, &value, 0, &string_length_ptr));
 
   EXPECT_GT(value, compared_value);
 }
@@ -94,9 +87,8 @@ void ValidateGetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
   SQLULEN value = 0;
   SQLINTEGER string_length_ptr;
 
-  SQLRETURN ret = SQLGetStmtAttr(statement, attribute, &value, 0, &string_length_ptr);
-
-  EXPECT_EQ(SQL_ERROR, ret);
+  ASSERT_EQ(SQL_ERROR,
+            SQLGetStmtAttr(statement, attribute, &value, 0, &string_length_ptr));
 
   VerifyOdbcErrorState(SQL_HANDLE_STMT, statement, error_code);
 }
@@ -105,27 +97,23 @@ void ValidateGetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
 void ValidateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLULEN new_value) {
   SQLINTEGER string_length_ptr = sizeof(SQLULEN);
 
-  SQLRETURN ret = SQLSetStmtAttr(
-      statement, attribute, reinterpret_cast<SQLPOINTER>(new_value), string_length_ptr);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLSetStmtAttr(statement, attribute, reinterpret_cast<SQLPOINTER>(new_value),
+                           string_length_ptr));
 }
 
 // Validate return value for call to SQLSetStmtAttr with SQLLEN
 void ValidateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLLEN new_value) {
   SQLINTEGER string_length_ptr = sizeof(SQLLEN);
 
-  SQLRETURN ret = SQLSetStmtAttr(
-      statement, attribute, reinterpret_cast<SQLPOINTER>(new_value), string_length_ptr);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS,
+            SQLSetStmtAttr(statement, attribute, reinterpret_cast<SQLPOINTER>(new_value),
+                           string_length_ptr));
 }
 
 // Validate return value for call to SQLSetStmtAttr with SQLPOINTER
 void ValidateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLPOINTER value) {
-  SQLRETURN ret = SQLSetStmtAttr(statement, attribute, value, 0);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  EXPECT_EQ(SQL_SUCCESS, SQLSetStmtAttr(statement, attribute, value, 0));
 }
 
 // Validate error return value and code
@@ -133,10 +121,9 @@ void ValidateSetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
                                   SQLULEN new_value, std::string_view error_code) {
   SQLINTEGER string_length_ptr = sizeof(SQLULEN);
 
-  SQLRETURN ret = SQLSetStmtAttr(
-      statement, attribute, reinterpret_cast<SQLPOINTER>(new_value), string_length_ptr);
-
-  EXPECT_EQ(SQL_ERROR, ret);
+  ASSERT_EQ(SQL_ERROR,
+            SQLSetStmtAttr(statement, attribute, reinterpret_cast<SQLPOINTER>(new_value),
+                           string_length_ptr));
 
   VerifyOdbcErrorState(SQL_HANDLE_STMT, statement, error_code);
 }
@@ -417,14 +404,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetStmtAttrRowNumber) {
   std::wstring wsql = L"SELECT 1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLRETURN ret =
-      SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size()));
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  EXPECT_EQ(SQL_SUCCESS, ret);
-
-  ret = SQLFetch(this->stmt);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
   ValidateGetStmtAttr(this->stmt, SQL_ATTR_ROW_NUMBER, static_cast<SQLULEN>(1));
 
@@ -490,10 +473,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAppParamDesc) {
   SQLINTEGER string_length_ptr;
   this->Connect();
 
-  SQLRETURN ret = SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_PARAM_DESC, &app_param_desc, 0,
-                                 &string_length_ptr);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_PARAM_DESC,
+                                        &app_param_desc, 0, &string_length_ptr));
 
   ValidateSetStmtAttr(this->stmt, SQL_ATTR_APP_PARAM_DESC, static_cast<SQLULEN>(0));
 
@@ -508,10 +489,8 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrAppRowDesc) {
   SQLINTEGER string_length_ptr;
   this->Connect();
 
-  SQLRETURN ret = SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_ROW_DESC, &app_row_desc, 0,
-                                 &string_length_ptr);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_ROW_DESC, &app_row_desc,
+                                        0, &string_length_ptr));
 
   ValidateSetStmtAttr(this->stmt, SQL_ATTR_APP_ROW_DESC, static_cast<SQLULEN>(0));
 

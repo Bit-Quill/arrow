@@ -33,17 +33,16 @@ TEST(AttributeTests, SetAndGetAttribute) {
   const std::optional<Connection::Attribute> first_value =
       connection.GetAttribute(Connection::CONNECTION_TIMEOUT);
 
-  EXPECT_TRUE(first_value);
-
-  EXPECT_EQ(static_cast<uint32_t>(200), std::get<uint32_t>(*first_value));
+  ASSERT_TRUE(first_value);
+  ASSERT_EQ(static_cast<uint32_t>(200), std::get<uint32_t>(*first_value));
 
   connection.SetAttribute(Connection::CONNECTION_TIMEOUT, static_cast<uint32_t>(300));
 
   const std::optional<Connection::Attribute> change_value =
       connection.GetAttribute(Connection::CONNECTION_TIMEOUT);
 
-  EXPECT_TRUE(change_value);
-  EXPECT_EQ(static_cast<uint32_t>(300), std::get<uint32_t>(*change_value));
+  ASSERT_TRUE(change_value);
+  ASSERT_EQ(static_cast<uint32_t>(300), std::get<uint32_t>(*change_value));
 
   connection.Close();
 }
@@ -79,8 +78,8 @@ TEST(MetadataSettingsTest, StringColumnLengthTest) {
   const std::optional<int32_t> actual_string_column_length =
       connection.GetStringColumnLength(properties);
 
-  EXPECT_TRUE(actual_string_column_length);
-  EXPECT_EQ(expected_string_column_length, *actual_string_column_length);
+  ASSERT_TRUE(actual_string_column_length);
+  ASSERT_EQ(expected_string_column_length, *actual_string_column_length);
 
   connection.Close();
 }

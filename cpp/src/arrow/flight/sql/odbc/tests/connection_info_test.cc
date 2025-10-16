@@ -35,9 +35,8 @@ void Validate(SQLHDBC connection, SQLUSMALLINT info_type, SQLUSMALLINT expected_
   SQLUSMALLINT info_value;
   SQLSMALLINT message_length;
 
-  SQLRETURN ret = SQLGetInfo(connection, info_type, &info_value, 0, &message_length);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLGetInfo(connection, info_type, &info_value, 0, &message_length));
 
   EXPECT_EQ(expected_value, info_value);
 }
@@ -47,9 +46,8 @@ void Validate(SQLHDBC connection, SQLUSMALLINT info_type, SQLUINTEGER expected_v
   SQLUINTEGER info_value;
   SQLSMALLINT message_length;
 
-  SQLRETURN ret = SQLGetInfo(connection, info_type, &info_value, 0, &message_length);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLGetInfo(connection, info_type, &info_value, 0, &message_length));
 
   EXPECT_EQ(expected_value, info_value);
 }
@@ -59,9 +57,8 @@ void Validate(SQLHDBC connection, SQLUSMALLINT info_type, SQLULEN expected_value
   SQLULEN info_value;
   SQLSMALLINT message_length;
 
-  SQLRETURN ret = SQLGetInfo(connection, info_type, &info_value, 0, &message_length);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLGetInfo(connection, info_type, &info_value, 0, &message_length));
 
   EXPECT_EQ(expected_value, info_value);
 }
@@ -71,10 +68,8 @@ void Validate(SQLHDBC connection, SQLUSMALLINT info_type, SQLWCHAR* expected_val
   SQLWCHAR info_value[ODBC_BUFFER_SIZE] = L"";
   SQLSMALLINT message_length;
 
-  SQLRETURN ret =
-      SQLGetInfo(connection, info_type, info_value, ODBC_BUFFER_SIZE, &message_length);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLGetInfo(connection, info_type, info_value, ODBC_BUFFER_SIZE,
+                                    &message_length));
 
   EXPECT_EQ(*expected_value, *info_value);
 }
@@ -85,9 +80,8 @@ void ValidateGreaterThan(SQLHDBC connection, SQLUSMALLINT info_type,
   SQLUINTEGER info_value;
   SQLSMALLINT message_length;
 
-  SQLRETURN ret = SQLGetInfo(connection, info_type, &info_value, 0, &message_length);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLGetInfo(connection, info_type, &info_value, 0, &message_length));
 
   EXPECT_GT(info_value, compared_value);
 }
@@ -98,9 +92,8 @@ void ValidateGreaterThan(SQLHDBC connection, SQLUSMALLINT info_type,
   SQLULEN info_value;
   SQLSMALLINT message_length;
 
-  SQLRETURN ret = SQLGetInfo(connection, info_type, &info_value, 0, &message_length);
-
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLGetInfo(connection, info_type, &info_value, 0, &message_length));
 
   EXPECT_GT(info_value, compared_value);
 }
@@ -113,11 +106,10 @@ void ValidateNotEmptySQLWCHAR(SQLHDBC connection, SQLUSMALLINT info_type,
 
   SQLRETURN ret =
       SQLGetInfo(connection, info_type, info_value, ODBC_BUFFER_SIZE, &message_length);
-
   if (allow_truncation && ret == SQL_SUCCESS_WITH_INFO) {
-    EXPECT_EQ(SQL_SUCCESS_WITH_INFO, ret);
+    ASSERT_EQ(SQL_SUCCESS_WITH_INFO, ret);
   } else {
-    EXPECT_EQ(SQL_SUCCESS, ret);
+    ASSERT_EQ(SQL_SUCCESS, ret);
   }
 
   EXPECT_GT(wcslen(info_value), 0);
@@ -256,8 +248,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHstmt) {
 
   // Value returned from driver manager is the stmt address
   SQLHSTMT local_stmt = this->stmt;
-  SQLRETURN ret = SQLGetInfo(this->conn, SQL_DRIVER_HSTMT, &local_stmt, 0, 0);
-  EXPECT_EQ(SQL_SUCCESS, ret);
+  ASSERT_EQ(SQL_SUCCESS, SQLGetInfo(this->conn, SQL_DRIVER_HSTMT, &local_stmt, 0, 0));
   EXPECT_GT(local_stmt, static_cast<SQLHSTMT>(0));
 
   this->Disconnect();
