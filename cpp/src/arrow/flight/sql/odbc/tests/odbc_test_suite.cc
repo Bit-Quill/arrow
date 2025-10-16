@@ -154,6 +154,26 @@ void FlightSQLODBCRemoteTestBase::SetUp() {
   if (arrow::internal::GetEnvVar(TEST_CONNECT_STR).ValueOr("").empty()) {
     GTEST_SKIP() << "Skipping FlightSQLODBCRemoteTestBase test: TEST_CONNECT_STR not set";
   }
+
+  this->Connect();
+  connected_ = true;
+}
+
+void FlightSQLODBCRemoteTestBase::TearDown() {
+  if (connected_) {
+    this->Disconnect();
+    connected_ = false;
+  }
+}
+
+void FlightSQLOdbcV2RemoteTestBase::SetUp() {
+  if (arrow::internal::GetEnvVar(TEST_CONNECT_STR).ValueOr("").empty()) {
+    GTEST_SKIP()
+        << "Skipping FlightSQLOdbcV2RemoteTestBase test: TEST_CONNECT_STR not set";
+  }
+
+  this->Connect(SQL_OV_ODBC2);
+  connected_ = true;
 }
 
 std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
@@ -309,7 +329,7 @@ void FlightSQLODBCMockTestBase::CreateUnicodeTable() {
   ASSERT_OK(server_->ExecuteSql(unicode_sql));
 }
 
-void FlightSQLODBCMockTestBase::SetUp() {
+void FlightSQLODBCMockTestBase::Initialize() {
   ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
   arrow::flight::FlightServerOptions options(location);
   options.auth_handler = std::make_unique<NoOpAuthHandler>();
@@ -324,7 +344,25 @@ void FlightSQLODBCMockTestBase::SetUp() {
   ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
 }
 
-void FlightSQLODBCMockTestBase::TearDown() { ASSERT_OK(server_->Shutdown()); }
+void FlightSQLODBCMockTestBase::SetUp() {
+  this->Initialize();
+  this->Connect();
+  connected_ = true;
+}
+
+void FlightSQLODBCMockTestBase::TearDown() {
+  if (connected_) {
+    this->Disconnect();
+    connected_ = false;
+  }
+  ASSERT_OK(server_->Shutdown());
+}
+
+void FlightSQLOdbcV2MockTestBase::SetUp() {
+  this->Initialize();
+  this->Connect(SQL_OV_ODBC2);
+  connected_ = true;
+}
 
 bool CompareConnPropertyMap(Connection::ConnPropertyMap map1,
                             Connection::ConnPropertyMap map2) {

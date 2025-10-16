@@ -172,7 +172,6 @@ TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetDiagFieldWForConnectFailure
 
 TYPED_TEST(FlightSQLODBCTestBase,
            TestSQLGetDiagFieldWForDescriptorFailureFromDriverManager) {
-  this->Connect();
   SQLHDESC descriptor;
 
   // Allocate a descriptor using alloc handle
@@ -236,13 +235,10 @@ TYPED_TEST(FlightSQLODBCTestBase,
 
   // Free descriptor handle
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_DESC, descriptor));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase,
            TestSQLGetDiagRecForDescriptorFailureFromDriverManager) {
-  this->Connect();
   SQLHDESC descriptor;
 
   // Allocate a descriptor using alloc handle
@@ -271,8 +267,6 @@ TYPED_TEST(FlightSQLODBCTestBase,
 
   // Free descriptor handle
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_DESC, descriptor));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
@@ -329,7 +323,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecInputData) {
   // SQLGetDiagRec does not post diagnostic records for itself.
-  this->Connect();
 
   SQLWCHAR sql_state[6];
   SQLINTEGER native_error;
@@ -346,14 +339,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecInputData) {
 
   // Invalid handle
   EXPECT_EQ(SQL_INVALID_HANDLE, SQLGetDiagRec(0, 0, 0, 0, 0, 0, 0, 0));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorInputData) {
   // Test ODBC 2.0 API SQLError. Driver manager maps SQLError to SQLGetDiagRec.
   // SQLError does not post diagnostic records for itself.
-  this->Connect();
 
   // Pass valid handles with null inputs
   EXPECT_EQ(SQL_NO_DATA, SQLError(this->env, 0, 0, 0, 0, 0, 0, 0));
@@ -364,8 +354,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorInputData) {
 
   // Invalid handle
   EXPECT_EQ(SQL_INVALID_HANDLE, SQLError(0, 0, 0, 0, 0, 0, 0, 0));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
@@ -373,7 +361,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->Connect();
 
   // Attempt to set environment attribute after connection handle allocation
   ASSERT_EQ(SQL_ERROR, SQLSetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION,
@@ -394,8 +381,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
   EXPECT_EQ(std::wstring(L"HY010"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
@@ -403,7 +388,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->Connect();
 
   // Attempt to set unsupported attribute
   SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, 0);
@@ -425,8 +409,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
   EXPECT_EQ(std::wstring(L"HYC00"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
@@ -434,7 +416,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->Connect();
 
   std::wstring wsql = L"1";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -456,13 +437,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
   EXPECT_EQ(std::wstring(L"HY000"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarning) {
   // Test ODBC 2.0 API SQLError.
-  this->Connect();
 
   std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -497,12 +475,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarning) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorODBCVer2FromDriverManager) {
+TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorEnvErrorODBCVer2FromDriverManager) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->Connect(SQL_OV_ODBC2);
 
   // Attempt to set environment attribute after connection handle allocation
   ASSERT_EQ(SQL_ERROR, SQLSetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION,
@@ -523,16 +500,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorODBCVer2FromDriverManager)
   EXPECT_EQ(std::wstring(L"S1010"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnErrorODBCVer2) {
+TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorConnErrorODBCVer2) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->Connect(SQL_OV_ODBC2);
 
   // Attempt to set unsupported attribute
   ASSERT_EQ(SQL_ERROR, SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, 0));
@@ -552,16 +526,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnErrorODBCVer2) {
   EXPECT_EQ(std::wstring(L"S1C00"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtErrorODBCVer2) {
+TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorStmtErrorODBCVer2) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
-  this->Connect(SQL_OV_ODBC2);
 
   std::wstring wsql = L"1";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -584,13 +555,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtErrorODBCVer2) {
   EXPECT_EQ(std::wstring(L"S1000"), std::wstring(sql_state));
 
   EXPECT_TRUE(!std::wstring(message).empty());
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarningODBCVer2) {
+TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorStmtWarningODBCVer2) {
   // Test ODBC 2.0 API SQLError.
-  this->Connect(SQL_OV_ODBC2);
 
   std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());

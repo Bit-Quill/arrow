@@ -74,6 +74,15 @@ class FlightSQLODBCRemoteTestBase : public ::testing::Test {
 
  protected:
   void SetUp() override;
+
+  void TearDown() override;
+
+  bool connected_ = false;
+};
+
+class FlightSQLOdbcV2RemoteTestBase : public FlightSQLODBCRemoteTestBase {
+ protected:
+  void SetUp() override;
 };
 
 static constexpr std::string_view authorization_header = "authorization";
@@ -134,12 +143,19 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   int port;
 
  protected:
+  void Initialize();
+
   void SetUp() override;
 
   void TearDown() override;
 
  private:
   std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server_;
+};
+
+class FlightSQLOdbcV2MockTestBase : public FlightSQLODBCMockTestBase {
+ protected:
+  void SetUp() override;
 };
 
 template <typename T>
@@ -151,6 +167,16 @@ class FlightSQLODBCTestBase : public T {
 using TestTypes =
     ::testing::Types<FlightSQLODBCMockTestBase, FlightSQLODBCRemoteTestBase>;
 TYPED_TEST_SUITE(FlightSQLODBCTestBase, TestTypes);
+
+template <typename T>
+class FlightSQLOdbcV2TestBase : public T {
+ public:
+  using List = std::list<T>;
+};
+
+using TestTypesV2 =
+    ::testing::Types<FlightSQLOdbcV2MockTestBase, FlightSQLOdbcV2RemoteTestBase>;
+TYPED_TEST_SUITE(FlightSQLOdbcV2TestBase, TestTypesV2);
 
 /** ODBC read buffer size. */
 enum { ODBC_BUFFER_SIZE = 1024 };

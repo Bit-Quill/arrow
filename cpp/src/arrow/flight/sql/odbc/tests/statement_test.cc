@@ -29,8 +29,6 @@
 
 namespace arrow::flight::sql::odbc {
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
-  this->Connect();
-
   std::wstring wsql = L"SELECT 1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -50,13 +48,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectSimpleQuery) {
   ASSERT_EQ(SQL_ERROR, SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0));
   // Invalid cursor state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectInvalidQuery) {
-  this->Connect();
-
   std::wstring wsql = L"SELECT;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -64,13 +58,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectInvalidQuery) {
             SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
   // ODBC provides generic error code HY000 to all statement errors
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY000);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecuteSimpleQuery) {
-  this->Connect();
-
   std::wstring wsql = L"SELECT 1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -93,13 +83,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecuteSimpleQuery) {
   ASSERT_EQ(SQL_ERROR, SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0));
   // Invalid cursor state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLPrepareInvalidQuery) {
-  this->Connect();
-
   std::wstring wsql = L"SELECT;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -111,13 +97,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLPrepareInvalidQuery) {
   ASSERT_EQ(SQL_ERROR, SQLExecute(this->stmt));
   // Verify function sequence error state is returned
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
-  this->Connect();
-
   std::wstring wsql = this->GetQueryAllDataTypes();
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -351,14 +333,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectDataQuery) {
   EXPECT_EQ(59, timestamp_var.minute);
   EXPECT_EQ(59, timestamp_var.second);
   EXPECT_EQ(0, timestamp_var.fraction);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectTimeQuery) {
   // Mock server test is skipped due to limitation on the mock server.
   // Time type from mock server does not include the fraction
-  this->Connect();
 
   std::wstring wsql =
       LR"(
@@ -389,14 +368,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectTimeQuery) {
   EXPECT_EQ(23, time_var.hour);
   EXPECT_EQ(59, time_var.minute);
   EXPECT_EQ(59, time_var.second);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectVarbinaryQuery) {
   // Have binary test on mock test base as remote test servers tend to have different
   // formats for binary data
-  this->Connect();
 
   std::wstring wsql = L"SELECT X'ABCDEF' AS c_varbinary;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -415,15 +391,12 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectVarbinaryQuery) {
   EXPECT_EQ('\xAB', varbinary_val[0]);
   EXPECT_EQ('\xCD', varbinary_val[1]);
   EXPECT_EQ('\xEF', varbinary_val[2]);
-
-  this->Disconnect();
 }
 
 // Tests with SQL_C_DEFAULT as the target type
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
   // Test with default types. Only testing target types supported by server.
-  this->Connect();
 
   std::wstring wsql = this->GetQueryAllDataTypes();
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -603,14 +576,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectDataQueryDefaultType) {
   EXPECT_EQ(59, timestamp_var.minute);
   EXPECT_EQ(59, timestamp_var.second);
   EXPECT_EQ(0, timestamp_var.fraction);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectTimeQueryDefaultType) {
   // Mock server test is skipped due to limitation on the mock server.
   // Time type from mock server does not include the fraction
-  this->Connect();
 
   std::wstring wsql =
       LR"(
@@ -641,15 +611,12 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectTimeQueryDefaultType) {
   EXPECT_EQ(23, time_var.hour);
   EXPECT_EQ(59, time_var.minute);
   EXPECT_EQ(59, time_var.second);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectVarbinaryQueryDefaultType) {
   // Limitation on mock test server prevents SQL_C_DEFAULT from working properly.
   // Mock server has type `DENSE_UNION` for varbinary.
   // Note that not all remote servers support "from_hex" function
-  this->Connect();
 
   std::wstring wsql = L"SELECT from_hex('ABCDEF') AS c_varbinary;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -668,13 +635,9 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectVarbinaryQueryDefaultType) 
   EXPECT_EQ('\xAB', varbinary_val[0]);
   EXPECT_EQ('\xCD', varbinary_val[1]);
   EXPECT_EQ('\xEF', varbinary_val[2]);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectGuidQueryUnsupported) {
-  this->Connect();
-
   // Query GUID as string as SQLite does not support GUID
   std::wstring wsql = L"SELECT 'C77313CF-4E08-47CE-B6DF-94DD2FCF3541' AS guid;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -690,13 +653,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectGuidQueryUnsupported) {
   ASSERT_EQ(SQL_ERROR, SQLGetData(this->stmt, 1, SQL_C_GUID, &guid_var, buf_len, &ind));
   // GUID is not supported by ODBC
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY000);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
-  this->Connect();
-
   std::wstring wsql =
       LR"(
    SELECT 1 AS small_table
@@ -745,13 +704,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectRowFetching) {
 
   // Invalid cursor state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLFetchScrollRowFetching) {
-  this->Connect();
-
   SQLLEN rows_fetched;
   SQLSetStmtAttr(this->stmt, SQL_ATTR_ROWS_FETCHED_PTR, &rows_fetched, 0);
 
@@ -807,13 +762,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLFetchScrollRowFetching) {
   ASSERT_EQ(SQL_ERROR, SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &ind));
   // Invalid cursor state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLFetchScrollUnsupportedOrientation) {
   // SQL_FETCH_PRIOR is the only supported fetch orientation.
-  this->Connect();
 
   std::wstring wsql = L"SELECT 1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -846,13 +798,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLFetchScrollUnsupportedOrientation) {
 
   // DM returns state HY106 for SQL_FETCH_BOOKMARK
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY106);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectVarcharTruncation) {
-  this->Connect();
-
   std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -901,13 +849,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectVarcharTruncation) {
   SQLCHAR char_val4[len];
   // Verify SQL_NO_DATA is returned
   ASSERT_EQ(SQL_NO_DATA, SQLGetData(this->stmt, 1, SQL_C_CHAR, &char_val4, 0, &ind));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectWVarcharTruncation) {
-  this->Connect();
-
   std::wstring wsql = L"SELECT 'VERY LONG Unicode STRING 句子 here' AS wstring_col;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -957,14 +901,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectWVarcharTruncation) {
   SQLWCHAR wchar_val4[len];
   // Verify SQL_NO_DATA is returned
   ASSERT_EQ(SQL_NO_DATA, SQLGetData(this->stmt, 1, SQL_C_WCHAR, &wchar_val4, 0, &ind));
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectVarbinaryTruncation) {
   // Have binary test on mock test base as remote test servers tend to have different
   // formats for binary data
-  this->Connect();
 
   std::wstring wsql = L"SELECT X'ABCDEFAB' AS c_varbinary;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -1004,15 +945,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectVarbinaryTruncation) {
   // Verify SQL_NO_DATA is returned
   ASSERT_EQ(SQL_NO_DATA,
             SQLGetData(this->stmt, 1, SQL_C_BINARY, &varbinary_val3[0], buf_len, &ind));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLExecDirectFloatTruncation) {
   // Test is disabled until float truncation is supported.
   // GH-46985: return warning message instead of error on float truncation case
-  this->Connect();
-
   std::wstring wsql;
   if constexpr (std::is_same_v<TypeParam, FlightSQLODBCMockTestBase>) {
     wsql = std::wstring(L"SELECT CAST(1.234 AS REAL) AS float_val");
@@ -1034,14 +971,11 @@ TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLExecDirectFloatTruncation) {
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01S07);
 
   EXPECT_EQ(1, ssmall_int_val);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectNullQuery) {
   // Limitation on mock test server prevents null from working properly, so use remote
   // server instead. Mock server has type `DENSE_UNION` for null column data.
-  this->Connect();
 
   std::wstring wsql = L"SELECT null as null_col;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -1058,15 +992,12 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectNullQuery) {
 
   // Verify SQL_NULL_DATA is returned for indicator
   EXPECT_EQ(SQL_NULL_DATA, ind);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectTruncationQueryNullIndicator) {
   // Driver should not error out when indicator is null if the cell is non-null
   // Have binary test on mock test base as remote test servers tend to have different
   // formats for binary data
-  this->Connect();
 
   std::wstring wsql =
       LR"(
@@ -1113,14 +1044,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLExecDirectTruncationQueryNullIndicator)
             SQLGetData(this->stmt, 4, SQL_C_BINARY, &varbinary_val[0], buf_len, 0));
   // Verify binary truncation is reported
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_01004);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectNullQueryNullIndicator) {
   // Limitation on mock test server prevents null from working properly, so use remote
   // server instead. Mock server has type `DENSE_UNION` for null column data.
-  this->Connect();
 
   std::wstring wsql = L"SELECT null as null_col;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -1135,13 +1063,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLExecDirectNullQueryNullIndicator) {
   ASSERT_EQ(SQL_ERROR, SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, 0));
   // Verify invalid null indicator is reported, as it is required
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_22002);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectIgnoreInvalidBufLen) {
   // Verify the driver ignores invalid buffer length for fixed data types
-  this->Connect();
 
   std::wstring wsql = this->GetQueryAllDataTypes();
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -1336,13 +1261,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExecDirectIgnoreInvalidBufLen) {
   EXPECT_EQ(59, timestamp_var.minute);
   EXPECT_EQ(59, timestamp_var.second);
   EXPECT_EQ(0, timestamp_var.fraction);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColDataQuery) {
-  this->Connect();
-
   // Numeric Types
 
   // Signed Tiny Int
@@ -1616,14 +1537,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColDataQuery) {
   EXPECT_EQ(59, timestamp_val_max.minute);
   EXPECT_EQ(59, timestamp_val_max.second);
   EXPECT_EQ(0, timestamp_val_max.fraction);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLBindColTimeQuery) {
   // Mock server test is skipped due to limitation on the mock server.
   // Time type from mock server does not include the fraction
-  this->Connect();
 
   SQL_TIME_STRUCT time_var_min{};
   SQL_TIME_STRUCT time_var_max{};
@@ -1657,14 +1575,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLBindColTimeQuery) {
   EXPECT_EQ(23, time_var_max.hour);
   EXPECT_EQ(59, time_var_max.minute);
   EXPECT_EQ(59, time_var_max.second);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCMockTestBase, TestSQLBindColVarbinaryQuery) {
   // Have binary test on mock test base as remote test servers tend to have different
   // formats for binary data
-  this->Connect();
 
   // varbinary
   std::vector<int8_t> varbinary_val(3);
@@ -1685,14 +1600,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLBindColVarbinaryQuery) {
   EXPECT_EQ('\xAB', varbinary_val[0]);
   EXPECT_EQ('\xCD', varbinary_val[1]);
   EXPECT_EQ('\xEF', varbinary_val[2]);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLBindColNullQuery) {
   // Limitation on mock test server prevents null from working properly, so use remote
   // server instead. Mock server has type `DENSE_UNION` for null column data.
-  this->Connect();
 
   SQLINTEGER val;
   SQLLEN ind;
@@ -1709,14 +1621,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLBindColNullQuery) {
 
   // Verify SQL_NULL_DATA is returned for indicator
   EXPECT_EQ(SQL_NULL_DATA, ind);
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLBindColNullQueryNullIndicator) {
   // Limitation on mock test server prevents null from working properly, so use remote
   // server instead. Mock server has type `DENSE_UNION` for null column data.
-  this->Connect();
 
   SQLINTEGER val;
 
@@ -1731,13 +1640,9 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLBindColNullQueryNullIndicator) {
   ASSERT_EQ(SQL_ERROR, SQLFetch(this->stmt));
   // Verify invalid null indicator is reported, as it is required
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_22002);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowFetching) {
-  this->Connect();
-
   SQLINTEGER val;
   SQLLEN buf_len = sizeof(val);
   SQLLEN ind;
@@ -1779,13 +1684,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowFetching) {
 
   // Verify result set has no more data beyond row 3
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowArraySize) {
   // Set SQL_ATTR_ROW_ARRAY_SIZE to fetch 3 rows at once
-  this->Connect();
 
   constexpr SQLULEN rows = 3;
   SQLINTEGER val[rows];
@@ -1831,15 +1733,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColRowArraySize) {
 
   // Verify result set has no more data beyond row 3
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLBindColIndicatorOnly) {
   // GH-47021: implement driver to return indicator value when data pointer is null
 
   // Verify driver supports null data pointer with valid indicator pointer
-  this->Connect();
 
   // Numeric Types
 
@@ -1868,12 +1767,10 @@ TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLBindColIndicatorOnly) {
 
   // Char array
   EXPECT_EQ(1, char_val_ind);
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnlySQLUnbind) {
   // Verify driver supports valid indicator pointer after unbinding all columns
-  this->Connect();
 
   // Numeric Types
 
@@ -1908,13 +1805,10 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLBindColIndicatorOnlySQLUnbind) {
 
   // Char array
   // EXPECT_EQ(1, char_val_ind);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLExtendedFetchRowFetching) {
   // Set SQL_ROWSET_SIZE to fetch 3 rows at once
-  this->Connect();
 
   constexpr SQLULEN rows = 3;
   SQLINTEGER val[rows];
@@ -1965,16 +1859,12 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLExtendedFetchRowFetching) {
   SQLUSMALLINT row_status2[rows];
   EXPECT_EQ(SQL_NO_DATA,
             SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count2, row_status2));
-
-  this->Disconnect();
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, DISABLED_TestSQLExtendedFetchQueryNullIndicator) {
   // GH-47110: SQLExtendedFetch should return SQL_SUCCESS_WITH_INFO for 22002
   // Limitation on mock test server prevents null from working properly, so use remote
   // server instead. Mock server has type `DENSE_UNION` for null column data.
-  this->Connect();
-
   SQLINTEGER val;
 
   ASSERT_EQ(SQL_SUCCESS, SQLBindCol(this->stmt, 1, SQL_C_LONG, &val, 0, 0));
@@ -1992,13 +1882,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, DISABLED_TestSQLExtendedFetchQueryNullIndica
   ASSERT_EQ(SQL_SUCCESS_WITH_INFO,
             SQLExtendedFetch(this->stmt, SQL_FETCH_NEXT, 0, &row_count1, row_status1));
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_22002);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLMoreResultsNoData) {
   // Verify SQLMoreResults is stubbed to return SQL_NO_DATA
-  this->Connect();
 
   std::wstring wsql = L"SELECT 1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -2007,24 +1894,16 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLMoreResultsNoData) {
             SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
   ASSERT_EQ(SQL_NO_DATA, SQLMoreResults(this->stmt));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLMoreResultsInvalidFunctionSequence) {
-  this->Connect();
-
   // Verify function sequence error state is reported when SQLMoreResults is called
   // without executing any queries
   ASSERT_EQ(SQL_ERROR, SQLMoreResults(this->stmt));
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputString) {
-  this->Connect();
-
   SQLWCHAR buf[1024];
   SQLINTEGER buf_char_len = sizeof(buf) / ODBC::GetSqlWCharSize();
   SQLWCHAR input_str[] = L"SELECT * FROM mytable WHERE id == 1";
@@ -2041,13 +1920,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputString) {
   std::wstring returned_string(buf, buf + output_char_len);
 
   EXPECT_EQ(expected_string, returned_string);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsNTSInputString) {
-  this->Connect();
-
   SQLWCHAR buf[1024];
   SQLINTEGER buf_char_len = sizeof(buf) / ODBC::GetSqlWCharSize();
   SQLWCHAR input_str[] = L"SELECT * FROM mytable WHERE id == 1";
@@ -2064,13 +1939,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsNTSInputString) {
   std::wstring returned_string(buf, buf + output_char_len);
 
   EXPECT_EQ(expected_string, returned_string);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputStringLength) {
-  this->Connect();
-
   SQLWCHAR input_str[] = L"SELECT * FROM mytable WHERE id == 1";
   SQLINTEGER input_char_len = static_cast<SQLINTEGER>(wcslen(input_str));
   SQLINTEGER output_char_len = 0;
@@ -2085,13 +1956,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsInputStringLength) {
             SQLNativeSql(this->conn, input_str, SQL_NTS, nullptr, 0, &output_char_len));
 
   EXPECT_EQ(input_char_len, output_char_len);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsTruncatedString) {
-  this->Connect();
-
   const SQLINTEGER small_buf_size_in_char = 11;
   SQLWCHAR small_buf[small_buf_size_in_char];
   SQLINTEGER small_buf_char_len = sizeof(small_buf) / ODBC::GetSqlWCharSize();
@@ -2117,13 +1984,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsTruncatedString) {
   std::wstring returned_string(small_buf, small_buf + small_buf_char_len);
 
   EXPECT_EQ(expected_string, returned_string);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsErrorOnBadInputs) {
-  this->Connect();
-
   SQLWCHAR buf[1024];
   SQLINTEGER buf_char_len = sizeof(buf) / ODBC::GetSqlWCharSize();
   SQLWCHAR input_str[] = L"SELECT * FROM mytable WHERE id == 1";
@@ -2141,13 +2004,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLNativeSqlReturnsErrorOnBadInputs) {
   ASSERT_EQ(SQL_ERROR, SQLNativeSql(this->conn, input_str, -100, buf, buf_char_len,
                                     &output_char_len));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY090);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsReturnsColumnsOnSelect) {
-  this->Connect();
-
   SQLSMALLINT column_count = 0;
   SQLSMALLINT expected_value = 3;
   SQLWCHAR sql_query[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3";
@@ -2164,13 +2023,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsReturnsColumnsOnSelect) {
   ASSERT_EQ(SQL_SUCCESS, SQLNumResultCols(this->stmt, &column_count));
 
   EXPECT_EQ(expected_value, column_count);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsReturnsSuccessOnNullptr) {
-  this->Connect();
-
   SQLWCHAR sql_query[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3";
   SQLINTEGER query_length = static_cast<SQLINTEGER>(wcslen(sql_query));
 
@@ -2183,13 +2038,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsReturnsSuccessOnNullptr) {
   CheckIntColumn(this->stmt, 3, 3);
 
   ASSERT_EQ(SQL_SUCCESS, SQLNumResultCols(this->stmt, nullptr));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsFunctionSequenceErrorOnNoQuery) {
-  this->Connect();
-
   SQLSMALLINT column_count = 0;
   SQLSMALLINT expected_value = 0;
 
@@ -2197,13 +2048,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLNumResultColsFunctionSequenceErrorOnNoQuery
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
 
   EXPECT_EQ(expected_value, column_count);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountReturnsNegativeOneOnSelect) {
-  this->Connect();
-
   SQLLEN row_count = 0;
   SQLLEN expected_value = -1;
   SQLWCHAR sql_query[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3";
@@ -2220,13 +2067,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountReturnsNegativeOneOnSelect) {
   ASSERT_EQ(SQL_SUCCESS, SQLRowCount(this->stmt, &row_count));
 
   EXPECT_EQ(expected_value, row_count);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountReturnsSuccessOnNullptr) {
-  this->Connect();
-
   SQLWCHAR sql_query[] = L"SELECT 1 AS col1, 'One' AS col2, 3 AS col3";
   SQLINTEGER query_length = static_cast<SQLINTEGER>(wcslen(sql_query));
 
@@ -2239,13 +2082,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountReturnsSuccessOnNullptr) {
   CheckIntColumn(this->stmt, 3, 3);
 
   ASSERT_EQ(SQL_SUCCESS, SQLRowCount(this->stmt, 0));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountFunctionSequenceErrorOnNoQuery) {
-  this->Connect();
-
   SQLLEN row_count = 0;
   SQLLEN expected_value = 0;
 
@@ -2253,13 +2092,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLRowCountFunctionSequenceErrorOnNoQuery) {
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY010);
 
   EXPECT_EQ(expected_value, row_count);
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLFreeStmtSQLClose) {
-  this->Connect();
-
   std::wstring wsql = L"SELECT 1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -2267,13 +2102,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLFreeStmtSQLClose) {
             SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
   ASSERT_EQ(SQL_SUCCESS, SQLFreeStmt(this->stmt, SQL_CLOSE));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLCloseCursor) {
-  this->Connect();
-
   std::wstring wsql = L"SELECT 1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -2281,28 +2112,19 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLCloseCursor) {
             SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
   ASSERT_EQ(SQL_SUCCESS, SQLCloseCursor(this->stmt));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLFreeStmtSQLCloseWithoutCursor) {
   // SQLFreeStmt(SQL_CLOSE) does not throw error with invalid cursor
-  this->Connect();
 
   ASSERT_EQ(SQL_SUCCESS, SQLFreeStmt(this->stmt, SQL_CLOSE));
-
-  this->Disconnect();
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLCloseCursorWithoutCursor) {
-  this->Connect();
-
   ASSERT_EQ(SQL_ERROR, SQLCloseCursor(this->stmt));
 
   // Verify invalid cursor error state is returned
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_24000);
-
-  this->Disconnect();
 }
 
 }  // namespace arrow::flight::sql::odbc
