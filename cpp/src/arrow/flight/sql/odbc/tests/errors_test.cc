@@ -26,7 +26,27 @@
 
 namespace arrow::flight::sql::odbc {
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
+template <typename T>
+class ErrorsTest : public T {
+ public:
+  using List = std::list<T>;
+};
+
+using TestTypes =
+    ::testing::Types<FlightSQLODBCMockTestBase, FlightSQLODBCRemoteTestBase>;
+TYPED_TEST_SUITE(ErrorsTest, TestTypes);
+
+template <typename T>
+class ErrorsOdbcV2Test : public T {
+ public:
+  using List = std::list<T>;
+};
+
+using TestTypesOdbcV2 =
+    ::testing::Types<FlightSQLOdbcV2MockTestBase, FlightSQLOdbcV2RemoteTestBase>;
+TYPED_TEST_SUITE(ErrorsOdbcV2Test, TestTypesOdbcV2);
+
+TYPED_TEST(ErrorsTest, TestSQLGetDiagFieldWForConnectFailure) {
   //  ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -117,7 +137,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetDiagFieldWForConnectFailureNTS) {
+TYPED_TEST(ErrorsTest, DISABLED_TestSQLGetDiagFieldWForConnectFailureNTS) {
   // Test is disabled because driver manager on Windows does not pass through SQL_NTS
   // This test case can be potentially used on macOS/Linux
   SQLHENV env;
@@ -170,8 +190,7 @@ TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetDiagFieldWForConnectFailure
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase,
-           TestSQLGetDiagFieldWForDescriptorFailureFromDriverManager) {
+TYPED_TEST(ErrorsTest, TestSQLGetDiagFieldWForDescriptorFailureFromDriverManager) {
   SQLHDESC descriptor;
 
   // Allocate a descriptor using alloc handle
@@ -237,8 +256,7 @@ TYPED_TEST(FlightSQLODBCTestBase,
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_DESC, descriptor));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase,
-           TestSQLGetDiagRecForDescriptorFailureFromDriverManager) {
+TYPED_TEST(ErrorsTest, TestSQLGetDiagRecForDescriptorFailureFromDriverManager) {
   SQLHDESC descriptor;
 
   // Allocate a descriptor using alloc handle
@@ -269,7 +287,7 @@ TYPED_TEST(FlightSQLODBCTestBase,
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_DESC, descriptor));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
+TYPED_TEST(ErrorsTest, TestSQLGetDiagRecForConnectFailure) {
   //  ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -321,7 +339,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecInputData) {
+TYPED_TEST(ErrorsTest, TestSQLGetDiagRecInputData) {
   // SQLGetDiagRec does not post diagnostic records for itself.
 
   SQLWCHAR sql_state[6];
@@ -341,7 +359,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetDiagRecInputData) {
   EXPECT_EQ(SQL_INVALID_HANDLE, SQLGetDiagRec(0, 0, 0, 0, 0, 0, 0, 0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorInputData) {
+TYPED_TEST(ErrorsTest, TestSQLErrorInputData) {
   // Test ODBC 2.0 API SQLError. Driver manager maps SQLError to SQLGetDiagRec.
   // SQLError does not post diagnostic records for itself.
 
@@ -356,7 +374,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorInputData) {
   EXPECT_EQ(SQL_INVALID_HANDLE, SQLError(0, 0, 0, 0, 0, 0, 0, 0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
+TYPED_TEST(ErrorsTest, TestSQLErrorEnvErrorFromDriverManager) {
   // Test ODBC 2.0 API SQLError.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -383,7 +401,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorEnvErrorFromDriverManager) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
+TYPED_TEST(ErrorsTest, TestSQLErrorConnError) {
   // Test ODBC 2.0 API SQLError.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -411,7 +429,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorConnError) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
+TYPED_TEST(ErrorsTest, TestSQLErrorStmtError) {
   // Test ODBC 2.0 API SQLError.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -439,7 +457,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtError) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarning) {
+TYPED_TEST(ErrorsTest, TestSQLErrorStmtWarning) {
   // Test ODBC 2.0 API SQLError.
 
   std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
@@ -475,7 +493,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLErrorStmtWarning) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorEnvErrorODBCVer2FromDriverManager) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorEnvErrorODBCVer2FromDriverManager) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -502,7 +520,7 @@ TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorEnvErrorODBCVer2FromDriverManage
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorConnErrorODBCVer2) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnErrorODBCVer2) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -528,7 +546,7 @@ TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorConnErrorODBCVer2) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorStmtErrorODBCVer2) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtErrorODBCVer2) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -557,7 +575,7 @@ TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorStmtErrorODBCVer2) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
-TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLErrorStmtWarningODBCVer2) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtWarningODBCVer2) {
   // Test ODBC 2.0 API SQLError.
 
   std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";

@@ -26,6 +26,16 @@
 
 namespace arrow::flight::sql::odbc {
 
+template <typename T>
+class ConnectionInfoTest : public T {
+ public:
+  using List = std::list<T>;
+};
+
+class ConnectionInfoMockTest : public FlightSQLODBCMockTestBase {};
+using TestTypes = ::testing::Types<ConnectionInfoMockTest, FlightSQLODBCRemoteTestBase>;
+TYPED_TEST_SUITE(ConnectionInfoTest, TestTypes);
+
 // Helper Functions
 
 // Validate unsigned short SQLUSMALLINT return value
@@ -115,42 +125,42 @@ void ValidateNotEmptySQLWCHAR(SQLHDBC connection, SQLUSMALLINT info_type,
 
 // Driver Information
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoActiveEnvironments) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoActiveEnvironments) {
   Validate(this->conn, SQL_ACTIVE_ENVIRONMENTS, static_cast<SQLUSMALLINT>(0));
 }
 
 #ifdef SQL_ASYNC_DBC_FUNCTIONS
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAsyncDbcFunctions) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAsyncDbcFunctions) {
   Validate(this->conn, SQL_ASYNC_DBC_FUNCTIONS,
            static_cast<SQLUINTEGER>(SQL_ASYNC_DBC_NOT_CAPABLE));
 }
 #endif
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAsyncMode) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAsyncMode) {
   Validate(this->conn, SQL_ASYNC_MODE, static_cast<SQLUINTEGER>(SQL_AM_NONE));
 }
 
 #ifdef SQL_ASYNC_NOTIFICATION
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAsyncNotification) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAsyncNotification) {
   Validate(this->conn, SQL_ASYNC_NOTIFICATION,
            static_cast<SQLUINTEGER>(SQL_ASYNC_NOTIFICATION_NOT_CAPABLE));
 }
 #endif
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoBatchRowCount) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoBatchRowCount) {
   Validate(this->conn, SQL_BATCH_ROW_COUNT, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoBatchSupport) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoBatchSupport) {
   Validate(this->conn, SQL_BATCH_SUPPORT, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDataSourceName) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDataSourceName) {
   Validate(this->conn, SQL_DATA_SOURCE_NAME, (SQLWCHAR*)L"");
 }
 
 #ifdef SQL_DRIVER_AWARE_POOLING_SUPPORTED
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverAwarePoolingSupported) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverAwarePoolingSupported) {
   // A driver does not need to implement SQL_DRIVER_AWARE_POOLING_SUPPORTED and the
   // Driver Manager will not honor to the driver's return value.
 
@@ -160,13 +170,13 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverAwarePoolingSupported) {
 #endif
 
 // These information types are implemented by the Driver Manager alone.
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHdbc) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverHdbc) {
   // Value returned from driver manager is the connection address
   ValidateGreaterThan(this->conn, SQL_DRIVER_HDBC, static_cast<SQLULEN>(0));
 }
 
 // These information types are implemented by the Driver Manager alone.
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHdesc) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverHdesc) {
   SQLHDESC descriptor;
 
   // Allocate a descriptor using alloc handle
@@ -183,557 +193,557 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHdesc) {
 }
 
 // These information types are implemented by the Driver Manager alone.
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHenv) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverHenv) {
   // Value returned from driver manager is the env address
   ValidateGreaterThan(this->conn, SQL_DRIVER_HENV, static_cast<SQLULEN>(0));
 }
 
 // These information types are implemented by the Driver Manager alone.
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHlib) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverHlib) {
   ValidateGreaterThan(this->conn, SQL_DRIVER_HLIB, static_cast<SQLULEN>(0));
 }
 
 // These information types are implemented by the Driver Manager alone.
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverHstmt) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverHstmt) {
   // Value returned from driver manager is the stmt address
   SQLHSTMT local_stmt = this->stmt;
   ASSERT_EQ(SQL_SUCCESS, SQLGetInfo(this->conn, SQL_DRIVER_HSTMT, &local_stmt, 0, 0));
   EXPECT_GT(local_stmt, static_cast<SQLHSTMT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverName) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverName) {
   Validate(this->conn, SQL_DRIVER_NAME, (SQLWCHAR*)L"Arrow Flight ODBC Driver");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverOdbcVer) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverOdbcVer) {
   Validate(this->conn, SQL_DRIVER_ODBC_VER, (SQLWCHAR*)L"03.80");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDriverVer) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverVer) {
   Validate(this->conn, SQL_DRIVER_VER, (SQLWCHAR*)L"00.09.0000.0");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDynamicCursorAttributes1) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDynamicCursorAttributes1) {
   Validate(this->conn, SQL_DYNAMIC_CURSOR_ATTRIBUTES1, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDynamicCursorAttributes2) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDynamicCursorAttributes2) {
   Validate(this->conn, SQL_DYNAMIC_CURSOR_ATTRIBUTES2, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoForwardOnlyCursorAttributes1) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoForwardOnlyCursorAttributes1) {
   Validate(this->conn, SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES1,
            static_cast<SQLUINTEGER>(SQL_CA1_NEXT));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoForwardOnlyCursorAttributes2) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoForwardOnlyCursorAttributes2) {
   Validate(this->conn, SQL_FORWARD_ONLY_CURSOR_ATTRIBUTES2,
            static_cast<SQLUINTEGER>(SQL_CA2_READ_ONLY_CONCURRENCY));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoFileUsage) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoFileUsage) {
   Validate(this->conn, SQL_FILE_USAGE, static_cast<SQLUSMALLINT>(SQL_FILE_NOT_SUPPORTED));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoGetDataExtensions) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoGetDataExtensions) {
   Validate(this->conn, SQL_GETDATA_EXTENSIONS,
            static_cast<SQLUINTEGER>(SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoSchemaViews) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSchemaViews) {
   Validate(this->conn, SQL_INFO_SCHEMA_VIEWS,
            static_cast<SQLUINTEGER>(SQL_ISV_TABLES | SQL_ISV_COLUMNS | SQL_ISV_VIEWS));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoKeysetCursorAttributes1) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoKeysetCursorAttributes1) {
   Validate(this->conn, SQL_KEYSET_CURSOR_ATTRIBUTES1, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoKeysetCursorAttributes2) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoKeysetCursorAttributes2) {
   Validate(this->conn, SQL_KEYSET_CURSOR_ATTRIBUTES2, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxAsyncConcurrentStatements) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxAsyncConcurrentStatements) {
   Validate(this->conn, SQL_MAX_ASYNC_CONCURRENT_STATEMENTS, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxConcurrentActivities) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxConcurrentActivities) {
   Validate(this->conn, SQL_MAX_CONCURRENT_ACTIVITIES, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxDriverConnections) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxDriverConnections) {
   Validate(this->conn, SQL_MAX_DRIVER_CONNECTIONS, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoOdbcInterfaceConformance) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoOdbcInterfaceConformance) {
   Validate(this->conn, SQL_ODBC_INTERFACE_CONFORMANCE,
            static_cast<SQLUINTEGER>(SQL_OIC_CORE));
 }
 
 // case SQL_ODBC_STANDARD_CLI_CONFORMANCE: - mentioned in SQLGetInfo spec with no
 // description and there is no constant for this.
-TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetInfoOdbcStandardCliConformance) {
+TYPED_TEST(ConnectionInfoTest, DISABLED_TestSQLGetInfoOdbcStandardCliConformance) {
   // Type commented out in odbc_connection.cc
   // Type does not exist in sql.h
   // Validate(this->conn, SQL_ODBC_STANDARD_CLI_CONFORMANCE,
   // static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoOdbcVer) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoOdbcVer) {
   // This is implemented only in the Driver Manager.
 
   Validate(this->conn, SQL_ODBC_VER, (SQLWCHAR*)L"03.80.0000");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoParamArrayRowCounts) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoParamArrayRowCounts) {
   Validate(this->conn, SQL_PARAM_ARRAY_ROW_COUNTS,
            static_cast<SQLUINTEGER>(SQL_PARC_NO_BATCH));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoParamArraySelects) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoParamArraySelects) {
   Validate(this->conn, SQL_PARAM_ARRAY_SELECTS,
            static_cast<SQLUINTEGER>(SQL_PAS_NO_SELECT));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoRowUpdates) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoRowUpdates) {
   Validate(this->conn, SQL_ROW_UPDATES, (SQLWCHAR*)L"N");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoSearchPatternEscape) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSearchPatternEscape) {
   Validate(this->conn, SQL_SEARCH_PATTERN_ESCAPE, (SQLWCHAR*)L"\\");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoServerName) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoServerName) {
   ValidateNotEmptySQLWCHAR(this->conn, SQL_SERVER_NAME, false);
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoStaticCursorAttributes1) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoStaticCursorAttributes1) {
   Validate(this->conn, SQL_STATIC_CURSOR_ATTRIBUTES1, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoStaticCursorAttributes2) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoStaticCursorAttributes2) {
   Validate(this->conn, SQL_STATIC_CURSOR_ATTRIBUTES2, static_cast<SQLUINTEGER>(0));
 }
 
 // DBMS Product Information
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDatabaseName) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDatabaseName) {
   Validate(this->conn, SQL_DATABASE_NAME, (SQLWCHAR*)L"");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDbmsName) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDbmsName) {
   ValidateNotEmptySQLWCHAR(this->conn, SQL_DBMS_NAME, false);
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDbmsVer) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDbmsVer) {
   ValidateNotEmptySQLWCHAR(this->conn, SQL_DBMS_VER, false);
 }
 
 // Data Source Information
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAccessibleProcedures) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAccessibleProcedures) {
   Validate(this->conn, SQL_ACCESSIBLE_PROCEDURES, (SQLWCHAR*)L"N");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAccessibleTables) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAccessibleTables) {
   Validate(this->conn, SQL_ACCESSIBLE_TABLES, (SQLWCHAR*)L"Y");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoBookmarkPersistence) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoBookmarkPersistence) {
   Validate(this->conn, SQL_BOOKMARK_PERSISTENCE, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCatalogTerm) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogTerm) {
   Validate(this->conn, SQL_CATALOG_TERM, (SQLWCHAR*)L"");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCollationSeq) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCollationSeq) {
   Validate(this->conn, SQL_COLLATION_SEQ, (SQLWCHAR*)L"");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConcatNullBehavior) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConcatNullBehavior) {
   Validate(this->conn, SQL_CONCAT_NULL_BEHAVIOR, static_cast<SQLUSMALLINT>(SQL_CB_NULL));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCursorCommitBehavior) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCursorCommitBehavior) {
   Validate(this->conn, SQL_CURSOR_COMMIT_BEHAVIOR,
            static_cast<SQLUSMALLINT>(SQL_CB_CLOSE));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCursorRollbackBehavior) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCursorRollbackBehavior) {
   Validate(this->conn, SQL_CURSOR_ROLLBACK_BEHAVIOR,
            static_cast<SQLUSMALLINT>(SQL_CB_CLOSE));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCursorSensitivity) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCursorSensitivity) {
   Validate(this->conn, SQL_CURSOR_SENSITIVITY, static_cast<SQLUINTEGER>(SQL_UNSPECIFIED));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDataSourceReadOnly) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDataSourceReadOnly) {
   Validate(this->conn, SQL_DATA_SOURCE_READ_ONLY, (SQLWCHAR*)L"N");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDefaultTxnIsolation) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDefaultTxnIsolation) {
   Validate(this->conn, SQL_DEFAULT_TXN_ISOLATION, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDescribeParameter) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDescribeParameter) {
   Validate(this->conn, SQL_DESCRIBE_PARAMETER, (SQLWCHAR*)L"N");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMultResultSets) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMultResultSets) {
   Validate(this->conn, SQL_MULT_RESULT_SETS, (SQLWCHAR*)L"N");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMultipleActiveTxn) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMultipleActiveTxn) {
   Validate(this->conn, SQL_MULTIPLE_ACTIVE_TXN, (SQLWCHAR*)L"N");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoNeedLongDataLen) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoNeedLongDataLen) {
   Validate(this->conn, SQL_NEED_LONG_DATA_LEN, (SQLWCHAR*)L"N");
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoNullCollation) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoNullCollation) {
   Validate(this->conn, SQL_NULL_COLLATION, static_cast<SQLUSMALLINT>(SQL_NC_START));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoProcedureTerm) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoProcedureTerm) {
   Validate(this->conn, SQL_PROCEDURE_TERM, (SQLWCHAR*)L"");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoSchemaTerm) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSchemaTerm) {
   Validate(this->conn, SQL_SCHEMA_TERM, (SQLWCHAR*)L"schema");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoScrollOptions) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoScrollOptions) {
   Validate(this->conn, SQL_SCROLL_OPTIONS, static_cast<SQLUINTEGER>(SQL_SO_FORWARD_ONLY));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoTableTerm) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTableTerm) {
   Validate(this->conn, SQL_TABLE_TERM, (SQLWCHAR*)L"table");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoTxnCapable) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTxnCapable) {
   Validate(this->conn, SQL_TXN_CAPABLE, static_cast<SQLUSMALLINT>(SQL_TC_NONE));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoTxnIsolationOption) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTxnIsolationOption) {
   Validate(this->conn, SQL_TXN_ISOLATION_OPTION, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoUserName) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoUserName) {
   Validate(this->conn, SQL_USER_NAME, (SQLWCHAR*)L"");
 }
 
 // Supported SQL
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAggregateFunctions) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAggregateFunctions) {
   Validate(
       this->conn, SQL_AGGREGATE_FUNCTIONS,
       static_cast<SQLUINTEGER>(SQL_AF_ALL | SQL_AF_AVG | SQL_AF_COUNT | SQL_AF_DISTINCT |
                                SQL_AF_MAX | SQL_AF_MIN | SQL_AF_SUM));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAlterDomain) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAlterDomain) {
   Validate(this->conn, SQL_ALTER_DOMAIN, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetInfoAlterSchema) {
+TYPED_TEST(ConnectionInfoTest, DISABLED_TestSQLGetInfoAlterSchema) {
   // Type commented out in odbc_connection.cc
   // Type does not exist in sql.h
   // Validate(this->conn, SQL_ALTER_SCHEMA, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoAlterTable) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAlterTable) {
   Validate(this->conn, SQL_ALTER_TABLE, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetInfoAnsiSqlDatetimeLiterals) {
+TYPED_TEST(ConnectionInfoTest, DISABLED_TestSQLGetInfoAnsiSqlDatetimeLiterals) {
   // Type commented out in odbc_connection.cc
   // Type does not exist in sql.h
   // Validate(this->conn, SQL_ANSI_SQL_DATETIME_LITERALS, (SQLWCHAR*)L"");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCatalogLocation) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogLocation) {
   Validate(this->conn, SQL_CATALOG_LOCATION, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCatalogName) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogName) {
   Validate(this->conn, SQL_CATALOG_NAME, (SQLWCHAR*)L"N");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCatalogNameSeparator) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogNameSeparator) {
   Validate(this->conn, SQL_CATALOG_NAME_SEPARATOR, (SQLWCHAR*)L"");
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoCatalogUsage) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoCatalogUsage) {
   Validate(this->conn, SQL_CATALOG_USAGE, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoColumnAlias) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoColumnAlias) {
   Validate(this->conn, SQL_COLUMN_ALIAS, (SQLWCHAR*)L"Y");
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoCorrelationName) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoCorrelationName) {
   Validate(this->conn, SQL_CORRELATION_NAME, static_cast<SQLUSMALLINT>(SQL_CN_NONE));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCreateAssertion) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCreateAssertion) {
   Validate(this->conn, SQL_CREATE_ASSERTION, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCreateCharacterSet) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCreateCharacterSet) {
   Validate(this->conn, SQL_CREATE_CHARACTER_SET, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCreateCollation) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCreateCollation) {
   Validate(this->conn, SQL_CREATE_COLLATION, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCreateDomain) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCreateDomain) {
   Validate(this->conn, SQL_CREATE_DOMAIN, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoCreateSchema) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoCreateSchema) {
   Validate(this->conn, SQL_CREATE_SCHEMA, static_cast<SQLUINTEGER>(1));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoCreateTable) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoCreateTable) {
   Validate(this->conn, SQL_CREATE_TABLE, static_cast<SQLUINTEGER>(1));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoCreateTranslation) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCreateTranslation) {
   Validate(this->conn, SQL_CREATE_TRANSLATION, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDdlIndex) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDdlIndex) {
   Validate(this->conn, SQL_DDL_INDEX, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDropAssertion) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropAssertion) {
   Validate(this->conn, SQL_DROP_ASSERTION, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDropCharacterSet) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropCharacterSet) {
   Validate(this->conn, SQL_DROP_CHARACTER_SET, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDropCollation) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropCollation) {
   Validate(this->conn, SQL_DROP_COLLATION, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDropDomain) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropDomain) {
   Validate(this->conn, SQL_DROP_DOMAIN, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDropSchema) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropSchema) {
   Validate(this->conn, SQL_DROP_SCHEMA, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDropTable) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropTable) {
   Validate(this->conn, SQL_DROP_TABLE, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDropTranslation) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropTranslation) {
   Validate(this->conn, SQL_DROP_TRANSLATION, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoDropView) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropView) {
   Validate(this->conn, SQL_DROP_VIEW, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoExpressionsInOrderby) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoExpressionsInOrderby) {
   Validate(this->conn, SQL_EXPRESSIONS_IN_ORDERBY, (SQLWCHAR*)L"N");
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoGroupBy) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoGroupBy) {
   Validate(this->conn, SQL_GROUP_BY,
            static_cast<SQLUSMALLINT>(SQL_GB_GROUP_BY_CONTAINS_SELECT));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoIdentifierCase) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIdentifierCase) {
   Validate(this->conn, SQL_IDENTIFIER_CASE, static_cast<SQLUSMALLINT>(SQL_IC_MIXED));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoIdentifierQuoteChar) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIdentifierQuoteChar) {
   Validate(this->conn, SQL_IDENTIFIER_QUOTE_CHAR, (SQLWCHAR*)L"\"");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoIndexKeywords) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIndexKeywords) {
   Validate(this->conn, SQL_INDEX_KEYWORDS, static_cast<SQLUINTEGER>(SQL_IK_NONE));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoInsertStatement) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoInsertStatement) {
   Validate(this->conn, SQL_INSERT_STATEMENT,
            static_cast<SQLUINTEGER>(SQL_IS_INSERT_LITERALS | SQL_IS_INSERT_SEARCHED |
                                     SQL_IS_SELECT_INTO));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoIntegrity) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIntegrity) {
   Validate(this->conn, SQL_INTEGRITY, (SQLWCHAR*)L"N");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoKeywords) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoKeywords) {
   ValidateNotEmptySQLWCHAR(this->conn, SQL_KEYWORDS, true);
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoLikeEscapeClause) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoLikeEscapeClause) {
   Validate(this->conn, SQL_LIKE_ESCAPE_CLAUSE, (SQLWCHAR*)L"Y");
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoNonNullableColumns) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoNonNullableColumns) {
   Validate(this->conn, SQL_NON_NULLABLE_COLUMNS, static_cast<SQLUSMALLINT>(SQL_NNC_NULL));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoOjCapabilities) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoOjCapabilities) {
   Validate(this->conn, SQL_OJ_CAPABILITIES,
            static_cast<SQLUINTEGER>(SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_FULL));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoOrderByColumnsInSelect) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoOrderByColumnsInSelect) {
   Validate(this->conn, SQL_ORDER_BY_COLUMNS_IN_SELECT, (SQLWCHAR*)L"Y");
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoOuterJoins) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoOuterJoins) {
   Validate(this->conn, SQL_OUTER_JOINS, (SQLWCHAR*)L"N");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoProcedures) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoProcedures) {
   Validate(this->conn, SQL_PROCEDURES, (SQLWCHAR*)L"N");
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoQuotedIdentifierCase) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoQuotedIdentifierCase) {
   Validate(this->conn, SQL_QUOTED_IDENTIFIER_CASE,
            static_cast<SQLUSMALLINT>(SQL_IC_MIXED));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoSchemaUsage) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoSchemaUsage) {
   Validate(this->conn, SQL_SCHEMA_USAGE, static_cast<SQLUINTEGER>(SQL_SU_DML_STATEMENTS));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoSpecialCharacters) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSpecialCharacters) {
   Validate(this->conn, SQL_SPECIAL_CHARACTERS, (SQLWCHAR*)L"");
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoSqlConformance) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSqlConformance) {
   Validate(this->conn, SQL_SQL_CONFORMANCE, static_cast<SQLUINTEGER>(SQL_SC_SQL92_ENTRY));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoSubqueries) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoSubqueries) {
   Validate(this->conn, SQL_SUBQUERIES,
            static_cast<SQLUINTEGER>(SQL_SQ_CORRELATED_SUBQUERIES | SQL_SQ_COMPARISON |
                                     SQL_SQ_EXISTS | SQL_SQ_IN | SQL_SQ_QUANTIFIED));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoUnion) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoUnion) {
   Validate(this->conn, SQL_UNION,
            static_cast<SQLUINTEGER>(SQL_U_UNION | SQL_U_UNION_ALL));
 }
 
 // SQL Limits
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxBinaryLiteralLen) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxBinaryLiteralLen) {
   Validate(this->conn, SQL_MAX_BINARY_LITERAL_LEN, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoMaxCatalogNameLen) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxCatalogNameLen) {
   Validate(this->conn, SQL_MAX_CATALOG_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxCharLiteralLen) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxCharLiteralLen) {
   Validate(this->conn, SQL_MAX_CHAR_LITERAL_LEN, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoMaxColumnNameLen) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxColumnNameLen) {
   Validate(this->conn, SQL_MAX_COLUMN_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxColumnsInGroupBy) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxColumnsInGroupBy) {
   Validate(this->conn, SQL_MAX_COLUMNS_IN_GROUP_BY, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxColumnsInIndex) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxColumnsInIndex) {
   Validate(this->conn, SQL_MAX_COLUMNS_IN_INDEX, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxColumnsInOrderBy) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxColumnsInOrderBy) {
   Validate(this->conn, SQL_MAX_COLUMNS_IN_ORDER_BY, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxColumnsInSelect) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxColumnsInSelect) {
   Validate(this->conn, SQL_MAX_COLUMNS_IN_SELECT, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxColumnsInTable) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxColumnsInTable) {
   Validate(this->conn, SQL_MAX_COLUMNS_IN_TABLE, static_cast<SQLUSMALLINT>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoMaxCursorNameLen) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxCursorNameLen) {
   Validate(this->conn, SQL_MAX_CURSOR_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxIdentifierLen) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxIdentifierLen) {
   Validate(this->conn, SQL_MAX_IDENTIFIER_LEN, static_cast<SQLUSMALLINT>(65535));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxIndexSize) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxIndexSize) {
   Validate(this->conn, SQL_MAX_INDEX_SIZE, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxProcedureNameLen) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxProcedureNameLen) {
   Validate(this->conn, SQL_MAX_PROCEDURE_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxRowSize) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxRowSize) {
   Validate(this->conn, SQL_MAX_ROW_SIZE, (SQLWCHAR*)L"");
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoMaxRowSizeIncludesLong) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxRowSizeIncludesLong) {
   Validate(this->conn, SQL_MAX_ROW_SIZE_INCLUDES_LONG, (SQLWCHAR*)L"N");
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoMaxSchemaNameLen) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxSchemaNameLen) {
   Validate(this->conn, SQL_MAX_SCHEMA_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxStatementLen) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxStatementLen) {
   Validate(this->conn, SQL_MAX_STATEMENT_LEN, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoMaxTableNameLen) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxTableNameLen) {
   Validate(this->conn, SQL_MAX_TABLE_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoMaxTablesInSelect) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxTablesInSelect) {
   Validate(this->conn, SQL_MAX_TABLES_IN_SELECT, static_cast<SQLUSMALLINT>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoMaxUserNameLen) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxUserNameLen) {
   Validate(this->conn, SQL_MAX_USER_NAME_LEN, static_cast<SQLUSMALLINT>(0));
 }
 
 // Scalar Function Information
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoConvertFunctions) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoConvertFunctions) {
   Validate(this->conn, SQL_CONVERT_FUNCTIONS, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoNumericFunctions) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoNumericFunctions) {
   Validate(this->conn, SQL_NUMERIC_FUNCTIONS, static_cast<SQLUINTEGER>(4058942));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoStringFunctions) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoStringFunctions) {
   Validate(this->conn, SQL_STRING_FUNCTIONS,
            static_cast<SQLUINTEGER>(SQL_FN_STR_LTRIM | SQL_FN_STR_LENGTH |
                                     SQL_FN_STR_REPLACE | SQL_FN_STR_RTRIM));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoSystemFunctions) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoSystemFunctions) {
   Validate(this->conn, SQL_SYSTEM_FUNCTIONS,
            static_cast<SQLUINTEGER>(SQL_FN_SYS_IFNULL | SQL_FN_SYS_USERNAME));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoTimedateAddIntervals) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTimedateAddIntervals) {
   Validate(this->conn, SQL_TIMEDATE_ADD_INTERVALS,
            static_cast<SQLUINTEGER>(SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND |
                                     SQL_FN_TSI_MINUTE | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY |
@@ -741,7 +751,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoTimedateAddIntervals) {
                                     SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoTimedateDiffIntervals) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTimedateDiffIntervals) {
   Validate(this->conn, SQL_TIMEDATE_DIFF_INTERVALS,
            static_cast<SQLUINTEGER>(SQL_FN_TSI_FRAC_SECOND | SQL_FN_TSI_SECOND |
                                     SQL_FN_TSI_MINUTE | SQL_FN_TSI_HOUR | SQL_FN_TSI_DAY |
@@ -749,7 +759,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoTimedateDiffIntervals) {
                                     SQL_FN_TSI_QUARTER | SQL_FN_TSI_YEAR));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoTimedateFunctions) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoTimedateFunctions) {
   Validate(this->conn, SQL_TIMEDATE_FUNCTIONS,
            static_cast<SQLUINTEGER>(
                SQL_FN_TD_CURRENT_DATE | SQL_FN_TD_CURRENT_TIME |
@@ -763,87 +773,87 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoTimedateFunctions) {
 
 // Conversion Information
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoConvertBigint) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoConvertBigint) {
   Validate(this->conn, SQL_CONVERT_BIGINT, static_cast<SQLUINTEGER>(8));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoConvertBinary) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoConvertBinary) {
   Validate(this->conn, SQL_CONVERT_BINARY, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertBit) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertBit) {
   Validate(this->conn, SQL_CONVERT_BIT, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoConvertChar) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoConvertChar) {
   Validate(this->conn, SQL_CONVERT_CHAR, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoConvertDate) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoConvertDate) {
   Validate(this->conn, SQL_CONVERT_DATE, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoConvertDecimal) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoConvertDecimal) {
   Validate(this->conn, SQL_CONVERT_DECIMAL, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertDouble) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertDouble) {
   Validate(this->conn, SQL_CONVERT_DOUBLE, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoConvertFloat) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoConvertFloat) {
   Validate(this->conn, SQL_CONVERT_FLOAT, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertInteger) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertInteger) {
   Validate(this->conn, SQL_CONVERT_INTEGER, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoConvertIntervalDayTime) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoConvertIntervalDayTime) {
   Validate(this->conn, SQL_CONVERT_INTERVAL_DAY_TIME, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertIntervalYearMonth) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertIntervalYearMonth) {
   Validate(this->conn, SQL_CONVERT_INTERVAL_YEAR_MONTH, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertLongvarbinary) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertLongvarbinary) {
   Validate(this->conn, SQL_CONVERT_LONGVARBINARY, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertLongvarchar) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertLongvarchar) {
   Validate(this->conn, SQL_CONVERT_LONGVARCHAR, static_cast<SQLUINTEGER>(0));
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetInfoConvertNumeric) {
+TEST_F(ConnectionInfoMockTest, TestSQLGetInfoConvertNumeric) {
   Validate(this->conn, SQL_CONVERT_NUMERIC, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertReal) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertReal) {
   Validate(this->conn, SQL_CONVERT_REAL, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertSmallint) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertSmallint) {
   Validate(this->conn, SQL_CONVERT_SMALLINT, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertTime) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertTime) {
   Validate(this->conn, SQL_CONVERT_TIME, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertTimestamp) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertTimestamp) {
   Validate(this->conn, SQL_CONVERT_TIMESTAMP, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertTinyint) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertTinyint) {
   Validate(this->conn, SQL_CONVERT_TINYINT, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertVarbinary) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertVarbinary) {
   Validate(this->conn, SQL_CONVERT_VARBINARY, static_cast<SQLUINTEGER>(0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetInfoConvertVarchar) {
+TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConvertVarchar) {
   Validate(this->conn, SQL_CONVERT_VARCHAR, static_cast<SQLUINTEGER>(0));
 }
 

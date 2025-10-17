@@ -158,26 +158,6 @@ class FlightSQLOdbcV2MockTestBase : public FlightSQLODBCMockTestBase {
   void SetUp() override;
 };
 
-template <typename T>
-class FlightSQLODBCTestBase : public T {
- public:
-  using List = std::list<T>;
-};
-
-using TestTypes =
-    ::testing::Types<FlightSQLODBCMockTestBase, FlightSQLODBCRemoteTestBase>;
-TYPED_TEST_SUITE(FlightSQLODBCTestBase, TestTypes);
-
-template <typename T>
-class FlightSQLOdbcV2TestBase : public T {
- public:
-  using List = std::list<T>;
-};
-
-using TestTypesV2 =
-    ::testing::Types<FlightSQLOdbcV2MockTestBase, FlightSQLOdbcV2RemoteTestBase>;
-TYPED_TEST_SUITE(FlightSQLOdbcV2TestBase, TestTypesV2);
-
 /** ODBC read buffer size. */
 enum { ODBC_BUFFER_SIZE = 1024 };
 

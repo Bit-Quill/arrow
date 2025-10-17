@@ -26,7 +26,27 @@
 
 namespace arrow::flight::sql::odbc {
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsAllFunctions) {
+template <typename T>
+class GetFunctionsTest : public T {
+ public:
+  using List = std::list<T>;
+};
+
+using TestTypes =
+    ::testing::Types<FlightSQLODBCMockTestBase, FlightSQLODBCRemoteTestBase>;
+TYPED_TEST_SUITE(GetFunctionsTest, TestTypes);
+
+template <typename T>
+class GetFunctionsOdbcV2Test : public T {
+ public:
+  using List = std::list<T>;
+};
+
+using TestTypesOdbcV2 =
+    ::testing::Types<FlightSQLOdbcV2MockTestBase, FlightSQLOdbcV2RemoteTestBase>;
+TYPED_TEST_SUITE(GetFunctionsOdbcV2Test, TestTypesOdbcV2);
+
+TYPED_TEST(GetFunctionsTest, TestSQLGetFunctionsAllFunctions) {
   // Verify driver manager return values for SQLGetFunctions
 
   SQLUSMALLINT api_exists[SQL_API_ODBC3_ALL_FUNCTIONS_SIZE];
@@ -73,7 +93,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsAllFunctions) {
   }
 }
 
-TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLGetFunctionsAllFunctionsODBCVer2) {
+TYPED_TEST(GetFunctionsOdbcV2Test, TestSQLGetFunctionsAllFunctionsODBCVer2) {
   // Verify driver manager return values for SQLGetFunctions
 
   // ODBC 2.0 SQLGetFunctions returns 100 elements according to spec
@@ -109,7 +129,7 @@ TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLGetFunctionsAllFunctionsODBCVer2) {
   }
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsSupportedSingleAPI) {
+TYPED_TEST(GetFunctionsTest, TestSQLGetFunctionsSupportedSingleAPI) {
   const std::vector<SQLUSMALLINT> supported_functions = {
       SQL_API_SQLALLOCHANDLE, SQL_API_SQLBINDCOL, SQL_API_SQLGETDIAGFIELD,
       SQL_API_SQLCANCEL, SQL_API_SQLCLOSECURSOR, SQL_API_SQLGETDIAGREC,
@@ -141,7 +161,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsSupportedSingleAPI) {
   }
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsUnsupportedSingleAPI) {
+TYPED_TEST(GetFunctionsTest, TestSQLGetFunctionsUnsupportedSingleAPI) {
   const std::vector<SQLUSMALLINT> unsupported_functions = {
       SQL_API_SQLPUTDATA,        SQL_API_SQLGETDESCFIELD,     SQL_API_SQLGETDESCREC,
       SQL_API_SQLCOPYDESC,       SQL_API_SQLPARAMDATA,        SQL_API_SQLENDTRAN,
@@ -161,7 +181,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetFunctionsUnsupportedSingleAPI) {
   }
 }
 
-TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLGetFunctionsSupportedSingleAPIODBCVer2) {
+TYPED_TEST(GetFunctionsOdbcV2Test, TestSQLGetFunctionsSupportedSingleAPIODBCVer2) {
   const std::vector<SQLUSMALLINT> supported_functions = {
       SQL_API_SQLCONNECT, SQL_API_SQLGETINFO, SQL_API_SQLDESCRIBECOL,
       SQL_API_SQLGETTYPEINFO, SQL_API_SQLDISCONNECT, SQL_API_SQLNUMRESULTCOLS,
@@ -185,7 +205,7 @@ TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLGetFunctionsSupportedSingleAPIODBCVer
   }
 }
 
-TYPED_TEST(FlightSQLOdbcV2TestBase, TestSQLGetFunctionsUnsupportedSingleAPIODBCVer2) {
+TYPED_TEST(GetFunctionsOdbcV2Test, TestSQLGetFunctionsUnsupportedSingleAPIODBCVer2) {
   const std::vector<SQLUSMALLINT> unsupported_functions = {
       SQL_API_SQLPUTDATA,        SQL_API_SQLPARAMDATA,        SQL_API_SQLSETCURSORNAME,
       SQL_API_SQLGETCURSORNAME,  SQL_API_SQLSTATISTICS,       SQL_API_SQLSPECIALCOLUMNS,
