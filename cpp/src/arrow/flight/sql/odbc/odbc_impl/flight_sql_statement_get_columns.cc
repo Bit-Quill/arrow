@@ -101,10 +101,9 @@ Result<std::shared_ptr<RecordBatch>> TransformInner(
     const auto& table_name = reader.GetTableName();
     const std::shared_ptr<Schema>& schema = reader.GetSchema();
     if (schema == nullptr) {
-      // TODO: Test and build the driver against a server that returns
+      // GH-46561 TODO: Test and build the driver against a server that returns
       // complex types columns with the children
       // types and handle the failure properly.
-      // https://github.com/apache/arrow/issues/46561
       continue;
     }
     for (int i = 0; i < schema->num_fields(); ++i) {

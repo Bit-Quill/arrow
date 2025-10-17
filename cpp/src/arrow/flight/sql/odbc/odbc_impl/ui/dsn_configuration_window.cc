@@ -566,7 +566,7 @@ bool DsnConfigurationWindow::OnMessage(UINT msg, WPARAM wparam, LPARAM lparam) {
           open_file_name.lpstrFile = file_name;
           open_file_name.lpstrFile[0] = '\0';
           open_file_name.nMaxFile = FILENAME_MAX;
-          // TODO: What type should this be?
+          // GH-47851 TODO: Update `lpstrFilter` to correct value
           open_file_name.lpstrFilter = L"All\0*.*";
           open_file_name.nFilterIndex = 1;
           open_file_name.lpstrFileTitle = NULL;

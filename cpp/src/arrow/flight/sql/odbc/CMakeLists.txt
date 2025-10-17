@@ -110,10 +110,10 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   set(CPACK_PACKAGE_NAME ${ODBC_PACKAGE_NAME})
   set(CPACK_PACKAGE_VENDOR ${ODBC_PACKAGE_VENDOR})
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
-  set(CPACK_PACKAGE_CONTACT "#TODO arrow maintainers")
+  set(CPACK_PACKAGE_CONTACT "#GH-47787 TODO arrow maintainers")
 
-  # TODO: set up `flight_sql_odbc_lib` component for macOS Installer
-  # TODO: set up `flight_sql_odbc_lib` component for Linux Installer
+  # GH-47876 TODO: set up `flight_sql_odbc_lib` component for macOS Installer
+  # GH-47877 TODO: set up `flight_sql_odbc_lib` component for Linux Installer
   if(WIN32)
     install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
             DESTINATION bin
@@ -156,8 +156,8 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
     # Upgrade GUID is required to be unchanged for ODBC installer to upgrade
     set(CPACK_WIX_UPGRADE_GUID "DBF27A18-F8BF-423F-9E3A-957414D52C4B")
   endif()
-  # TODO: create macOS Installer using cpack
-  # TODO: create Linux Installer using cpack
+  # GH-47876 TODO: create macOS Installer using cpack
+  # GH-47877 TODO: create Linux Installer using cpack
 
   # Load CPack after all CPACK* variables are set
   include(CPack)

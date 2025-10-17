@@ -116,12 +116,13 @@ SqlDataType GetDataTypeFromArrowFieldV3(const std::shared_ptr<Field>& field,
     case Type::TIME64:
       return SqlDataType_TYPE_TIME;
     case Type::INTERVAL_MONTHS:
-      return SqlDataType_INTERVAL_MONTH;  // TODO: maybe
-                                          // SqlDataType_INTERVAL_YEAR_TO_MONTH
+      return SqlDataType_INTERVAL_MONTH;  // GH-47873 TODO: check and update to
+                                          // SqlDataType_INTERVAL_YEAR_TO_MONTH if it is
+                                          // more appropriate
     case Type::INTERVAL_DAY_TIME:
       return SqlDataType_INTERVAL_DAY;
 
-    // TODO: Handle remaining types.
+    // GH-47873 TODO: Handle remaining types.
     case Type::INTERVAL_MONTH_DAY_NANO:
     case Type::LIST:
     case Type::STRUCT:
@@ -669,7 +670,7 @@ optional<int32_t> GetDisplaySize(SqlDataType data_type,
     case SqlDataType_INTERVAL_HOUR_TO_MINUTE:
     case SqlDataType_INTERVAL_HOUR_TO_SECOND:
     case SqlDataType_INTERVAL_MINUTE_TO_SECOND:
-      return nullopt;  // TODO: Implement for INTERVAL types
+      return nullopt;  // GH-47874 TODO: Implement for INTERVAL types
     case SqlDataType_GUID:
       return 36;
     default:

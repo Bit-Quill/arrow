@@ -164,7 +164,7 @@ TEST(ConvertToJson, MonthInterval) {
 }
 
 TEST(ConvertToJson, Duration) {
-  // TODO: Append TimeUnit on conversion
+  // GH-47857 TODO: Append TimeUnit on conversion
   ASSERT_EQ("\"123\"", ConvertToJson(DurationScalar(123, TimeUnit::SECOND)));
   ASSERT_EQ("\"123\"", ConvertToJson(DurationScalar(123, TimeUnit::MILLI)));
   ASSERT_EQ("\"123\"", ConvertToJson(DurationScalar(123, TimeUnit::MICRO)));

@@ -233,8 +233,8 @@ SQLRETURN ODBCConnection::GetInfo(SQLUSMALLINT info_type, SQLPOINTER value,
     case SQL_COLUMN_ALIAS:
     case SQL_DBMS_NAME:
     case SQL_DBMS_VER:
-    case SQL_DRIVER_NAME:  // TODO: This should be the driver's filename and shouldn't
-                           // come from the SPI.
+    case SQL_DRIVER_NAME:  // GH-47858 TODO: This should be the driver's filename and
+                           // shouldn't come from the SPI.
     case SQL_DRIVER_VER:
     case SQL_SEARCH_PATTERN_ESCAPE:
     case SQL_SERVER_NAME:

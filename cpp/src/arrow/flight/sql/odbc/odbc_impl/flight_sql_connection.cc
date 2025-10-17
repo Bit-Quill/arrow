@@ -339,7 +339,7 @@ Location FlightSqlConnection::BuildLocation(
           ThrowIfNotOK(Location::ForGrpcTls(host_name_info, port).Value(&location));
           return location;
         }
-        // TODO: We should log that we could not convert an IP to hostname here.
+        // GH-47852 TODO: We should log that we could not convert an IP to hostname here.
       }
     } catch (...) {
       // This is expected. The Host attribute can be an IP or name, but make_address will

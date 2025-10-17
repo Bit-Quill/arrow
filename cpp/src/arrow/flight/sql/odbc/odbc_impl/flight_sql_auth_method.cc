@@ -38,9 +38,8 @@ class NoOpAuthMethod : public FlightSqlAuthMethod {
                     FlightCallOptions& call_options) override {
     // Do nothing
 
-    // TODO: implement NoOpAuthMethod to validate server address.
+    // GH-46733 TODO: implement NoOpAuthMethod to validate server address.
     // Can use NoOpClientAuthHandler.
-    // https://github.com/apache/arrow/issues/46733
   }
 };
 

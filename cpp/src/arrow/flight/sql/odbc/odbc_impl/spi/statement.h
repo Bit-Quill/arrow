@@ -39,7 +39,7 @@ class Statement {
   virtual ~Statement() = default;
 
   /// \brief Statement attributes that can be called at anytime.
-  ////TODO: Document attributes
+  /// GH-47850 TODO: Document attributes
   enum StatementAttributeId {
     MAX_LENGTH,   // size_t - The maximum length when retrieving variable length data. 0
                   // means no limit.

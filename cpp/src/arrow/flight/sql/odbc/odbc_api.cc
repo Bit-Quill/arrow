@@ -264,8 +264,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handle_type, SQLHANDLE handle,
                           SQLSMALLINT rec_number, SQLSMALLINT diag_identifier,
                           SQLPOINTER diag_info_ptr, SQLSMALLINT buffer_length,
                           SQLSMALLINT* string_length_ptr) {
-  // TODO: Implement additional fields types
-  // https://github.com/apache/arrow/issues/46573
+  // GH-46573 TODO: Implement additional fields types
   ARROW_LOG(DEBUG) << "SQLGetDiagFieldW called with handle_type: " << handle_type
                    << ", handle: " << handle << ", rec_number: " << rec_number
                    << ", diag_identifier: " << diag_identifier
@@ -345,7 +344,7 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT handle_type, SQLHANDLE handle,
       return SQL_SUCCESS;
     }
 
-    // TODO implement return code function
+    // Driver manager implements SQL_DIAG_RETURNCODE
     case SQL_DIAG_RETURNCODE: {
       return SQL_SUCCESS;
     }
@@ -789,11 +788,10 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
                    << static_cast<const void*>(out_connection_string_len)
                    << ", driver_completion: " << driver_completion;
 
-  // TODO: Implement FILEDSN and SAVEFILE keywords according to the spec
-  // https://github.com/apache/arrow/issues/46449
+  // GH-46449 TODO: Implement FILEDSN and SAVEFILE keywords according to the spec
 
-  // TODO: Copy connection string properly in SQLDriverConnect according to the
-  // spec https://github.com/apache/arrow/issues/46560
+  // GH-46560 TODO: Copy connection string properly in SQLDriverConnect according to the
+  // spec
 
   using ODBC::ODBCConnection;
 
@@ -810,8 +808,8 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
 
     std::vector<std::string_view> missing_properties;
 
-    // TODO: Implement SQL_DRIVER_COMPLETE_REQUIRED in SQLDriverConnect according to the
-    // spec https://github.com/apache/arrow/issues/46448
+    // GH-46448 TODO: Implement SQL_DRIVER_COMPLETE_REQUIRED in SQLDriverConnect according
+    // to the spec
 #if defined _WIN32 || defined _WIN64
     // Load the DSN window according to driver_completion
     if (driver_completion == SQL_DRIVER_PROMPT) {

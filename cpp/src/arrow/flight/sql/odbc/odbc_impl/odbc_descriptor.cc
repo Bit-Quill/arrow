@@ -312,7 +312,7 @@ void ODBCDescriptor::GetField(SQLSMALLINT record_number, SQLSMALLINT field_ident
     throw DriverException("Invalid descriptor index", "07009");
   }
 
-  // TODO: Restrict fields based on AppDescriptor IPD, and IRD.
+  // GH-47867 TODO: Restrict fields based on AppDescriptor IPD, and IRD.
 
   bool length_in_bytes = true;
   SQLSMALLINT zero_based_record = record_number - 1;
@@ -507,10 +507,12 @@ void ODBCDescriptor::PopulateFromResultSetMetadata(ResultSetMetadata* rsmd) {
         rsmd->IsAutoUnique(one_based_index) ? SQL_TRUE : SQL_FALSE;
     records_[i].case_sensitive =
         rsmd->IsCaseSensitive(one_based_index) ? SQL_TRUE : SQL_FALSE;
-    records_[i].datetime_interval_precision;  // TODO - update when rsmd adds this
+    records_[i].datetime_interval_precision;  // GH-47869 TODO implement
+                                              // `SQL_DESC_DATETIME_INTERVAL_PRECISION`
     SQLINTEGER num_prec_radix = rsmd->GetNumPrecRadix(one_based_index);
     records_[i].num_prec_radix = num_prec_radix > 0 ? num_prec_radix : 0;
-    records_[i].datetime_interval_code;  // TODO
+    records_[i].datetime_interval_code;  // GH-47868 TODO implement
+                                         // `SQL_DESC_DATETIME_INTERVAL_CODE`
     records_[i].fixed_prec_scale =
         rsmd->IsFixedPrecScale(one_based_index) ? SQL_TRUE : SQL_FALSE;
     records_[i].nullable = rsmd->IsNullable(one_based_index);
@@ -579,5 +581,5 @@ void ODBCDescriptor::SetDataPtrOnRecord(SQLPOINTER data_ptr, SQLSMALLINT record_
 }
 
 void DescriptorRecord::CheckConsistency() {
-  // TODO
+  // GH-47870 TODO implement
 }
