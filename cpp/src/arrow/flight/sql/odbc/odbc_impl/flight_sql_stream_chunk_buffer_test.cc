@@ -23,7 +23,8 @@
 #include "arrow/flight/sql/odbc/odbc_impl/json_converter.h"
 #include "arrow/flight/test_flight_server.h"
 #include "arrow/flight/test_util.h"
-#include "gtest/gtest.h"
+
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
 

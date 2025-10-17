@@ -19,15 +19,13 @@
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/statement.h"
 
-#ifdef _WIN32
-#  include <windows.h>
-#endif
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include <sql.h>
 #include <sqltypes.h>
 #include <sqlucode.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
 

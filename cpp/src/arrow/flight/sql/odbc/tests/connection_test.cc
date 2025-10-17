@@ -16,39 +16,38 @@
 // under the License.
 #include "arrow/flight/sql/odbc/tests/odbc_test_suite.h"
 
-#ifdef _WIN32
-#  include <windows.h>
-#endif
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include <sql.h>
 #include <sqltypes.h>
 #include <sqlucode.h>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
-
 TEST(SQLAllocHandle, TestSQLAllocHandleEnv) {
-  // ODBC Environment
   SQLHENV env;
 
   // Allocate an environment handle
-  SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
+  ASSERT_EQ(SQL_SUCCESS, SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env));
 
-  ASSERT_THAT(env, ::testing::NotNull());
+  ASSERT_NE(env, nullptr);
+
+  // Free an environment handle
+  ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
 TEST(SQLAllocEnv, TestSQLAllocEnv) {
-  // ODBC Environment
   SQLHENV env;
 
   // Allocate an environment handle
   ASSERT_EQ(SQL_SUCCESS, SQLAllocEnv(&env));
+
+  // Free an environment handle
+  ASSERT_EQ(SQL_SUCCESS, SQLFreeEnv(env));
 }
 
 TEST(SQLAllocHandle, TestSQLAllocHandleConnect) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -60,7 +59,6 @@ TEST(SQLAllocHandle, TestSQLAllocHandleConnect) {
 }
 
 TEST(SQLAllocConnect, TestSQLAllocHandleConnect) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -71,19 +69,7 @@ TEST(SQLAllocConnect, TestSQLAllocHandleConnect) {
   ASSERT_EQ(SQL_SUCCESS, SQLAllocConnect(env, &conn));
 }
 
-TEST(SQLFreeHandle, TestSQLFreeHandleEnv) {
-  // ODBC Environment
-  SQLHENV env;
-
-  // Allocate an environment handle
-  SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &env);
-
-  // Free an environment handle
-  ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
-}
-
 TEST(SQLFreeEnv, TestSQLFreeEnv) {
-  // ODBC Environment
   SQLHENV env;
 
   // Allocate an environment handle
@@ -94,7 +80,6 @@ TEST(SQLFreeEnv, TestSQLFreeEnv) {
 }
 
 TEST(SQLFreeHandle, TestSQLFreeHandleConnect) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -121,7 +106,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestFreeNullHandles) {
 }
 
 TEST(SQLFreeConnect, TestSQLFreeConnect) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -136,7 +120,6 @@ TEST(SQLFreeConnect, TestSQLFreeConnect) {
 }
 
 TEST(SQLGetEnvAttr, TestSQLGetEnvAttrODBCVersion) {
-  // ODBC Environment
   SQLHENV env;
 
   SQLINTEGER version;
@@ -150,7 +133,6 @@ TEST(SQLGetEnvAttr, TestSQLGetEnvAttrODBCVersion) {
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionValid) {
-  // ODBC Environment
   SQLHENV env;
 
   // Allocate an environment handle
@@ -162,7 +144,6 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionValid) {
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
-  // ODBC Environment
   SQLHENV env;
 
   // Allocate an environment handle
@@ -212,7 +193,6 @@ TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetEnvAttrNullValuePointer) {
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSValid) {
-  // ODBC Environment
   SQLHENV env;
 
   // Allocate an environment handle
@@ -224,7 +204,6 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSValid) {
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSInvalid) {
-  // ODBC Environment
   SQLHENV env;
 
   // Allocate an environment handle
@@ -236,7 +215,6 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSInvalid) {
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
-  // ODBC Environment
   SQLHENV env;
 
   // Allocate an environment handle
@@ -247,7 +225,6 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -307,7 +284,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
 
 #if defined _WIN32 || defined _WIN64
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnectDsn) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -371,7 +347,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnectDsn) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -431,7 +406,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -500,7 +474,6 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -558,7 +531,6 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
 }
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -623,7 +595,6 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
 #endif
 
 TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -665,7 +636,6 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
 }
 
 TEST(SQLDisconnect, TestSQLDisconnectWithoutConnection) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
 
@@ -717,7 +687,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
 }
 
 TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
-  // ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
   SQLHSTMT statement;

@@ -24,9 +24,7 @@
 #include "arrow/flight/sql/example/sqlite_server.h"
 #include "arrow/flight/sql/odbc/odbc_impl/encoding_utils.h"
 
-#ifdef _WIN32
-#  include <windows.h>
-#endif
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include <sql.h>
 #include <sqltypes.h>

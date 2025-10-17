@@ -16,15 +16,13 @@
 // under the License.
 #include "arrow/flight/sql/odbc/tests/odbc_test_suite.h"
 
-#ifdef _WIN32
-#  include <windows.h>
-#endif
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include <sql.h>
 #include <sqltypes.h>
 #include <sqlucode.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
 
