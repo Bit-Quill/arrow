@@ -26,92 +26,70 @@
 
 namespace arrow::flight::sql::odbc {
 
-#ifdef SQL_ATTR_ASYNC_DBC_EVENT
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAsyncDbcEventUnsupported) {
-  this->Connect();
+template <typename T>
+class ConnectionAttributeTest : public T {
+ public:
+  using List = std::list<T>;
+};
 
+using TestTypes =
+    ::testing::Types<FlightSQLODBCMockTestBase, FlightSQLODBCRemoteTestBase>;
+TYPED_TEST_SUITE(ConnectionAttributeTest, TestTypes);
+
+#ifdef SQL_ATTR_ASYNC_DBC_EVENT
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrAsyncDbcEventUnsupported) {
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_EVENT, 0, 0));
   // Driver Manager on Windows returns error code HY118
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY118);
-
-  this->Disconnect();
 }
 #endif
 
 #ifdef SQL_ATTR_ASYNC_ENABLE
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAyncEnableUnsupported) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrAyncEnableUnsupported) {
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_ASYNC_ENABLE, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
-
-  this->Disconnect();
 }
 #endif
 
 #ifdef SQL_ATTR_ASYNC_DBC_PCALLBACK
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAyncDbcPcCallbackUnsupported) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrAyncDbcPcCallbackUnsupported) {
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_PCALLBACK, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
-
-  this->Disconnect();
 }
 #endif
 
 #ifdef SQL_ATTR_ASYNC_DBC_PCONTEXT
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAyncDbcPcContextUnsupported) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrAyncDbcPcContextUnsupported) {
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_PCONTEXT, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
-
-  this->Disconnect();
 }
 #endif
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAutoIpdReadOnly) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrAutoIpdReadOnly) {
   // Verify read-only attribute cannot be set
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_AUTO_IPD, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY092);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrConnectionDeadReadOnly) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrConnectionDeadReadOnly) {
   // Verify read-only attribute cannot be set
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_CONNECTION_DEAD, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY092);
-
-  this->Disconnect();
 }
 
 #ifdef SQL_ATTR_DBC_INFO_TOKEN
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrDbcInfoTokenUnsupported) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrDbcInfoTokenUnsupported) {
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_DBC_INFO_TOKEN, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
-
-  this->Disconnect();
 }
 #endif
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrEnlistInDtcUnsupported) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrEnlistInDtcUnsupported) {
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_ENLIST_IN_DTC, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrOdbcCursorsDMOnly) {
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrOdbcCursorsDMOnly) {
   this->AllocEnvConnHandles();
 
   // Verify DM-only attribute is settable via Driver Manager
@@ -121,33 +99,22 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrOdbcCursorsDMOnly) {
 
   std::string connect_str = this->GetConnectionString();
   this->ConnectWithString(connect_str);
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrQuietModeReadOnly) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrQuietModeReadOnly) {
   // Verify read-only attribute cannot be set
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_QUIET_MODE, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY092);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTraceDMOnly) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrTraceDMOnly) {
   // Verify DM-only attribute is settable via Driver Manager
   ASSERT_EQ(SQL_SUCCESS,
             SQLSetConnectAttr(this->conn, SQL_ATTR_TRACE,
                               reinterpret_cast<SQLPOINTER>(SQL_OPT_TRACE_OFF), 0));
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTracefileDMOnly) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrTracefileDMOnly) {
   // Verify DM-only attribute is handled by Driver Manager
 
   // Use placeholder value as we want the call to fail, or else
@@ -157,80 +124,52 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTracefileDMOnly) {
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_TRACEFILE, &trace_file0[0],
                                          static_cast<SQLINTEGER>(trace_file0.size())));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY000);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTranslateLabDMOnly) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrTranslateLabDMOnly) {
   // Verify DM-only attribute is handled by Driver Manager
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_TRANSLATE_LIB, 0, 0));
   // Checks for invalid argument return error
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY024);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTranslateOptionUnsupported) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrTranslateOptionUnsupported) {
   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_TRANSLATE_OPTION, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrTxnIsolationUnsupported) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrTxnIsolationUnsupported) {
   ASSERT_EQ(SQL_ERROR,
             SQLSetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION,
                               reinterpret_cast<SQLPOINTER>(SQL_TXN_READ_UNCOMMITTED), 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
-
-  this->Disconnect();
 }
 
 #ifdef SQL_ATTR_DBC_INFO_TOKEN
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrDbcInfoTokenSetOnly) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrDbcInfoTokenSetOnly) {
   // Verify that set-only attribute cannot be read
   SQLPOINTER ptr = NULL;
   ASSERT_EQ(SQL_ERROR, SQLGetConnectAttr(this->conn, SQL_ATTR_DBC_INFO_TOKEN, ptr, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY092);
-
-  this->Disconnect();
 }
 #endif
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrOdbcCursorsDMOnly) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrOdbcCursorsDMOnly) {
   // Verify that DM-only attribute is handled by driver manager
   SQLULEN cursor_attr;
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetConnectAttr(this->conn, SQL_ATTR_ODBC_CURSORS, &cursor_attr, 0, 0));
   EXPECT_EQ(SQL_CUR_USE_DRIVER, cursor_attr);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTraceDMOnly) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrTraceDMOnly) {
   // Verify that DM-only attribute is handled by driver manager
   SQLUINTEGER trace;
   ASSERT_EQ(SQL_SUCCESS, SQLGetConnectAttr(this->conn, SQL_ATTR_TRACE, &trace, 0, 0));
   EXPECT_EQ(SQL_OPT_TRACE_OFF, trace);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTraceFileDMOnly) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrTraceFileDMOnly) {
   // Verify that DM-only attribute is handled by driver manager
   SQLWCHAR out_str[ODBC_BUFFER_SIZE];
   SQLINTEGER out_str_len;
@@ -242,156 +181,104 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTraceFileDMOnly) {
   std::string out_connection_string =
       ODBC::SqlWcharToString(out_str, static_cast<SQLSMALLINT>(out_str_len));
   EXPECT_TRUE(!out_connection_string.empty());
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTranslateLibUnsupported) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrTranslateLibUnsupported) {
   SQLWCHAR out_str[ODBC_BUFFER_SIZE];
   SQLINTEGER out_str_len;
   ASSERT_EQ(SQL_ERROR, SQLGetConnectAttr(this->conn, SQL_ATTR_TRANSLATE_LIB, out_str,
                                          ODBC_BUFFER_SIZE, &out_str_len));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTranslateOptionUnsupported) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrTranslateOptionUnsupported) {
   SQLINTEGER option;
   ASSERT_EQ(SQL_ERROR,
             SQLGetConnectAttr(this->conn, SQL_ATTR_TRANSLATE_OPTION, &option, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrTxnIsolationUnsupported) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrTxnIsolationUnsupported) {
   SQLINTEGER isolation;
   ASSERT_EQ(SQL_ERROR,
             SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, &isolation, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HYC00);
-
-  this->Disconnect();
 }
 
 #ifdef SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE
-TYPED_TEST(FlightSQLODBCTestBase,
+TYPED_TEST(ConnectionAttributeTest,
            TestSQLGetConnectAttrAsyncDbcFunctionsEnableUnsupported) {
-  this->Connect();
-
   // Verifies that the Windows driver manager returns HY114 for unsupported functionality
   SQLUINTEGER enable;
   ASSERT_EQ(SQL_ERROR, SQLGetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_FUNCTIONS_ENABLE,
                                          &enable, 0, 0));
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_HY114);
-
-  this->Disconnect();
 }
 #endif
 
 // Tests for supported attributes
 
 #ifdef SQL_ATTR_ASYNC_DBC_EVENT
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAsyncDbcEventDefault) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrAsyncDbcEventDefault) {
   SQLPOINTER ptr = NULL;
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_EVENT, ptr, 0, 0));
   EXPECT_EQ(reinterpret_cast<SQLPOINTER>(NULL), ptr);
-
-  this->Disconnect();
 }
 #endif
 
 #ifdef SQL_ATTR_ASYNC_DBC_PCALLBACK
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAsyncDbcPcallbackDefault) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrAsyncDbcPcallbackDefault) {
   SQLPOINTER ptr = NULL;
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_PCALLBACK, ptr, 0, 0));
   EXPECT_EQ(reinterpret_cast<SQLPOINTER>(NULL), ptr);
-
-  this->Disconnect();
 }
 #endif
 
 #ifdef SQL_ATTR_ASYNC_DBC_PCONTEXT
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAsyncDbcPcontextDefault) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrAsyncDbcPcontextDefault) {
   SQLPOINTER ptr = NULL;
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetConnectAttr(this->conn, SQL_ATTR_ASYNC_DBC_PCONTEXT, ptr, 0, 0));
   EXPECT_EQ(reinterpret_cast<SQLPOINTER>(NULL), ptr);
-
-  this->Disconnect();
 }
 #endif
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAsyncEnableDefault) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrAsyncEnableDefault) {
   SQLULEN enable;
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetConnectAttr(this->conn, SQL_ATTR_ASYNC_ENABLE, &enable, 0, 0));
   EXPECT_EQ(SQL_ASYNC_ENABLE_OFF, enable);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAutoIpdDefault) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrAutoIpdDefault) {
   SQLUINTEGER ipd;
   ASSERT_EQ(SQL_SUCCESS, SQLGetConnectAttr(this->conn, SQL_ATTR_AUTO_IPD, &ipd, 0, 0));
   EXPECT_EQ(static_cast<SQLUINTEGER>(SQL_FALSE), ipd);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrAutocommitDefault) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrAutocommitDefault) {
   SQLUINTEGER auto_commit;
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetConnectAttr(this->conn, SQL_ATTR_AUTOCOMMIT, &auto_commit, 0, 0));
   EXPECT_EQ(SQL_AUTOCOMMIT_ON, auto_commit);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrEnlistInDtcDefault) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrEnlistInDtcDefault) {
   SQLPOINTER ptr = NULL;
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetConnectAttr(this->conn, SQL_ATTR_ENLIST_IN_DTC, ptr, 0, 0));
   EXPECT_EQ(reinterpret_cast<SQLPOINTER>(NULL), ptr);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetConnectAttrQuietModeDefault) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrQuietModeDefault) {
   HWND ptr = NULL;
   ASSERT_EQ(SQL_SUCCESS, SQLGetConnectAttr(this->conn, SQL_ATTR_QUIET_MODE, ptr, 0, 0));
   EXPECT_EQ(reinterpret_cast<SQLPOINTER>(NULL), ptr);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAccessModeValid) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrAccessModeValid) {
   // The driver always returns SQL_MODE_READ_WRITE
 
   // Check default value first
@@ -416,13 +303,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrAccessModeValid) {
 
   // Verify warning status
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_01S02);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrConnectionTimeoutValid) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrConnectionTimeoutValid) {
   // Check default value first
   SQLUINTEGER timeout = -1;
   ASSERT_EQ(SQL_SUCCESS,
@@ -436,13 +319,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrConnectionTimeoutValid) {
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetConnectAttr(this->conn, SQL_ATTR_CONNECTION_TIMEOUT, &timeout, 0, 0));
   EXPECT_EQ(42, timeout);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrLoginTimeoutValid) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrLoginTimeoutValid) {
   // Check default value first
   SQLUINTEGER timeout = -1;
   ASSERT_EQ(SQL_SUCCESS,
@@ -456,13 +335,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrLoginTimeoutValid) {
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetConnectAttr(this->conn, SQL_ATTR_LOGIN_TIMEOUT, &timeout, 0, 0));
   EXPECT_EQ(42, timeout);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrPacketSizeValid) {
-  this->Connect();
-
+TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrPacketSizeValid) {
   // The driver always returns 0. PACKET_SIZE value is unused by the driver.
 
   // Check default value first
@@ -485,8 +360,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetConnectAttrPacketSizeValid) {
 
   // Verify warning status
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, error_state_01S02);
-
-  this->Disconnect();
 }
 
 }  // namespace arrow::flight::sql::odbc

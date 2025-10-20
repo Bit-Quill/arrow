@@ -25,6 +25,29 @@
 #include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
+
+template <typename T>
+class ColumnsTest : public T {
+ public:
+  using List = std::list<T>;
+};
+
+class ColumnsMockTest : public FlightSQLODBCMockTestBase {};
+class ColumnsRemoteTest : public FlightSQLODBCRemoteTestBase {};
+using TestTypes = ::testing::Types<ColumnsMockTest, ColumnsRemoteTest>;
+TYPED_TEST_SUITE(ColumnsTest, TestTypes);
+
+template <typename T>
+class ColumnsOdbcV2Test : public T {
+ public:
+  using List = std::list<T>;
+};
+
+class ColumnsOdbcV2MockTest : public FlightSQLOdbcV2MockTestBase {};
+class ColumnsOdbcV2RemoteTest : public FlightSQLOdbcV2RemoteTestBase {};
+using TestTypesOdbcV2 = ::testing::Types<ColumnsOdbcV2MockTest, ColumnsOdbcV2RemoteTest>;
+TYPED_TEST_SUITE(ColumnsOdbcV2Test, TestTypesOdbcV2);
+
 // Helper functions
 void checkSQLColumns(
     SQLHSTMT stmt, const std::wstring& expected_table,
@@ -357,9 +380,7 @@ void CheckSQLColAttributesNumeric(SQLHSTMT stmt, const std::wstring& wsql,
   ASSERT_EQ(expected_attr_numeric, num_val);
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsTestInputData) {
-  this->Connect();
-
+TYPED_TEST(ColumnsTest, SQLColumnsTestInputData) {
   SQLWCHAR catalog_name[] = L"";
   SQLWCHAR schema_name[] = L"";
   SQLWCHAR table_name[] = L"";
@@ -388,13 +409,10 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsTestInputData) {
   // All values and sizes are nulls
   EXPECT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, 0, 0, 0, 0, 0, 0, 0, 0));
   ValidateFetch(this->stmt, SQL_SUCCESS);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
+TEST_F(ColumnsMockTest, TestSQLColumnsAllColumns) {
   // Check table pattern and column pattern returns all columns
-  this->Connect();
 
   // Attempt to get all columns
   SQLWCHAR table_pattern[] = L"%";
@@ -548,17 +566,14 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllColumns) {
                       8,                      // expected_octet_char_length
                       4,                      // expected_ordinal_position
                       std::wstring(L"YES"));  // expected_is_nullable
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
+TEST_F(ColumnsMockTest, TestSQLColumnsAllTypes) {
   // Limitation: Mock server returns incorrect values for column size for some columns.
   // For character and binary type columns, the driver calculates buffer length and char
   // octet length from column size.
 
   // Checks filtering table with table name pattern
-  this->Connect();
   this->CreateTableAllDataType();
 
   // Attempt to get all columns from AllTypesTable
@@ -654,15 +669,12 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsAllTypes) {
 
   // There should be no more column data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsUnicode) {
+TEST_F(ColumnsMockTest, TestSQLColumnsUnicode) {
   // Limitation: Mock server returns incorrect values for column size for some columns.
   // For character and binary type columns, the driver calculates buffer length and char
   // octet length from column size.
-  this->Connect();
   this->CreateUnicodeTable();
 
   // Attempt to get all columns
@@ -695,14 +707,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsUnicode) {
 
   // There should be no more column data
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
+TEST_F(ColumnsRemoteTest, TestSQLColumnsAllTypes) {
   // GH-47159: Return NUM_PREC_RADIX based on whether COLUMN_SIZE contains number of
   // digits or bits
-  this->Connect();
 
   SQLWCHAR table_pattern[] = L"ODBCTest";
   SQLWCHAR column_pattern[] = L"%";
@@ -901,14 +910,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypes) {
 
   // There is no more column
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
+TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColumnsAllTypesODBCVer2) {
   // GH-47159: Return NUM_PREC_RADIX based on whether COLUMN_SIZE contains number of
   // digits or bits
-  this->Connect(SQL_OV_ODBC2);
 
   SQLWCHAR table_pattern[] = L"ODBCTest";
   SQLWCHAR column_pattern[] = L"%";
@@ -1106,14 +1112,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColumnsAllTypesODBCVer2) {
 
   // There is no more column
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnscolumn_pattern) {
+TEST_F(ColumnsMockTest, TestSQLColumnscolumn_pattern) {
   // Checks filtering table with column name pattern.
   // Only check table and column name
-  this->Connect();
 
   SQLWCHAR table_pattern[] = L"%";
   SQLWCHAR column_pattern[] = L"id";
@@ -1163,14 +1166,11 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnscolumn_pattern) {
 
   // There is no more column
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsTablecolumn_pattern) {
+TEST_F(ColumnsMockTest, TestSQLColumnsTablecolumn_pattern) {
   // Checks filtering table with table and column name pattern.
   // Only check table and column name
-  this->Connect();
 
   SQLWCHAR table_pattern[] = L"foreignTable";
   SQLWCHAR column_pattern[] = L"id";
@@ -1200,13 +1200,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsTablecolumn_pattern) {
 
   // There is no more column
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsInvalidtable_pattern) {
-  this->Connect();
-
+TEST_F(ColumnsMockTest, TestSQLColumnsInvalidtable_pattern) {
   SQLWCHAR table_pattern[] = L"non-existent-table";
   SQLWCHAR column_pattern[] = L"%";
 
@@ -1215,13 +1211,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColumnsInvalidtable_pattern) {
 
   // There is no column from filter
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeTestInputData) {
-  this->Connect();
-
+TYPED_TEST(ColumnsTest, SQLColAttributeTestInputData) {
   std::wstring wsql = L"SELECT 1 as col1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -1249,13 +1241,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeTestInputData) {
             SQLColAttribute(this->stmt, idx, SQL_COLUMN_TABLE_NAME, 0, 0, 0, 0));
 
   EXPECT_EQ(SQL_SUCCESS, SQLColAttribute(this->stmt, idx, SQL_DESC_COUNT, 0, 0, 0, 0));
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeGetCharacterLen) {
-  this->Connect();
-
+TYPED_TEST(ColumnsTest, SQLColAttributeGetCharacterLen) {
   std::wstring wsql = L"SELECT 1 as col1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -1270,13 +1258,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeGetCharacterLen) {
   ASSERT_EQ(SQL_SUCCESS, SQLColAttribute(this->stmt, 1, SQL_DESC_BASE_COLUMN_NAME, 0, 0,
                                          &character_attr_len, 0));
   EXPECT_EQ(4 * ODBC::GetSqlWCharSize(), character_attr_len);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeInvalidFieldId) {
-  this->Connect();
-
+TYPED_TEST(ColumnsTest, SQLColAttributeInvalidFieldId) {
   std::wstring wsql = L"SELECT 1 as col1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -1296,13 +1280,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeInvalidFieldId) {
                             (SQLSMALLINT)character_attr.size(), &character_attr_len, 0));
   // Verify invalid descriptor field identifier error state is returned
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY091);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeInvalidColId) {
-  this->Connect();
-
+TYPED_TEST(ColumnsTest, SQLColAttributeInvalidColId) {
   std::wstring wsql = L"SELECT 1 as col1;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -1321,12 +1301,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColAttributeInvalidColId) {
                             &character_attr_len, 0));
   // Verify invalid descriptor index error state is returned
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeAllTypes) {
-  this->Connect();
+TEST_F(ColumnsMockTest, TestSQLColAttributeAllTypes) {
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
@@ -1404,13 +1381,10 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeAllTypes) {
                        8,                            // expected_octet_length
                        SQL_PRED_NONE,                // expected_searchable
                        SQL_FALSE);                   // expected_unsigned_column
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesAllTypesODBCVer2) {
+TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesAllTypesODBCVer2) {
   // Tests ODBC 2.0 API SQLColAttributes
-  this->Connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
@@ -1467,13 +1441,10 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         SQL_NULLABLE,                 // expected_column_nullability
                         SQL_PRED_NONE,                // expected_searchable
                         SQL_FALSE);                   // expected_unsigned_column
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
+TEST_F(ColumnsRemoteTest, TestSQLColAttributeAllTypes) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
-  this->Connect();
 
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -1635,14 +1606,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypes) {
                        16,                              // expected_octet_length
                        SQL_SEARCHABLE,                  // expected_searchable
                        SQL_TRUE);                       // expected_unsigned_column
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
+TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributeAllTypesODBCVer2) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
-  this->Connect(SQL_OV_ODBC2);
-
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -1803,15 +1770,11 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeAllTypesODBCVer2) {
                        16,                              // expected_octet_length
                        SQL_SEARCHABLE,                  // expected_searchable
                        SQL_TRUE);                       // expected_unsigned_column
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
+TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesAllTypesODBCVer2) {
   // Tests ODBC 2.0 API SQLColAttributes
   // Test assumes there is a table $scratch.ODBCTest in remote server
-  this->Connect(SQL_OV_ODBC2);
-
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
@@ -1927,13 +1890,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesAllTypesODBCVer2) {
                         SQL_NULLABLE,                    // expected_column_nullability
                         SQL_SEARCHABLE,                  // expected_searchable
                         SQL_TRUE);                       // expected_unsigned_column
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeCaseSensitive) {
+TYPED_TEST(ColumnsTest, TestSQLColAttributeCaseSensitive) {
   // Arrow limitation: returns SQL_FALSE for case sensitive column
-  this->Connect();
 
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Int column
@@ -1941,14 +1901,11 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeCaseSensitive) {
   SQLFreeStmt(this->stmt, SQL_CLOSE);
   // Varchar column
   CheckSQLColAttributeNumeric(this->stmt, wsql, 28, SQL_DESC_CASE_SENSITIVE, SQL_FALSE);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributesCaseSensitive) {
+TYPED_TEST(ColumnsOdbcV2Test, TestSQLColAttributesCaseSensitive) {
   // Arrow limitation: returns SQL_FALSE for case sensitive column
   // Tests ODBC 2.0 API SQLColAttributes
-  this->Connect(SQL_OV_ODBC2);
 
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Int column
@@ -1957,202 +1914,146 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributesCaseSensitive) {
   // Varchar column
   CheckSQLColAttributesNumeric(this->stmt, wsql, 28, SQL_COLUMN_CASE_SENSITIVE,
                                SQL_FALSE);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeUniqueValue) {
+TEST_F(ColumnsMockTest, TestSQLColAttributeUniqueValue) {
   // Mock server limitation: returns false for auto-increment column
-  this->Connect();
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   CheckSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_AUTO_UNIQUE_VALUE, SQL_FALSE);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesAutoIncrement) {
+TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesAutoIncrement) {
   // Tests ODBC 2.0 API SQLColAttributes
   // Mock server limitation: returns false for auto-increment column
-  this->Connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   CheckSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_COLUMN_AUTO_INCREMENT, SQL_FALSE);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeBasetable_name) {
-  this->Connect();
+TEST_F(ColumnsMockTest, TestSQLColAttributeBasetable_name) {
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_BASE_TABLE_NAME,
                              std::wstring(L"AllTypesTable"));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributestable_name) {
+TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributestable_name) {
   // Tests ODBC 2.0 API SQLColAttributes
-  this->Connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   CheckSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TABLE_NAME,
                               std::wstring(L"AllTypesTable"));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributecatalog_name) {
+TEST_F(ColumnsMockTest, TestSQLColAttributecatalog_name) {
   // Mock server limitattion: mock doesn't return catalog for result metadata,
   // and the defautl catalog should be 'main'
-  this->Connect();
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_CATALOG_NAME,
                              std::wstring(L""));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributecatalog_name) {
+TEST_F(ColumnsRemoteTest, TestSQLColAttributecatalog_name) {
   // Remote server does not have catalogs
-  this->Connect();
 
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_CATALOG_NAME,
                              std::wstring(L""));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesQualifierName) {
+TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesQualifierName) {
   // Mock server limitattion: mock doesn't return catalog for result metadata,
   // and the defautl catalog should be 'main'
   // Tests ODBC 2.0 API SQLColAttributes
-  this->Connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_COLUMN_QUALIFIER_NAME,
                              std::wstring(L""));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesQualifierName) {
+TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesQualifierName) {
   // Remote server does not have catalogs
   // Tests ODBC 2.0 API SQLColAttributes
-  this->Connect(SQL_OV_ODBC2);
-
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_COLUMN_QUALIFIER_NAME,
                              std::wstring(L""));
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeCount) {
-  this->Connect();
-
+TYPED_TEST(ColumnsTest, TestSQLColAttributeCount) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Pass 0 as column number, driver should ignore it
   CheckSQLColAttributeNumeric(this->stmt, wsql, 0, SQL_DESC_COUNT, 32);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeLocalTypeName) {
-  this->Connect();
-
+TEST_F(ColumnsMockTest, TestSQLColAttributeLocalTypeName) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Mock server doesn't have local type name
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_LOCAL_TYPE_NAME,
                              std::wstring(L""));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeLocalTypeName) {
-  this->Connect();
-
+TEST_F(ColumnsRemoteTest, TestSQLColAttributeLocalTypeName) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_LOCAL_TYPE_NAME,
                              std::wstring(L"INTEGER"));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeschema_name) {
-  this->Connect();
+TEST_F(ColumnsMockTest, TestSQLColAttributeschema_name) {
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   // Mock server doesn't have schemas
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_SCHEMA_NAME,
                              std::wstring(L""));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeschema_name) {
+TEST_F(ColumnsRemoteTest, TestSQLColAttributeschema_name) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
-  this->Connect();
 
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   // Remote server limitation: doesn't return schema name, expected schema name is
   // $scratch
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_SCHEMA_NAME,
                              std::wstring(L""));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesOwnerName) {
+TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesOwnerName) {
   // Tests ODBC 2.0 API SQLColAttributes
-  this->Connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   // Mock server doesn't have schemas
   CheckSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_OWNER_NAME,
                               std::wstring(L""));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesOwnerName) {
+TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesOwnerName) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
   // Tests ODBC 2.0 API SQLColAttributes
-  this->Connect(SQL_OV_ODBC2);
-
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   // Remote server limitation: doesn't return schema name, expected schema name is
   // $scratch
   CheckSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_OWNER_NAME,
                               std::wstring(L""));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributetable_name) {
-  this->Connect();
+TEST_F(ColumnsMockTest, TestSQLColAttributetable_name) {
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TABLE_NAME,
                              std::wstring(L"AllTypesTable"));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeTypeName) {
-  this->Connect();
+TEST_F(ColumnsMockTest, TestSQLColAttributeTypeName) {
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
@@ -2164,13 +2065,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributeTypeName) {
                              std::wstring(L"BINARY"));
   CheckSQLColAttributeString(this->stmt, L"", 4, SQL_DESC_TYPE_NAME,
                              std::wstring(L"DOUBLE"));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeTypeName) {
-  this->Connect();
-
+TEST_F(ColumnsRemoteTest, TestSQLColAttributeTypeName) {
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   CheckSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TYPE_NAME,
                              std::wstring(L"INTEGER"));
@@ -2190,13 +2087,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributeTypeName) {
                              std::wstring(L"TIME"));
   CheckSQLColAttributeString(this->stmt, L"", 9, SQL_DESC_TYPE_NAME,
                              std::wstring(L"TIMESTAMP"));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesTypeName) {
+TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesTypeName) {
   // Tests ODBC 2.0 API SQLColAttributes
-  this->Connect(SQL_OV_ODBC2);
   this->CreateTableAllDataType();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
@@ -2209,14 +2103,10 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLColAttributesTypeName) {
                               std::wstring(L"BINARY"));
   CheckSQLColAttributesString(this->stmt, L"", 4, SQL_COLUMN_TYPE_NAME,
                               std::wstring(L"DOUBLE"));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesTypeName) {
+TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesTypeName) {
   // Tests ODBC 2.0 API SQLColAttributes
-  this->Connect(SQL_OV_ODBC2);
-
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   CheckSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TYPE_NAME,
                               std::wstring(L"INTEGER"));
@@ -2236,44 +2126,29 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLColAttributesTypeName) {
                               std::wstring(L"TIME"));
   CheckSQLColAttributesString(this->stmt, L"", 9, SQL_COLUMN_TYPE_NAME,
                               std::wstring(L"TIMESTAMP"));
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeUnnamed) {
-  this->Connect();
-
+TYPED_TEST(ColumnsTest, TestSQLColAttributeUnnamed) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   CheckSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_UNNAMED, SQL_NAMED);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributeUpdatable) {
-  this->Connect();
-
+TYPED_TEST(ColumnsTest, TestSQLColAttributeUpdatable) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Mock server and remote server do not return updatable information
   CheckSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_UPDATABLE,
                               SQL_ATTR_READWRITE_UNKNOWN);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLColAttributesUpdatable) {
+TYPED_TEST(ColumnsOdbcV2Test, TestSQLColAttributesUpdatable) {
   // Tests ODBC 2.0 API SQLColAttributes
-  this->Connect(SQL_OV_ODBC2);
-
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Mock server and remote server do not return updatable information
   CheckSQLColAttributesNumeric(this->stmt, wsql, 1, SQL_COLUMN_UPDATABLE,
                                SQL_ATTR_READWRITE_UNKNOWN);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColValidateInput) {
-  this->Connect();
+TEST_F(ColumnsMockTest, SQLDescribeColValidateInput) {
   this->CreateTestTables();
 
   SQLWCHAR sql_query[] = L"SELECT * FROM TestTable LIMIT 1;";
@@ -2312,14 +2187,11 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColValidateInput) {
                                       buf_char_len, &name_length, &data_type,
                                       &column_size, &decimal_digits, &nullable));
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_07009);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
+TEST_F(ColumnsMockTest, SQLDescribeColQueryAllDataTypesMetadata) {
   // Mock server has a limitation where only SQL_WVARCHAR column type values are returned
   // from SELECT AS queries
-  this->Connect();
 
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
@@ -2385,13 +2257,9 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
     decimal_digits = 0;
     nullable = 0;
   }
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
-  this->Connect();
-
+TEST_F(ColumnsRemoteTest, SQLDescribeColQueryAllDataTypesMetadata) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
       static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
@@ -2463,13 +2331,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColQueryAllDataTypesMetadata) {
     decimal_digits = 0;
     nullable = 0;
   }
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadata) {
+TEST_F(ColumnsRemoteTest, SQLDescribeColODBCTestTableMetadata) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
-  this->Connect();
 
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
@@ -2521,14 +2386,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadata) {
     decimal_digits = 0;
     nullable = 0;
   }
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataODBC2) {
+TEST_F(ColumnsOdbcV2RemoteTest, SQLDescribeColODBCTestTableMetadataODBC2) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
-  this->Connect(SQL_OV_ODBC2);
-
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
       static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
@@ -2579,12 +2440,9 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLDescribeColODBCTestTableMetadataODBC2) {
     decimal_digits = 0;
     nullable = 0;
   }
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColAllTypesTableMetadata) {
-  this->Connect();
+TEST_F(ColumnsMockTest, SQLDescribeColAllTypesTableMetadata) {
   this->CreateTableAllDataType();
 
   SQLWCHAR column_name[1024];
@@ -2631,12 +2489,9 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColAllTypesTableMetadata) {
     decimal_digits = 0;
     nullable = 0;
   }
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColUnicodeTableMetadata) {
-  this->Connect();
+TEST_F(ColumnsMockTest, SQLDescribeColUnicodeTableMetadata) {
   this->CreateUnicodeTable();
 
   SQLWCHAR column_name[1024];
@@ -2672,13 +2527,9 @@ TEST_F(FlightSQLODBCMockTestBase, SQLDescribeColUnicodeTableMetadata) {
   EXPECT_EQ(column_size, expected_column_size);
   EXPECT_EQ(0, decimal_digits);
   EXPECT_EQ(SQL_NULLABLE, nullable);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsGetMetadataBySQLDescribeCol) {
-  this->Connect();
-
+TYPED_TEST(ColumnsTest, SQLColumnsGetMetadataBySQLDescribeCol) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
       static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
@@ -2731,13 +2582,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsGetMetadataBySQLDescribeCol) {
     decimal_digits = 0;
     nullable = 0;
   }
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsGetMetadataBySQLDescribeColODBC2) {
-  this->Connect(SQL_OV_ODBC2);
-
+TYPED_TEST(ColumnsOdbcV2Test, SQLColumnsGetMetadataBySQLDescribeColODBC2) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
       static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
@@ -2798,7 +2645,5 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLColumnsGetMetadataBySQLDescribeColODBC2) {
     decimal_digits = 0;
     nullable = 0;
   }
-
-  this->Disconnect();
 }
 }  // namespace arrow::flight::sql::odbc

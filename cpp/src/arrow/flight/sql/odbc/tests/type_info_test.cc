@@ -28,6 +28,18 @@ namespace arrow::flight::sql::odbc {
 
 using std::optional;
 
+template <typename T>
+class TypeInfoTest : public T {
+ public:
+  using List = std::list<T>;
+};
+
+class TypeInfoMockTest : public FlightSQLODBCMockTestBase {};
+using TestTypes = ::testing::Types<TypeInfoMockTest, FlightSQLODBCRemoteTestBase>;
+TYPED_TEST_SUITE(TypeInfoTest, TestTypes);
+
+class TypeInfoOdbcV2MockTest : public FlightSQLOdbcV2MockTestBase {};
+
 void CheckSQLDescribeCol(SQLHSTMT stmt, const SQLUSMALLINT column_index,
                          const std::wstring& expected_name,
                          const SQLSMALLINT& expected_data_type,
@@ -184,9 +196,7 @@ void CheckSQLGetTypeInfo(
   CheckIntColumn(stmt, 19, expected_interval_prec);           // interval prec
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoAllTypes) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_ALL_TYPES));
 
   // Check bit data type
@@ -634,13 +644,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypes) {
                       NULL);                       // expected_interval_prec
 
   CheckSQLDescribeColODBC3(this->stmt);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
-  this->Connect(SQL_OV_ODBC2);
-
+TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoAllTypesODBCVer2) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_ALL_TYPES));
 
   // Check bit data type
@@ -1088,13 +1094,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoAllTypesODBCVer2) {
                       NULL);  // expected_interval_prec
 
   CheckSQLDescribeColODBC2(this->stmt);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBit) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoBit) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_BIT));
 
   // Check bit data type
@@ -1125,13 +1127,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBit) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTinyInt) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoTinyInt) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_TINYINT));
 
   // Check tinyint data type
@@ -1162,13 +1160,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTinyInt) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBigInt) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoBigInt) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_BIGINT));
 
   // Check bigint data type
@@ -1199,13 +1193,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoBigInt) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarbinary) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoLongVarbinary) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_LONGVARBINARY));
 
   // Check longvarbinary data type
@@ -1236,13 +1226,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarbinary) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarbinary) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoVarbinary) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_VARBINARY));
 
   // Check varbinary data type
@@ -1271,13 +1257,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarbinary) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarchar) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoLongVarchar) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_WLONGVARCHAR));
 
   // Check text data type
@@ -1335,13 +1317,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoLongVarchar) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoChar) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoChar) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_WCHAR));
 
   // Check char data type
@@ -1373,13 +1351,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoChar) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoInteger) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoInteger) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_INTEGER));
 
   // Check integer data type
@@ -1410,13 +1384,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoInteger) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSmallInt) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoSmallInt) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_SMALLINT));
 
   // Check smallint data type
@@ -1447,13 +1417,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSmallInt) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoFloat) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoFloat) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_FLOAT));
 
   // Check float data type
@@ -1484,13 +1450,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoFloat) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDouble) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoDouble) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_DOUBLE));
 
   // Check double data type
@@ -1548,13 +1510,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDouble) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarchar) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoVarchar) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_WVARCHAR));
 
   // Check varchar data type
@@ -1586,13 +1544,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoVarchar) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDate) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoSQLTypeDate) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_TYPE_DATE));
 
   // Check date data type
@@ -1623,13 +1577,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDate) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLDate) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoSQLDate) {
   // Pass ODBC Ver 2 data type
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_DATE));
 
@@ -1661,13 +1611,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLDate) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDateODBCVer2) {
-  this->Connect(SQL_OV_ODBC2);
-
+TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoDateODBCVer2) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_DATE));
 
   // Check date data type
@@ -1698,25 +1644,17 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoDateODBCVer2) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeDateODBCVer2) {
-  this->Connect(SQL_OV_ODBC2);
-
+TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTypeDateODBCVer2) {
   // Pass ODBC Ver 3 data type
   ASSERT_EQ(SQL_ERROR, SQLGetTypeInfo(this->stmt, SQL_TYPE_DATE));
 
   // Driver manager returns SQL data type out of range error state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1004);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTime) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoSQLTypeTime) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_TYPE_TIME));
 
   // Check time data type
@@ -1747,13 +1685,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTime) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTime) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoSQLTime) {
   // Pass ODBC Ver 2 data type
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_TIME));
 
@@ -1785,13 +1719,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTime) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimeODBCVer2) {
-  this->Connect(SQL_OV_ODBC2);
-
+TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoTimeODBCVer2) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_TIME));
 
   // Check time data type
@@ -1822,25 +1752,17 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoTimeODBCVer2) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimeODBCVer2) {
-  this->Connect(SQL_OV_ODBC2);
-
+TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTypeTimeODBCVer2) {
   // Pass ODBC Ver 3 data type
   ASSERT_EQ(SQL_ERROR, SQLGetTypeInfo(this->stmt, SQL_TYPE_TIME));
 
   // Driver manager returns SQL data type out of range error state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1004);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestamp) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoSQLTypeTimestamp) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_TYPE_TIMESTAMP));
 
   // Check timestamp data type
@@ -1871,13 +1793,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestamp) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestamp) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoSQLTimestamp) {
   // Pass ODBC Ver 2 data type
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_TIMESTAMP));
 
@@ -1909,13 +1827,9 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestamp) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampODBCVer2) {
-  this->Connect(SQL_OV_ODBC2);
-
+TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTimestampODBCVer2) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_TIMESTAMP));
 
   // Check timestamp data type
@@ -1946,42 +1860,29 @@ TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTimestampODBCVer2) {
 
   // No more data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoSQLTypeTimestampODBCVer2) {
-  this->Connect(SQL_OV_ODBC2);
-
+TEST_F(TypeInfoOdbcV2MockTest, TestSQLGetTypeInfoSQLTypeTimestampODBCVer2) {
   // Pass ODBC Ver 3 data type
   ASSERT_EQ(SQL_ERROR, SQLGetTypeInfo(this->stmt, SQL_TYPE_TIMESTAMP));
 
   // Driver manager returns SQL data type out of range error state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_S1004);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, TestSQLGetTypeInfoInvalidDataType) {
-  this->Connect();
-
+TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoInvalidDataType) {
   SQLSMALLINT invalid_data_type = -114;
   ASSERT_EQ(SQL_ERROR, SQLGetTypeInfo(this->stmt, invalid_data_type));
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, error_state_HY004);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetTypeInfoUnsupportedDataType) {
+TYPED_TEST(TypeInfoTest, TestSQLGetTypeInfoUnsupportedDataType) {
   // Assumes mock and remote server don't support GUID data type
-  this->Connect();
 
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_GUID));
 
   // Result set is empty with valid data type that is unsupported by the server
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-
-  this->Disconnect();
 }
 
 }  // namespace arrow::flight::sql::odbc

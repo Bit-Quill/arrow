@@ -25,6 +25,17 @@
 #include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
+
+template <typename T>
+class ConnectionTest : public T {
+ public:
+  using List = std::list<T>;
+};
+
+class ConnectionRemoteTest : public FlightSQLODBCRemoteTestBase {};
+using TestTypes = ::testing::Types<FlightSQLODBCMockTestBase, ConnectionRemoteTest>;
+TYPED_TEST_SUITE(ConnectionTest, TestTypes);
+
 TEST(SQLAllocHandle, TestSQLAllocHandleEnv) {
   SQLHENV env;
 
@@ -93,16 +104,20 @@ TEST(SQLFreeHandle, TestSQLFreeHandleConnect) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_DBC, conn));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestFreeNullHandles) {
+TEST(SQLFreeHandle, TestFreeNullHandles) {
+  SQLHENV env = NULL;
+  SQLHDBC conn = NULL;
+  SQLHSTMT stmt = NULL;
+
   // Verifies attempt to free invalid handle does not cause segfault
   // Attempt to free null statement handle
-  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_STMT, this->stmt));
+  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_STMT, stmt));
 
   // Attempt to free null connection handle
-  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_DBC, this->conn));
+  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_DBC, conn));
 
   // Attempt to free null environment handle
-  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_ENV, this->env));
+  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
 TEST(SQLFreeConnect, TestSQLFreeConnect) {
@@ -154,42 +169,30 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
             SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, reinterpret_cast<void*>(1), 0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLGetEnvAttrOutputNTS) {
-  this->Connect();
-
+TYPED_TEST(ConnectionTest, TestSQLGetEnvAttrOutputNTS) {
   SQLINTEGER output_nts;
 
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetEnvAttr(this->env, SQL_ATTR_OUTPUT_NTS, &output_nts, 0, 0));
 
   ASSERT_EQ(SQL_TRUE, output_nts);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetEnvAttrGetLength) {
+TYPED_TEST(ConnectionTest, DISABLED_TestSQLGetEnvAttrGetLength) {
   // Test is disabled because call to SQLGetEnvAttr is handled by the driver manager on
   // Windows. This test case can be potentially used on macOS/Linux
-  this->Connect();
-
   SQLINTEGER length;
   ASSERT_EQ(SQL_SUCCESS,
             SQLGetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION, nullptr, 0, &length));
 
   EXPECT_EQ(sizeof(SQLINTEGER), length);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, DISABLED_TestSQLGetEnvAttrNullValuePointer) {
+TYPED_TEST(ConnectionTest, DISABLED_TestSQLGetEnvAttrNullValuePointer) {
   // Test is disabled because call to SQLGetEnvAttr is handled by the driver manager on
   // Windows. This test case can be potentially used on macOS/Linux
-  this->Connect();
-
   ASSERT_EQ(SQL_ERROR,
             SQLGetEnvAttr(this->env, SQL_ATTR_ODBC_VERSION, nullptr, 0, nullptr));
-
-  this->Disconnect();
 }
 
 TEST(SQLSetEnvAttr, TestSQLSetEnvAttrOutputNTSValid) {
@@ -224,7 +227,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
   ASSERT_EQ(SQL_ERROR, SQLSetEnvAttr(env, SQL_ATTR_ODBC_VERSION, nullptr, 0));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
+TYPED_TEST(ConnectionTest, TestSQLDriverConnect) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -283,7 +286,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnect) {
 }
 
 #if defined _WIN32 || defined _WIN64
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnectDsn) {
+TYPED_TEST(ConnectionTest, TestSQLDriverConnectDsn) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -346,7 +349,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLDriverConnectDsn) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
+TYPED_TEST(ConnectionTest, TestSQLConnect) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -405,7 +408,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLConnect) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
+TEST_F(ConnectionRemoteTest, TestSQLConnectInputUidPwd) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -473,7 +476,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
+TEST_F(ConnectionRemoteTest, TestSQLConnectInvalidUid) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -530,7 +533,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectInvalidUid) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
+TEST_F(ConnectionRemoteTest, TestSQLConnectDSNPrecedence) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -594,7 +597,7 @@ TEST_F(FlightSQLODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
 
 #endif
 
-TEST_F(FlightSQLODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
+TEST_F(ConnectionRemoteTest, TestSQLDriverConnectInvalidUid) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -661,14 +664,11 @@ TEST(SQLDisconnect, TestSQLDisconnectWithoutConnection) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestConnect) {
+TYPED_TEST(ConnectionTest, TestConnect) {
   // Verifies connect and disconnect works on its own
-  this->Connect();
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
-  this->Connect();
+TYPED_TEST(ConnectionTest, TestSQLAllocFreeStmt) {
   SQLHSTMT statement;
 
   // Allocate a statement using alloc statement
@@ -682,11 +682,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeStmt) {
 
   // Free statement handle
   ASSERT_EQ(SQL_SUCCESS, SQLFreeStmt(statement, SQL_DROP));
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
+TYPED_TEST(ConnectionTest, TestCloseConnectionWithOpenStatement) {
   SQLHENV env;
   SQLHDBC conn;
   SQLHSTMT statement;
@@ -728,8 +726,7 @@ TYPED_TEST(FlightSQLODBCTestBase, TestCloseConnectionWithOpenStatement) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeDesc) {
-  this->Connect();
+TYPED_TEST(ConnectionTest, TestSQLAllocFreeDesc) {
   SQLHDESC descriptor;
 
   // Allocate a descriptor using alloc handle
@@ -737,13 +734,9 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLAllocFreeDesc) {
 
   // Free descriptor handle
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_DESC, descriptor));
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrDescriptor) {
-  this->Connect();
-
+TYPED_TEST(ConnectionTest, TestSQLSetStmtAttrDescriptor) {
   SQLHDESC apd_descriptor, ard_descriptor;
 
   // Allocate an APD descriptor using alloc handle
@@ -798,8 +791,6 @@ TYPED_TEST(FlightSQLODBCTestBase, TestSQLSetStmtAttrDescriptor) {
             SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_ROW_DESC, &value, sizeof(value), 0));
 
   EXPECT_EQ(internal_ard, value);
-
-  this->Disconnect();
 }
 
 }  // namespace arrow::flight::sql::odbc

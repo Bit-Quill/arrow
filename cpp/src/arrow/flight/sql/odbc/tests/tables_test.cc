@@ -26,6 +26,27 @@
 
 namespace arrow::flight::sql::odbc {
 
+template <typename T>
+class TablesTest : public T {
+ public:
+  using List = std::list<T>;
+};
+
+class TablesMockTest : public FlightSQLODBCMockTestBase {};
+class TablesRemoteTest : public FlightSQLODBCRemoteTestBase {};
+using TestTypes = ::testing::Types<TablesMockTest, TablesRemoteTest>;
+TYPED_TEST_SUITE(TablesTest, TestTypes);
+
+template <typename T>
+class TablesOdbcV2Test : public T {
+ public:
+  using List = std::list<T>;
+};
+
+using TestTypesOdbcV2 =
+    ::testing::Types<FlightSQLOdbcV2MockTestBase, FlightSQLOdbcV2RemoteTestBase>;
+TYPED_TEST_SUITE(TablesOdbcV2Test, TestTypesOdbcV2);
+
 // Helper Functions
 
 std::wstring GetStringColumnW(SQLHSTMT stmt, int colId) {
@@ -46,9 +67,7 @@ std::wstring GetStringColumnW(SQLHSTMT stmt, int colId) {
 
 // Test Cases
 
-TYPED_TEST(FlightSQLODBCTestBase, SQLTablesTestInputData) {
-  this->Connect();
-
+TYPED_TEST(TablesTest, SQLTablesTestInputData) {
   SQLWCHAR catalog_name[] = L"";
   SQLWCHAR schema_name[] = L"";
   SQLWCHAR table_name[] = L"";
@@ -80,13 +99,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesTestInputData) {
   EXPECT_EQ(SQL_SUCCESS, SQLTables(this->stmt, 0, 0, 0, 0, 0, 0, 0, 0));
 
   ValidateFetch(this->stmt, SQL_SUCCESS);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForAllCatalogs) {
-  this->Connect();
-
+TEST_F(TablesMockTest, SQLTablesTestGetMetadataForAllCatalogs) {
   SQLWCHAR empty[] = L"";
   SQLWCHAR SQL_ALL_CATALOGS_W[] = L"%";
   std::wstring expected_catalog_name = std::wstring(L"main");
@@ -104,12 +119,9 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForAllCatalogs) {
   CheckNullColumnW(this->stmt, 5);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForNamedCatalog) {
-  this->Connect();
+TEST_F(TablesMockTest, SQLTablesTestGetMetadataForNamedCatalog) {
   this->CreateTestTables();
 
   SQLWCHAR catalog_name[] = L"main";
@@ -135,13 +147,9 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForNamedCatalog) {
   }
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetSchemaHasNoData) {
-  this->Connect();
-
+TEST_F(TablesMockTest, SQLTablesTestGetSchemaHasNoData) {
   SQLWCHAR SQL_ALL_SCHEMAS_W[] = L"%";
 
   // Validate that no schema data is available for Mock server
@@ -149,13 +157,9 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetSchemaHasNoData) {
                                    SQL_NTS, nullptr, SQL_NTS, nullptr, SQL_NTS));
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestGetMetadataForAllSchemas) {
-  this->Connect();
-
+TEST_F(TablesRemoteTest, SQLTablesTestGetMetadataForAllSchemas) {
   SQLWCHAR empty[] = L"";
   SQLWCHAR SQL_ALL_SCHEMAS_W[] = L"%";
   std::set<std::wstring> actual_schemas;
@@ -185,14 +189,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestGetMetadataForAllSchemas) {
   }
 
   EXPECT_EQ(actual_schemas, expected_schemas);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestFilterByAllSchema) {
+TEST_F(TablesRemoteTest, SQLTablesTestFilterByAllSchema) {
   // Requires creation of user table named ODBCTest using schema $scratch in remote server
-  this->Connect();
-
   SQLWCHAR SQL_ALL_SCHEMAS_W[] = L"%";
   SQLWCHAR* schema_names[] = {(SQLWCHAR*)L"INFORMATION_SCHEMA",
                               (SQLWCHAR*)L"INFORMATION_SCHEMA",
@@ -249,14 +249,10 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesTestFilterByAllSchema) {
   }
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForNamedSchema) {
+TEST_F(TablesRemoteTest, SQLTablesGetMetadataForNamedSchema) {
   // Requires creation of user table named ODBCTest using schema $scratch in remote server
-  this->Connect();
-
   SQLWCHAR schema_name[] = L"$scratch";
   std::wstring expected_schema_name = std::wstring(schema_name);
   std::wstring expected_table_name = std::wstring(L"ODBCTest");
@@ -274,12 +270,9 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForNamedSchema) {
   CheckNullColumnW(this->stmt, 5);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForAllTables) {
-  this->Connect();
+TEST_F(TablesMockTest, SQLTablesTestGetMetadataForAllTables) {
   this->CreateTestTables();
 
   SQLWCHAR SQL_ALL_TABLES_W[] = L"%";
@@ -305,12 +298,9 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForAllTables) {
   }
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForTableName) {
-  this->Connect();
+TEST_F(TablesMockTest, SQLTablesTestGetMetadataForTableName) {
   this->CreateTestTables();
 
   SQLWCHAR* table_names[] = {(SQLWCHAR*)L"TestTable", (SQLWCHAR*)L"foreignTable",
@@ -334,12 +324,9 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForTableName) {
 
     ValidateFetch(this->stmt, SQL_NO_DATA);
   }
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForUnicodeTableByTableName) {
-  this->Connect();
+TEST_F(TablesMockTest, SQLTablesTestGetMetadataForUnicodeTableByTableName) {
   this->CreateUnicodeTable();
 
   SQLWCHAR unicodetable_name[] = L"数据";
@@ -361,12 +348,9 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForUnicodeTableByTable
   CheckNullColumnW(this->stmt, 5);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForInvalidTableNameNoData) {
-  this->Connect();
+TEST_F(TablesMockTest, SQLTablesTestGetMetadataForInvalidTableNameNoData) {
   this->CreateTestTables();
 
   SQLWCHAR invalid_table_name[] = L"NonExistanttable_name";
@@ -376,13 +360,10 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesTestGetMetadataForInvalidTableNameNoD
                                    invalid_table_name, SQL_NTS, nullptr, SQL_NTS));
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetMetadataForTableType) {
+TEST_F(TablesMockTest, SQLTablesGetMetadataForTableType) {
   // Mock server only supports table type "table" in lowercase
-  this->Connect();
   this->CreateTestTables();
 
   SQLWCHAR table_type_table_lowercase[] = L"table";
@@ -428,14 +409,10 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetMetadataForTableType) {
   }
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForTableTypeTable) {
+TEST_F(TablesRemoteTest, SQLTablesGetMetadataForTableTypeTable) {
   // Requires creation of user table named ODBCTest using schema $scratch in remote server
-  this->Connect();
-
   SQLWCHAR* type_list[] = {(SQLWCHAR*)L"TABLE", (SQLWCHAR*)L"TABLE,VIEW"};
   std::wstring expected_schema_name = std::wstring(L"$scratch");
   std::wstring expected_table_name = std::wstring(L"ODBCTest");
@@ -455,13 +432,9 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForTableTypeTable) {
 
     ValidateFetch(this->stmt, SQL_NO_DATA);
   }
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForTableTypeViewHasNoData) {
-  this->Connect();
-
+TEST_F(TablesRemoteTest, SQLTablesGetMetadataForTableTypeViewHasNoData) {
   SQLWCHAR empty[] = L"";
   SQLWCHAR type_view[] = L"VIEW";
 
@@ -474,13 +447,9 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetMetadataForTableTypeViewHasNoDat
                                    nullptr, SQL_NTS, type_view, SQL_NTS));
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetSupportedTableTypes) {
-  this->Connect();
-
+TEST_F(TablesMockTest, SQLTablesGetSupportedTableTypes) {
   SQLWCHAR empty[] = L"";
   SQLWCHAR SQL_ALL_TABLE_TYPES_W[] = L"%";
   std::wstring expected_table_type = std::wstring(L"table");
@@ -498,13 +467,9 @@ TEST_F(FlightSQLODBCMockTestBase, SQLTablesGetSupportedTableTypes) {
   CheckNullColumnW(this->stmt, 5);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetSupportedTableTypes) {
-  this->Connect();
-
+TEST_F(TablesRemoteTest, SQLTablesGetSupportedTableTypes) {
   SQLWCHAR empty[] = L"";
   SQLWCHAR SQL_ALL_TABLE_TYPES_W[] = L"%";
   SQLWCHAR* type_lists[] = {(SQLWCHAR*)L"TABLE", (SQLWCHAR*)L"SYSTEM_TABLE",
@@ -524,13 +489,9 @@ TEST_F(FlightSQLODBCRemoteTestBase, SQLTablesGetSupportedTableTypes) {
   }
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeCol) {
-  this->Connect();
-
+TYPED_TEST(TablesTest, SQLTablesGetMetadataBySQLDescribeCol) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
       static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
@@ -573,13 +534,9 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeCol) {
     decimal_digits = 0;
     nullable = 0;
   }
-
-  this->Disconnect();
 }
 
-TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeColODBC2) {
-  this->Connect(SQL_OV_ODBC2);
-
+TYPED_TEST(TablesOdbcV2Test, SQLTablesGetMetadataBySQLDescribeColODBC2) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
       static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
@@ -622,7 +579,5 @@ TYPED_TEST(FlightSQLODBCTestBase, SQLTablesGetMetadataBySQLDescribeColODBC2) {
     decimal_digits = 0;
     nullable = 0;
   }
-
-  this->Disconnect();
 }
 }  // namespace arrow::flight::sql::odbc
