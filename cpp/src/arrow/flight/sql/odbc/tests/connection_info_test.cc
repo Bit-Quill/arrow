@@ -164,8 +164,9 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDataSourceName) {
 
 #ifdef SQL_DRIVER_AWARE_POOLING_SUPPORTED
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverAwarePoolingSupported) {
-  // A driver does not need to implement SQL_DRIVER_AWARE_POOLING_SUPPORTED and the
-  // Driver Manager will not honor to the driver's return value.
+  // According to Microsoft documentation, ODBC driver does not need to implement
+  // SQL_DRIVER_AWARE_POOLING_SUPPORTED and the Driver Manager will ignore the
+  // driver's return value for it.
 
   Validate(this->conn, SQL_DRIVER_AWARE_POOLING_SUPPORTED,
            static_cast<SQLUINTEGER>(SQL_DRIVER_AWARE_POOLING_NOT_CAPABLE));
