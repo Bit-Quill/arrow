@@ -316,8 +316,8 @@ bool GetInfoCache::LoadInfoFromServer() {
               std::string server_name(
                   reinterpret_cast<StringScalar*>(scalar->child_value().get())->view());
 
-              // TODO: Consider creating different properties in GetSqlInfo.
-              // TODO: Investigate if SQL_SERVER_NAME should just be the host
+              // GH-47855 TODO: Consider creating different properties in GetSqlInfo.
+              // GH-47856 TODO: Investigate if SQL_SERVER_NAME should just be the host
               // address as well. In JDBC, FLIGHT_SQL_SERVER_NAME is only used for
               // the DatabaseProductName.
               info_[SQL_SERVER_NAME] = server_name;

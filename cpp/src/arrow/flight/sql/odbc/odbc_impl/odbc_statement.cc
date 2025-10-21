@@ -328,7 +328,7 @@ bool ODBCStatement::Fetch(size_t rows, SQLULEN* row_count_ptr,
   }
 
   if (current_ard_->HaveBindingsChanged()) {
-    // TODO: Deal handle when offset != buffer_length.
+    // GH-47871 TODO: handle when offset != buffer_length.
 
     // Wipe out all bindings in the ResultSet.
     // Note that the number of ARD records can both be more or less
@@ -728,7 +728,7 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT record_number, SQLSMALLINT c_type,
 
   SQLSMALLINT evaluated_c_type = c_type;
 
-  // TODO: Get proper default precision and scale from abstraction.
+  // GH-47872 TODO: Get proper default precision and scale from abstraction.
   int precision = 38;  // arrow::Decimal128Type::kMaxPrecision;
   int scale = 0;
 
