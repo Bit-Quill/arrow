@@ -40,6 +40,9 @@ TYPED_TEST_SUITE(TypeInfoTest, TestTypes);
 
 class TypeInfoOdbcV2MockTest : public FlightSQLOdbcV2MockTestBase {};
 
+namespace {
+// Helper Functions
+
 void CheckSQLDescribeCol(SQLHSTMT stmt, const SQLUSMALLINT column_index,
                          const std::wstring& expected_name,
                          const SQLSMALLINT& expected_data_type,
@@ -195,6 +198,7 @@ void CheckSQLGetTypeInfo(
   CheckIntColumn(stmt, 18, expected_num_prec_radix);          // num prec radix
   CheckIntColumn(stmt, 19, expected_interval_prec);           // interval prec
 }
+}  // namespace
 
 TEST_F(TypeInfoMockTest, TestSQLGetTypeInfoAllTypes) {
   ASSERT_EQ(SQL_SUCCESS, SQLGetTypeInfo(this->stmt, SQL_ALL_TYPES));

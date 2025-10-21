@@ -36,6 +36,7 @@ class ConnectionInfoMockTest : public FlightSQLODBCMockTestBase {};
 using TestTypes = ::testing::Types<ConnectionInfoMockTest, FlightSQLODBCRemoteTestBase>;
 TYPED_TEST_SUITE(ConnectionInfoTest, TestTypes);
 
+namespace {
 // Helper Functions
 
 // Validate unsigned short SQLUSMALLINT return value
@@ -122,6 +123,7 @@ void ValidateNotEmptySQLWCHAR(SQLHDBC connection, SQLUSMALLINT info_type,
 
   EXPECT_GT(wcslen(info_value), 0);
 }
+}  // namespace
 
 // Driver Information
 

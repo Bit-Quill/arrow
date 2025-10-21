@@ -47,6 +47,7 @@ using TestTypesOdbcV2 =
     ::testing::Types<FlightSQLOdbcV2MockTestBase, FlightSQLOdbcV2RemoteTestBase>;
 TYPED_TEST_SUITE(TablesOdbcV2Test, TestTypesOdbcV2);
 
+namespace {
 // Helper Functions
 
 std::wstring GetStringColumnW(SQLHSTMT stmt, int colId) {
@@ -64,6 +65,7 @@ std::wstring GetStringColumnW(SQLHSTMT stmt, int colId) {
   size_t char_count = static_cast<size_t>(len_indicator) / ODBC::GetSqlWCharSize();
   return std::wstring(buf, buf + char_count);
 }
+}  // namespace
 
 // Test Cases
 

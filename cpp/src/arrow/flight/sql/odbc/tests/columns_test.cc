@@ -48,6 +48,7 @@ class ColumnsOdbcV2RemoteTest : public FlightSQLOdbcV2RemoteTestBase {};
 using TestTypesOdbcV2 = ::testing::Types<ColumnsOdbcV2MockTest, ColumnsOdbcV2RemoteTest>;
 TYPED_TEST_SUITE(ColumnsOdbcV2Test, TestTypesOdbcV2);
 
+namespace {
 // Helper functions
 void checkSQLColumns(
     SQLHSTMT stmt, const std::wstring& expected_table,
@@ -379,6 +380,7 @@ void CheckSQLColAttributesNumeric(SQLHSTMT stmt, const std::wstring& wsql,
             SQLColAttributes(stmt, idx, field_identifier, 0, 0, 0, &num_val));
   ASSERT_EQ(expected_attr_numeric, num_val);
 }
+}  // namespace
 
 TYPED_TEST(ColumnsTest, SQLColumnsTestInputData) {
   SQLWCHAR catalog_name[] = L"";
