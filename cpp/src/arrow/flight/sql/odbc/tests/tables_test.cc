@@ -127,8 +127,10 @@ TEST_F(TablesMockTest, SQLTablesTestGetMetadataForNamedCatalog) {
   this->CreateTestTables();
 
   SQLWCHAR catalog_name[] = L"main";
-  SQLWCHAR* table_names[] = {(SQLWCHAR*)L"TestTable", (SQLWCHAR*)L"foreignTable",
-                             (SQLWCHAR*)L"intTable", (SQLWCHAR*)L"sqlite_sequence"};
+  const SQLWCHAR* table_names[] = {static_cast<const SQLWCHAR*>(L"TestTable"),
+                                   static_cast<const SQLWCHAR*>(L"foreignTable"),
+                                   static_cast<const SQLWCHAR*>(L"intTable"),
+                                   static_cast<const SQLWCHAR*>(L"sqlite_sequence")};
   std::wstring expected_catalog_name = std::wstring(catalog_name);
   std::wstring expected_table_type = std::wstring(L"table");
 
@@ -196,38 +198,38 @@ TEST_F(TablesRemoteTest, SQLTablesTestGetMetadataForAllSchemas) {
 TEST_F(TablesRemoteTest, SQLTablesTestFilterByAllSchema) {
   // Requires creation of user table named ODBCTest using schema $scratch in remote server
   SQLWCHAR SQL_ALL_SCHEMAS_W[] = L"%";
-  SQLWCHAR* schema_names[] = {(SQLWCHAR*)L"INFORMATION_SCHEMA",
-                              (SQLWCHAR*)L"INFORMATION_SCHEMA",
-                              (SQLWCHAR*)L"INFORMATION_SCHEMA",
-                              (SQLWCHAR*)L"INFORMATION_SCHEMA",
-                              (SQLWCHAR*)L"INFORMATION_SCHEMA",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys",
-                              (SQLWCHAR*)L"sys.cache",
-                              (SQLWCHAR*)L"sys.cache",
-                              (SQLWCHAR*)L"sys.cache",
-                              (SQLWCHAR*)L"sys.cache",
-                              (SQLWCHAR*)L"$scratch"};
+  const SQLWCHAR* schema_names[] = {static_cast<const SQLWCHAR*>(L"INFORMATION_SCHEMA"),
+                                    static_cast<const SQLWCHAR*>(L"INFORMATION_SCHEMA"),
+                                    static_cast<const SQLWCHAR*>(L"INFORMATION_SCHEMA"),
+                                    static_cast<const SQLWCHAR*>(L"INFORMATION_SCHEMA"),
+                                    static_cast<const SQLWCHAR*>(L"INFORMATION_SCHEMA"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys"),
+                                    static_cast<const SQLWCHAR*>(L"sys.cache"),
+                                    static_cast<const SQLWCHAR*>(L"sys.cache"),
+                                    static_cast<const SQLWCHAR*>(L"sys.cache"),
+                                    static_cast<const SQLWCHAR*>(L"sys.cache"),
+                                    static_cast<const SQLWCHAR*>(L"$scratch")};
   std::wstring expected_system_table_type = std::wstring(L"SYSTEM_TABLE");
   std::wstring expected_user_table_type = std::wstring(L"TABLE");
 
@@ -278,8 +280,10 @@ TEST_F(TablesMockTest, SQLTablesTestGetMetadataForAllTables) {
   this->CreateTestTables();
 
   SQLWCHAR SQL_ALL_TABLES_W[] = L"%";
-  SQLWCHAR* table_names[] = {(SQLWCHAR*)L"TestTable", (SQLWCHAR*)L"foreignTable",
-                             (SQLWCHAR*)L"intTable", (SQLWCHAR*)L"sqlite_sequence"};
+  const SQLWCHAR* table_names[] = {static_cast<const SQLWCHAR*>(L"TestTable"),
+                                   static_cast<const SQLWCHAR*>(L"foreignTable"),
+                                   static_cast<const SQLWCHAR*>(L"intTable"),
+                                   static_cast<const SQLWCHAR*>(L"sqlite_sequence")};
   std::wstring expected_catalog_name = std::wstring(L"main");
   std::wstring expected_table_type = std::wstring(L"table");
 
@@ -305,8 +309,14 @@ TEST_F(TablesMockTest, SQLTablesTestGetMetadataForAllTables) {
 TEST_F(TablesMockTest, SQLTablesTestGetMetadataForTableName) {
   this->CreateTestTables();
 
-  SQLWCHAR* table_names[] = {(SQLWCHAR*)L"TestTable", (SQLWCHAR*)L"foreignTable",
-                             (SQLWCHAR*)L"intTable", (SQLWCHAR*)L"sqlite_sequence"};
+  // Use mutable arrays to pass SQLWCHAR parameters to SQLTables
+  SQLWCHAR test_table[] = L"TestTable";
+  SQLWCHAR foreign_table[] = L"foreignTable";
+  SQLWCHAR int_table[] = L"intTable";
+  SQLWCHAR sqlite_sequence[] = L"sqlite_sequence";
+
+  SQLWCHAR* table_names[] = {test_table, foreign_table, int_table, sqlite_sequence};
+
   std::wstring expected_catalog_name = std::wstring(L"main");
   std::wstring expected_table_type = std::wstring(L"table");
 
@@ -372,8 +382,10 @@ TEST_F(TablesMockTest, SQLTablesGetMetadataForTableType) {
   SQLWCHAR table_type_table_uppercase[] = L"TABLE";
   SQLWCHAR table_type_view[] = L"VIEW";
   SQLWCHAR table_type_table_view[] = L"TABLE,VIEW";
-  SQLWCHAR* table_names[] = {(SQLWCHAR*)L"TestTable", (SQLWCHAR*)L"foreignTable",
-                             (SQLWCHAR*)L"intTable", (SQLWCHAR*)L"sqlite_sequence"};
+  const SQLWCHAR* table_names[] = {static_cast<const SQLWCHAR*>(L"TestTable"),
+                                   static_cast<const SQLWCHAR*>(L"foreignTable"),
+                                   static_cast<const SQLWCHAR*>(L"intTable"),
+                                   static_cast<const SQLWCHAR*>(L"sqlite_sequence")};
   std::wstring expected_catalog_name = std::wstring(L"main");
   std::wstring expected_table_name = std::wstring(L"TestTable");
   std::wstring expected_table_type = std::wstring(table_type_table_lowercase);
@@ -415,7 +427,13 @@ TEST_F(TablesMockTest, SQLTablesGetMetadataForTableType) {
 
 TEST_F(TablesRemoteTest, SQLTablesGetMetadataForTableTypeTable) {
   // Requires creation of user table named ODBCTest using schema $scratch in remote server
-  SQLWCHAR* type_list[] = {(SQLWCHAR*)L"TABLE", (SQLWCHAR*)L"TABLE,VIEW"};
+
+  // Use mutable arrays to pass SQLWCHAR parameters to SQLTables
+  SQLWCHAR table[] = L"TABLE";
+  SQLWCHAR table_view[] = L"TABLE,VIEW";
+
+  SQLWCHAR* type_list[] = {table, table_view};
+
   std::wstring expected_schema_name = std::wstring(L"$scratch");
   std::wstring expected_table_name = std::wstring(L"ODBCTest");
   std::wstring expected_table_type = std::wstring(L"TABLE");
@@ -474,8 +492,9 @@ TEST_F(TablesMockTest, SQLTablesGetSupportedTableTypes) {
 TEST_F(TablesRemoteTest, SQLTablesGetSupportedTableTypes) {
   SQLWCHAR empty[] = L"";
   SQLWCHAR SQL_ALL_TABLE_TYPES_W[] = L"%";
-  SQLWCHAR* type_lists[] = {(SQLWCHAR*)L"TABLE", (SQLWCHAR*)L"SYSTEM_TABLE",
-                            (SQLWCHAR*)L"VIEW"};
+  const SQLWCHAR* type_lists[] = {static_cast<const SQLWCHAR*>(L"TABLE"),
+                                  static_cast<const SQLWCHAR*>(L"SYSTEM_TABLE"),
+                                  static_cast<const SQLWCHAR*>(L"VIEW")};
 
   ASSERT_EQ(SQL_SUCCESS, SQLTables(this->stmt, empty, SQL_NTS, empty, SQL_NTS, empty,
                                    SQL_NTS, SQL_ALL_TABLE_TYPES_W, SQL_NTS));
@@ -504,9 +523,11 @@ TYPED_TEST(TablesTest, SQLTablesGetMetadataBySQLDescribeCol) {
   SQLSMALLINT nullable = 0;
   size_t column_index = 0;
 
-  SQLWCHAR* column_names[] = {(SQLWCHAR*)L"TABLE_CAT", (SQLWCHAR*)L"TABLE_SCHEM",
-                              (SQLWCHAR*)L"TABLE_NAME", (SQLWCHAR*)L"TABLE_TYPE",
-                              (SQLWCHAR*)L"REMARKS"};
+  const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"TABLE_CAT"),
+                                    static_cast<const SQLWCHAR*>(L"TABLE_SCHEM"),
+                                    static_cast<const SQLWCHAR*>(L"TABLE_NAME"),
+                                    static_cast<const SQLWCHAR*>(L"TABLE_TYPE"),
+                                    static_cast<const SQLWCHAR*>(L"REMARKS")};
   SQLSMALLINT column_data_types[] = {SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR,
                                      SQL_WVARCHAR, SQL_WVARCHAR};
   SQLULEN column_sizes[] = {1024, 1024, 1024, 1024, 1024};
@@ -549,9 +570,11 @@ TYPED_TEST(TablesOdbcV2Test, SQLTablesGetMetadataBySQLDescribeColODBC2) {
   SQLSMALLINT nullable = 0;
   size_t column_index = 0;
 
-  SQLWCHAR* column_names[] = {(SQLWCHAR*)L"TABLE_QUALIFIER", (SQLWCHAR*)L"TABLE_OWNER",
-                              (SQLWCHAR*)L"TABLE_NAME", (SQLWCHAR*)L"TABLE_TYPE",
-                              (SQLWCHAR*)L"REMARKS"};
+  const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"TABLE_QUALIFIER"),
+                                    static_cast<const SQLWCHAR*>(L"TABLE_OWNER"),
+                                    static_cast<const SQLWCHAR*>(L"TABLE_NAME"),
+                                    static_cast<const SQLWCHAR*>(L"TABLE_TYPE"),
+                                    static_cast<const SQLWCHAR*>(L"REMARKS")};
   SQLSMALLINT column_data_types[] = {SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR,
                                      SQL_WVARCHAR, SQL_WVARCHAR};
   SQLULEN column_sizes[] = {1024, 1024, 1024, 1024, 1024};
