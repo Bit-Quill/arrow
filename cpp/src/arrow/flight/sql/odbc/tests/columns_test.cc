@@ -2208,23 +2208,38 @@ TEST_F(ColumnsMockTest, SQLDescribeColQueryAllDataTypesMetadata) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLWCHAR* column_names[] = {
-      (SQLWCHAR*)L"stiny_int_min",    (SQLWCHAR*)L"stiny_int_max",
-      (SQLWCHAR*)L"utiny_int_min",    (SQLWCHAR*)L"utiny_int_max",
-      (SQLWCHAR*)L"ssmall_int_min",   (SQLWCHAR*)L"ssmall_int_max",
-      (SQLWCHAR*)L"usmall_int_min",   (SQLWCHAR*)L"usmall_int_max",
-      (SQLWCHAR*)L"sinteger_min",     (SQLWCHAR*)L"sinteger_max",
-      (SQLWCHAR*)L"uinteger_min",     (SQLWCHAR*)L"uinteger_max",
-      (SQLWCHAR*)L"sbigint_min",      (SQLWCHAR*)L"sbigint_max",
-      (SQLWCHAR*)L"ubigint_min",      (SQLWCHAR*)L"ubigint_max",
-      (SQLWCHAR*)L"decimal_negative", (SQLWCHAR*)L"decimal_positive",
-      (SQLWCHAR*)L"float_min",        (SQLWCHAR*)L"float_max",
-      (SQLWCHAR*)L"double_min",       (SQLWCHAR*)L"double_max",
-      (SQLWCHAR*)L"bit_false",        (SQLWCHAR*)L"bit_true",
-      (SQLWCHAR*)L"c_char",           (SQLWCHAR*)L"c_wchar",
-      (SQLWCHAR*)L"c_wvarchar",       (SQLWCHAR*)L"c_varchar",
-      (SQLWCHAR*)L"date_min",         (SQLWCHAR*)L"date_max",
-      (SQLWCHAR*)L"timestamp_min",    (SQLWCHAR*)L"timestamp_max"};
+  const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"stiny_int_min"),
+                                    static_cast<const SQLWCHAR*>(L"stiny_int_max"),
+                                    static_cast<const SQLWCHAR*>(L"utiny_int_min"),
+                                    static_cast<const SQLWCHAR*>(L"utiny_int_max"),
+                                    static_cast<const SQLWCHAR*>(L"ssmall_int_min"),
+                                    static_cast<const SQLWCHAR*>(L"ssmall_int_max"),
+                                    static_cast<const SQLWCHAR*>(L"usmall_int_min"),
+                                    static_cast<const SQLWCHAR*>(L"usmall_int_max"),
+                                    static_cast<const SQLWCHAR*>(L"sinteger_min"),
+                                    static_cast<const SQLWCHAR*>(L"sinteger_max"),
+                                    static_cast<const SQLWCHAR*>(L"uinteger_min"),
+                                    static_cast<const SQLWCHAR*>(L"uinteger_max"),
+                                    static_cast<const SQLWCHAR*>(L"sbigint_min"),
+                                    static_cast<const SQLWCHAR*>(L"sbigint_max"),
+                                    static_cast<const SQLWCHAR*>(L"ubigint_min"),
+                                    static_cast<const SQLWCHAR*>(L"ubigint_max"),
+                                    static_cast<const SQLWCHAR*>(L"decimal_negative"),
+                                    static_cast<const SQLWCHAR*>(L"decimal_positive"),
+                                    static_cast<const SQLWCHAR*>(L"float_min"),
+                                    static_cast<const SQLWCHAR*>(L"float_max"),
+                                    static_cast<const SQLWCHAR*>(L"double_min"),
+                                    static_cast<const SQLWCHAR*>(L"double_max"),
+                                    static_cast<const SQLWCHAR*>(L"bit_false"),
+                                    static_cast<const SQLWCHAR*>(L"bit_true"),
+                                    static_cast<const SQLWCHAR*>(L"c_char"),
+                                    static_cast<const SQLWCHAR*>(L"c_wchar"),
+                                    static_cast<const SQLWCHAR*>(L"c_wvarchar"),
+                                    static_cast<const SQLWCHAR*>(L"c_varchar"),
+                                    static_cast<const SQLWCHAR*>(L"date_min"),
+                                    static_cast<const SQLWCHAR*>(L"date_max"),
+                                    static_cast<const SQLWCHAR*>(L"timestamp_min"),
+                                    static_cast<const SQLWCHAR*>(L"timestamp_max")};
   SQLSMALLINT column_data_types[] = {
       SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR,
       SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR,
@@ -2275,23 +2290,38 @@ TEST_F(ColumnsRemoteTest, SQLDescribeColQueryAllDataTypesMetadata) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  SQLWCHAR* column_names[] = {
-      (SQLWCHAR*)L"stiny_int_min",    (SQLWCHAR*)L"stiny_int_max",
-      (SQLWCHAR*)L"utiny_int_min",    (SQLWCHAR*)L"utiny_int_max",
-      (SQLWCHAR*)L"ssmall_int_min",   (SQLWCHAR*)L"ssmall_int_max",
-      (SQLWCHAR*)L"usmall_int_min",   (SQLWCHAR*)L"usmall_int_max",
-      (SQLWCHAR*)L"sinteger_min",     (SQLWCHAR*)L"sinteger_max",
-      (SQLWCHAR*)L"uinteger_min",     (SQLWCHAR*)L"uinteger_max",
-      (SQLWCHAR*)L"sbigint_min",      (SQLWCHAR*)L"sbigint_max",
-      (SQLWCHAR*)L"ubigint_min",      (SQLWCHAR*)L"ubigint_max",
-      (SQLWCHAR*)L"decimal_negative", (SQLWCHAR*)L"decimal_positive",
-      (SQLWCHAR*)L"float_min",        (SQLWCHAR*)L"float_max",
-      (SQLWCHAR*)L"double_min",       (SQLWCHAR*)L"double_max",
-      (SQLWCHAR*)L"bit_false",        (SQLWCHAR*)L"bit_true",
-      (SQLWCHAR*)L"c_char",           (SQLWCHAR*)L"c_wchar",
-      (SQLWCHAR*)L"c_wvarchar",       (SQLWCHAR*)L"c_varchar",
-      (SQLWCHAR*)L"date_min",         (SQLWCHAR*)L"date_max",
-      (SQLWCHAR*)L"timestamp_min",    (SQLWCHAR*)L"timestamp_max"};
+  const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"stiny_int_min"),
+                                    static_cast<const SQLWCHAR*>(L"stiny_int_max"),
+                                    static_cast<const SQLWCHAR*>(L"utiny_int_min"),
+                                    static_cast<const SQLWCHAR*>(L"utiny_int_max"),
+                                    static_cast<const SQLWCHAR*>(L"ssmall_int_min"),
+                                    static_cast<const SQLWCHAR*>(L"ssmall_int_max"),
+                                    static_cast<const SQLWCHAR*>(L"usmall_int_min"),
+                                    static_cast<const SQLWCHAR*>(L"usmall_int_max"),
+                                    static_cast<const SQLWCHAR*>(L"sinteger_min"),
+                                    static_cast<const SQLWCHAR*>(L"sinteger_max"),
+                                    static_cast<const SQLWCHAR*>(L"uinteger_min"),
+                                    static_cast<const SQLWCHAR*>(L"uinteger_max"),
+                                    static_cast<const SQLWCHAR*>(L"sbigint_min"),
+                                    static_cast<const SQLWCHAR*>(L"sbigint_max"),
+                                    static_cast<const SQLWCHAR*>(L"ubigint_min"),
+                                    static_cast<const SQLWCHAR*>(L"ubigint_max"),
+                                    static_cast<const SQLWCHAR*>(L"decimal_negative"),
+                                    static_cast<const SQLWCHAR*>(L"decimal_positive"),
+                                    static_cast<const SQLWCHAR*>(L"float_min"),
+                                    static_cast<const SQLWCHAR*>(L"float_max"),
+                                    static_cast<const SQLWCHAR*>(L"double_min"),
+                                    static_cast<const SQLWCHAR*>(L"double_max"),
+                                    static_cast<const SQLWCHAR*>(L"bit_false"),
+                                    static_cast<const SQLWCHAR*>(L"bit_true"),
+                                    static_cast<const SQLWCHAR*>(L"c_char"),
+                                    static_cast<const SQLWCHAR*>(L"c_wchar"),
+                                    static_cast<const SQLWCHAR*>(L"c_wvarchar"),
+                                    static_cast<const SQLWCHAR*>(L"c_varchar"),
+                                    static_cast<const SQLWCHAR*>(L"date_min"),
+                                    static_cast<const SQLWCHAR*>(L"date_max"),
+                                    static_cast<const SQLWCHAR*>(L"timestamp_min"),
+                                    static_cast<const SQLWCHAR*>(L"timestamp_max")};
   SQLSMALLINT column_data_types[] = {
       SQL_INTEGER,        SQL_INTEGER,       SQL_INTEGER,  SQL_INTEGER,   SQL_INTEGER,
       SQL_INTEGER,        SQL_INTEGER,       SQL_INTEGER,  SQL_INTEGER,   SQL_INTEGER,
@@ -2351,11 +2381,15 @@ TEST_F(ColumnsRemoteTest, SQLDescribeColODBCTestTableMetadata) {
   SQLWCHAR sql_query[] = L"SELECT * from $scratch.ODBCTest LIMIT 1;";
   SQLINTEGER query_length = static_cast<SQLINTEGER>(wcslen(sql_query));
 
-  SQLWCHAR* column_names[] = {(SQLWCHAR*)L"sinteger_max",     (SQLWCHAR*)L"sbigint_max",
-                              (SQLWCHAR*)L"decimal_positive", (SQLWCHAR*)L"float_max",
-                              (SQLWCHAR*)L"double_max",       (SQLWCHAR*)L"bit_true",
-                              (SQLWCHAR*)L"date_max",         (SQLWCHAR*)L"time_max",
-                              (SQLWCHAR*)L"timestamp_max"};
+  const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"sinteger_max"),
+                                    static_cast<const SQLWCHAR*>(L"sbigint_max"),
+                                    static_cast<const SQLWCHAR*>(L"decimal_positive"),
+                                    static_cast<const SQLWCHAR*>(L"float_max"),
+                                    static_cast<const SQLWCHAR*>(L"double_max"),
+                                    static_cast<const SQLWCHAR*>(L"bit_true"),
+                                    static_cast<const SQLWCHAR*>(L"date_max"),
+                                    static_cast<const SQLWCHAR*>(L"time_max"),
+                                    static_cast<const SQLWCHAR*>(L"timestamp_max")};
   SQLSMALLINT column_data_types[] = {SQL_INTEGER,   SQL_BIGINT,    SQL_DECIMAL,
                                      SQL_FLOAT,     SQL_DOUBLE,    SQL_BIT,
                                      SQL_TYPE_DATE, SQL_TYPE_TIME, SQL_TYPE_TIMESTAMP};
@@ -2405,11 +2439,15 @@ TEST_F(ColumnsOdbcV2RemoteTest, SQLDescribeColODBCTestTableMetadataODBC2) {
   SQLWCHAR sql_query[] = L"SELECT * from $scratch.ODBCTest LIMIT 1;";
   SQLINTEGER query_length = static_cast<SQLINTEGER>(wcslen(sql_query));
 
-  SQLWCHAR* column_names[] = {(SQLWCHAR*)L"sinteger_max",     (SQLWCHAR*)L"sbigint_max",
-                              (SQLWCHAR*)L"decimal_positive", (SQLWCHAR*)L"float_max",
-                              (SQLWCHAR*)L"double_max",       (SQLWCHAR*)L"bit_true",
-                              (SQLWCHAR*)L"date_max",         (SQLWCHAR*)L"time_max",
-                              (SQLWCHAR*)L"timestamp_max"};
+  const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"sinteger_max"),
+                                    static_cast<const SQLWCHAR*>(L"sbigint_max"),
+                                    static_cast<const SQLWCHAR*>(L"decimal_positive"),
+                                    static_cast<const SQLWCHAR*>(L"float_max"),
+                                    static_cast<const SQLWCHAR*>(L"double_max"),
+                                    static_cast<const SQLWCHAR*>(L"bit_true"),
+                                    static_cast<const SQLWCHAR*>(L"date_max"),
+                                    static_cast<const SQLWCHAR*>(L"time_max"),
+                                    static_cast<const SQLWCHAR*>(L"timestamp_max")};
   SQLSMALLINT column_data_types[] = {SQL_INTEGER, SQL_BIGINT, SQL_DECIMAL,
                                      SQL_FLOAT,   SQL_DOUBLE, SQL_BIT,
                                      SQL_DATE,    SQL_TIME,   SQL_TIMESTAMP};
@@ -2460,8 +2498,10 @@ TEST_F(ColumnsMockTest, SQLDescribeColAllTypesTableMetadata) {
   SQLWCHAR sql_query[] = L"SELECT * from AllTypesTable LIMIT 1;";
   SQLINTEGER query_length = static_cast<SQLINTEGER>(wcslen(sql_query));
 
-  SQLWCHAR* column_names[] = {(SQLWCHAR*)L"bigint_col", (SQLWCHAR*)L"char_col",
-                              (SQLWCHAR*)L"varbinary_col", (SQLWCHAR*)L"double_col"};
+  const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"bigint_col"),
+                                    static_cast<const SQLWCHAR*>(L"char_col"),
+                                    static_cast<const SQLWCHAR*>(L"varbinary_col"),
+                                    static_cast<const SQLWCHAR*>(L"double_col")};
   SQLSMALLINT column_data_types[] = {SQL_BIGINT, SQL_WVARCHAR, SQL_BINARY, SQL_DOUBLE};
   SQLULEN column_sizes[] = {8, 0, 0, 8};
 
@@ -2542,16 +2582,24 @@ TYPED_TEST(ColumnsTest, SQLColumnsGetMetadataBySQLDescribeCol) {
   SQLSMALLINT nullable = 0;
   size_t column_index = 0;
 
-  SQLWCHAR* column_names[] = {
-      (SQLWCHAR*)L"TABLE_CAT",        (SQLWCHAR*)L"TABLE_SCHEM",
-      (SQLWCHAR*)L"TABLE_NAME",       (SQLWCHAR*)L"COLUMN_NAME",
-      (SQLWCHAR*)L"DATA_TYPE",        (SQLWCHAR*)L"TYPE_NAME",
-      (SQLWCHAR*)L"COLUMN_SIZE",      (SQLWCHAR*)L"BUFFER_LENGTH",
-      (SQLWCHAR*)L"DECIMAL_DIGITS",   (SQLWCHAR*)L"NUM_PREC_RADIX",
-      (SQLWCHAR*)L"NULLABLE",         (SQLWCHAR*)L"REMARKS",
-      (SQLWCHAR*)L"COLUMN_DEF",       (SQLWCHAR*)L"SQL_DATA_TYPE",
-      (SQLWCHAR*)L"SQL_DATETIME_SUB", (SQLWCHAR*)L"CHAR_OCTET_LENGTH",
-      (SQLWCHAR*)L"ORDINAL_POSITION", (SQLWCHAR*)L"IS_NULLABLE"};
+  const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"TABLE_CAT"),
+                                    static_cast<const SQLWCHAR*>(L"TABLE_SCHEM"),
+                                    static_cast<const SQLWCHAR*>(L"TABLE_NAME"),
+                                    static_cast<const SQLWCHAR*>(L"COLUMN_NAME"),
+                                    static_cast<const SQLWCHAR*>(L"DATA_TYPE"),
+                                    static_cast<const SQLWCHAR*>(L"TYPE_NAME"),
+                                    static_cast<const SQLWCHAR*>(L"COLUMN_SIZE"),
+                                    static_cast<const SQLWCHAR*>(L"BUFFER_LENGTH"),
+                                    static_cast<const SQLWCHAR*>(L"DECIMAL_DIGITS"),
+                                    static_cast<const SQLWCHAR*>(L"NUM_PREC_RADIX"),
+                                    static_cast<const SQLWCHAR*>(L"NULLABLE"),
+                                    static_cast<const SQLWCHAR*>(L"REMARKS"),
+                                    static_cast<const SQLWCHAR*>(L"COLUMN_DEF"),
+                                    static_cast<const SQLWCHAR*>(L"SQL_DATA_TYPE"),
+                                    static_cast<const SQLWCHAR*>(L"SQL_DATETIME_SUB"),
+                                    static_cast<const SQLWCHAR*>(L"CHAR_OCTET_LENGTH"),
+                                    static_cast<const SQLWCHAR*>(L"ORDINAL_POSITION"),
+                                    static_cast<const SQLWCHAR*>(L"IS_NULLABLE")};
   SQLSMALLINT column_data_types[] = {
       SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_SMALLINT, SQL_WVARCHAR,
       SQL_INTEGER,  SQL_INTEGER,  SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT, SQL_WVARCHAR,
@@ -2597,24 +2645,24 @@ TYPED_TEST(ColumnsOdbcV2Test, SQLColumnsGetMetadataBySQLDescribeColODBC2) {
   SQLSMALLINT nullable = 0;
   size_t column_index = 0;
 
-  SQLWCHAR* column_names[] = {(SQLWCHAR*)L"TABLE_QUALIFIER",
-                              (SQLWCHAR*)L"TABLE_OWNER",
-                              (SQLWCHAR*)L"TABLE_NAME",
-                              (SQLWCHAR*)L"COLUMN_NAME",
-                              (SQLWCHAR*)L"DATA_TYPE",
-                              (SQLWCHAR*)L"TYPE_NAME",
-                              (SQLWCHAR*)L"PRECISION",
-                              (SQLWCHAR*)L"LENGTH",
-                              (SQLWCHAR*)L"SCALE",
-                              (SQLWCHAR*)L"RADIX",
-                              (SQLWCHAR*)L"NULLABLE",
-                              (SQLWCHAR*)L"REMARKS",
-                              (SQLWCHAR*)L"COLUMN_DEF",
-                              (SQLWCHAR*)L"SQL_DATA_TYPE",
-                              (SQLWCHAR*)L"SQL_DATETIME_SUB",
-                              (SQLWCHAR*)L"CHAR_OCTET_LENGTH",
-                              (SQLWCHAR*)L"ORDINAL_POSITION",
-                              (SQLWCHAR*)L"IS_NULLABLE"};
+  const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"TABLE_QUALIFIER"),
+                                    static_cast<const SQLWCHAR*>(L"TABLE_OWNER"),
+                                    static_cast<const SQLWCHAR*>(L"TABLE_NAME"),
+                                    static_cast<const SQLWCHAR*>(L"COLUMN_NAME"),
+                                    static_cast<const SQLWCHAR*>(L"DATA_TYPE"),
+                                    static_cast<const SQLWCHAR*>(L"TYPE_NAME"),
+                                    static_cast<const SQLWCHAR*>(L"PRECISION"),
+                                    static_cast<const SQLWCHAR*>(L"LENGTH"),
+                                    static_cast<const SQLWCHAR*>(L"SCALE"),
+                                    static_cast<const SQLWCHAR*>(L"RADIX"),
+                                    static_cast<const SQLWCHAR*>(L"NULLABLE"),
+                                    static_cast<const SQLWCHAR*>(L"REMARKS"),
+                                    static_cast<const SQLWCHAR*>(L"COLUMN_DEF"),
+                                    static_cast<const SQLWCHAR*>(L"SQL_DATA_TYPE"),
+                                    static_cast<const SQLWCHAR*>(L"SQL_DATETIME_SUB"),
+                                    static_cast<const SQLWCHAR*>(L"CHAR_OCTET_LENGTH"),
+                                    static_cast<const SQLWCHAR*>(L"ORDINAL_POSITION"),
+                                    static_cast<const SQLWCHAR*>(L"IS_NULLABLE")};
   SQLSMALLINT column_data_types[] = {
       SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_SMALLINT, SQL_WVARCHAR,
       SQL_INTEGER,  SQL_INTEGER,  SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT, SQL_WVARCHAR,
