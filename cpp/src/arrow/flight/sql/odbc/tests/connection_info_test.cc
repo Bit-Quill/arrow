@@ -27,15 +27,13 @@
 namespace arrow::flight::sql::odbc {
 
 template <typename T>
-class ConnectionInfoTest : public T {
- public:
-  using List = std::list<T>;
-};
+class ConnectionInfoTest : public T {};
 
 class ConnectionInfoMockTest : public FlightSQLODBCMockTestBase {};
 using TestTypes = ::testing::Types<ConnectionInfoMockTest, FlightSQLODBCRemoteTestBase>;
 TYPED_TEST_SUITE(ConnectionInfoTest, TestTypes);
 
+namespace {
 // Helper Functions
 
 // Validate unsigned short SQLUSMALLINT return value
@@ -72,7 +70,8 @@ void Validate(SQLHDBC connection, SQLUSMALLINT info_type, SQLULEN expected_value
 }
 
 // Validate wchar string SQLWCHAR return value
-void Validate(SQLHDBC connection, SQLUSMALLINT info_type, SQLWCHAR* expected_value) {
+void Validate(SQLHDBC connection, SQLUSMALLINT info_type,
+              const SQLWCHAR* expected_value) {
   SQLWCHAR info_value[kOdbcBufferSize] = L"";
   SQLSMALLINT message_length;
 
@@ -122,6 +121,7 @@ void ValidateNotEmptySQLWCHAR(SQLHDBC connection, SQLUSMALLINT info_type,
 
   EXPECT_GT(wcslen(info_value), 0);
 }
+}  // namespace
 
 // Driver Information
 
@@ -156,13 +156,14 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoBatchSupport) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDataSourceName) {
-  Validate(this->conn, SQL_DATA_SOURCE_NAME, (SQLWCHAR*)L"");
+  Validate(this->conn, SQL_DATA_SOURCE_NAME, static_cast<const SQLWCHAR*>(L""));
 }
 
 #ifdef SQL_DRIVER_AWARE_POOLING_SUPPORTED
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverAwarePoolingSupported) {
-  // A driver does not need to implement SQL_DRIVER_AWARE_POOLING_SUPPORTED and the
-  // Driver Manager will not honor to the driver's return value.
+  // According to Microsoft documentation, ODBC driver does not need to implement
+  // SQL_DRIVER_AWARE_POOLING_SUPPORTED and the Driver Manager will ignore the
+  // driver's return value for it.
 
   Validate(this->conn, SQL_DRIVER_AWARE_POOLING_SUPPORTED,
            static_cast<SQLUINTEGER>(SQL_DRIVER_AWARE_POOLING_NOT_CAPABLE));
@@ -211,15 +212,16 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverHstmt) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverName) {
-  Validate(this->conn, SQL_DRIVER_NAME, (SQLWCHAR*)L"Arrow Flight ODBC Driver");
+  Validate(this->conn, SQL_DRIVER_NAME,
+           static_cast<const SQLWCHAR*>(L"Arrow Flight ODBC Driver"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverOdbcVer) {
-  Validate(this->conn, SQL_DRIVER_ODBC_VER, (SQLWCHAR*)L"03.80");
+  Validate(this->conn, SQL_DRIVER_ODBC_VER, static_cast<const SQLWCHAR*>(L"03.80"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverVer) {
-  Validate(this->conn, SQL_DRIVER_VER, (SQLWCHAR*)L"00.09.0000.0");
+  Validate(this->conn, SQL_DRIVER_VER, static_cast<const SQLWCHAR*>(L"00.09.0000.0"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDynamicCursorAttributes1) {
@@ -291,7 +293,7 @@ TYPED_TEST(ConnectionInfoTest, DISABLED_TestSQLGetInfoOdbcStandardCliConformance
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoOdbcVer) {
   // This is implemented only in the Driver Manager.
 
-  Validate(this->conn, SQL_ODBC_VER, (SQLWCHAR*)L"03.80.0000");
+  Validate(this->conn, SQL_ODBC_VER, static_cast<const SQLWCHAR*>(L"03.80.0000"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoParamArrayRowCounts) {
@@ -305,11 +307,11 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoParamArraySelects) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoRowUpdates) {
-  Validate(this->conn, SQL_ROW_UPDATES, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_ROW_UPDATES, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSearchPatternEscape) {
-  Validate(this->conn, SQL_SEARCH_PATTERN_ESCAPE, (SQLWCHAR*)L"\\");
+  Validate(this->conn, SQL_SEARCH_PATTERN_ESCAPE, static_cast<const SQLWCHAR*>(L"\\"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoServerName) {
@@ -327,7 +329,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoStaticCursorAttributes2) {
 // DBMS Product Information
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDatabaseName) {
-  Validate(this->conn, SQL_DATABASE_NAME, (SQLWCHAR*)L"");
+  Validate(this->conn, SQL_DATABASE_NAME, static_cast<const SQLWCHAR*>(L""));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDbmsName) {
@@ -341,11 +343,11 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDbmsVer) {
 // Data Source Information
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAccessibleProcedures) {
-  Validate(this->conn, SQL_ACCESSIBLE_PROCEDURES, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_ACCESSIBLE_PROCEDURES, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAccessibleTables) {
-  Validate(this->conn, SQL_ACCESSIBLE_TABLES, (SQLWCHAR*)L"Y");
+  Validate(this->conn, SQL_ACCESSIBLE_TABLES, static_cast<const SQLWCHAR*>(L"Y"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoBookmarkPersistence) {
@@ -353,11 +355,11 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoBookmarkPersistence) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogTerm) {
-  Validate(this->conn, SQL_CATALOG_TERM, (SQLWCHAR*)L"");
+  Validate(this->conn, SQL_CATALOG_TERM, static_cast<const SQLWCHAR*>(L""));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCollationSeq) {
-  Validate(this->conn, SQL_COLLATION_SEQ, (SQLWCHAR*)L"");
+  Validate(this->conn, SQL_COLLATION_SEQ, static_cast<const SQLWCHAR*>(L""));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConcatNullBehavior) {
@@ -379,7 +381,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCursorSensitivity) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDataSourceReadOnly) {
-  Validate(this->conn, SQL_DATA_SOURCE_READ_ONLY, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_DATA_SOURCE_READ_ONLY, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDefaultTxnIsolation) {
@@ -387,19 +389,19 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDefaultTxnIsolation) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDescribeParameter) {
-  Validate(this->conn, SQL_DESCRIBE_PARAMETER, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_DESCRIBE_PARAMETER, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMultResultSets) {
-  Validate(this->conn, SQL_MULT_RESULT_SETS, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_MULT_RESULT_SETS, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMultipleActiveTxn) {
-  Validate(this->conn, SQL_MULTIPLE_ACTIVE_TXN, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_MULTIPLE_ACTIVE_TXN, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoNeedLongDataLen) {
-  Validate(this->conn, SQL_NEED_LONG_DATA_LEN, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_NEED_LONG_DATA_LEN, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoNullCollation) {
@@ -407,11 +409,11 @@ TEST_F(ConnectionInfoMockTest, TestSQLGetInfoNullCollation) {
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoProcedureTerm) {
-  Validate(this->conn, SQL_PROCEDURE_TERM, (SQLWCHAR*)L"");
+  Validate(this->conn, SQL_PROCEDURE_TERM, static_cast<const SQLWCHAR*>(L""));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSchemaTerm) {
-  Validate(this->conn, SQL_SCHEMA_TERM, (SQLWCHAR*)L"schema");
+  Validate(this->conn, SQL_SCHEMA_TERM, static_cast<const SQLWCHAR*>(L"schema"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoScrollOptions) {
@@ -419,7 +421,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoScrollOptions) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTableTerm) {
-  Validate(this->conn, SQL_TABLE_TERM, (SQLWCHAR*)L"table");
+  Validate(this->conn, SQL_TABLE_TERM, static_cast<const SQLWCHAR*>(L"table"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTxnCapable) {
@@ -431,7 +433,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTxnIsolationOption) {
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoUserName) {
-  Validate(this->conn, SQL_USER_NAME, (SQLWCHAR*)L"");
+  Validate(this->conn, SQL_USER_NAME, static_cast<const SQLWCHAR*>(L""));
 }
 
 // Supported SQL
@@ -460,7 +462,8 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAlterTable) {
 TYPED_TEST(ConnectionInfoTest, DISABLED_TestSQLGetInfoAnsiSqlDatetimeLiterals) {
   // Type commented out in odbc_connection.cc
   // Type does not exist in sql.h
-  // Validate(this->conn, SQL_ANSI_SQL_DATETIME_LITERALS, (SQLWCHAR*)L"");
+  // Validate(this->conn, SQL_ANSI_SQL_DATETIME_LITERALS, static_cast<const
+  // SQLWCHAR*>(L""));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogLocation) {
@@ -468,11 +471,11 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogLocation) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogName) {
-  Validate(this->conn, SQL_CATALOG_NAME, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_CATALOG_NAME, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogNameSeparator) {
-  Validate(this->conn, SQL_CATALOG_NAME_SEPARATOR, (SQLWCHAR*)L"");
+  Validate(this->conn, SQL_CATALOG_NAME_SEPARATOR, static_cast<const SQLWCHAR*>(L""));
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoCatalogUsage) {
@@ -480,7 +483,7 @@ TEST_F(ConnectionInfoMockTest, TestSQLGetInfoCatalogUsage) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoColumnAlias) {
-  Validate(this->conn, SQL_COLUMN_ALIAS, (SQLWCHAR*)L"Y");
+  Validate(this->conn, SQL_COLUMN_ALIAS, static_cast<const SQLWCHAR*>(L"Y"));
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoCorrelationName) {
@@ -552,7 +555,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropView) {
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoExpressionsInOrderby) {
-  Validate(this->conn, SQL_EXPRESSIONS_IN_ORDERBY, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_EXPRESSIONS_IN_ORDERBY, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoGroupBy) {
@@ -565,7 +568,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIdentifierCase) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIdentifierQuoteChar) {
-  Validate(this->conn, SQL_IDENTIFIER_QUOTE_CHAR, (SQLWCHAR*)L"\"");
+  Validate(this->conn, SQL_IDENTIFIER_QUOTE_CHAR, static_cast<const SQLWCHAR*>(L"\")"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIndexKeywords) {
@@ -579,7 +582,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoInsertStatement) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIntegrity) {
-  Validate(this->conn, SQL_INTEGRITY, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_INTEGRITY, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoKeywords) {
@@ -587,7 +590,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoKeywords) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoLikeEscapeClause) {
-  Validate(this->conn, SQL_LIKE_ESCAPE_CLAUSE, (SQLWCHAR*)L"Y");
+  Validate(this->conn, SQL_LIKE_ESCAPE_CLAUSE, static_cast<const SQLWCHAR*>(L"Y"));
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoNonNullableColumns) {
@@ -600,15 +603,16 @@ TEST_F(ConnectionInfoMockTest, TestSQLGetInfoOjCapabilities) {
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoOrderByColumnsInSelect) {
-  Validate(this->conn, SQL_ORDER_BY_COLUMNS_IN_SELECT, (SQLWCHAR*)L"Y");
+  Validate(this->conn, SQL_ORDER_BY_COLUMNS_IN_SELECT,
+           static_cast<const SQLWCHAR*>(L"Y"));
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoOuterJoins) {
-  Validate(this->conn, SQL_OUTER_JOINS, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_OUTER_JOINS, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoProcedures) {
-  Validate(this->conn, SQL_PROCEDURES, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_PROCEDURES, static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoQuotedIdentifierCase) {
@@ -621,7 +625,7 @@ TEST_F(ConnectionInfoMockTest, TestSQLGetInfoSchemaUsage) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSpecialCharacters) {
-  Validate(this->conn, SQL_SPECIAL_CHARACTERS, (SQLWCHAR*)L"");
+  Validate(this->conn, SQL_SPECIAL_CHARACTERS, static_cast<const SQLWCHAR*>(L""));
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSqlConformance) {
@@ -694,11 +698,12 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxProcedureNameLen) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxRowSize) {
-  Validate(this->conn, SQL_MAX_ROW_SIZE, (SQLWCHAR*)L"");
+  Validate(this->conn, SQL_MAX_ROW_SIZE, static_cast<const SQLWCHAR*>(L""));
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxRowSizeIncludesLong) {
-  Validate(this->conn, SQL_MAX_ROW_SIZE_INCLUDES_LONG, (SQLWCHAR*)L"N");
+  Validate(this->conn, SQL_MAX_ROW_SIZE_INCLUDES_LONG,
+           static_cast<const SQLWCHAR*>(L"N"));
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxSchemaNameLen) {

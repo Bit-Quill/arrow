@@ -50,6 +50,8 @@ class ODBCRemoteTestBase : public ::testing::Test {
  public:
   /// \brief Allocate environment and connection handles
   void AllocEnvConnHandles(SQLINTEGER odbc_ver = SQL_OV_ODBC3);
+  /// \brief Free environment and connection handles
+  void FreeEnvConnHandles();
   /// \brief Connect to Arrow Flight SQL server using connection string defined in
   /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN", allocate statement handle.
   /// Connects using ODBC Ver 3 by default
@@ -101,6 +103,12 @@ class FlightSQLODBCRemoteTestBase : public ODBCRemoteTestBase {
 class FlightSQLOdbcV2RemoteTestBase : public FlightSQLODBCRemoteTestBase {
  protected:
   void SetUp() override;
+};
+
+class FlightSQLOdbcHandleRemoteTestBase : public FlightSQLODBCRemoteTestBase {
+ protected:
+  void SetUp() override;
+  void TearDown() override;
 };
 
 static constexpr std::string_view kAuthorizationHeader = "authorization";
@@ -166,7 +174,6 @@ class ODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
 
   void TearDown() override;
 
- private:
   std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server_;
 };
 
@@ -188,10 +195,11 @@ class FlightSQLOdbcV2MockTestBase : public FlightSQLODBCMockTestBase {
   void SetUp() override;
 };
 
-template <typename T>
-class ODBCTestBase : public T {};
-using OdbcBaseTestTypes = ::testing::Types<ODBCRemoteTestBase, ODBCMockTestBase>;
-TYPED_TEST_SUITE(ODBCTestBase, OdbcBaseTestTypes);
+class FlightSQLOdbcHandleMockTestBase : public FlightSQLODBCMockTestBase {
+ protected:
+  void SetUp() override;
+  void TearDown() override;
+};
 
 /** ODBC read buffer size. */
 static constexpr int kOdbcBufferSize = 1024;
