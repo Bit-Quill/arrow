@@ -30,15 +30,13 @@
 namespace arrow::flight::sql::odbc {
 
 template <typename T>
-class StatementAttributeTest : public T {
- public:
-  using List = std::list<T>;
-};
+class StatementAttributeTest : public T {};
 
 using TestTypes =
     ::testing::Types<FlightSQLODBCMockTestBase, FlightSQLODBCRemoteTestBase>;
 TYPED_TEST_SUITE(StatementAttributeTest, TestTypes);
 
+namespace {
 // Helper Functions
 
 // Validate SQLULEN return value
@@ -135,6 +133,7 @@ void ValidateSetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
 
   VerifyOdbcErrorState(SQL_HANDLE_STMT, statement, error_code);
 }
+}  // namespace
 
 // Test Cases
 

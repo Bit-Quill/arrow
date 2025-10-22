@@ -85,6 +85,12 @@ class FlightSQLOdbcV2RemoteTestBase : public FlightSQLODBCRemoteTestBase {
   void SetUp() override;
 };
 
+class FlightSQLOdbcEnvConnHandleRemoteTestBase : public FlightSQLODBCRemoteTestBase {
+ protected:
+  void SetUp() override;
+  void TearDown() override;
+};
+
 static constexpr std::string_view authorization_header = "authorization";
 static constexpr std::string_view bearer_prefix = "Bearer ";
 static constexpr std::string_view test_token = "t0k3n";
@@ -149,13 +155,18 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
 
   void TearDown() override;
 
- private:
   std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server_;
 };
 
 class FlightSQLOdbcV2MockTestBase : public FlightSQLODBCMockTestBase {
  protected:
   void SetUp() override;
+};
+
+class FlightSQLOdbcEnvConnHandleMockTestBase : public FlightSQLODBCMockTestBase {
+ protected:
+  void SetUp() override;
+  void TearDown() override;
 };
 
 /** ODBC read buffer size. */
