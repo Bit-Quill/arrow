@@ -29,10 +29,7 @@ namespace arrow::flight::sql::odbc {
 using std::optional;
 
 template <typename T>
-class TypeInfoTest : public T {
- public:
-  using List = std::list<T>;
-};
+class TypeInfoTest : public T {};
 
 class TypeInfoMockTest : public FlightSQLODBCMockTestBase {};
 using TestTypes = ::testing::Types<TypeInfoMockTest, FlightSQLODBCRemoteTestBase>;
