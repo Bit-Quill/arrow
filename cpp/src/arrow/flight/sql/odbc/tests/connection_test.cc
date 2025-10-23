@@ -101,7 +101,7 @@ TEST(ODBCHandles, TestSQLAllocAndFreeConnect) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeEnv(env));
 }
 
-TYPED_TEST(ConnectionTest, TestFreeNullHandles) {
+TYPED_TEST(ODBCTestBase, TestFreeNullHandles) {
   // Verifies attempt to free invalid handle does not cause segfault
   // Attempt to free null statement handle
   ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_STMT, this->stmt));
@@ -218,7 +218,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeEnv(env));
 }
 
-TYPED_TEST(ConnectionTest, TestSQLDriverConnect) {
+TYPED_TEST(ODBCTestBase, TestSQLDriverConnect) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -268,7 +268,7 @@ TYPED_TEST(ConnectionTest, TestSQLDriverConnect) {
 }
 
 #if defined _WIN32
-TYPED_TEST(ConnectionTest, TestSQLDriverConnectDsn) {
+TYPED_TEST(ODBCTestBase, TestSQLDriverConnectDsn) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -322,7 +322,7 @@ TYPED_TEST(ConnectionTest, TestSQLDriverConnectDsn) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TYPED_TEST(ConnectionTest, TestSQLConnect) {
+TYPED_TEST(ODBCTestBase, TestSQLConnect) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -372,7 +372,7 @@ TYPED_TEST(ConnectionTest, TestSQLConnect) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TEST_F(ConnectionRemoteTest, TestSQLConnectInputUidPwd) {
+TEST_F(ODBCRemoteTestBase, TestSQLConnectInputUidPwd) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -431,7 +431,7 @@ TEST_F(ConnectionRemoteTest, TestSQLConnectInputUidPwd) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TEST_F(ConnectionRemoteTest, TestSQLConnectInvalidUid) {
+TEST_F(ODBCRemoteTestBase, TestSQLConnectInvalidUid) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -488,7 +488,7 @@ TEST_F(ConnectionRemoteTest, TestSQLConnectInvalidUid) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TEST_F(ConnectionRemoteTest, TestSQLConnectDSNPrecedence) {
+TEST_F(ODBCRemoteTestBase, TestSQLConnectDSNPrecedence) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -543,7 +543,7 @@ TEST_F(ConnectionRemoteTest, TestSQLConnectDSNPrecedence) {
 
 #endif
 
-TEST_F(ConnectionRemoteTest, TestSQLDriverConnectInvalidUid) {
+TEST_F(ODBCRemoteTestBase, TestSQLDriverConnectInvalidUid) {
   SQLHENV env;
   SQLHDBC conn;
 
@@ -630,7 +630,7 @@ TYPED_TEST(ConnectionTest, TestSQLAllocFreeStmt) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeStmt(statement, SQL_DROP));
 }
 
-TYPED_TEST(ConnectionTest, TestCloseConnectionWithOpenStatement) {
+TYPED_TEST(ODBCTestBase, TestCloseConnectionWithOpenStatement) {
   SQLHENV env;
   SQLHDBC conn;
   SQLHSTMT statement;
