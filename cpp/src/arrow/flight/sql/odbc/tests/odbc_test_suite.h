@@ -42,11 +42,11 @@ static constexpr std::string_view kTestDsn = "Apache Arrow Flight SQL Test DSN";
 namespace arrow::flight::sql::odbc {
 
 /// \brief Base test fixture for running tests against a remote server.
-/// Each test file running remote server tests should define a
-/// fixture inheriting from this base fixture.
 /// The connection string for connecting to this server is defined
 /// in the ARROW_FLIGHT_SQL_ODBC_CONN environment variable.
-class FlightSQLODBCRemoteTestBase : public ::testing::Test {
+/// Note that this fixture does not handle the driver's connection/disconnection
+/// during SetUp/Teardown.
+class ODBCRemoteTestBase : public ::testing::Test {
  public:
   /// \brief Allocate environment and connection handles
   void AllocEnvConnHandles(SQLINTEGER odbc_ver = SQL_OV_ODBC3);
@@ -75,6 +75,16 @@ class FlightSQLODBCRemoteTestBase : public ::testing::Test {
   /** ODBC Statement. */
   SQLHSTMT stmt = 0;
 
+ protected:
+  void SetUp() override;
+};
+
+/// \brief Base test fixture for running tests against a remote server.
+/// Each test file running remote server tests should define a
+/// fixture inheriting from this base fixture.
+/// The connection string for connecting to this server is defined
+/// in the ARROW_FLIGHT_SQL_ODBC_CONN environment variable.
+class FlightSQLODBCRemoteTestBase : public ODBCRemoteTestBase {
  protected:
   void SetUp() override;
 
@@ -129,9 +139,7 @@ class MockServerMiddlewareFactory : public ServerMiddlewareFactory {
 };
 
 /// \brief Base test fixture for running tests against a mock server.
-/// Each test file running mock server tests should define a
-/// fixture inheriting from this base fixture.
-class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
+class ODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   // Sets up a mock server for each test case
  public:
   /// \brief Get connection string for mock server
@@ -152,14 +160,22 @@ class FlightSQLODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   int port;
 
  protected:
-  void Initialize();
-
   void SetUp() override;
 
   void TearDown() override;
 
  private:
   std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server_;
+};
+
+/// \brief Base test fixture for running tests against a mock server.
+/// Each test file running mock server tests should define a
+/// fixture inheriting from this base fixture.
+class FlightSQLODBCMockTestBase : public ODBCMockTestBase {
+ protected:
+  void SetUp() override;
+
+  void TearDown() override;
 };
 
 /// \brief Base test fixture for running ODBC V2 tests against a mock server.
@@ -169,6 +185,11 @@ class FlightSQLOdbcV2MockTestBase : public FlightSQLODBCMockTestBase {
  protected:
   void SetUp() override;
 };
+
+template <typename T>
+class ODBCTestBase : public T {};
+using OdbcBaseTestTypes = ::testing::Types<ODBCRemoteTestBase, ODBCMockTestBase>;
+TYPED_TEST_SUITE(ODBCTestBase, OdbcBaseTestTypes);
 
 /** ODBC read buffer size. */
 static constexpr int kOdbcBufferSize = 1024;
