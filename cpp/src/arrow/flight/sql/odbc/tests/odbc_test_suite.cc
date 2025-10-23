@@ -349,6 +349,7 @@ void FlightSQLODBCMockTestBase::TearDown() {
     connected_ = false;
   }
   ASSERT_OK(server_->Shutdown());
+  ASSERT_OK(server_->Wait());
 }
 
 void FlightSQLOdbcV2MockTestBase::SetUp() {
