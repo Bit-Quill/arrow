@@ -41,13 +41,11 @@
 #include <sstream>
 
 namespace arrow::flight::sql::odbc {
-
 using config::Configuration;
 using config::ConnectionStringParser;
 using config::DsnConfigurationWindow;
 using config::Result;
 using config::Window;
-
 bool DisplayConnectionWindow(void* window_parent, Configuration& config) {
   HWND hwnd_parent = (HWND)window_parent;
 
@@ -93,9 +91,20 @@ bool DisplayConnectionWindow(void* window_parent, Configuration& config,
     return false;
   }
 }
+}  // namespace arrow::flight::sql::odbc
 
 BOOL INSTAPI ConfigDSNW(HWND hwnd_parent, WORD req, LPCWSTR wdriver,
                         LPCWSTR wattributes) {
+  using arrow::flight::sql::odbc::DisplayConnectionWindow;
+  using arrow::flight::sql::odbc::DriverException;
+  using arrow::flight::sql::odbc::FlightSqlConnection;
+  using arrow::flight::sql::odbc::PostArrowUtilError;
+  using arrow::flight::sql::odbc::PostError;
+  using arrow::flight::sql::odbc::RegisterDsn;
+  using arrow::flight::sql::odbc::UnregisterDsn;
+  using arrow::flight::sql::odbc::config::Configuration;
+  using arrow::flight::sql::odbc::config::ConnectionStringParser;
+
   Configuration config;
   ConnectionStringParser parser(config);
 
@@ -165,4 +174,3 @@ BOOL INSTAPI ConfigDSNW(HWND hwnd_parent, WORD req, LPCWSTR wdriver,
 
   return TRUE;
 }
-}  // namespace arrow::flight::sql::odbc
