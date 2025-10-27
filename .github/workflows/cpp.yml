@@ -362,6 +362,27 @@ jobs:
           path: ccache
           key: cpp-ccache-${{ matrix.msystem_lower}}-${{ hashFiles('cpp/**') }}
           restore-keys: cpp-ccache-${{ matrix.msystem_lower}}-
+      - name: Set up Docker (Linux Engine)
+        uses: crazy-max/ghaction-setup-docker@v3
+        with:
+          version: "latest"
+          daemon-config: |
+            {
+              "experimental": true,
+              "features": { "buildkit": true }
+            }
+      - name: Use Linux Docker context
+        shell: bash
+        run: |
+          docker context ls
+          docker context use default
+      - name: Start Dremio Docker Container
+        run: |
+          cd cpp/src/arrow/flight/sql/odbc/tests/dremio/
+          docker compose up -d
+      - name: Set Up Dremio Instance
+        run: |
+          sh .cpp/src/arrow/flight/sql/odbc/tests/dremio/set_up_dremio_instance.sh
       - name: Build
         shell: msys2 {0}
         run: |
@@ -394,7 +415,33 @@ jobs:
         shell: cmd
         run: |
           call "cpp\src\arrow\flight\sql\odbc\tests\install_odbc.cmd" ${{ github.workspace }}\build\cpp\%ARROW_BUILD_TYPE%\libarrow_flight_sql_odbc.dll
+      # - name: Set up Docker (Linux Engine)
+      #   uses: crazy-max/ghaction-setup-docker@v3
+      #   with:
+      #     version: "latest"
+      #     daemon-config: |
+      #       {
+      #         "experimental": true,
+      #         "features": { "buildkit": true }
+      #       }
+      # - name: Use Linux Docker context
+      #   shell: bash
+      #   run: |
+      #     docker context use default
+      #     docker info | grep "OSType"
+      # - name: Start Dremio Docker Container
+      #   run: |
+      #     cd cpp/src/arrow/flight/sql/odbc/tests/dremio/
+      #     docker compose up -d
+      # - name: Set Up Dremio Instance
+      #   run: |
+      #     cd cpp/src/arrow/flight/sql/odbc/tests/dremio/
+      #     sh ./set_up_dremio_instance.sh
       - name: Test
         shell: msys2 {0}
         run: |
           ci/scripts/cpp_test.sh "$(pwd)" "$(pwd)/build"
+      - name: Stop Dremio Docker Container
+        run: |
+          cd cpp/src/arrow/flight/sql/odbc/tests/dremio/
+          docker compose down

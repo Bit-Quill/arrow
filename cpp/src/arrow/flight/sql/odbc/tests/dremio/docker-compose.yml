@@ -1,0 +1,16 @@
+services:
+  dremio:
+    platform: linux/x86_64
+    image: dremio/dremio-oss:latest
+    ports:
+      - 9047:9047  # REST API
+      - 31010:31010  # JDBC/ODBC
+      - 32010:32010
+    container_name: dremio_container
+    environment:
+    - DREMIO_JAVA_SERVER_EXTRA_OPTS=-Dsaffron.default.charset=UTF-8 -Dsaffron.default.nationalcharset=UTF-8 -Dsaffron.default.collation.name=UTF-8$$en_US
+    healthcheck:
+      test: curl --fail http://localhost:9047 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 30
