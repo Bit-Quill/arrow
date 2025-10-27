@@ -101,16 +101,20 @@ TEST(ODBCHandles, TestSQLAllocAndFreeConnect) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeEnv(env));
 }
 
-TYPED_TEST(ConnectionTest, TestFreeNullHandles) {
+TEST(SQLFreeHandle, TestFreeNullHandles) {
+  SQLHENV env = NULL;
+  SQLHDBC conn = NULL;
+  SQLHSTMT stmt = NULL;
+
   // Verifies attempt to free invalid handle does not cause segfault
   // Attempt to free null statement handle
-  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_STMT, this->stmt));
+  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_STMT, stmt));
 
   // Attempt to free null connection handle
-  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_DBC, this->conn));
+  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_DBC, conn));
 
   // Attempt to free null environment handle
-  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_ENV, this->env));
+  ASSERT_EQ(SQL_INVALID_HANDLE, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
 TEST(SQLGetEnvAttr, TestSQLGetEnvAttrODBCVersion) {
