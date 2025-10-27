@@ -46,7 +46,7 @@ using TestTypesOdbcV2 =
     ::testing::Types<FlightSQLOdbcV2MockTestBase, FlightSQLOdbcV2RemoteTestBase>;
 TYPED_TEST_SUITE(ErrorsOdbcV2Test, TestTypesOdbcV2);
 
-TYPED_TEST(ErrorsTest, TestSQLGetDiagFieldWForConnectFailure) {
+TYPED_TEST(ODBCTestBase, TestSQLGetDiagFieldWForConnectFailure) {
   //  ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
@@ -137,7 +137,7 @@ TYPED_TEST(ErrorsTest, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 }
 
-TYPED_TEST(ErrorsTest, DISABLED_TestSQLGetDiagFieldWForConnectFailureNTS) {
+TYPED_TEST(ODBCTestBase, DISABLED_TestSQLGetDiagFieldWForConnectFailureNTS) {
   // Test is disabled because driver manager on Windows does not pass through SQL_NTS
   // This test case can be potentially used on macOS/Linux
   SQLHENV env;
@@ -287,7 +287,7 @@ TYPED_TEST(ErrorsTest, TestSQLGetDiagRecForDescriptorFailureFromDriverManager) {
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_DESC, descriptor));
 }
 
-TYPED_TEST(ErrorsTest, TestSQLGetDiagRecForConnectFailure) {
+TYPED_TEST(ODBCTestBase, TestSQLGetDiagRecForConnectFailure) {
   //  ODBC Environment
   SQLHENV env;
   SQLHDBC conn;
