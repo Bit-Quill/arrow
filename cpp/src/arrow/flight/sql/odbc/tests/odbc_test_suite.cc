@@ -184,6 +184,10 @@ void FlightSQLOdbcV2RemoteTestBase::SetUp() {
 
 void FlightSQLOdbcHandleRemoteTestBase::SetUp() {
   ODBCRemoteTestBase::SetUp();
+  if (skipping_test_) {
+    return;
+  }
+
   this->AllocEnvConnHandles();
 }
 
