@@ -77,6 +77,8 @@ class ODBCRemoteTestBase : public ::testing::Test {
 
  protected:
   void SetUp() override;
+
+  bool skipping_test_ = false;
 };
 
 /// \brief Base test fixture for running tests against a remote server.
