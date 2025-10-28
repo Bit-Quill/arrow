@@ -109,6 +109,8 @@ class FlightSQLOdbcHandleRemoteTestBase : public FlightSQLODBCRemoteTestBase {
  protected:
   void SetUp() override;
   void TearDown() override;
+
+  bool allocated_ = false;
 };
 
 static constexpr std::string_view kAuthorizationHeader = "authorization";

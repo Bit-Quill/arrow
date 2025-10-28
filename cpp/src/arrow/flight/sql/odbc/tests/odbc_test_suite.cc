@@ -189,9 +189,15 @@ void FlightSQLOdbcHandleRemoteTestBase::SetUp() {
   }
 
   this->AllocEnvConnHandles();
+  allocated_ = true;
 }
 
-void FlightSQLOdbcHandleRemoteTestBase::TearDown() { this->FreeEnvConnHandles(); }
+void FlightSQLOdbcHandleRemoteTestBase::TearDown() {
+  if (allocated_) {
+    this->FreeEnvConnHandles();
+    allocated_ = false;
+  }
+}
 
 std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
   // Lambda function to compare characters without case sensitivity.
