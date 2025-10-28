@@ -73,6 +73,10 @@ void ODBCRemoteTestBase::Disconnect() {
   EXPECT_EQ(SQL_SUCCESS, SQLDisconnect(conn))
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 
+  FreeEnvConnHandles();
+}
+
+void ODBCRemoteTestBase::FreeEnvConnHandles() {
   // Free connection handle
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_DBC, conn));
 
@@ -176,6 +180,23 @@ void FlightSQLOdbcV2RemoteTestBase::SetUp() {
 
   this->Connect(SQL_OV_ODBC2);
   connected_ = true;
+}
+
+void FlightSQLOdbcHandleRemoteTestBase::SetUp() {
+  ODBCRemoteTestBase::SetUp();
+  if (skipping_test_) {
+    return;
+  }
+
+  this->AllocEnvConnHandles();
+  allocated_ = true;
+}
+
+void FlightSQLOdbcHandleRemoteTestBase::TearDown() {
+  if (allocated_) {
+    this->FreeEnvConnHandles();
+    allocated_ = false;
+  }
 }
 
 std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
@@ -369,6 +390,16 @@ void FlightSQLOdbcV2MockTestBase::SetUp() {
   ODBCMockTestBase::SetUp();
   this->Connect(SQL_OV_ODBC2);
   connected_ = true;
+}
+
+void FlightSQLOdbcHandleMockTestBase::SetUp() {
+  ODBCMockTestBase::SetUp();
+  this->AllocEnvConnHandles();
+}
+
+void FlightSQLOdbcHandleMockTestBase::TearDown() {
+  this->FreeEnvConnHandles();
+  ODBCMockTestBase::TearDown();
 }
 
 bool CompareConnPropertyMap(Connection::ConnPropertyMap map1,
