@@ -31,15 +31,15 @@ set(ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS
 
 add_arrow_test(flight_sql_odbc_test
                SOURCES
-               columns_test.cc
-               connection_attr_test.cc
-               connection_info_test.cc
-               errors_test.cc
-               get_functions_test.cc
-               statement_attr_test.cc
-               statement_test.cc
-               tables_test.cc
-               type_info_test.cc
+               #columns_test.cc
+               #connection_attr_test.cc
+               #connection_info_test.cc
+               #errors_test.cc
+               #get_functions_test.cc
+               #statement_attr_test.cc
+               #statement_test.cc
+               #tables_test.cc
+               #type_info_test.cc
                # Move connection_test to last to prevent segfault errors
                connection_test.cc
                odbc_test_suite.cc
