@@ -766,8 +766,6 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
   // GH-46560 TODO: Copy connection string properly in SQLDriverConnect according to the
   // spec
 
-  using arrow::flight::sql::odbc::Connection;
-  using arrow::flight::sql::odbc::DriverException;
   using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
@@ -840,8 +838,6 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* dsn_name, SQLSMALLINT dsn_name_len,
                    << ", password: " << static_cast<const void*>(password)
                    << ", password_len: " << password_len;
 
-  using arrow::flight::sql::odbc::FlightSqlConnection;
-  using arrow::flight::sql::odbc::config::Configuration;
   using ODBC::ODBCConnection;
 
   using ODBC::SqlWcharToString;
