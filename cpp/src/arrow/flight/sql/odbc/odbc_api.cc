@@ -764,8 +764,15 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value_ptr,
   ARROW_LOG(DEBUG) << "SQLSetConnectAttrW called with conn: " << conn
                    << ", attr: " << attr << ", value_ptr: " << value_ptr
                    << ", value_len: " << value_len;
-  // GH-47708 TODO: Implement SQLSetConnectAttr
-  return SQL_INVALID_HANDLE;
+  // GH-47708 TODO: Add tests for SQLSetConnectAttr
+  using ODBC::ODBCConnection;
+
+  return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    const bool is_unicode = true;
+    ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
+    connection->SetConnectAttr(attr, value_ptr, value_len, is_unicode);
+    return SQL_SUCCESS;
+  });
 }
 
 // Load properties from the given DSN. The properties loaded do _not_ overwrite existing
