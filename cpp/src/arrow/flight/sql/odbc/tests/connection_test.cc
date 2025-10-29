@@ -217,6 +217,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeEnv(env));
 }
 
+/*
 TYPED_TEST(ConnectionHandleTest, TestSQLDriverConnect) {
   // Connect string
   std::string connect_str = this->GetConnectionString();
@@ -465,7 +466,10 @@ TYPED_TEST(ConnectionHandleTest, TestSQLDisconnectWithoutConnection) {
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorState08003);
 }
 
+*/
+
+// -AL- TODO attempt to reproduce segfault test with just TestConnect
 TYPED_TEST(ConnectionTest, TestConnect) {
-  // Verifies connect and disconnect works on its own
+  // Verifies connect and disconnect during setup/teardown works on its own
 }
 }  // namespace arrow::flight::sql::odbc

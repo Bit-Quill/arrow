@@ -54,12 +54,13 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
       using ODBC::ODBCEnvironment;
 
       *result = SQL_NULL_HENV;
-
+      ARROW_LOG(DEBUG) << "-AL- 57 SQLAllocHandle\n";
       try {
         static std::shared_ptr<FlightSqlDriver> odbc_driver =
             std::make_shared<FlightSqlDriver>();
+        ARROW_LOG(DEBUG) << "-AL- 61 SQLAllocHandle\n";
         *result = reinterpret_cast<SQLHENV>(new ODBCEnvironment(odbc_driver));
-
+        ARROW_LOG(DEBUG) << "-AL- 64 SQLAllocHandle\n";
         return SQL_SUCCESS;
       } catch (const std::bad_alloc&) {
         // allocating environment failed so cannot log diagnostic error here
@@ -72,22 +73,24 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
       using ODBC::ODBCEnvironment;
 
       *result = SQL_NULL_HDBC;
-
+      ARROW_LOG(DEBUG) << "-AL- 76 SQLAllocHandle\n";
       ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(parent);
-
+      ARROW_LOG(DEBUG) << "-AL- 78 SQLAllocHandle\n";
       return ODBCEnvironment::ExecuteWithDiagnostics(environment, SQL_ERROR, [=]() {
+        ARROW_LOG(DEBUG) << "-AL- 80 SQLAllocHandle\n";
         std::shared_ptr<ODBCConnection> conn = environment->CreateConnection();
-
+        ARROW_LOG(DEBUG) << "-AL- 82 SQLAllocHandle\n";
         if (conn) {
+          ARROW_LOG(DEBUG) << "-AL- 84 SQLAllocHandle\n";
           // Inside `CreateConnection`, the shared_ptr `conn` is kept
           // in a `std::vector` of connections inside the environment handle.
           // As long as the parent environment handle is alive, the connection shared_ptr
           // will be kept alive unless the user frees the connection.
           *result = reinterpret_cast<SQLHDBC>(conn.get());
-
+          ARROW_LOG(DEBUG) << "-AL- 90 SQLAllocHandle\n";
           return SQL_SUCCESS;
         }
-
+        ARROW_LOG(DEBUG) << "-AL- 93 SQLAllocHandle\n";
         return SQL_ERROR;
       });
     }
@@ -97,18 +100,20 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
       using ODBC::ODBCStatement;
 
       *result = SQL_NULL_HSTMT;
-
+      ARROW_LOG(DEBUG) << "-AL- 103 SQLAllocHandle\n";
       ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(parent);
-
+      ARROW_LOG(DEBUG) << "-AL- 105 SQLAllocHandle\n";
       return ODBCConnection::ExecuteWithDiagnostics(connection, SQL_ERROR, [=]() {
+        ARROW_LOG(DEBUG) << "-AL- 107 SQLAllocHandle\n";
         std::shared_ptr<ODBCStatement> statement = connection->CreateStatement();
-
+        ARROW_LOG(DEBUG) << "-AL- 109 SQLAllocHandle\n";
         if (statement) {
+          ARROW_LOG(DEBUG) << "-AL- 111 SQLAllocHandle\n";
           *result = reinterpret_cast<SQLHSTMT>(statement.get());
-
+          ARROW_LOG(DEBUG) << "-AL- 113 SQLAllocHandle\n";
           return SQL_SUCCESS;
         }
-
+        ARROW_LOG(DEBUG) << "-AL- 116 SQLAllocHandle\n";
         return SQL_ERROR;
       });
     }
@@ -118,26 +123,30 @@ SQLRETURN SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) 
       using ODBC::ODBCDescriptor;
 
       *result = SQL_NULL_HDESC;
-
+      ARROW_LOG(DEBUG) << "-AL- 126 SQLAllocHandle\n";
       ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(parent);
-
+      ARROW_LOG(DEBUG) << "-AL- 128 SQLAllocHandle\n";
       return ODBCConnection::ExecuteWithDiagnostics(connection, SQL_ERROR, [=]() {
+        ARROW_LOG(DEBUG) << "-AL- 130 SQLAllocHandle\n";
         std::shared_ptr<ODBCDescriptor> descriptor = connection->CreateDescriptor();
-
+        ARROW_LOG(DEBUG) << "-AL- 132 SQLAllocHandle\n";
         if (descriptor) {
+          ARROW_LOG(DEBUG) << "-AL- 134 SQLAllocHandle\n";
           *result = reinterpret_cast<SQLHDESC>(descriptor.get());
-
+          ARROW_LOG(DEBUG) << "-AL- 136 SQLAllocHandle\n";
           return SQL_SUCCESS;
         }
-
+        ARROW_LOG(DEBUG) << "-AL- 139 SQLAllocHandle\n";
         return SQL_ERROR;
       });
     }
 
     default:
+      ARROW_LOG(DEBUG) << "-AL- 145 SQLAllocHandle\n";
       break;
   }
 
+  ARROW_LOG(DEBUG) << "-AL- 149 SQLAllocHandle\n";
   return SQL_ERROR;
 }
 
@@ -152,67 +161,72 @@ SQLRETURN SQLFreeHandle(SQLSMALLINT type, SQLHANDLE handle) {
   switch (type) {
     case SQL_HANDLE_ENV: {
       using ODBC::ODBCEnvironment;
-
+      ARROW_LOG(DEBUG) << "-AL- 164 SQLFreeHandle\n";
       ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(handle);
-
+      ARROW_LOG(DEBUG) << "-AL- 166 SQLFreeHandle\n";
       if (!environment) {
+        ARROW_LOG(DEBUG) << "-AL- 168 SQLFreeHandle\n";
         return SQL_INVALID_HANDLE;
       }
-
+      ARROW_LOG(DEBUG) << "-AL- 171 SQLFreeHandle\n";
       delete environment;
-
+      ARROW_LOG(DEBUG) << "-AL- 173 SQLFreeHandle\n";
       return SQL_SUCCESS;
     }
 
     case SQL_HANDLE_DBC: {
       using ODBC::ODBCConnection;
-
+      ARROW_LOG(DEBUG) << "-AL- 179 SQLFreeHandle\n";
       ODBCConnection* conn = reinterpret_cast<ODBCConnection*>(handle);
-
+      ARROW_LOG(DEBUG) << "-AL- 181 SQLFreeHandle\n";
       if (!conn) {
+        ARROW_LOG(DEBUG) << "-AL- 183 SQLFreeHandle\n";
         return SQL_INVALID_HANDLE;
       }
-
+      ARROW_LOG(DEBUG) << "-AL- 186 SQLFreeHandle\n";
       // `ReleaseConnection` does the equivalent of `delete`.
       // `ReleaseConnection` removes the connection `shared_ptr` from the `std::vector` of
       // connections, and the `shared_ptr` is automatically destructed afterwards.
       conn->ReleaseConnection();
-
+      ARROW_LOG(DEBUG) << "-AL- 191 SQLFreeHandle\n";
       return SQL_SUCCESS;
     }
 
     case SQL_HANDLE_STMT: {
       using ODBC::ODBCStatement;
-
+      ARROW_LOG(DEBUG) << "-AL- 197 SQLFreeHandle\n";
       ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(handle);
-
+      ARROW_LOG(DEBUG) << "-AL- 199 SQLFreeHandle\n";
       if (!statement) {
+        ARROW_LOG(DEBUG) << "-AL- 201 SQLFreeHandle\n";
         return SQL_INVALID_HANDLE;
       }
-
+      ARROW_LOG(DEBUG) << "-AL- 204 SQLFreeHandle\n";
       statement->ReleaseStatement();
-
+      ARROW_LOG(DEBUG) << "-AL- 206 SQLFreeHandle\n";
       return SQL_SUCCESS;
     }
 
     case SQL_HANDLE_DESC: {
       using ODBC::ODBCDescriptor;
-
+      ARROW_LOG(DEBUG) << "-AL- 212 SQLFreeHandle\n";
       ODBCDescriptor* descriptor = reinterpret_cast<ODBCDescriptor*>(handle);
-
+      ARROW_LOG(DEBUG) << "-AL- 214 SQLFreeHandle\n";
       if (!descriptor) {
+        ARROW_LOG(DEBUG) << "-AL- 216 SQLFreeHandle\n";
         return SQL_INVALID_HANDLE;
       }
-
+      ARROW_LOG(DEBUG) << "-AL- 219 SQLFreeHandle\n";
       descriptor->ReleaseDescriptor();
-
+      ARROW_LOG(DEBUG) << "-AL- 221 SQLFreeHandle\n";
       return SQL_SUCCESS;
     }
 
     default:
+      ARROW_LOG(DEBUG) << "-AL- 226 SQLFreeHandle\n";
       break;
   }
-
+  ARROW_LOG(DEBUG) << "-AL- 229 SQLFreeHandle\n";
   return SQL_ERROR;
 }
 
@@ -611,49 +625,64 @@ SQLRETURN SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value_ptr,
   using ODBC::ODBCEnvironment;
 
   ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
-
+  ARROW_LOG(DEBUG) << "-AL- 628 SQLGetEnvAttr\n";
   return ODBCEnvironment::ExecuteWithDiagnostics(environment, SQL_ERROR, [=]() {
+    ARROW_LOG(DEBUG) << "-AL- 630 SQLGetEnvAttr\n";
     switch (attr) {
       case SQL_ATTR_ODBC_VERSION: {
+        ARROW_LOG(DEBUG) << "-AL- 633 SQLGetEnvAttr\n";
         if (!value_ptr && !str_len_ptr) {
+          ARROW_LOG(DEBUG) << "-AL- 635 SQLGetEnvAttr\n";
           throw DriverException("Invalid null pointer for attribute.", "HY000");
         }
-
+        ARROW_LOG(DEBUG) << "-AL- 638 SQLGetEnvAttr\n";
         if (value_ptr) {
+          ARROW_LOG(DEBUG) << "-AL- 640 SQLGetEnvAttr\n";
           SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(value_ptr);
+          ARROW_LOG(DEBUG) << "-AL- 642 SQLGetEnvAttr\n";
           *value = static_cast<SQLSMALLINT>(environment->GetODBCVersion());
+          ARROW_LOG(DEBUG) << "-AL- 644 SQLGetEnvAttr\n";
         }
-
+        ARROW_LOG(DEBUG) << "-AL- 646 SQLGetEnvAttr\n";
         if (str_len_ptr) {
+          ARROW_LOG(DEBUG) << "-AL- 648 SQLGetEnvAttr\n";
           *str_len_ptr = sizeof(SQLINTEGER);
         }
-
+        ARROW_LOG(DEBUG) << "-AL- 651 SQLGetEnvAttr\n";
         return SQL_SUCCESS;
       }
 
       case SQL_ATTR_OUTPUT_NTS: {
+        ARROW_LOG(DEBUG) << "-AL- 656 SQLGetEnvAttr\n";
         if (!value_ptr && !str_len_ptr) {
+          ARROW_LOG(DEBUG) << "-AL- 658 SQLGetEnvAttr\n";
           throw DriverException("Invalid null pointer for attribute.", "HY000");
         }
-
+        ARROW_LOG(DEBUG) << "-AL- 661 SQLGetEnvAttr\n";
         if (value_ptr) {
+          ARROW_LOG(DEBUG) << "-AL- 663 SQLGetEnvAttr\n";
           // output nts always returns SQL_TRUE
           SQLINTEGER* value = reinterpret_cast<SQLINTEGER*>(value_ptr);
+          ARROW_LOG(DEBUG) << "-AL- 666 SQLGetEnvAttr\n";
           *value = SQL_TRUE;
         }
-
+        ARROW_LOG(DEBUG) << "-AL- 669 SQLGetEnvAttr\n";
         if (str_len_ptr) {
+          ARROW_LOG(DEBUG) << "-AL- 671 SQLGetEnvAttr\n";
           *str_len_ptr = sizeof(SQLINTEGER);
         }
+        ARROW_LOG(DEBUG) << "-AL- 674 SQLGetEnvAttr\n";
 
         return SQL_SUCCESS;
       }
 
       case SQL_ATTR_CONNECTION_POOLING: {
+        ARROW_LOG(DEBUG) << "-AL- 680 SQLGetEnvAttr\n";
         throw DriverException("Optional feature not supported.", "HYC00");
       }
 
       default: {
+        ARROW_LOG(DEBUG) << "-AL- 685 SQLGetEnvAttr\n";
         throw DriverException("Invalid attribute", "HYC00");
       }
     }
@@ -668,40 +697,52 @@ SQLRETURN SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value_ptr,
   using ODBC::ODBCEnvironment;
 
   ODBCEnvironment* environment = reinterpret_cast<ODBCEnvironment*>(env);
-
+  ARROW_LOG(DEBUG) << "-AL- 700 SQLSetEnvAttr\n";
   return ODBCEnvironment::ExecuteWithDiagnostics(environment, SQL_ERROR, [=]() {
+    ARROW_LOG(DEBUG) << "-AL- 702 SQLSetEnvAttr\n";
     if (!value_ptr) {
+      ARROW_LOG(DEBUG) << "-AL- 704 SQLSetEnvAttr\n";
       throw DriverException("Invalid null pointer for attribute.", "HY024");
     }
-
+    ARROW_LOG(DEBUG) << "-AL- 707 SQLSetEnvAttr\n";
     switch (attr) {
       case SQL_ATTR_ODBC_VERSION: {
+        ARROW_LOG(DEBUG) << "-AL- 710 SQLSetEnvAttr\n";
         SQLINTEGER version =
             static_cast<SQLINTEGER>(reinterpret_cast<intptr_t>(value_ptr));
+        ARROW_LOG(DEBUG) << "-AL- 713 SQLSetEnvAttr\n";
         if (version == SQL_OV_ODBC2 || version == SQL_OV_ODBC3) {
+          ARROW_LOG(DEBUG) << "-AL- 715 SQLSetEnvAttr\n";
           environment->SetODBCVersion(version);
-
+          ARROW_LOG(DEBUG) << "-AL- 717 SQLSetEnvAttr\n";
           return SQL_SUCCESS;
         } else {
+          ARROW_LOG(DEBUG) << "-AL- 720 SQLSetEnvAttr\n";
           throw DriverException("Invalid value for attribute", "HY024");
         }
       }
 
       case SQL_ATTR_OUTPUT_NTS: {
+        ARROW_LOG(DEBUG) << "-AL- 726 SQLSetEnvAttr\n";
         // output nts can not be set to SQL_FALSE, is always SQL_TRUE
         SQLINTEGER value = static_cast<SQLINTEGER>(reinterpret_cast<intptr_t>(value_ptr));
+        ARROW_LOG(DEBUG) << "-AL- 729 SQLSetEnvAttr\n";
         if (value == SQL_TRUE) {
+          ARROW_LOG(DEBUG) << "-AL- 731 SQLSetEnvAttr\n";
           return SQL_SUCCESS;
         } else {
+          ARROW_LOG(DEBUG) << "-AL- 734 SQLSetEnvAttr\n";
           throw DriverException("Invalid value for attribute", "HY024");
         }
       }
 
       case SQL_ATTR_CONNECTION_POOLING: {
+        ARROW_LOG(DEBUG) << "-AL- 740 SQLSetEnvAttr\n";
         throw DriverException("Optional feature not supported.", "HYC00");
       }
 
       default: {
+        ARROW_LOG(DEBUG) << "-AL- 745 SQLSetEnvAttr\n";
         throw DriverException("Invalid attribute", "HY092");
       }
     }
@@ -769,23 +810,31 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
   using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    ARROW_LOG(DEBUG) << "-AL- 813 SQLDriverConnectW\n";
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
+    ARROW_LOG(DEBUG) << "-AL- 815 SQLDriverConnectW\n";
     std::string connection_string =
         ODBC::SqlWcharToString(in_connection_string, in_connection_string_len);
+    ARROW_LOG(DEBUG) << "-AL- 818 SQLDriverConnectW\n";
     Connection::ConnPropertyMap properties;
+    ARROW_LOG(DEBUG) << "-AL- 820 SQLDriverConnectW\n";
     std::string dsn = ODBCConnection::GetDsnIfExists(connection_string);
+    ARROW_LOG(DEBUG) << "-AL- 822 SQLDriverConnectW\n";
     if (!dsn.empty()) {
+      ARROW_LOG(DEBUG) << "-AL- 824 SQLDriverConnectW\n";
       LoadPropertiesFromDSN(dsn, properties);
     }
+    ARROW_LOG(DEBUG) << "-AL- 827 SQLDriverConnectW\n";
     ODBCConnection::GetPropertiesFromConnString(connection_string, properties);
-
+    ARROW_LOG(DEBUG) << "-AL- 829 SQLDriverConnectW\n";
     std::vector<std::string_view> missing_properties;
-
+    ARROW_LOG(DEBUG) << "-AL- 831 SQLDriverConnectW\n";
     // GH-46448 TODO: Implement SQL_DRIVER_COMPLETE_REQUIRED in SQLDriverConnect according
     // to the spec
 #if defined _WIN32
     // Load the DSN window according to driver_completion
     if (driver_completion == SQL_DRIVER_PROMPT) {
+      ARROW_LOG(DEBUG) << "-AL- 837 SQLDriverConnectW\n";
       // Load DSN window before first attempt to connect
       arrow::flight::sql::odbc::config::Configuration config;
       if (!DisplayConnectionWindow(window_handle, config, properties)) {
@@ -794,6 +843,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
       connection->Connect(dsn, properties, missing_properties);
     } else if (driver_completion == SQL_DRIVER_COMPLETE ||
                driver_completion == SQL_DRIVER_COMPLETE_REQUIRED) {
+      ARROW_LOG(DEBUG) << "-AL- 846 SQLDriverConnectW\n";
       try {
         connection->Connect(dsn, properties, missing_properties);
       } catch (const DriverException&) {
@@ -812,6 +862,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
         }
       }
     } else {
+      ARROW_LOG(DEBUG) << "-AL- 865 SQLDriverConnectW\n";
       // Default case: attempt connection without showing DSN window
       connection->Connect(dsn, properties, missing_properties);
     }
@@ -820,6 +871,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
     connection->Connect(dsn, properties, missing_properties);
 #endif
     // Copy connection string to out_connection_string after connection attempt
+    ARROW_LOG(DEBUG) << "-AL- 874 SQLDriverConnectW\n";
     return ODBC::GetStringAttribute(true, connection_string, false, out_connection_string,
                                     out_connection_string_buffer_len,
                                     out_connection_string_len,
@@ -843,26 +895,33 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* dsn_name, SQLSMALLINT dsn_name_len,
   using ODBC::SqlWcharToString;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    ARROW_LOG(DEBUG) << "-AL- 898 SQLConnectW\n";
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
+    ARROW_LOG(DEBUG) << "-AL- 900 SQLConnectW\n";
     std::string dsn = SqlWcharToString(dsn_name, dsn_name_len);
-
+    ARROW_LOG(DEBUG) << "-AL- 902 SQLConnectW\n";
     Configuration config;
+    ARROW_LOG(DEBUG) << "-AL- 904 SQLConnectW\n";
     config.LoadDsn(dsn);
-
+    ARROW_LOG(DEBUG) << "-AL- 906 SQLConnectW\n";
     if (user_name) {
+      ARROW_LOG(DEBUG) << "-AL- 908 SQLConnectW\n";
       std::string uid = SqlWcharToString(user_name, user_name_len);
+      ARROW_LOG(DEBUG) << "-AL- 910 SQLConnectW\n";
       config.Emplace(FlightSqlConnection::UID, std::move(uid));
     }
-
+    ARROW_LOG(DEBUG) << "-AL- 913 SQLConnectW\n";
     if (password) {
+      ARROW_LOG(DEBUG) << "-AL- 915 SQLConnectW\n";
       std::string pwd = SqlWcharToString(password, password_len);
+      ARROW_LOG(DEBUG) << "-AL- 917 SQLConnectW\n";
       config.Emplace(FlightSqlConnection::PWD, std::move(pwd));
     }
-
+    ARROW_LOG(DEBUG) << "-AL- 920 SQLConnectW\n";
     std::vector<std::string_view> missing_properties;
-
+    ARROW_LOG(DEBUG) << "-AL- 922 SQLConnectW\n";
     connection->Connect(dsn, config.GetProperties(), missing_properties);
-
+    ARROW_LOG(DEBUG) << "-AL- 924 SQLConnectW\n";
     return SQL_SUCCESS;
   });
 }
@@ -873,10 +932,11 @@ SQLRETURN SQLDisconnect(SQLHDBC conn) {
   using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    ARROW_LOG(DEBUG) << "-AL- 935 SQLDisconnect\n";
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
-
+    ARROW_LOG(DEBUG) << "-AL- 937 SQLDisconnect\n";
     connection->Disconnect();
-
+    ARROW_LOG(DEBUG) << "-AL- 939 SQLDisconnect\n";
     return SQL_SUCCESS;
   });
 }
@@ -893,17 +953,20 @@ SQLRETURN SQLGetInfo(SQLHDBC conn, SQLUSMALLINT info_type, SQLPOINTER info_value
   using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    ARROW_LOG(DEBUG) << "-AL- 956 SQLGetInfoW\n";
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
-
+    ARROW_LOG(DEBUG) << "-AL- 958 SQLGetInfoW\n";
     // Set character type to be Unicode by default
     const bool is_unicode = true;
-
+    ARROW_LOG(DEBUG) << "-AL- 961 SQLGetInfoW\n";
     if (!info_value_ptr && !string_length_ptr) {
+      ARROW_LOG(DEBUG) << "-AL- 963 SQLGetInfoW\n";
       return static_cast<SQLRETURN>(SQL_ERROR);
     }
-
+    ARROW_LOG(DEBUG) << "-AL- 966 SQLGetInfoW\n";
     connection->GetInfo(info_type, info_value_ptr, buf_len, string_length_ptr,
                         is_unicode);
+    ARROW_LOG(DEBUG) << "-AL- 969 SQLGetInfoW\n";
     return static_cast<SQLRETURN>(SQL_SUCCESS);
   });
 }
