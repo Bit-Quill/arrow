@@ -42,6 +42,7 @@ using TestTypesHandle =
     ::testing::Types<FlightSQLOdbcHandleMockTestBase, FlightSQLOdbcHandleRemoteTestBase>;
 TYPED_TEST_SUITE(ConnectionHandleTest, TestTypesHandle);
 
+/* // -AL- unit tests that do not use driver
 TEST(ODBCHandles, TestSQLAllocAndFreeEnv) {
   // Allocate an environment handle
   SQLHENV env;
@@ -151,6 +152,8 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeEnv(env));
 }
 
+*/ // -AL- unit tests that do not use driver
+
 //-AL- disable segfault test
 
 /*
@@ -164,6 +167,8 @@ TYPED_TEST(ConnectionTest, TestSQLGetEnvAttrOutputNTS) {
 }
 */
 
+
+/* //// -AL- unit tests that do not use driver
 TYPED_TEST(ConnectionTest, DISABLED_TestSQLGetEnvAttrGetLength) {
   // Test is disabled because call to SQLGetEnvAttr is handled by the driver manager on
   // Windows. Windows driver manager ignores the length pointer.
@@ -220,6 +225,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
   // Free environment handle
   ASSERT_EQ(SQL_SUCCESS, SQLFreeEnv(env));
 }
+*/ // -AL- unit tests that do not use driver
 
 /*
 TYPED_TEST(ConnectionHandleTest, TestSQLDriverConnect) {
