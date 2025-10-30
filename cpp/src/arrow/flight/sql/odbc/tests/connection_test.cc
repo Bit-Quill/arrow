@@ -466,10 +466,11 @@ TYPED_TEST(ConnectionHandleTest, TestSQLDisconnectWithoutConnection) {
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorState08003);
 }
 
-*/
 
-// -AL- TODO attempt to reproduce segfault test with just TestConnect
+
+// -AL- TODO disable to see if this test causes segfault?
 TYPED_TEST(ConnectionTest, TestConnect) {
   // Verifies connect and disconnect during setup/teardown works on its own
 }
+*/
 }  // namespace arrow::flight::sql::odbc
