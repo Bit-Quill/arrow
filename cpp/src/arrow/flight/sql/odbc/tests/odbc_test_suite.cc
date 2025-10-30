@@ -72,9 +72,8 @@ void ODBCRemoteTestBase::Disconnect() {
   // Disconnect from ODBC
   EXPECT_EQ(SQL_SUCCESS, SQLDisconnect(conn))
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
-
-  FreeEnvConnHandles();
   std::cout << "ODBCRemoteTestBase Disconnect 74\n";
+  this->FreeEnvConnHandles();
   std::cout << "ODBCRemoteTestBase Disconnect 77\n";
 }
 
