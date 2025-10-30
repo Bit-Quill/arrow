@@ -151,7 +151,7 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrODBCVersionInvalid) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeEnv(env));
 }
 
-//-AL- remove segfault test
+//-AL- disable segfault test
 
 /*
 TYPED_TEST(ConnectionTest, TestSQLGetEnvAttrOutputNTS) {
@@ -470,11 +470,11 @@ TYPED_TEST(ConnectionHandleTest, TestSQLDisconnectWithoutConnection) {
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorState08003);
 }
 
+*/
 
-
-// -AL- TODO disable to see if this test causes segfault?
+// -AL- TODO enable to see if this test causes segfault?
 TYPED_TEST(ConnectionTest, TestConnect) {
   // Verifies connect and disconnect during setup/teardown works on its own
 }
-*/
+
 }  // namespace arrow::flight::sql::odbc
