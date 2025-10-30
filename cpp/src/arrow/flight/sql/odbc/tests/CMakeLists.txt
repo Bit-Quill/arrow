@@ -31,7 +31,7 @@ set(ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS
 
 add_arrow_test(flight_sql_odbc_test
                SOURCES
-               #columns_test.cc
+               columns_test.cc
                #connection_attr_test.cc
                #connection_info_test.cc
                #errors_test.cc
