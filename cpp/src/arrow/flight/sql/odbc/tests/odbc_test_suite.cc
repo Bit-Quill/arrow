@@ -73,7 +73,7 @@ void ODBCRemoteTestBase::Disconnect() {
   EXPECT_EQ(SQL_SUCCESS, SQLDisconnect(conn))
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
   std::cout << "ODBCRemoteTestBase Disconnect 74\n";
-  this->FreeEnvConnHandles();
+  FreeEnvConnHandles();
   std::cout << "ODBCRemoteTestBase Disconnect 77\n";
 }
 
@@ -170,7 +170,7 @@ void FlightSQLODBCRemoteTestBase::SetUp() {
     return;
   }
   std::cout << "FlightSQLODBCRemoteTestBase SetUp 172\n";
-  this->Connect();
+  Connect();
   std::cout << "FlightSQLODBCRemoteTestBase SetUp 174\n";
   connected_ = true;
   std::cout << "FlightSQLODBCRemoteTestBase SetUp 176\n";
@@ -180,7 +180,7 @@ void FlightSQLODBCRemoteTestBase::TearDown() {
   std::cout << "FlightSQLODBCRemoteTestBase TearDown 180\n";
   if (connected_) {
     std::cout << "FlightSQLODBCRemoteTestBase TearDown 182\n";
-    this->Disconnect();
+    Disconnect();
     std::cout << "FlightSQLODBCRemoteTestBase TearDown 184\n";
     connected_ = false;
     std::cout << "FlightSQLODBCRemoteTestBase TearDown 186\n";
@@ -194,7 +194,7 @@ void FlightSQLOdbcV2RemoteTestBase::SetUp() {
     return;
   }
 
-  this->Connect(SQL_OV_ODBC2);
+  Connect(SQL_OV_ODBC2);
   connected_ = true;
 }
 
@@ -204,13 +204,13 @@ void FlightSQLOdbcHandleRemoteTestBase::SetUp() {
     return;
   }
 
-  this->AllocEnvConnHandles();
+  AllocEnvConnHandles();
   allocated_ = true;
 }
 
 void FlightSQLOdbcHandleRemoteTestBase::TearDown() {
   if (allocated_) {
-    this->FreeEnvConnHandles();
+    FreeEnvConnHandles();
     allocated_ = false;
   }
 }
@@ -396,7 +396,7 @@ void FlightSQLODBCMockTestBase::SetUp() {
   std::cout << "FlightSQLODBCMockTestBase SetUp 380\n";
   ODBCMockTestBase::SetUp();
   std::cout << "FlightSQLODBCMockTestBase SetUp 382\n";
-  this->Connect();
+  Connect();
   std::cout << "FlightSQLODBCMockTestBase SetUp 384\n";
   connected_ = true;
   std::cout << "FlightSQLODBCMockTestBase SetUp 386\n";
@@ -414,7 +414,7 @@ void FlightSQLODBCMockTestBase::TearDown() {
   std::cout << "FlightSQLODBCMockTestBase TearDown 398\n";
   if (connected_) {
     std::cout << "FlightSQLODBCMockTestBase TearDown 400\n";
-    this->Disconnect();
+    Disconnect();
     std::cout << "FlightSQLODBCMockTestBase TearDown 402\n";
     connected_ = false;
     std::cout << "FlightSQLODBCMockTestBase TearDown 404\n";
@@ -426,17 +426,17 @@ void FlightSQLODBCMockTestBase::TearDown() {
 
 void FlightSQLOdbcV2MockTestBase::SetUp() {
   ODBCMockTestBase::SetUp();
-  this->Connect(SQL_OV_ODBC2);
+  Connect(SQL_OV_ODBC2);
   connected_ = true;
 }
 
 void FlightSQLOdbcHandleMockTestBase::SetUp() {
   ODBCMockTestBase::SetUp();
-  this->AllocEnvConnHandles();
+  AllocEnvConnHandles();
 }
 
 void FlightSQLOdbcHandleMockTestBase::TearDown() {
-  this->FreeEnvConnHandles();
+  FreeEnvConnHandles();
   ODBCMockTestBase::TearDown();
 }
 
