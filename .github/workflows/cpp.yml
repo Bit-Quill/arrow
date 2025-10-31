@@ -402,13 +402,13 @@ jobs:
           path: ccache
           key: cpp-ccache-${{ matrix.msystem_lower}}-${{ hashFiles('cpp/**') }}
           restore-keys: cpp-ccache-${{ matrix.msystem_lower}}-
-      - name: Set ARROW_FLIGHT_SQL_ODBC_CONN
-        shell: powershell
-        run: |
-          $dremioUrl = "${{ needs.dremio-docker.outputs.dremio_url }}"
-          $dremioHost = [System.Uri]::new($dremioUrl).Host
-          $env:ARROW_FLIGHT_SQL_ODBC_CONN = "driver={Apache Arrow Flight SQL ODBC Driver};HOST=$dremioHost;port=32010;uid=admin;pwd=admin2025;useEncryption=false;"
-          Write-Host "ARROW_FLIGHT_SQL_ODBC_CONN=$env:ARROW_FLIGHT_SQL_ODBC_CONN"
+      # - name: Set ARROW_FLIGHT_SQL_ODBC_CONN
+      #   shell: powershell
+      #   run: |
+      #     $dremioUrl = "${{ needs.dremio-docker.outputs.dremio_url }}"
+      #     $dremioHost = [System.Uri]::new($dremioUrl).Host
+      #     $env:ARROW_FLIGHT_SQL_ODBC_CONN = "driver={Apache Arrow Flight SQL ODBC Driver};HOST=$dremioHost;port=32010;uid=admin;pwd=admin2025;useEncryption=false;"
+      #     Write-Host "ARROW_FLIGHT_SQL_ODBC_CONN=$env:ARROW_FLIGHT_SQL_ODBC_CONN"
       # - name: Set up Docker (Linux Engine)
       #   uses: crazy-max/ghaction-setup-docker@v3
       #   with:
@@ -486,7 +486,14 @@ jobs:
       #     sh ./set_up_dremio_instance.sh
       - name: Test
         shell: msys2 {0}
+        env:
+          DREMIO_URL: ${{ needs.dremio-docker.outputs.dremio_url }}
         run: |
+          dremioHost=$(echo $DREMIO_URL | sed -E 's#https?://([^/:]+).*#\1#')
+          echo "Dremio host: $dremioHost"
+          export ARROW_FLIGHT_SQL_ODBC_CONN="driver={Apache Arrow Flight SQL ODBC Driver};HOST=$dremioHost;port=32010;uid=admin;pwd=admin2025;useEncryption=false;"
+          echo "ARROW_FLIGHT_SQL_ODBC_CONN=$ARROW_FLIGHT_SQL_ODBC_CONN"
+
           ci/scripts/cpp_test.sh "$(pwd)" "$(pwd)/build"
       - name: Stop Dremio Docker Container
         run: |
