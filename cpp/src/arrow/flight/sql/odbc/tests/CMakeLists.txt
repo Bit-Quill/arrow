@@ -37,7 +37,7 @@ add_arrow_test(flight_sql_odbc_test
                connection_test.cc
                # Enable Protobuf cleanup after test execution
                # GH-46889: move protobuf_test_util to a more common location
-               ../../../../engine/substrait/protobuf_test_util.cc
+               # ../../../../engine/substrait/protobuf_test_util.cc
                ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
                EXTRA_LINK_LIBS
                ${ODBC_LIBRARIES}
