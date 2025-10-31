@@ -161,13 +161,13 @@ void FlightSQLODBCRemoteTestBase::SetUp() {
     return;
   }
 
-  Connect();
+  this->Connect();
   connected_ = true;
 }
 
 void FlightSQLODBCRemoteTestBase::TearDown() {
   if (connected_) {
-    Disconnect();
+    this->Disconnect();
     connected_ = false;
   }
 }
@@ -178,7 +178,7 @@ void FlightSQLOdbcV2RemoteTestBase::SetUp() {
     return;
   }
 
-  Connect(SQL_OV_ODBC2);
+  this->Connect(SQL_OV_ODBC2);
   connected_ = true;
 }
 
@@ -188,13 +188,13 @@ void FlightSQLOdbcHandleRemoteTestBase::SetUp() {
     return;
   }
 
-  AllocEnvConnHandles();
+  this->AllocEnvConnHandles();
   allocated_ = true;
 }
 
 void FlightSQLOdbcHandleRemoteTestBase::TearDown() {
   if (allocated_) {
-    FreeEnvConnHandles();
+    this->FreeEnvConnHandles();
     allocated_ = false;
   }
 }
@@ -369,7 +369,7 @@ void ODBCMockTestBase::SetUp() {
 
 void FlightSQLODBCMockTestBase::SetUp() {
   ODBCMockTestBase::SetUp();
-  Connect();
+  this->Connect();
   connected_ = true;
 }
 
@@ -380,7 +380,7 @@ void ODBCMockTestBase::TearDown() {
 
 void FlightSQLODBCMockTestBase::TearDown() {
   if (connected_) {
-    Disconnect();
+    this->Disconnect();
     connected_ = false;
   }
   ODBCMockTestBase::TearDown();
@@ -388,17 +388,17 @@ void FlightSQLODBCMockTestBase::TearDown() {
 
 void FlightSQLOdbcV2MockTestBase::SetUp() {
   ODBCMockTestBase::SetUp();
-  Connect(SQL_OV_ODBC2);
+  this->Connect(SQL_OV_ODBC2);
   connected_ = true;
 }
 
 void FlightSQLOdbcHandleMockTestBase::SetUp() {
   ODBCMockTestBase::SetUp();
-  AllocEnvConnHandles();
+  this->AllocEnvConnHandles();
 }
 
 void FlightSQLOdbcHandleMockTestBase::TearDown() {
-  FreeEnvConnHandles();
+  this->FreeEnvConnHandles();
   ODBCMockTestBase::TearDown();
 }
 

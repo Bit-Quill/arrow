@@ -217,7 +217,6 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
   ASSERT_EQ(SQL_SUCCESS, SQLFreeEnv(env));
 }
 
-/*
 TYPED_TEST(ConnectionHandleTest, TestSQLDriverConnect) {
   // Connect string
   std::string connect_str = this->GetConnectionString();
@@ -465,13 +464,11 @@ TYPED_TEST(ConnectionHandleTest, TestSQLDisconnectWithoutConnection) {
   // Expect ODBC driver manager to return error state
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorState08003);
 }
-*/
 
 TYPED_TEST(ConnectionTest, TestConnect) {
   // Verifies connect and disconnect works on its own
 }
 
-/*
 TYPED_TEST(ConnectionTest, TestSQLAllocFreeStmt) {
   SQLHSTMT statement;
 
@@ -579,6 +576,6 @@ TYPED_TEST(ConnectionTest, TestSQLSetStmtAttrDescriptor) {
             SQLGetStmtAttr(this->stmt, SQL_ATTR_APP_ROW_DESC, &value, sizeof(value), 0));
 
   EXPECT_EQ(internal_ard, value);
-}*/
+}
 
 }  // namespace arrow::flight::sql::odbc
