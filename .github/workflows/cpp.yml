@@ -178,6 +178,10 @@ jobs:
           cat tunnel.log
           TUNNEL_URL=$(grep -oE 'https://[-a-zA-Z0-9]+\.trycloudflare\.com' tunnel.log | head -n 1)
           echo "dremio_url=$TUNNEL_URL" >> $GITHUB_OUTPUT
+      - name: Verify tunnel
+        run: |
+          echo "Tunnel URL is: ${{ steps.tunnel.outputs.dremio_url }}"
+          curl -I ${{ steps.tunnel.outputs.dremio_url }}
 
   build-example:
     name: C++ Minimal Build Example
@@ -386,8 +390,6 @@ jobs:
           path: ccache
           key: cpp-ccache-${{ matrix.msystem_lower}}-${{ hashFiles('cpp/**') }}
           restore-keys: cpp-ccache-${{ matrix.msystem_lower}}-
-      - name: Print Dremio IP
-        run: echo ${{ needs.dremio-docker.outputs.dremio_url }}
       # - name: Set up Docker (Linux Engine)
       #   uses: crazy-max/ghaction-setup-docker@v3
       #   with:
