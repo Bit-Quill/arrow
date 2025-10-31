@@ -406,8 +406,8 @@ jobs:
         shell: powershell
         run: |
           $dremioUrl = "${{ needs.dremio-docker.outputs.dremio_url }}"
-          $host = [System.Uri]::new($dremioUrl).Host
-          $env:ARROW_FLIGHT_SQL_ODBC_CONN = "driver={Apache Arrow Flight SQL ODBC Driver};HOST=$host;port=32010;uid=admin;pwd=admin2025;useEncryption=false;"
+          $dremioHost = [System.Uri]::new($dremioUrl).Host
+          $env:ARROW_FLIGHT_SQL_ODBC_CONN = "driver={Apache Arrow Flight SQL ODBC Driver};HOST=$dremioHost;port=32010;uid=admin;pwd=admin2025;useEncryption=false;"
           Write-Host "ARROW_FLIGHT_SQL_ODBC_CONN=$env:ARROW_FLIGHT_SQL_ODBC_CONN"
       # - name: Set up Docker (Linux Engine)
       #   uses: crazy-max/ghaction-setup-docker@v3
