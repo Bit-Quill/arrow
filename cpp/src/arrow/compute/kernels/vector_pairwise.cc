@@ -57,7 +57,11 @@ Status PairwiseExecImpl(KernelContext* ctx, const ArraySpan& input,
                         ArrayData* result) {
   // We only compute values in the region where the input-with-offset overlaps
   // the original input. The margin where these do not overlap gets filled with null.
-  const auto margin_length = std::min(abs(periods), input.length);
+
+  // -AL- locally fix the build issue on msys2
+int64_t p = std::abs(static_cast<int64_t>(periods));
+const auto margin_length = std::min(p, input.length);
+
   const auto computed_length = input.length - margin_length;
   const auto computed_start = periods > 0 ? margin_length : 0;
   const auto left_start = computed_start;
