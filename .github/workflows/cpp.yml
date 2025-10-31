@@ -158,6 +158,8 @@ jobs:
 
   dremio-docker:
     runs-on: ubuntu-latest
+    outputs:
+      dremio_url: ${{ steps.tunnel.outputs.dremio_url }}
     steps:
       - uses: actions/checkout@v4
       - name: Start and Set Up Dremio
