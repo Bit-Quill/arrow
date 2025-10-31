@@ -178,10 +178,20 @@ jobs:
           cat tunnel.log
           TUNNEL_URL=$(grep -oE 'https://[-a-zA-Z0-9]+\.trycloudflare\.com' tunnel.log | head -n 1)
           echo "dremio_url=$TUNNEL_URL" >> $GITHUB_OUTPUT
-      - name: Verify tunnel
+      - name: Verify Cloudflare Tunnel availability
         run: |
           echo "Tunnel URL is: ${{ steps.tunnel.outputs.dremio_url }}"
-          curl -I ${{ steps.tunnel.outputs.dremio_url }}
+          for i in {1..10}; do
+            echo "Attempt $i: Checking tunnel availability..."
+            if curl -s -I "${{ steps.tunnel.outputs.dremio_url }}" | grep -q "HTTP"; then
+              echo "Tunnel is responding!"
+              exit 0
+            fi
+            echo "Not ready yet. Retrying in 5 seconds..."
+            sleep 5
+          done
+          echo "🚨 Tunnel failed to become available after 50 seconds."
+          exit 1
 
   build-example:
     name: C++ Minimal Build Example
