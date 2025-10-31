@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 
-NEW_USER_URL="http://localhost:9047/apiv2/bootstrap/firstuser"
-LOGIN_URL="http://localhost:9047/apiv2/login"
-SQL_URL="http://localhost:9047/api/v3/sql"
+HOST_URL="http://localhost:9047"
+NEW_USER_URL="$HOST_URL/apiv2/bootstrap/firstuser"
+LOGIN_URL="$HOST_URL/apiv2/login"
+SQL_URL="$HOST_URL/api/v3/sql"
 
 ADMIN_USER="admin"
 ADMIN_PASSWORD="admin2025"
