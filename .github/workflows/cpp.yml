@@ -160,10 +160,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - name: Start and Set Up Dremio
+        run: |
           cd cpp/src/arrow/flight/sql/odbc/tests/dremio/
           docker compose up -d
           sh ./set_up_dremio_instance.sh
+      - name: Install Cloudflared
+        run: |
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
+      - name: Start Tunnel
+        id: tunnel
+        run: |
+          ./cloudflared tunnel --url http://localhost:9047 --no-autoupdate > tunnel.log 2>&1 &
+          sleep 5
+          echo "Tunnel log:"
+          cat tunnel.log
+          TUNNEL_URL=$(grep -oE 'https://[-a-zA-Z0-9]+\.trycloudflare\.com' tunnel.log | head -n 1)
+          echo "dremio_url=$TUNNEL_URL" >> $GITHUB_OUTPUT
 
   build-example:
     name: C++ Minimal Build Example
@@ -372,6 +386,8 @@ jobs:
           path: ccache
           key: cpp-ccache-${{ matrix.msystem_lower}}-${{ hashFiles('cpp/**') }}
           restore-keys: cpp-ccache-${{ matrix.msystem_lower}}-
+      - name: Print Dremio IP
+        run: echo ${{ needs.dremio-docker.outputs.dremio_url }}
       # - name: Set up Docker (Linux Engine)
       #   uses: crazy-max/ghaction-setup-docker@v3
       #   with:
