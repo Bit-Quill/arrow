@@ -173,7 +173,7 @@ jobs:
           # This returns the runner's public IP (for demonstration)
           PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
           echo "dremio_ip=$PUBLIC_IP" >> $GITHUB_OUTPUT
-          echo "Dremio IP = ${{ steps.get-ip.outputs.dremio_ip }}"
+          echo "Dremio IP = $PUBLIC_IP"
       # - name: Install Cloudflared
       #   run: |
       #     curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
