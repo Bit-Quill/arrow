@@ -173,6 +173,7 @@ jobs:
           # This returns the runner's public IP (for demonstration)
           PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
           echo "dremio_ip=$PUBLIC_IP" >> $GITHUB_OUTPUT
+          echo "Dremio IP = ${{ steps.get-ip.outputs.dremio_ip }}"
       # - name: Install Cloudflared
       #   run: |
       #     curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
@@ -409,14 +410,14 @@ jobs:
           path: ccache
           key: cpp-ccache-${{ matrix.msystem_lower}}-${{ hashFiles('cpp/**') }}
           restore-keys: cpp-ccache-${{ matrix.msystem_lower}}-
-      - name: Start Dremio Docker on Windows
-        shell: pwsh
-        run: |
-          docker compose -f cpp/src/arrow/flight/sql/odbc/tests/dremio/docker-compose.yaml up -d
-      - name: Set Up Dremio Docker on Windows
-        shell: pwsh
-        run: |
-          sh cpp/src/arrow/flight/sql/odbc/tests/dremio/set_up_dremio_instance.sh
+      # - name: Start Dremio Docker on Windows
+      #   shell: pwsh
+      #   run: |
+      #     docker compose -f cpp/src/arrow/flight/sql/odbc/tests/dremio/docker-compose.yaml up -d
+      # - name: Set Up Dremio Docker on Windows
+      #   shell: pwsh
+      #   run: |
+      #     sh cpp/src/arrow/flight/sql/odbc/tests/dremio/set_up_dremio_instance.sh
       # - name: Set ARROW_FLIGHT_SQL_ODBC_CONN
       #   shell: powershell
       #   run: |
