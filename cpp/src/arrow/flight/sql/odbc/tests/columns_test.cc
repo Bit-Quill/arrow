@@ -336,6 +336,7 @@ void CheckSQLColAttributeNumeric(SQLHSTMT stmt, const std::wstring& wsql,
   ASSERT_EQ(expected_attr_numeric, num_val);
 }
 
+// -AL- CheckSQLColAttributesString also needs to be replaced with getters
 void CheckSQLColAttributesString(SQLHSTMT stmt, const std::wstring& wsql,
                                  SQLUSMALLINT idx, SQLUSMALLINT field_identifier,
                                  const std::wstring& expected_attr_string) {
