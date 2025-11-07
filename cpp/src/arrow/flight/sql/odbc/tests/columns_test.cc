@@ -340,7 +340,7 @@ void GetSQLColAttributesString(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMAL
   value = ConvertToWString(str_val, str_len);
 }
 
-void getSQLColAttributeNumeric(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
+void GetSQLColAttributeNumeric(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
                                SQLUSMALLINT field_identifier, SQLLEN* value) {
   // Execute query and check SQLColAttribute numeric attribute
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -353,7 +353,7 @@ void getSQLColAttributeNumeric(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMAL
   ASSERT_EQ(SQL_SUCCESS, SQLColAttribute(stmt, idx, field_identifier, 0, 0, 0, value));
 }
 
-void getSQLColAttributesNumeric(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
+void GetSQLColAttributesNumeric(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
                                 SQLUSMALLINT field_identifier, SQLLEN* value) {
   // Execute query and check SQLColAttribute numeric attribute
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -1885,11 +1885,11 @@ TYPED_TEST(ColumnsTest, TestSQLColAttributeCaseSensitive) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Int column
   SQLLEN value;
-  getSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_CASE_SENSITIVE, &value);
+  GetSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_CASE_SENSITIVE, &value);
   ASSERT_EQ(SQL_FALSE, value);
   SQLFreeStmt(this->stmt, SQL_CLOSE);
   // Varchar column
-  getSQLColAttributeNumeric(this->stmt, wsql, 28, SQL_DESC_CASE_SENSITIVE, &value);
+  GetSQLColAttributeNumeric(this->stmt, wsql, 28, SQL_DESC_CASE_SENSITIVE, &value);
   ASSERT_EQ(SQL_FALSE, value);
 }
 
@@ -1900,11 +1900,11 @@ TYPED_TEST(ColumnsOdbcV2Test, TestSQLColAttributesCaseSensitive) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Int column
   SQLLEN value;
-  getSQLColAttributesNumeric(this->stmt, wsql, 1, SQL_COLUMN_CASE_SENSITIVE, &value);
+  GetSQLColAttributesNumeric(this->stmt, wsql, 1, SQL_COLUMN_CASE_SENSITIVE, &value);
   ASSERT_EQ(SQL_FALSE, value);
   SQLFreeStmt(this->stmt, SQL_CLOSE);
   // Varchar column
-  getSQLColAttributesNumeric(this->stmt, wsql, 28, SQL_COLUMN_CASE_SENSITIVE, &value);
+  GetSQLColAttributesNumeric(this->stmt, wsql, 28, SQL_COLUMN_CASE_SENSITIVE, &value);
   ASSERT_EQ(SQL_FALSE, value);
 }
 
@@ -1914,7 +1914,7 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeUniqueValue) {
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   SQLLEN value;
-  getSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_AUTO_UNIQUE_VALUE, &value);
+  GetSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_AUTO_UNIQUE_VALUE, &value);
   ASSERT_EQ(SQL_FALSE, value);
 }
 
@@ -1925,7 +1925,7 @@ TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesAutoIncrement) {
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   SQLLEN value;
-  getSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_COLUMN_AUTO_INCREMENT, &value);
+  GetSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_COLUMN_AUTO_INCREMENT, &value);
   ASSERT_EQ(SQL_FALSE, value);
 }
 
@@ -1993,7 +1993,7 @@ TYPED_TEST(ColumnsTest, TestSQLColAttributeCount) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Pass 0 as column number, driver should ignore it
   SQLLEN value;
-  getSQLColAttributeNumeric(this->stmt, wsql, 0, SQL_DESC_COUNT, &value);
+  GetSQLColAttributeNumeric(this->stmt, wsql, 0, SQL_DESC_COUNT, &value);
   ASSERT_EQ(32, value);
 }
 
@@ -2146,7 +2146,7 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesTypeName) {
 TYPED_TEST(ColumnsTest, TestSQLColAttributeUnnamed) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   SQLLEN value;
-  getSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_UNNAMED, &value);
+  GetSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_UNNAMED, &value);
   ASSERT_EQ(SQL_NAMED, value);
 }
 
@@ -2154,7 +2154,7 @@ TYPED_TEST(ColumnsTest, TestSQLColAttributeUpdatable) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Mock server and remote server do not return updatable information
   SQLLEN value;
-  getSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_UPDATABLE, &value);
+  GetSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_UPDATABLE, &value);
   ASSERT_EQ(SQL_ATTR_READWRITE_UNKNOWN, value);
 }
 
@@ -2163,7 +2163,7 @@ TYPED_TEST(ColumnsOdbcV2Test, TestSQLColAttributesUpdatable) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Mock server and remote server do not return updatable information
   SQLLEN value;
-  getSQLColAttributesNumeric(this->stmt, wsql, 1, SQL_COLUMN_UPDATABLE, &value);
+  GetSQLColAttributesNumeric(this->stmt, wsql, 1, SQL_COLUMN_UPDATABLE, &value);
   ASSERT_EQ(SQL_ATTR_READWRITE_UNKNOWN, value);
 }
 
