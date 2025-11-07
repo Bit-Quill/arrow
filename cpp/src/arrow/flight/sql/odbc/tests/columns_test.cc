@@ -298,7 +298,7 @@ void CheckSQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT idx,
   EXPECT_EQ(expected_unsigned_column, unsigned_col);
 }
 
-void getSQLColAttributeString(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
+void GetSQLColAttributeString(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
                               SQLUSMALLINT field_identifier, std::wstring& value) {
   if (!wsql.empty()) {
     // Execute query
@@ -319,7 +319,7 @@ void getSQLColAttributeString(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALL
   value = ConvertToWString(str_val, str_len);
 }
 
-void getSQLColAttributesString(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
+void GetSQLColAttributesString(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMALLINT idx,
                                SQLUSMALLINT field_identifier, std::wstring& value) {
   if (!wsql.empty()) {
     // Execute query
@@ -1934,7 +1934,7 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeBaseTableName) {
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_BASE_TABLE_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_BASE_TABLE_NAME, value);
   ASSERT_EQ(std::wstring(L"AllTypesTable"), value);
 }
 
@@ -1944,7 +1944,7 @@ TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesTableName) {
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
-  getSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TABLE_NAME, value);
+  GetSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TABLE_NAME, value);
   ASSERT_EQ(std::wstring(L"AllTypesTable"), value);
 }
 
@@ -1955,7 +1955,7 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeCatalogName) {
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_CATALOG_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_CATALOG_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
 }
 
@@ -1964,7 +1964,7 @@ TEST_F(ColumnsRemoteTest, TestSQLColAttributeCatalogName) {
 
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_CATALOG_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_CATALOG_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
 }
 
@@ -1976,7 +1976,7 @@ TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesQualifierName) {
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_COLUMN_QUALIFIER_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_COLUMN_QUALIFIER_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
 }
 
@@ -1985,7 +1985,7 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesQualifierName) {
   // Tests ODBC 2.0 API SQLColAttributes
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_COLUMN_QUALIFIER_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_COLUMN_QUALIFIER_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
 }
 
@@ -2001,14 +2001,14 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeLocalTypeName) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   // Mock server doesn't have local type name
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_LOCAL_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_LOCAL_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
 }
 
 TEST_F(ColumnsRemoteTest, TestSQLColAttributeLocalTypeName) {
   std::wstring wsql = this->GetQueryAllDataTypes();
   std::wstring value;
-  getSQLColAttributesString(this->stmt, wsql, 1, SQL_DESC_LOCAL_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, wsql, 1, SQL_DESC_LOCAL_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"INTEGER"), value);
 }
 
@@ -2018,7 +2018,7 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeSchemaName) {
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   // Mock server doesn't have schemas
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_SCHEMA_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_SCHEMA_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
 }
 
@@ -2029,7 +2029,7 @@ TEST_F(ColumnsRemoteTest, TestSQLColAttributeSchemaName) {
   // Remote server limitation: doesn't return schema name, expected schema name is
   // $scratch
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_SCHEMA_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_SCHEMA_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
 }
 
@@ -2040,7 +2040,7 @@ TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesOwnerName) {
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   // Mock server doesn't have schemas
   std::wstring value;
-  getSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_OWNER_NAME, value);
+  GetSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_OWNER_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
 }
 
@@ -2051,7 +2051,7 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesOwnerName) {
   // Remote server limitation: doesn't return schema name, expected schema name is
   // $scratch
   std::wstring value;
-  getSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_OWNER_NAME, value);
+  GetSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_OWNER_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
 }
 
@@ -2060,7 +2060,7 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeTableName) {
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TABLE_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TABLE_NAME, value);
   ASSERT_EQ(std::wstring(L"AllTypesTable"), value);
 }
 
@@ -2069,36 +2069,36 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeTypeName) {
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"BIGINT"), value);
-  getSQLColAttributeString(this->stmt, L"", 2, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 2, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"WVARCHAR"), value);
-  getSQLColAttributeString(this->stmt, L"", 3, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 3, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"BINARY"), value);
-  getSQLColAttributeString(this->stmt, L"", 4, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 4, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"DOUBLE"), value);
 }
 
 TEST_F(ColumnsRemoteTest, TestSQLColAttributeTypeName) {
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   std::wstring value;
-  getSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"INTEGER"), value);
-  getSQLColAttributeString(this->stmt, L"", 2, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 2, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"BIGINT"), value);
-  getSQLColAttributeString(this->stmt, L"", 3, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 3, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"DECIMAL"), value);
-  getSQLColAttributeString(this->stmt, L"", 4, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 4, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"FLOAT"), value);
-  getSQLColAttributeString(this->stmt, L"", 5, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 5, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"DOUBLE"), value);
-  getSQLColAttributeString(this->stmt, L"", 6, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 6, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"BOOLEAN"), value);
-  getSQLColAttributeString(this->stmt, L"", 7, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 7, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"DATE"), value);
-  getSQLColAttributeString(this->stmt, L"", 8, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 8, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"TIME"), value);
-  getSQLColAttributeString(this->stmt, L"", 9, SQL_DESC_TYPE_NAME, value);
+  GetSQLColAttributeString(this->stmt, L"", 9, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"TIMESTAMP"), value);
 }
 
@@ -2109,13 +2109,13 @@ TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesTypeName) {
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   // Mock server doesn't return data source-dependent data type name
   std::wstring value;
-  getSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"BIGINT"), value);
-  getSQLColAttributesString(this->stmt, L"", 2, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 2, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"WVARCHAR"), value);
-  getSQLColAttributesString(this->stmt, L"", 3, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 3, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"BINARY"), value);
-  getSQLColAttributesString(this->stmt, L"", 4, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 4, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"DOUBLE"), value);
 }
 
@@ -2123,23 +2123,23 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesTypeName) {
   // Tests ODBC 2.0 API SQLColAttributes
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
   std::wstring value;
-  getSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"INTEGER"), value);
-  getSQLColAttributesString(this->stmt, L"", 2, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 2, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"BIGINT"), value);
-  getSQLColAttributesString(this->stmt, L"", 3, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 3, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"DECIMAL"), value);
-  getSQLColAttributesString(this->stmt, L"", 4, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 4, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"FLOAT"), value);
-  getSQLColAttributesString(this->stmt, L"", 5, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 5, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"DOUBLE"), value);
-  getSQLColAttributesString(this->stmt, L"", 6, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 6, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"BOOLEAN"), value);
-  getSQLColAttributesString(this->stmt, L"", 7, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 7, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"DATE"), value);
-  getSQLColAttributesString(this->stmt, L"", 8, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 8, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"TIME"), value);
-  getSQLColAttributesString(this->stmt, L"", 9, SQL_COLUMN_TYPE_NAME, value);
+  GetSQLColAttributesString(this->stmt, L"", 9, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"TIMESTAMP"), value);
 }
 
