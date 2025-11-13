@@ -36,6 +36,8 @@ USER_ODBCINST_FILE="$HOME/Library/ODBC/odbcinst.ini"
 DRIVER_NAME="Apache Arrow Flight SQL ODBC Driver"
 DSN_NAME="Apache Arrow Flight SQL ODBC DSN"
 
+mkdir -p $HOME/Library/ODBC
+
 touch "$USER_ODBCINST_FILE"
 
 # Admin privilege is needed to add ODBC driver registration
