@@ -224,6 +224,11 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Enable ODBC build on 15-intel only
+        if: ${{ matrix.macos-version == '15-intel' }}
+        run: |
+          echo "ARROW_FLIGHT_SQL=ON" >> $GITHUB_ENV
+          echo "ARROW_FLIGHT_SQL_ODBC=ON" >> $GITHUB_ENV
       - name: Install Dependencies
         run: |
           # pkg-config formula is deprecated but it's still installed
