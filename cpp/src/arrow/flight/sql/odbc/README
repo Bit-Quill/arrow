@@ -44,7 +44,6 @@ should show as an available ODBC driver in the x64 ODBC Driver Manager.
 
 If the generation is successful, you will find `Apache Arrow Flight SQL ODBC-<version>-win64.msi` generated under the `build` folder.
 
-
 ## Steps to Enable Logging
 Arrow Flight SQL ODBC driver uses Arrow's internal logging framework. By default, the log messages are printed to the terminal.
 1. Set environment variable `ARROW_ODBC_LOG_LEVEL` to any of the following valid values to enable logging. If `ARROW_ODBC_LOG_LEVEL` is set to a non-empty string that does not match any of the following values, `DEBUG` level is used by default. 
@@ -60,3 +59,8 @@ The characters are case-insensitive.
 The Windows ODBC driver currently does not support writing log files. `ARROW_USE_GLOG` is required to write log files, and `ARROW_USE_GLOG` is disabled on Windows platform since plasma using `glog` is not fully tested on windows.
 
 Note: GH-47670 running more than 1 tests with logging enabled is not fully supported. 
+
+## macOS Intel Build Trouble-shooting
+1. Cmake cannot find `libiodbc` from brew library
+
+  If there are multiple odbc libraries installed on your machine, cmake might not find the `libiodbc` library. Pass cmake flags `-DODBC_INCLUDE_DIR=/usr/local/Cellar/libiodbc/3.52.16/include -DODBC_LIBRARY=/usr/local/Cellar/libiodbc/3.52.16/lib/libiodbc.dylib` in the cmake configuration phase.

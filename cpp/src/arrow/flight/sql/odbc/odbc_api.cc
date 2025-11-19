@@ -853,7 +853,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
     }
 #else
     // Attempt connection without loading DSN window on macOS/Linux
-    connection->Connect(dsn, properties, missing_properties);
+    connection->Connect(dsn_value, properties, missing_properties);
 #endif
     // Copy connection string to out_connection_string after connection attempt
     return ODBC::GetStringAttribute(true, connection_string, false, out_connection_string,
@@ -882,7 +882,7 @@ SQLRETURN SQLConnect(SQLHDBC conn, SQLWCHAR* dsn_name, SQLSMALLINT dsn_name_len,
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
     std::string dsn = SqlWcharToString(dsn_name, dsn_name_len);
 
-    Configuration config;
+    config::Configuration config;
     config.LoadDsn(dsn);
 
     if (user_name) {
