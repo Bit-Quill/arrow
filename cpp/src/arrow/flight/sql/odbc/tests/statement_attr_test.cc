@@ -63,6 +63,7 @@ void GetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLPOINTER* value) {
             SQLGetStmtAttr(statement, attribute, value, SQL_IS_POINTER, &string_length));
 }
 
+// Enable helper function if relevant attribute is defined
 #if defined(SQL_ATTR_ASYNC_STMT_EVENT) || defined(SQL_ATTR_ASYNC_STMT_PCALLBACK) || \
     defined(SQL_ATTR_ASYNC_STMT_PCONTEXT)
 // Validate error return value and code
@@ -76,7 +77,7 @@ void ValidateGetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
 
   VerifyOdbcErrorState(SQL_HANDLE_STMT, statement, error_code);
 }
-#endif
+#endif // defined(SQL_ATTR_ASYNC_STMT_EVENT) || defined(SQL_ATTR_ASYNC_STMT_PCALLBACK) || defined(SQL_ATTR_ASYNC_STMT_PCONTEXT)
 
 // Validate return value for call to SQLSetStmtAttr with SQLULEN
 void ValidateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLULEN new_value) {
@@ -619,7 +620,7 @@ TYPED_TEST(StatementAttributeTest, TestSQLSetStmtAttrRowOperationPtr) {
 
 TYPED_TEST(StatementAttributeTest, TestSQLSetStmtAttrRowStatusPtr) {
   constexpr SQLULEN row_status_size = 4;
-  SQLUSMALLINT values[4] = {0, 0, 0, 0};
+  SQLUSMALLINT values[row_status_size] = {0, 0, 0, 0};
 
   ValidateSetStmtAttr(this->stmt, SQL_ATTR_ROW_STATUS_PTR,
                       static_cast<SQLPOINTER>(values));
