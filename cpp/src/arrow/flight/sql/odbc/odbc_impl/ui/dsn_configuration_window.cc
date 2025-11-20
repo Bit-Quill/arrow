@@ -29,7 +29,6 @@
 #include <commdlg.h>
 #include <sql.h>
 #include <sstream>
-#include "arrow/flight/sql/odbc/odbc_impl/util.h"
 
 #define COMMON_TAB 0
 #define ADVANCED_TAB 1
