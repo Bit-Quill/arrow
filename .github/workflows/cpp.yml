@@ -224,8 +224,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Enable ODBC build on 15-intel only
-        if: ${{ matrix.macos-version == '15-intel' }}
+      - name: Enable ODBC build
         run: |
           echo "ARROW_FLIGHT_SQL=ON" >> $GITHUB_ENV
           echo "ARROW_FLIGHT_SQL_ODBC=ON" >> $GITHUB_ENV
@@ -235,8 +234,15 @@ jobs:
           # in GitHub Actions runner now. We can remove this once
           # pkg-config formula is removed from GitHub Actions runner.
           brew uninstall pkg-config || :
-          brew uninstall pkg-config@0.29.2 || :
           brew bundle --file=cpp/Brewfile
+          export LIBIODBC_DIR="$(brew --cellar libiodbc)/$(brew list --versions libiodbc | awk '{print $2}')"
+          export ODBC_INCLUDE_DIR="$LIBIODBC_DIR/include"
+          export ODBC_LIB_DIR="$LIBIODBC_DIR/lib"
+          echo "LIBIODBC_DIR=$LIBIODBC_DIR"
+          echo "ODBC_INCLUDE_DIR=$ODBC_INCLUDE_DIR"
+          echo "ODBC_LIB_DIR=$ODBC_LIB_DIR"
+          echo "ODBC_INCLUDE_DIR=$ODBC_INCLUDE_DIR" >> $GITHUB_ENV
+          echo "ODBC_LIB_DIR=$ODBC_LIB_DIR" >> $GITHUB_ENV
       - name: Install MinIO
         run: |
           $(brew --prefix bash)/bin/bash \
@@ -264,19 +270,19 @@ jobs:
           restore-keys: cpp-ccache-macos-${{ matrix.macos-version }}-
       - name: Build
         run: |
-          if [ "${{ matrix.macos-version }}" = "15-intel" ]; then
-            # This is a workaround.
-            #
-            # Homebrew uses /usr/local as prefix. So packages
-            # installed by Homebrew also use /usr/local/include. We
-            # want to include headers for packages installed by
-            # Homebrew as system headers to ignore warnings in them.
-            # But "-isystem /usr/local/include" isn't used by CMake
-            # because /usr/local/include is marked as the default
-            # include path. So we disable -Werror to avoid build error
-            # by warnings from packages installed by Homebrew.
-            export BUILD_WARNING_LEVEL=PRODUCTION
-          fi
+          echo "ODBC_INCLUDE_DIR=$ODBC_INCLUDE_DIR"
+          echo "ODBC_LIB_DIR=$ODBC_LIB_DIR"
+          # This is a workaround.
+          #
+          # Homebrew uses /usr/local as prefix. So packages
+          # installed by Homebrew also use /usr/local/include. We
+          # want to include headers for packages installed by
+          # Homebrew as system headers to ignore warnings in them.
+          # But "-isystem /usr/local/include" isn't used by CMake
+          # because /usr/local/include is marked as the default
+          # include path. So we disable -Werror to avoid build error
+          # by warnings from packages installed by Homebrew.
+          export BUILD_WARNING_LEVEL=PRODUCTION
           ci/scripts/cpp_build.sh $(pwd) $(pwd)/build
       # -AL- temporarily disable test phase. Enable after script registration is done.
       # - name: Test

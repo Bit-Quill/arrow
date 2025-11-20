@@ -17,7 +17,7 @@
 
 add_custom_target(tests)
 
-include_directories(${ODBC_INCLUDE_DIRS})
+include_directories(${ODBC_INCLUDE_DIR})
 
 find_package(SQLite3Alt REQUIRED)
 
