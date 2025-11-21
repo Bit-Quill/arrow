@@ -17,11 +17,17 @@
 # specific language governing permissions and limitations
 # under the License.
 
-DRIVER_PATH="$1"
+ODBC_64BIT="$1"
 
-if [[ -z "$DRIVER_PATH" ]]; then
+if [[ -z "$ODBC_64BIT" ]]; then
   echo "error: 64-bit driver is not specified. Call format: install_odbc abs_path_to_64_bit_driver"
   exit 1
+fi
+
+if [ ! -f $ODBC_64BIT ]; then
+    echo "64-bit driver can not be found: $ODBC_64BIT"
+	  echo "Call format: install_odbc abs_path_to_64_bit_driver"
+    exit 1
 fi
 
 USER_ODBCINST_FILE="$HOME/Library/ODBC/odbcinst.ini"
@@ -43,7 +49,7 @@ else
   echo "
 [$DRIVER_NAME]
 Description=An ODBC Driver for Apache Arrow Flight SQL
-Driver=$DRIVER_PATH
+Driver=$ODBC_64BIT
 " >> "$USER_ODBCINST_FILE"
 fi
 
