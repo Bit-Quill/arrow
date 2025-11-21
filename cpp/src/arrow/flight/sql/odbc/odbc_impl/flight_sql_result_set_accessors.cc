@@ -29,12 +29,13 @@
 #include "arrow/flight/sql/odbc/odbc_impl/accessors/timestamp_array_accessor.h"
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
-// Undefine `BOOL` from sqltypes.h on macOS to avoid conflict with Type::BOOL
-#if defined(__APPLE__)
-#ifdef BOOL
-#undef BOOL
-#endif // BOOL
-#endif // defined(__APPLE__)
+// -AL- TODO remove if `-UBOOL` resolves the issue
+// // Undefine `BOOL` from sqltypes.h on macOS to avoid conflict with Type::BOOL
+// #if defined(__APPLE__)
+// #ifdef BOOL
+// #undef BOOL
+// #endif // BOOL
+// #endif // defined(__APPLE__)
 
 namespace arrow::flight::sql::odbc {
 

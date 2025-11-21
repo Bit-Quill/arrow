@@ -114,6 +114,12 @@ target_compile_definitions(arrow_odbc_spi_impl PUBLIC UNICODE)
 target_include_directories(arrow_odbc_spi_impl PUBLIC include include/odbc_impl)
 target_include_directories(arrow_odbc_spi_impl PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
+# Undefine BOOL to avoid conflict on macOS.
+# iodbc on macOS brings in `BOOL` definition which has a conflict with Arrow
+if(APPLE)
+  target_compile_options(arrow_odbc_spi_impl PRIVATE -UBOOL)
+endif()
+
 if(WIN32)
   target_sources(arrow_odbc_spi_impl
                  PRIVATE ui/add_property_window.cc
