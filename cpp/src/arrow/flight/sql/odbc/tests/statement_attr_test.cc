@@ -77,7 +77,8 @@ void ValidateGetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
 
   VerifyOdbcErrorState(SQL_HANDLE_STMT, statement, error_code);
 }
-#endif // defined(SQL_ATTR_ASYNC_STMT_EVENT) || defined(SQL_ATTR_ASYNC_STMT_PCALLBACK) || defined(SQL_ATTR_ASYNC_STMT_PCONTEXT)
+#endif  // defined(SQL_ATTR_ASYNC_STMT_EVENT) || defined(SQL_ATTR_ASYNC_STMT_PCALLBACK) ||
+        // defined(SQL_ATTR_ASYNC_STMT_PCONTEXT)
 
 // Validate return value for call to SQLSetStmtAttr with SQLULEN
 void ValidateSetStmtAttr(SQLHSTMT statement, SQLINTEGER attribute, SQLULEN new_value) {

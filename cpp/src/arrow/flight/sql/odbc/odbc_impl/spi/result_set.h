@@ -24,7 +24,7 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/types.h"
 
-#include "arrow/flight/sql/odbc/sqltypes_fixup.h"
+#include <sqltypes.h>
 
 namespace arrow::flight::sql::odbc {
 
