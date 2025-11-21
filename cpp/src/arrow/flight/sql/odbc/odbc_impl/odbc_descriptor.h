@@ -21,10 +21,11 @@
 
 #include <sql.h>
 #include <sqlext.h>
-#include <sqltypes.h>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include "arrow/flight/sql/odbc/sqltypes_fixup.h"
 
 namespace arrow::flight::sql::odbc {
 class ResultSetMetadata;

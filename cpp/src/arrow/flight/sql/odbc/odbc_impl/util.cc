@@ -34,14 +34,6 @@
 #include <ctime>
 #include <sstream>
 
-// -AL- TODO remove if `-UBOOL` resolves the issue
-// // Undefine `BOOL` from sqltypes.h on macOS to avoid conflict with Type::BOOL
-// #if defined(__APPLE__)
-// #ifdef BOOL
-// #undef BOOL
-// #endif // BOOL
-// #endif // defined(__APPLE__)
-
 namespace arrow::flight::sql::odbc {
 namespace util {
 namespace {

@@ -21,10 +21,11 @@
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include <sql.h>
-#include <sqltypes.h>
 #include <functional>
 #include <mutex>
 #include "arrow/flight/sql/odbc/odbc_impl/diagnostics.h"
+
+#include "arrow/flight/sql/odbc/sqltypes_fixup.h"
 
 /**
  * @brief An abstraction over a generic ODBC handle.

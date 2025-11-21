@@ -28,10 +28,11 @@
 
 #include <sql.h>
 #include <sqlext.h>
-#include <sqltypes.h>
 #include <boost/variant.hpp>
 #include <optional>
 #include <utility>
+
+#include "arrow/flight/sql/odbc/sqltypes_fixup.h"
 
 using ODBC::DescriptorRecord;
 using ODBC::ODBCConnection;
