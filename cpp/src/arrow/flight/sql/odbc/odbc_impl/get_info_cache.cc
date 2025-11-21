@@ -25,8 +25,8 @@
 #include "arrow/array/array_nested.h"
 #include "arrow/flight/sql/api.h"
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
+#include "arrow/flight/sql/odbc/odbc_impl/type_fwd_fixup.h"
 #include "arrow/scalar.h"
-#include "arrow/type_fwd.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_stream_chunk_buffer.h"
 #include "arrow/flight/sql/odbc/odbc_impl/scalar_function_reporter.h"

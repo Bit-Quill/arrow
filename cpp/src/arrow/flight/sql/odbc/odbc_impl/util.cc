@@ -24,8 +24,8 @@
 
 #include "arrow/builder.h"
 #include "arrow/compute/api.h"
+#include "arrow/flight/sql/odbc/odbc_impl/type_fwd_fixup.h"
 #include "arrow/type.h"
-#include "arrow/type_fwd.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/json_converter.h"
 
@@ -33,6 +33,13 @@
 
 #include <ctime>
 #include <sstream>
+
+// Undefine `BOOL` from sqltypes.h on macOS to avoid conflict with Type::BOOL
+#if defined(__APPLE__)
+#  ifdef BOOL
+#    undef BOOL
+#  endif  // BOOL
+#endif    // defined(__APPLE__)
 
 namespace arrow::flight::sql::odbc {
 namespace util {

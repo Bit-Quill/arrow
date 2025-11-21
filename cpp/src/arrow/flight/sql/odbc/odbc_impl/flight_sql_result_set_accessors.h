@@ -18,8 +18,8 @@
 #pragma once
 
 #include <memory>
+#include "arrow/flight/sql/odbc/odbc_impl/type_fwd_fixup.h"
 #include "arrow/flight/sql/odbc/odbc_impl/types.h"
-#include "arrow/type_fwd.h"
 
 namespace arrow::flight::sql::odbc {
 

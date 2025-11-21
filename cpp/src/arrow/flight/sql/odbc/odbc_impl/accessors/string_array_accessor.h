@@ -20,9 +20,9 @@
 #include <locale>
 #include "arrow/flight/sql/odbc/odbc_impl/accessors/types.h"
 #include "arrow/flight/sql/odbc/odbc_impl/encoding.h"
+#include "arrow/flight/sql/odbc/odbc_impl/type_fwd_fixup.h"
 #include "arrow/flight/sql/odbc/odbc_impl/types.h"
 #include "arrow/flight/sql/odbc/odbc_impl/util.h"
-#include "arrow/type_fwd.h"
 
 namespace arrow::flight::sql::odbc {
 
