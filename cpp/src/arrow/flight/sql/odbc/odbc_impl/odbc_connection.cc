@@ -15,10 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
-
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
+
+// utf8.h needs to be included first due to conflicts with odbc_connection.h on macOS
+#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
