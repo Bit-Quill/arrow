@@ -227,8 +227,8 @@ jobs:
         run: |
           echo "ARROW_FLIGHT_SQL=ON" >> $GITHUB_ENV
           echo "ARROW_FLIGHT_SQL_ODBC=ON" >> $GITHUB_ENV
-          echo "ODBC_INCLUDE_DIR=/usr/local/Cellar/libiodbc/3.52.16/include" >> $GITHUB_ENV
-          echo "ODBC_LIBRARY_DIR=/usr/local/Cellar/libiodbc/3.52.16/lib/libiodbc.dylib" >> $GITHUB_ENV
+        # echo "ODBC_INCLUDE_DIR=/usr/local/Cellar/libiodbc/3.52.16/include" >> $GITHUB_ENV
+        # echo "ODBC_LIBRARY_DIR=/usr/local/Cellar/libiodbc/3.52.16/lib/libiodbc.dylib" >> $GITHUB_ENV
         # -AL- TODO if above fix works, find a better way to export the paths
       - name: Install Dependencies
         run: |
@@ -237,6 +237,8 @@ jobs:
           # pkg-config formula is removed from GitHub Actions runner.
           brew uninstall pkg-config || :
           brew uninstall pkg-config@0.29.2 || :
+          # unixodbc is pre-installed and needs to be uninstalled for cmake to pick up iodbc
+          brew uninstall unixodbc
           brew bundle --file=cpp/Brewfile
       - name: Install MinIO
         run: |
