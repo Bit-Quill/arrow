@@ -227,9 +227,8 @@ jobs:
         run: |
           echo "ARROW_FLIGHT_SQL=ON" >> $GITHUB_ENV
           echo "ARROW_FLIGHT_SQL_ODBC=ON" >> $GITHUB_ENV
-        # echo "ODBC_INCLUDE_DIR=/usr/local/Cellar/libiodbc/3.52.16/include" >> $GITHUB_ENV
-        # echo "ODBC_LIBRARY_DIR=/usr/local/Cellar/libiodbc/3.52.16/lib/libiodbc.dylib" >> $GITHUB_ENV
-        # -AL- TODO if above fix works, find a better way to export the paths
+          echo "ODBC_INCLUDE_DIR=/usr/local/Cellar/libiodbc/3.52.16/include" >> $GITHUB_ENV
+          echo "ODBC_LIBRARY_DIR=/usr/local/Cellar/libiodbc/3.52.16/lib/libiodbc.dylib" >> $GITHUB_ENV
       - name: Install Dependencies
         run: |
           # pkg-config formula is deprecated but it's still installed
