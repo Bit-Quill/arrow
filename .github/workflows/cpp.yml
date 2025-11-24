@@ -237,9 +237,9 @@ jobs:
           # pkg-config formula is removed from GitHub Actions runner.
           brew uninstall pkg-config || :
           brew uninstall pkg-config@0.29.2 || :
-          # unixodbc is pre-installed and needs to be uninstalled for cmake to pick up iodbc
-          brew uninstall unixodbc
           brew bundle --file=cpp/Brewfile
+          # -AL- check real path of libodbc
+          realpath /usr/local/lib/libodbc.dylib
       - name: Install MinIO
         run: |
           $(brew --prefix bash)/bin/bash \
