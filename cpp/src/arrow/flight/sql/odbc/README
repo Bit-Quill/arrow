@@ -57,11 +57,11 @@ After the build succeeds, the ODBC DLL will be located in
     i. `cd to repo.`
     ii. `cd <path\to\repo>`
     iii. Give script permission to execute
-    `chmod +x cpp/src/arrow/flight/sql/odbc/tests/install_odbc.sh`
+    `chmod +x cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh`
     iv. Run script with `sudo` to register your ODBC DYLIB as Apache Arrow Flight SQL ODBC Driver
-    `sudo cpp/src/arrow/flight/sql/odbc/tests/install_odbc.sh <path\to\repo>/cpp/build/< release | debug >/libarrow_flight_sql_odbc.dylib`
+    `sudo cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh <path\to\repo>/cpp/build/< release | debug >/libarrow_flight_sql_odbc.dylib`
     Example command for reference:
-    `sudo cpp/src/arrow/flight/sql/odbc/tests/install_odbc.sh /path/to/arrow/cpp/build/release/libarrow_flight_sql_odbc.dylib`
+    `sudo cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh /path/to/arrow/cpp/build/release/libarrow_flight_sql_odbc.dylib`
 
 If the registration is successful, then Apache Arrow Flight SQL ODBC Driver 
 should be shown at `~/Library/ODBC/odbcinst.ini`

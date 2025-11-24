@@ -20,15 +20,12 @@
 # GH-47876 TODO: create macOS ODBC Installer
 # Script for installing macOS ODBC driver, to be used for macOS installer.
 
-# -AL- TODO use script in test folder for installing driver portion.
-# -AL- work on the script here but we can move it in separate PR later.
+source_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# -AL- pseudo code:
-# tests/install_odbc.sh /Library/Apache/ArrowFlightSQLODBC/lib/libarrow_flight_sql_odbc.dylib
-# and then remove all other code.
+odbc_install_script="${source_dir}/install_odbc.sh"
 
-chmod +x ../../tests/install_odbc.sh
-../../tests/install_odbc.sh /Library/Apache/ArrowFlightSQLODBC/lib/libarrow_flight_sql_odbc.dylib
+chmod +x "$odbc_install_script"
+. "$odbc_install_script" /Library/Apache/ArrowFlightSQLODBC/lib/libarrow_flight_sql_odbc.dylib
 
 # -AL- todo uncomment DSN part afterwards
 

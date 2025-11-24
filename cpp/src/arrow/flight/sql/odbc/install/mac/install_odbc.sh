@@ -17,6 +17,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# Used by macOS ODBC installer script and macOS ODBC testing
+
 ODBC_64BIT="$1"
 
 if [[ -z "$ODBC_64BIT" ]]; then

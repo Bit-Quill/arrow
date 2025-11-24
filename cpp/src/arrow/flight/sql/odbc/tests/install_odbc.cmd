@@ -17,6 +17,8 @@
 
 @echo off
 
+@REM Used for Windows ODBC testing only
+
 set ODBC_64BIT=%1
 
 @REM enable delayed variable expansion to make environment variables enclosed with "!" to be evaluated 
