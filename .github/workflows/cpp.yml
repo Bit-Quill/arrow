@@ -231,14 +231,18 @@ jobs:
           brew uninstall pkg-config@0.29.2 || :
           brew bundle --file=cpp/Brewfile
           # -AL- check real path of libodbc
-          brew list libiodbc
+          # brew list libiodbc
       - name: Enable ODBC build on 15-intel only
         if: ${{ matrix.macos-version == '15-intel' }}
         run: |
           echo "ARROW_FLIGHT_SQL=ON" >> $GITHUB_ENV
           echo "ARROW_FLIGHT_SQL_ODBC=ON" >> $GITHUB_ENV
-          echo "ODBC_INCLUDE_DIR=/usr/local/Cellar/libiodbc/3.52.16/include" >> $GITHUB_ENV
-          echo "ODBC_LIBRARY=/usr/local/Cellar/libiodbc/3.52.16/lib/libiodbc.dylib" >> $GITHUB_ENV
+          echo "ODBC_INCLUDE_DIR=/usr/local/Cellar/unixodbc/2.3.14/include" >> $GITHUB_ENV
+          echo "ODBC_LIBRARY=/usr/local/Cellar/unixodbc/2.3.14/lib/libodbc.2.dylib" >> $GITHUB_ENV
+
+          # -AL- old code to use libiodbc
+          # echo "ODBC_INCLUDE_DIR=/usr/local/Cellar/libiodbc/3.52.16/include" >> $GITHUB_ENV
+          # echo "ODBC_LIBRARY=/usr/local/Cellar/libiodbc/3.52.16/lib/libiodbc.dylib" >> $GITHUB_ENV
           # -AL- check real path of libodbc
           realpath /usr/local/lib/libodbc.dylib
       - name: Install MinIO
