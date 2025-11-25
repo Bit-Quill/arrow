@@ -24,6 +24,8 @@
 
 #include <optional>
 
+#include <optional>
+
 namespace arrow::flight::sql::odbc {
 
 TEST(AttributeTests, SetAndGetAttribute) {
