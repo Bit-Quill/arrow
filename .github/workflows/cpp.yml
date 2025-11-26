@@ -229,7 +229,18 @@ jobs:
           # pkg-config formula is removed from GitHub Actions runner.
           brew uninstall pkg-config || :
           brew uninstall pkg-config@0.29.2 || :
+
+          # -AL- remove build-in SQL headers
+          ls -l /usr/local/include/sqlext.h
+          sudo rm -f /usr/local/include/sql.h \
+          /usr/local/include/sqlext.h \
+          /usr/local/include/sqltypes.h \
+          /usr/local/include/sqlucode.h || true
+
           brew bundle --file=cpp/Brewfile
+
+          # -AL- in case sqlext.h still exists
+          ls -l /usr/local/include/sqlext.h || true
           # -AL- check real path of libodbc
           # brew list libiodbc
       - name: Enable ODBC build on 15-intel only
@@ -245,6 +256,7 @@ jobs:
           # echo "ODBC_LIBRARY=/usr/local/Cellar/libiodbc/3.52.16/lib/libiodbc.dylib" >> $GITHUB_ENV
           # -AL- check real path of libodbc
           realpath /usr/local/lib/libodbc.dylib
+          
       - name: Install MinIO
         run: |
           $(brew --prefix bash)/bin/bash \
