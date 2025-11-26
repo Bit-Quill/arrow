@@ -44,9 +44,8 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
 
 #define BUFFER_SIZE (1024)
   std::vector<wchar_t> buf(BUFFER_SIZE);
-
+  // -AL- work on this.
   // TODO enable unicode support on macOS and Linux and remove the ifdef
-#if defined _WIN32
   int ret =
       SQLGetPrivateProfileString(wdsn.c_str(), wkey.c_str(), wdflt.c_str(), buf.data(),
                                  static_cast<int>(buf.size()), L"ODBC.INI");
@@ -62,8 +61,6 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
   std::wstring wresult = std::wstring(buf.data(), ret);
   CONVERT_UTF8_STR(const std::string result, wresult);
   return result;
-#endif  // defined(_WIN32)
-  return std::string("");
 }
 
 void RemoveAllKnownKeys(std::vector<std::string>& keys) {
@@ -84,8 +81,8 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
 
   std::vector<wchar_t> buf(BUFFER_SIZE);
 
-// TODO enable unicode support on macOS and Linux and remove the ifdef
-#if defined _WIN32
+  // -AL- in-prog
+  // TODO enable unicode support on macOS and Linux and remove the ifdef
   int ret = SQLGetPrivateProfileString(wdsn.c_str(), NULL, L"", buf.data(),
                                        static_cast<int>(buf.size()), L"ODBC.INI");
 
@@ -95,7 +92,6 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
     ret = SQLGetPrivateProfileString(wdsn.c_str(), NULL, L"", buf.data(),
                                      static_cast<int>(buf.size()), L"ODBC.INI");
   }
-#endif  // defined(_WIN32)
 
   // When you pass NULL to SQLGetPrivateProfileString it gives back a \0 delimited list of
   // all the keys. The below loop simply tokenizes all the keys and places them into a
