@@ -248,12 +248,12 @@ jobs:
         run: |
           echo "ARROW_FLIGHT_SQL=ON" >> $GITHUB_ENV
           echo "ARROW_FLIGHT_SQL_ODBC=ON" >> $GITHUB_ENV
-          echo "ODBC_INCLUDE_DIR=/usr/local/Cellar/unixodbc/2.3.14/include" >> $GITHUB_ENV
-          echo "ODBC_LIBRARY=/usr/local/Cellar/unixodbc/2.3.14/lib/libodbc.2.dylib" >> $GITHUB_ENV
+          echo "ODBC_INCLUDE_DIR=$(brew --prefix unixodbc)/include" >> $GITHUB_ENV
+          echo "ODBC_LIBRARY=$(brew --prefix unixodbc)/lib/libodbc.2.dylib" >> $GITHUB_ENV
 
           # -AL- old code to use libiodbc
-          # echo "ODBC_INCLUDE_DIR=/usr/local/Cellar/libiodbc/3.52.16/include" >> $GITHUB_ENV
-          # echo "ODBC_LIBRARY=/usr/local/Cellar/libiodbc/3.52.16/lib/libiodbc.dylib" >> $GITHUB_ENV
+          # echo "ODBC_INCLUDE_DIR=$(brew --prefix libiodbc)/include" >> $GITHUB_ENV
+          # echo "ODBC_LIBRARY=$(brew --prefix libiodbc)/lib/libiodbc.dylib" >> $GITHUB_ENV
           # -AL- check real path of libodbc
           realpath /usr/local/lib/libodbc.dylib
           
