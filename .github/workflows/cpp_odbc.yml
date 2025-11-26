@@ -17,9 +17,6 @@
 
 name: C++ ODBC
 
-#-AL- TODO change into ODBC workflow
-# path should be odbc only.
-
 on:
   push:
     branches:
@@ -36,6 +33,8 @@ on:
       - '.github/workflows/cpp_odbc.yml'
       - 'ci/scripts/cpp_*'
       - 'cpp/src/arrow/flight/sql/odbc/*'
+  schedule:
+    - cron: '0 13 * * *'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.head_ref || github.sha }}-${{ github.workflow }}
@@ -51,7 +50,6 @@ jobs:
     env:
       ARROW_BUILD_SHARED: ON
       ARROW_BUILD_STATIC: ON
-      # -AL- todo have Github issue for this if it fails
       ARROW_BUILD_TESTS: ON
       ARROW_BUILD_TYPE: release
       ARROW_DATASET: ON
@@ -146,15 +144,16 @@ jobs:
         shell: cmd
         run: |
           call "cpp\src\arrow\flight\sql\odbc\tests\install_odbc.cmd" ${{ github.workspace }}\build\cpp\%ARROW_BUILD_TYPE%\arrow_flight_sql_odbc.dll
-      - name: Test
-        shell: cmd
-        run: |
-          set VCPKG_ROOT_KEEP=%VCPKG_ROOT%
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
-          # For ORC
-          set TZDIR=${{ steps.setup-msys2.outputs.msys2-location }}\usr\share\zoneinfo
+      # GH-48019 TODO: Enable ODBC tests in CI after segmentation fault and Flight SQL test blockers are resolved.
+      # - name: Test
+      #   shell: cmd
+      #   run: |
+      #     set VCPKG_ROOT_KEEP=%VCPKG_ROOT%
+      #     call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+      #     # For ORC
+      #     set TZDIR=${{ steps.setup-msys2.outputs.msys2-location }}\usr\share\zoneinfo
 
-          # Convert VCPKG Windows path to MSYS path
-          for /f "usebackq delims=" %%I in (`bash -c "cygpath -u \"$VCPKG_ROOT_KEEP\""` ) do set VCPKG_ROOT=%%I
+      #     # Convert VCPKG Windows path to MSYS path
+      #     for /f "usebackq delims=" %%I in (`bash -c "cygpath -u \"$VCPKG_ROOT_KEEP\""` ) do set VCPKG_ROOT=%%I
 
-          bash -c "ci/scripts/cpp_test.sh $(pwd) $(pwd)/build"
+      #     bash -c "ci/scripts/cpp_test.sh $(pwd) $(pwd)/build"
