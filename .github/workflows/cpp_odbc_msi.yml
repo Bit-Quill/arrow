@@ -55,12 +55,12 @@ jobs:
         run: |
           Invoke-WebRequest -Uri https://github.com/wixtoolset/wix/releases/download/v6.0.0/wix-cli-x64.msi -OutFile wix-cli-x64.msi
           Start-Process -FilePath wix-cli-x64.msi -ArgumentList '/quiet', 'Include_freethreaded=1' -Wait
+        # # Verify WiX version #-AL- remove later
+        # wix --version
+
+      - name: Add WIX Toolset to PATH
+        run: |
+          echo "C:\Program Files\WiX Toolset v6.0\bin\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           # Verify WiX version
           wix --version
-
-      # - name: Add WIX Toolset to PATH
-      #   run: |
-      #     echo "C:\Program Files\WiX Toolset v6.0\bin\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      #     # Verify WiX version
-      #     wix --version
 
