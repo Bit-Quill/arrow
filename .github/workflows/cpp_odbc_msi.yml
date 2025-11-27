@@ -1,0 +1,66 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: C++ ODBC TEMP
+
+#-AL- temp quick job for setting up wix tests
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!dependabot/**'
+    tags:
+      - '**'
+    paths:
+      - '.github/workflows/cpp_odbc_msi.yml'
+      - 'ci/scripts/cpp_*'
+      - 'cpp/src/arrow/flight/sql/odbc/*'
+  pull_request:
+    paths:
+      - '.github/workflows/cpp_odbc_msi.yml'
+      - 'ci/scripts/cpp_*'
+      - 'cpp/src/arrow/flight/sql/odbc/*'
+  schedule:
+    - cron: '0 13 * * *'
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 240
+    steps:
+      - name: Install WiX Toolset
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri https://github.com/wixtoolset/wix/releases/download/v6.0.0/wix-cli-x64.msi -OutFile wix-cli-x64.msi
+          Start-Process -FilePath wix-cli-x64.msi -ArgumentList '/quiet', 'Include_freethreaded=1' -Wait
+          # Verify WiX version
+          wix --version
+
+      # - name: Add WIX Toolset to PATH
+      #   run: |
+      #     echo "C:\Program Files\WiX Toolset v6.0\bin\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      #     # Verify WiX version
+      #     wix --version
+
