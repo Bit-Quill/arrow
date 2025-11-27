@@ -144,7 +144,9 @@ jobs:
         shell: cmd
         run: |
           call "cpp\src\arrow\flight\sql\odbc\tests\install_odbc.cmd" ${{ github.workspace }}\build\cpp\%ARROW_BUILD_TYPE%\arrow_flight_sql_odbc.dll
-      # GH-48019 TODO: Enable ODBC tests in CI after segmentation fault and Flight SQL test blockers are resolved.
+      # GH-48270 TODO: Resolve segementation fault during Arrow library unload
+      # GH-48269 TODO: Enable Flight & Flight SQL testing in MSVC CI
+      # TODO: enable ODBC tests after GH-48270 and GH-48269 are resolved.
       # - name: Test
       #   shell: cmd
       #   run: |
