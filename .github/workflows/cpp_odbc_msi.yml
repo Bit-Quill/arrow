@@ -61,6 +61,9 @@ jobs:
       - name: Add WIX Toolset to PATH
         run: |
           echo "C:\Program Files\WiX Toolset v6.0\bin\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          # Verify WiX version
+
+      - name: Verify WiX version
+        shell: pwsh
+        run: |
           wix --version
 
