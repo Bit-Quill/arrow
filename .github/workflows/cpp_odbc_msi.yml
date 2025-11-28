@@ -59,6 +59,7 @@ jobs:
       ARROW_FLIGHT: ON
       ARROW_FLIGHT_SQL: ON
       ARROW_FLIGHT_SQL_ODBC: ON
+      ARROW_FLIGHT_SQL_ODBC_INSTALLER: ON
       ARROW_SIMD_LEVEL: AVX2
       CMAKE_CXX_STANDARD: "17"
       CMAKE_GENERATOR: Ninja
@@ -163,6 +164,7 @@ jobs:
       #     bash -c "ci/scripts/cpp_test.sh $(pwd) $(pwd)/build"
 
       # -AL- for this test Workflow, below work jobs are what I newly added, so just need these. Above stuff is from ODBC workflow. 
+      # -AL- also need to add `ARROW_FLIGHT_SQL_ODBC_INSTALLER: ON`!!
 
       - name: Install WiX Toolset
         shell: pwsh
