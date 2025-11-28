@@ -95,9 +95,13 @@ foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
 endforeach()
 
+# -AL- todo remove these debug messages later
+message(STATUS "ARROW_FLIGHT_SQL_ODBC_INSTALLER value is ${ARROW_FLIGHT_SQL_ODBC_INSTALLER} -AL-"
+)
+
 # Construct ODBC Windows installer. Only Release installer is supported
 if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
-
+  message(STATUS "ARROW_FLIGHT_SQL_ODBC_INSTALLER is set -AL-")
   include(InstallRequiredSystemLibraries)
 
   set(CPACK_RESOURCE_FILE_LICENSE
@@ -153,6 +157,9 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
     set(CPACK_GENERATOR "WIX")
     set(CPACK_WIX_VERSION 4)
 
+    message(STATUS "1- CPACK_GENERATOR is set to ${CPACK_GENERATOR}, with CPACK_WIX_VERSION: ${CPACK_WIX_VERSION} -AL-"
+    )
+
     # Upgrade GUID is required to be unchanged for ODBC installer to upgrade
     set(CPACK_WIX_UPGRADE_GUID "DBF27A18-F8BF-423F-9E3A-957414D52C4B")
     set(CPACK_WIX_PRODUCT_GUID "279D087B-93B5-4DC3-BA69-BCF485022A26")
@@ -161,6 +168,8 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   # GH-47877 TODO: create Linux Installer using cpack
 
   # Load CPack after all CPACK* variables are set
+  message(STATUS "2 - CPACK_GENERATOR is set to ${CPACK_GENERATOR}, with CPACK_WIX_VERSION: ${CPACK_WIX_VERSION} -AL-"
+  )
   include(CPack)
   cpack_add_component(flight_sql_odbc_lib
                       DISPLAY_NAME "ODBC library"
