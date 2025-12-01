@@ -46,7 +46,7 @@ If the generation is successful, you will find `Apache Arrow Flight SQL ODBC-<ve
 
 ## Steps to Register the 64-bit Apache Arrow ODBC driver on macOS
 
-After the build succeeds, the ODBC DLL will be located in 
+After the build succeeds, the ODBC DYLIB will be located in 
 `build\debug` for a debug build and `build\release` for a release build.
 
 1. Open terminal shell.
