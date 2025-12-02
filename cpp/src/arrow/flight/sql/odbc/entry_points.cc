@@ -106,27 +106,8 @@ SQLRETURN SQL_API SQLSetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value_p
 SQLRETURN SQL_API SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attribute,
                                     SQLPOINTER value_ptr, SQLINTEGER buffer_length,
                                     SQLINTEGER* string_length_ptr) {
-  ARROW_LOG(DEBUG)
-      << "-AL- Alina test msg in entry_points.cc: SQLGetConnectAttr called with conn: "
-      << conn;  //-AL- refactor later.
   return arrow::flight::sql::odbc::SQLGetConnectAttr(conn, attribute, value_ptr,
                                                      buffer_length, string_length_ptr);
-}
-
-// -AL- not sure if needed on macOS, check again after implementing SQLError.
-SQLRETURN SQL_API SQLGetConnectOption(SQLHDBC conn, SQLUSMALLINT attribute,
-                                      SQLPOINTER value_ptr) {
-  ARROW_LOG(DEBUG) << "SQLGetConnectOption called with conn: " << conn
-                   << ", attribute: " << attribute
-                   << ", value_ptr: " << static_cast<const void*>(value_ptr);
-
-  // cast `SQLUSMALLINT` attribute to a `SQLINTEGER` type which works for
-  // SQLGetConnectAttr buffer_length, string_length_ptr should be set to 0
-  SQLINTEGER buffer_length = 0;
-  SQLINTEGER string_length = 0;
-  SQLINTEGER attribute_int = static_cast<SQLINTEGER>(attribute);
-  return arrow::flight::sql::odbc::SQLGetConnectAttr(conn, attribute_int, value_ptr,
-                                                     buffer_length, &string_length);
 }
 
 SQLRETURN SQL_API SQLSetConnectAttr(SQLHDBC conn, SQLINTEGER attr, SQLPOINTER value,

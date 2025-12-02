@@ -472,11 +472,16 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorEnvErrorFromDriverManager) {
   EXPECT_TRUE(!std::wstring(message).empty());
 }
 
+#ifndef __APPLE__
 TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnError) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
   // DM passes 512 as buffer length to SQLError.
+
+  // Known macOS Driver Manager (DM) behavior:
+  // Attempts to call SQLGetConnectOption without redirecting the API call to SQLGetConnectAttr.
+  // SQLGetConnectOption is not implemented as it is not required by macOS Excel.
 
   // Attempt to set unsupported attribute
   ASSERT_EQ(SQL_ERROR, SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, 0));
@@ -497,6 +502,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnError) {
 
   EXPECT_TRUE(!std::wstring(message).empty());
 }
+#endif // __APPLE__
 
 TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtError) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
