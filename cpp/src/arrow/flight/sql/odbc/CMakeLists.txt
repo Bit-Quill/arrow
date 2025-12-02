@@ -58,7 +58,7 @@ if(WIN32)
   set(VER_COMPANYNAME_STR ${ODBC_PACKAGE_VENDOR})
   set(VER_PRODUCTNAME_STR ${ODBC_PACKAGE_NAME})
 
-  configure_file("install/versioninfo.rc.in" "install/versioninfo.rc" @ONLY)
+  configure_file("install/windows/versioninfo.rc.in" "install/versioninfo.rc" @ONLY)
 
   list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def install/versioninfo.rc)
 endif()
@@ -136,11 +136,12 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
             PATTERN "zlib1.dll")
 
     set(CPACK_WIX_EXTRA_SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/install/arrow-flight-sql-odbc.wxs")
+        "${CMAKE_CURRENT_SOURCE_DIR}/install/windows/arrow-flight-sql-odbc.wxs")
     set(CPACK_WIX_PATCH_FILE
-        "${CMAKE_CURRENT_SOURCE_DIR}/install/arrow-flight-sql-odbc-patch.xml")
+        "${CMAKE_CURRENT_SOURCE_DIR}/install/windows/arrow-flight-sql-odbc-patch.xml")
 
-    set(CPACK_WIX_UI_BANNER "${CMAKE_CURRENT_SOURCE_DIR}/install/arrow-wix-banner.bmp")
+    set(CPACK_WIX_UI_BANNER
+        "${CMAKE_CURRENT_SOURCE_DIR}/install/windows/arrow-wix-banner.bmp")
   endif()
 
   get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
