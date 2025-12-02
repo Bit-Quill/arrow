@@ -83,51 +83,14 @@ SQLRETURN SQL_API SQLGetDiagRec(SQLSMALLINT handle_type, SQLHANDLE handle,
       buffer_length, text_length_ptr);
 }
 
-//-AL- todo test SQLError. Should do a ifdef macOS later.
+#if defined(__APPLE__)
 SQLRETURN SQL_API SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* sql_state,
                            SQLINTEGER* native_error_ptr, SQLWCHAR* message_text,
                            SQLSMALLINT buffer_length, SQLSMALLINT* text_length_ptr) {
-  // -AL- TODO move to odbc_api.cc.
-  ARROW_LOG(DEBUG) << "SQLError called with env: " << env << ", conn: " << conn
-                   << ", stmt: " << stmt
-                   << ", sql_state: " << static_cast<const void*>(sql_state)
-                   << ", native_error_ptr: " << static_cast<const void*>(native_error_ptr)
-                   << ", message_text: " << static_cast<const void*>(message_text)
-                   << ", buffer_length: " << buffer_length
-                   << ", text_length_ptr: " << static_cast<const void*>(text_length_ptr);
-
-  SQLSMALLINT handle_type;
-  SQLHANDLE handle;
-
-  if (env) {
-    handle_type = SQL_HANDLE_ENV;
-    handle = static_cast<SQLHANDLE>(env);
-  } else if (conn) {
-    handle_type = SQL_HANDLE_DBC;
-    handle = static_cast<SQLHANDLE>(conn);
-  } else if (stmt) {
-    handle_type = SQL_HANDLE_STMT;
-    handle = static_cast<SQLHANDLE>(stmt);
-  } else {
-    return static_cast<SQLRETURN>(SQL_INVALID_HANDLE);
-  }
-
-  // Use the last record
-  SQLINTEGER diag_number;
-  SQLSMALLINT diag_number_length;
-
-  SQLRETURN ret = SQLGetDiagField(handle_type, handle, 0, SQL_DIAG_NUMBER, &diag_number,
-                                  sizeof(SQLINTEGER), 0);
-  if (ret != SQL_SUCCESS) {
-    return ret;
-  }
-
-  SQLSMALLINT rec_number = static_cast<SQLSMALLINT>(diag_number);
-
-  return arrow::flight::sql::odbc::SQLGetDiagRec(
-      handle_type, handle, rec_number, sql_state, native_error_ptr, message_text,
-      buffer_length, text_length_ptr);
+  return arrow::flight::sql::odbc::SQLError(env, conn, stmt, sql_state, native_error_ptr,
+                                            message_text, buffer_length, text_length_ptr);
 }
+#endif  // __APPLE__
 
 SQLRETURN SQL_API SQLGetEnvAttr(SQLHENV env, SQLINTEGER attr, SQLPOINTER value_ptr,
                                 SQLINTEGER buffer_len, SQLINTEGER* str_len_ptr) {
