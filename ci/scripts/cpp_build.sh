@@ -261,6 +261,8 @@ else
     -DCMAKE_BUILD_TYPE=${ARROW_BUILD_TYPE:-debug} \
     -DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE:-OFF} \
     -DCMAKE_C_FLAGS="${CFLAGS:-}" \
+    #-AL- might need to add icudata here too. Uncomment below code if CI needs to find icu4c. untested.
+    # -DCMAKE_CXX_FLAGS="${CXXFLAGS:-} -I${ODBC_INCLUDE_DIR:-} -L${ODBC_LIB_DIR:-} -L${ICU4C_LIB_DIR:-}" \
     -DCMAKE_CXX_FLAGS="${CXXFLAGS:-} -I${ODBC_INCLUDE_DIR:-} -L${ODBC_LIB_DIR:-}" \
     -DCMAKE_CXX_STANDARD="${CMAKE_CXX_STANDARD:-20}" \
     -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR:-lib} \
