@@ -194,8 +194,6 @@ jobs:
       ARROW_BUILD_TESTS: ON
       ARROW_DATASET: ON
       ARROW_FLIGHT: ON
-      ARROW_FLIGHT_SQL: ON
-      ARROW_FLIGHT_SQL_ODBC: ON
       ARROW_GANDIVA: ON
       ARROW_GCS: ON
       ARROW_HDFS: ON
@@ -232,9 +230,6 @@ jobs:
           brew uninstall pkg-config || :
           brew uninstall pkg-config@0.29.2 || :
           brew bundle --file=cpp/Brewfile
-          export LIBIODBC_DIR="$(brew --cellar libiodbc)/$(brew list --versions libiodbc | awk '{print $2}')"
-          echo ODBC_INCLUDE_DIR="$LIBIODBC_DIR/include" >> $GITHUB_ENV
-          echo ODBC_LIB_DIR="$LIBIODBC_DIR/lib" >> $GITHUB_ENV
       - name: Install MinIO
         run: |
           $(brew --prefix bash)/bin/bash \
@@ -262,20 +257,20 @@ jobs:
           restore-keys: cpp-ccache-macos-${{ matrix.macos-version }}-
       - name: Build
         run: |
-          # Homebrew uses /usr/local as prefix. So packages
-          # installed by Homebrew also use /usr/local/include. We
-          # want to include headers for packages installed by
-          # Homebrew as system headers to ignore warnings in them.
-          # But "-isystem /usr/local/include" isn't used by CMake
-          # because /usr/local/include is marked as the default
-          # include path. So we disable -Werror to avoid build error
-          # by warnings from packages installed by Homebrew.
-          export BUILD_WARNING_LEVEL=PRODUCTION
+          if [ "${{ matrix.macos-version }}" = "15-intel" ]; then
+            # This is a workaround.
+            #
+            # Homebrew uses /usr/local as prefix. So packages
+            # installed by Homebrew also use /usr/local/include. We
+            # want to include headers for packages installed by
+            # Homebrew as system headers to ignore warnings in them.
+            # But "-isystem /usr/local/include" isn't used by CMake
+            # because /usr/local/include is marked as the default
+            # include path. So we disable -Werror to avoid build error
+            # by warnings from packages installed by Homebrew.
+            export BUILD_WARNING_LEVEL=PRODUCTION
+          fi
           ci/scripts/cpp_build.sh $(pwd) $(pwd)/build
-      - name: Register Flight SQL ODBC Driver
-        run: |
-           chmod +x cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh
-           sudo cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh $(pwd)/build/cpp/debug/libarrow_flight_sql_odbc.dylib
       - name: Test
         shell: bash
         run: |
