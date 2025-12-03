@@ -41,6 +41,8 @@ set(ARROW_RE2_LINKAGE
 # ----------------------------------------------------------------------
 # Resolve the dependencies
 
+# -AL- I believe this is the place where gRPC is linked. (or somewhere else related)
+
 set(ARROW_THIRDPARTY_DEPENDENCIES
     absl
     AWSSDK
@@ -1106,6 +1108,12 @@ function(build_boost)
     list(APPEND BOOST_INCLUDE_LIBRARIES uuid)
   else()
     list(APPEND BOOST_EXCLUDE_LIBRARIES uuid)
+  endif()
+  #-al- Add ODBC-specific dependencies
+  if(ARROW_FLIGHT_SQL_ODBC)
+    list(APPEND BOOST_INCLUDE_LIBRARIES beast xpressive)
+  else()
+    list(APPEND BOOST_EXCLUDE_LIBRARIES beast xpressive)
   endif()
   set(BOOST_SKIP_INSTALL_RULES ON)
   if(NOT ARROW_ENABLE_THREADING)
@@ -3021,11 +3029,16 @@ function(build_cares)
   set(CARES_BUILD_TOOLS OFF)
   fetchcontent_makeavailable(cares)
 
+  # -AL- getting issue here. Resolved issue on macOS Intel with `c-ares`
   if(APPLE)
     # libresolv must be linked from c-ares version 1.16.1
     find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv REQUIRED)
-    set_target_properties(c-ares::cares PROPERTIES INTERFACE_LINK_LIBRARIES
-                                                   "${LIBRESOLV_LIBRARY}")
+    # set_target_properties(c-ares::cares PROPERTIES INTERFACE_LINK_LIBRARIES
+    #                                                "${LIBRESOLV_LIBRARY}")
+    # -AL- Changed to below code to get pass
+    # `set_target_properties can not be used on an ALIAS target.` error.
+    set_target_properties(c-ares PROPERTIES INTERFACE_LINK_LIBRARIES
+                                            "${LIBRESOLV_LIBRARY}")
   endif()
 
   set(ARROW_BUNDLED_STATIC_LIBS

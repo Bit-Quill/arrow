@@ -109,20 +109,19 @@ set(ARROW_ODBC_SPI_IMPL_SOURCES accessors/binary_array_accessor.cc
             system_trust_store.cc
             system_trust_store.h
             types.h
-            type_fwd.h
             type_utilities.h
             util.cc
             util.h)
 
-# add_library(arrow_odbc_spi_impl STATIC
-#             ${ARROW_ODBC_SPI_IMPL_SOURCES})
-# target_compile_definitions(arrow_odbc_spi_impl PUBLIC UNICODE)
-# target_include_directories(arrow_odbc_spi_impl PUBLIC include include/odbc_impl)
-# target_include_directories(arrow_odbc_spi_impl PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+add_library(arrow_odbc_spi_impl STATIC
+            ${ARROW_ODBC_SPI_IMPL_SOURCES})
+target_compile_definitions(arrow_odbc_spi_impl PUBLIC UNICODE)
+target_include_directories(arrow_odbc_spi_impl PUBLIC include include/odbc_impl)
+target_include_directories(arrow_odbc_spi_impl PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 if(WIN32)
-  list(APPEND ARROW_ODBC_SPI_IMPL_SOURCES
-               ui/add_property_window.cc
+  target_sources(arrow_odbc_spi_impl
+                 PRIVATE ui/add_property_window.cc
                          ui/add_property_window.h
                          ui/custom_window.cc
                          ui/custom_window.h
@@ -135,95 +134,55 @@ if(WIN32)
                          system_dsn.h)
 endif()
 
-if(APPLE)
-  target_include_directories(arrow_odbc_spi_impl SYSTEM BEFORE PUBLIC ${ODBC_INCLUDE_DIR})
-  target_link_libraries(arrow_odbc_spi_impl
-                        PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
-                               iodbc)
-else()
-  find_package(ODBC REQUIRED)
-  target_include_directories(arrow_odbc_spi_impl PUBLIC ${ODBC_INCLUDE_DIR})
+message(STATUS "-AL- random msg in odbc_impl")
+
+if(WIN32)
   target_link_libraries(arrow_odbc_spi_impl
                         PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
                                ${ODBCINST})
+else()
+  # unix
+
+  # find_package(Arrow REQUIRED) #-AL- tried this line for static linking, but it doesn't work because when we build
+  # `arrow_odbc_spi_impl`, we are still in the process of building the Arrow library
+
+  # message(STATUS "-AL- 2 random msg in odbc_impl 2 ")
+  # find_dependency(Arrow CONFIG) # -AL- new issue: Could NOT find Arrow (missing: Arrow_DIR) error
+  # message(STATUS "-AL- 3 random msg in odbc_impl 3")
+  # find_dependency(ArrowCompute CONFIG)
+
+  # -AL- if I can link arrow_odbc_spi_impl with static libs, I will begin to understand how it works.
+  # (it is also possible that both ODBC and `flightsql-odbc` are needed to be statically linking to work)
+  target_link_libraries(arrow_odbc_spi_impl
+                        # -AL- shared libs are required for linking to work properly.
+                        # -AL- used to switch to `_static` when shared libraries are turned off.
+                        # Requires `find_package(Arrow REQUIRED)` so it won't work.
+                        #  PUBLIC Arrow::arrow_flight_sql_static ArrowCompute::arrow_compute_static
+                        # -AL- below is the format used by ARROW_EXAMPLE_LINK_LIBS example.
+                        PUBLIC arrow_flight_sql_static
+                               arrow_compute_static
+                               Boost::locale
+                               Boost::headers
+                               RapidJSON)
 endif()
 
-# if(WIN32)
-#   target_link_libraries(arrow_odbc_spi_impl
-#                         PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
-#                                ${ODBCINST})
-# else()
-#   # unix
-
-#   # find_package(Arrow REQUIRED) #-AL- tried this line for static linking, but it doesn't work because when we build
-#   # `arrow_odbc_spi_impl`, we are still in the process of building the Arrow library
-
-#   # message(STATUS "-AL- 2 random msg in odbc_impl 2 ")
-#   # find_dependency(Arrow CONFIG) # -AL- new issue: Could NOT find Arrow (missing: Arrow_DIR) error
-#   # message(STATUS "-AL- 3 random msg in odbc_impl 3")
-#   # find_dependency(ArrowCompute CONFIG)
-
-#   # -AL- if I can link arrow_odbc_spi_impl with static libs, I will begin to understand how it works.
-#   # (it is also possible that both ODBC and `flightsql-odbc` are needed to be statically linking to work)
-#   target_link_libraries(arrow_odbc_spi_impl
-#                         # -AL- shared libs are required for linking to work properly.
-#                         # -AL- used to switch to `_static` when shared libraries are turned off.
-#                         # Requires `find_package(Arrow REQUIRED)` so it won't work.
-#                         #  PUBLIC Arrow::arrow_flight_sql_static ArrowCompute::arrow_compute_static
-#                         # -AL- below is the format used by ARROW_EXAMPLE_LINK_LIBS example.
-#                         PUBLIC arrow_flight_sql_static
-#                                arrow_compute_static
-#                                Boost::locale
-#                                Boost::headers
-#                                RapidJSON)
-# endif()
-
-# -AL- TODO: if below works, need to refactor to add
-# ${ODBC_SPI_IMPL_STATIC_LINK_LIBS} ${ODBC_SPI_IMPL_SHARED_LINK_LIBS}
-add_arrow_lib(arrow_odbc_spi_impl
-            SOURCES
-            ${ARROW_ODBC_SPI_IMPL_SOURCES}
-            DEFINITIONS
-            UNICODE
-            SHARED_LINK_LIBS
-            arrow_flight_sql_shared
-            arrow_compute_shared
-            Boost::locale
-            Boost::headers
-            RapidJSON
-            STATIC_LINK_LIBS
-            arrow_flight_sql_static
-            arrow_compute_static
-            Boost::locale
-            Boost::headers
-            RapidJSON
-            # PUBLIC_INCLUDES #-AL- turns out Arrow doesn't have a `PUBLIC_INCLUDES` var
-            # include
-            # include/odbc_impl
-            # ${CMAKE_CURRENT_LIST_DIR}
-            )                                 
+set_target_properties(arrow_odbc_spi_impl
+                      PROPERTIES ARCHIVE_OUTPUT_DIRECTORY
+                                 ${CMAKE_BINARY_DIR}/$<CONFIG>/lib
+                                 LIBRARY_OUTPUT_DIRECTORY
+                                 ${CMAKE_BINARY_DIR}/$<CONFIG>/lib
+                                 RUNTIME_OUTPUT_DIRECTORY
+                                 ${CMAKE_BINARY_DIR}/$<CONFIG>/lib)
 
 # CLI
 add_executable(arrow_odbc_spi_impl_cli main.cc)
 set_target_properties(arrow_odbc_spi_impl_cli
                       PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                                  ${CMAKE_BINARY_DIR}/$<CONFIG>/bin)
-target_link_libraries(arrow_odbc_spi_impl_cli arrow_odbc_spi_impl_shared)
+target_link_libraries(arrow_odbc_spi_impl_cli arrow_odbc_spi_impl)
 
 # Unit tests
-
-# -AL- add comment
-# On Windows, dynamic linking ODBC is supported.
-# On unix systems, static linking ODBC is supported, thus the test linking is different.
-
-# -AL- todo: test this on Windows.
-set(ODBC_SPI_IMPL_TEST_LINK_LIBS arrow_odbc_spi_impl_shared
-               arrow_flight_testing_shared)
-
-if(APPLE)
-  list(APPEND ODBC_SPI_IMPL_TEST_LINK_LIBS ${ARROW_TEST_LINK_LIBS})
-endif()
-
+# if(WIN32)
 add_arrow_test(odbc_spi_impl_test
                SOURCES
                accessors/boolean_array_accessor_test.cc
@@ -241,4 +200,31 @@ add_arrow_test(odbc_spi_impl_test
                record_batch_transformer_test.cc
                util_test.cc
                EXTRA_LINK_LIBS
-               ${ODBC_SPI_IMPL_TEST_LINK_LIBS})
+               arrow_odbc_spi_impl
+               arrow_flight_testing_shared)
+# Using below code causes build issues
+# else()
+# # Unix
+# # Link Arrow libs statically on Unix for unit tests
+# #-AL- nicer way to do it might be like example in cpp/src/arrow/c/CMakeLists.txt
+# add_arrow_test(odbc_spi_impl_test
+#                SOURCES
+#                accessors/boolean_array_accessor_test.cc
+#                accessors/binary_array_accessor_test.cc
+#                accessors/date_array_accessor_test.cc
+#                accessors/decimal_array_accessor_test.cc
+#                accessors/primitive_array_accessor_test.cc
+#                accessors/string_array_accessor_test.cc
+#                accessors/time_array_accessor_test.cc
+#                accessors/timestamp_array_accessor_test.cc
+#                flight_sql_connection_test.cc
+#                flight_sql_stream_chunk_buffer_test.cc
+#                parse_table_types_test.cc
+#                json_converter_test.cc
+#                record_batch_transformer_test.cc
+#                util_test.cc
+#                EXTRA_LINK_LIBS
+#                arrow_odbc_spi_impl
+#                STATIC_LINK_LIBS
+#                arrow_flight_testing_static)
+# endif()

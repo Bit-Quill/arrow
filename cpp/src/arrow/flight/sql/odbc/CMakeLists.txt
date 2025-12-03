@@ -19,6 +19,12 @@
 # GH-44792: Arrow will switch to C++ 20
 set(CMAKE_CXX_STANDARD 20)
 
+
+if(APPLE)
+  # CMAKE_FIND_LIBRARY_SUFFIXES.
+  set(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+endif()
+
 if(WIN32)
   if(MSVC_VERSION GREATER_EQUAL 1900)
     set(ODBCINST legacy_stdio_definitions odbccp32 shlwapi)
@@ -31,8 +37,10 @@ else()
   set(ODBCINST odbcinst)
 endif()
 
+message(STATUS "-AL- random msg in odbc cmake")
+
 add_subdirectory(odbc_impl)
-add_subdirectory(tests)
+add_subdirectory(tests) # -AL- TODO enable after `odbc_impl` works and ODBC driver still links statically.
 
 arrow_install_all_headers("arrow/flight/sql/odbc")
 
@@ -61,33 +69,64 @@ if(WIN32)
   list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def install/versioninfo.rc)
 endif()
 
-add_arrow_lib(arrow_flight_sql_odbc
-              CMAKE_PACKAGE_NAME
-              ArrowFlightSqlOdbc
-              PKG_CONFIG_NAME
-              arrow-flight-sql-odbc
-              OUTPUTS
-              ARROW_FLIGHT_SQL_ODBC_LIBRARIES
-              SOURCES
-              ${ARROW_FLIGHT_SQL_ODBC_SRCS}
-              DEPENDENCIES
-              arrow_flight_sql
-              DEFINITIONS
-              UNICODE
-              SHARED_LINK_FLAGS
-              ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
-              SHARED_LINK_LIBS
-              arrow_flight_sql_shared
-              SHARED_INSTALL_INTERFACE_LIBS
-              ArrowFlight::arrow_flight_sql_shared
-              STATIC_LINK_LIBS
-              arrow_flight_sql_static
-              STATIC_INSTALL_INTERFACE_LIBS
-              ArrowFlight::arrow_flight_sql_static
-              SHARED_PRIVATE_LINK_LIBS
-              ODBC::ODBC
-              ${ODBCINST}
-              arrow_odbc_spi_impl)
+# -AL- TODO for ODBC layer, use variables so it's like
+# Var = “”
+# If windows
+# Var append shared lib
+# And that it. The end goal should be 1 add_arrow_lib call. 
+
+
+# -AL- build dynamically on Windows and statically on Unix systems.
+# Might make them both the same if it is easier to maintain? Currently doing it separately to not break ODBC on Windows for now.
+if(WIN32)
+  add_arrow_lib(arrow_flight_sql_odbc
+                CMAKE_PACKAGE_NAME
+                ArrowFlightSqlOdbc
+                PKG_CONFIG_NAME
+                arrow-flight-sql-odbc
+                OUTPUTS
+                ARROW_FLIGHT_SQL_ODBC_LIBRARIES
+                SOURCES
+                ${ARROW_FLIGHT_SQL_ODBC_SRCS}
+                DEFINITIONS
+                UNICODE
+                SHARED_LINK_FLAGS
+                ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
+                SHARED_LINK_LIBS
+                arrow_flight_sql_shared
+                SHARED_INSTALL_INTERFACE_LIBS
+                ArrowFlight::arrow_flight_sql_shared
+                STATIC_LINK_LIBS
+                arrow_flight_sql_static
+                STATIC_INSTALL_INTERFACE_LIBS
+                ArrowFlight::arrow_flight_sql_static
+                SHARED_PRIVATE_LINK_LIBS
+                ODBC::ODBC
+                ${ODBCINST}
+                arrow_odbc_spi_impl_shared)
+else()
+  # Unix
+  add_arrow_lib(arrow_flight_sql_odbc
+                CMAKE_PACKAGE_NAME
+                ArrowFlightSqlOdbc
+                PKG_CONFIG_NAME
+                arrow-flight-sql-odbc
+                OUTPUTS
+                ARROW_FLIGHT_SQL_ODBC_LIBRARIES
+                SOURCES
+                ${ARROW_FLIGHT_SQL_ODBC_SRCS}
+                DEFINITIONS
+                UNICODE
+                SHARED_LINK_FLAGS
+                ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
+                STATIC_LINK_LIBS
+                ODBC::ODBC
+                ${ODBCINST}
+                # -AL- below line removed = driver not loaded?
+                # SHARED_PRIVATE_LINK_LIBS
+                SHARED_LINK_LIBS #-AL- make odbc calls exported too?
+                arrow_odbc_spi_impl_static)
+endif()
 
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
