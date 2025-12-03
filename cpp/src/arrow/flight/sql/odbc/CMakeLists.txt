@@ -63,33 +63,66 @@ if(WIN32)
   list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def install/versioninfo.rc)
 endif()
 
-add_arrow_lib(arrow_flight_sql_odbc
-              CMAKE_PACKAGE_NAME
-              ArrowFlightSqlOdbc
-              PKG_CONFIG_NAME
-              arrow-flight-sql-odbc
-              OUTPUTS
-              ARROW_FLIGHT_SQL_ODBC_LIBRARIES
-              SOURCES
-              ${ARROW_FLIGHT_SQL_ODBC_SRCS}
-              DEPENDENCIES
-              arrow_flight_sql
-              DEFINITIONS
-              UNICODE
-              SHARED_LINK_FLAGS
-              ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
-              SHARED_LINK_LIBS
-              arrow_flight_sql_shared
-              SHARED_INSTALL_INTERFACE_LIBS
-              ArrowFlight::arrow_flight_sql_shared
-              STATIC_LINK_LIBS
-              arrow_flight_sql_static
-              STATIC_INSTALL_INTERFACE_LIBS
-              ArrowFlight::arrow_flight_sql_static
-              SHARED_PRIVATE_LINK_LIBS
-              ODBC::ODBC
-              ${ODBCINST}
-              arrow_odbc_spi_impl)
+# -AL- build dynamically on Windows and statically on Unix systems.
+# Might make them both the same if it is easier to maintain? Currently doing it separately to not break ODBC on Windows for now.
+if(WIN32)
+  add_arrow_lib(arrow_flight_sql_odbc
+                CMAKE_PACKAGE_NAME
+                ArrowFlightSqlOdbc
+                PKG_CONFIG_NAME
+                arrow-flight-sql-odbc
+                OUTPUTS
+                ARROW_FLIGHT_SQL_ODBC_LIBRARIES
+                SOURCES
+                ${ARROW_FLIGHT_SQL_ODBC_SRCS}
+                DEPENDENCIES
+                arrow_flight_sql
+                DEFINITIONS
+                UNICODE
+                SHARED_LINK_FLAGS
+                ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
+                SHARED_LINK_LIBS
+                arrow_flight_sql_shared
+                SHARED_INSTALL_INTERFACE_LIBS
+                ArrowFlight::arrow_flight_sql_shared
+                STATIC_LINK_LIBS
+                arrow_flight_sql_static
+                STATIC_INSTALL_INTERFACE_LIBS
+                ArrowFlight::arrow_flight_sql_static
+                SHARED_PRIVATE_LINK_LIBS
+                ODBC::ODBC
+                ${ODBCINST}
+                arrow_odbc_spi_impl)
+else()
+  # Unix
+  add_arrow_lib(arrow_flight_sql_odbc
+                CMAKE_PACKAGE_NAME
+                ArrowFlightSqlOdbc
+                PKG_CONFIG_NAME
+                arrow-flight-sql-odbc
+                OUTPUTS
+                ARROW_FLIGHT_SQL_ODBC_LIBRARIES
+                SOURCES
+                ${ARROW_FLIGHT_SQL_ODBC_SRCS}
+                DEPENDENCIES
+                arrow_flight_sql
+                DEFINITIONS
+                UNICODE
+                SHARED_LINK_FLAGS
+                ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
+                SHARED_LINK_LIBS
+                arrow_flight_sql_shared
+                SHARED_INSTALL_INTERFACE_LIBS
+                ArrowFlight::arrow_flight_sql_shared
+                STATIC_LINK_LIBS
+                arrow_flight_sql_static
+                ODBC::ODBC
+                ${ODBCINST}
+                STATIC_INSTALL_INTERFACE_LIBS
+                ArrowFlight::arrow_flight_sql_static
+                SHARED_PRIVATE_LINK_LIBS
+                arrow_odbc_spi_impl)
+endif()
 
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
