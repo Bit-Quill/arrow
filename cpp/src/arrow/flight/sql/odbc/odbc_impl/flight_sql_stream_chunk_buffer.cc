@@ -20,8 +20,6 @@
 
 namespace arrow::flight::sql::odbc {
 
-using arrow::Result;
-
 FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     FlightSqlClient& flight_sql_client, const FlightClientOptions& client_options,
     const FlightCallOptions& call_options, const std::shared_ptr<FlightInfo>& flight_info,
@@ -58,7 +56,7 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
     util::ThrowIfNotOK(result.status());
     std::shared_ptr<FlightStreamReader> stream_reader_ptr(std::move(result.ValueOrDie()));
 
-    BlockingQueue<std::pair<Result<FlightStreamChunk>,
+    BlockingQueue<std::pair<arrow::Result<FlightStreamChunk>,
                             std::shared_ptr<FlightSqlClient>>>::Supplier supplier = [=] {
       auto result = stream_reader_ptr->Next();
       bool is_not_ok = !result.ok();
@@ -68,24 +66,26 @@ FlightStreamChunkBuffer::FlightStreamChunkBuffer(
       // call. temp_flight_sql_client is intentionally null if the list of endpoint
       // Locations is empty.
       // After all data is fetched from reader, the temp client is closed.
-
-      // gh-48084 Replace boost::optional with std::optional
-      return boost::make_optional(
-          is_not_ok || is_not_empty,
-          std::make_pair(std::move(result), temp_flight_sql_client));
+      if (is_not_ok || is_not_empty) {
+        return std::make_optional(
+            std::make_pair(std::move(result), temp_flight_sql_client));
+      } else {
+        return std::optional<std::pair<arrow::Result<FlightStreamChunk>,
+                                       std::shared_ptr<FlightSqlClient>>>{};
+      }
     };
     queue_.AddProducer(std::move(supplier));
   }
 }
 
 bool FlightStreamChunkBuffer::GetNext(FlightStreamChunk* chunk) {
-  std::pair<Result<FlightStreamChunk>, std::shared_ptr<FlightSqlClient>>
+  std::pair<arrow::Result<FlightStreamChunk>, std::shared_ptr<FlightSqlClient>>
       closeable_endpoint_stream_pair;
   if (!queue_.Pop(&closeable_endpoint_stream_pair)) {
     return false;
   }
 
-  Result<FlightStreamChunk> result = closeable_endpoint_stream_pair.first;
+  arrow::Result<FlightStreamChunk> result = closeable_endpoint_stream_pair.first;
   if (!result.status().ok()) {
     Close();
     throw DriverException(result.status().message());

@@ -29,7 +29,7 @@
 #include "arrow/flight/sql/odbc/odbc_impl/util.h"
 #include "arrow/io/memory.h"
 
-#include <boost/optional.hpp>
+#include <optional>
 #include <utility>
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
 
@@ -83,9 +83,9 @@ bool FlightSqlStatement::SetAttribute(StatementAttributeId attribute,
     case MAX_LENGTH:
       return CheckIfSetToOnlyValidValue(value, static_cast<size_t>(0));
     case QUERY_TIMEOUT:
-      if (boost::get<size_t>(value) > 0) {
+      if (std::get<size_t>(value) > 0) {
         call_options_.timeout =
-            TimeoutDuration{static_cast<double>(boost::get<size_t>(value))};
+            TimeoutDuration{static_cast<double>(std::get<size_t>(value))};
       } else {
         call_options_.timeout = TimeoutDuration{-1};
         // Intentional fall-through.
@@ -96,13 +96,17 @@ bool FlightSqlStatement::SetAttribute(StatementAttributeId attribute,
   }
 }
 
-boost::optional<Statement::Attribute> FlightSqlStatement::GetAttribute(
+std::optional<Statement::Attribute> FlightSqlStatement::GetAttribute(
     StatementAttributeId attribute) {
   const auto& it = attribute_.find(attribute);
-  return boost::make_optional(it != attribute_.end(), it->second);
+  if (it != attribute_.end()) {
+    return std::make_optional(it->second);
+  } else {
+    return std::nullopt;
+  }
 }
 
-boost::optional<std::shared_ptr<ResultSetMetadata>> FlightSqlStatement::Prepare(
+std::optional<std::shared_ptr<ResultSetMetadata>> FlightSqlStatement::Prepare(
     const std::string& query) {
   ClosePreparedStatementIfAny(prepared_statement_, call_options_);
 
@@ -114,7 +118,7 @@ boost::optional<std::shared_ptr<ResultSetMetadata>> FlightSqlStatement::Prepare(
 
   const auto& result_set_metadata = std::make_shared<FlightSqlResultSetMetadata>(
       prepared_statement_->dataset_schema(), metadata_settings_);
-  return boost::optional<std::shared_ptr<ResultSetMetadata>>(result_set_metadata);
+  return std::optional<std::shared_ptr<ResultSetMetadata>>(result_set_metadata);
 }
 
 bool FlightSqlStatement::ExecutePrepared() {
