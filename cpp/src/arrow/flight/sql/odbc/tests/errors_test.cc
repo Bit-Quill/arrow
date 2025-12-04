@@ -90,9 +90,12 @@ TYPED_TEST(ErrorsHandleTest, TestSQLGetDiagFieldWForConnectFailure) {
   SQLWCHAR message_text[kOdbcBufferSize];
   SQLSMALLINT message_text_length;
 
-  EXPECT_EQ(SQL_SUCCESS,
-            SQLGetDiagField(SQL_HANDLE_DBC, this->conn, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
-                            message_text, kOdbcBufferSize, &message_text_length));
+  SQLRETURN ret =
+      SQLGetDiagField(SQL_HANDLE_DBC, this->conn, RECORD_1, SQL_DIAG_MESSAGE_TEXT,
+                      message_text, kOdbcBufferSize, &message_text_length);
+
+  // dependent on the size of the message it could output SQL_SUCCESS_WITH_INFO
+  EXPECT_TRUE(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO);
 
   EXPECT_GT(message_text_length, 100);
 
@@ -114,8 +117,7 @@ TYPED_TEST(ErrorsHandleTest, TestSQLGetDiagFieldWForConnectFailure) {
   EXPECT_EQ(
       SQL_SUCCESS,
       SQLGetDiagField(SQL_HANDLE_DBC, this->conn, RECORD_1, SQL_DIAG_SQLSTATE, sql_state,
-                      sql_state_size * arrow::flight::sql::odbc::GetSqlWCharSize(),
-                      &sql_state_length));
+                      sql_state_size * GetSqlWCharSize(), &sql_state_length));
 
   EXPECT_EQ(std::wstring(L"28000"), std::wstring(sql_state));
 }
@@ -305,11 +307,17 @@ TYPED_TEST(ErrorsTest, TestSQLGetDiagRecInputData) {
                                        nullptr, 0, nullptr));
 
   // Invalid handle
+#ifdef __APPLE__
+  // MacOS ODBC driver manager requires connection handle
+  EXPECT_EQ(SQL_INVALID_HANDLE,
+            SQLGetDiagRec(0, this->conn, 1, nullptr, nullptr, nullptr, 0, nullptr));
+#else
   EXPECT_EQ(SQL_INVALID_HANDLE,
             SQLGetDiagRec(0, nullptr, 0, nullptr, nullptr, nullptr, 0, nullptr));
+#endif  // __APPLE__
 }
 
-TYPED_TEST(ErrorsTest, TestSQLErrorInputData) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorInputData) {
   // Test ODBC 2.0 API SQLError. Driver manager maps SQLError to SQLGetDiagRec.
   // SQLError does not post diagnostic records for itself.
 
@@ -320,8 +328,13 @@ TYPED_TEST(ErrorsTest, TestSQLErrorInputData) {
   EXPECT_EQ(SQL_NO_DATA, SQLError(nullptr, this->conn, nullptr, nullptr, nullptr, nullptr,
                                   0, nullptr));
 
+#ifdef __APPLE__
+  EXPECT_EQ(SQL_NO_DATA, SQLError(SQL_NULL_HENV, this->conn, this->stmt, nullptr, nullptr,
+                                  nullptr, 0, nullptr));
+#else
   EXPECT_EQ(SQL_NO_DATA, SQLError(nullptr, nullptr, this->stmt, nullptr, nullptr, nullptr,
                                   0, nullptr));
+#endif  // __APPLE__
 
   // Invalid handle
   EXPECT_EQ(SQL_INVALID_HANDLE,
@@ -362,9 +375,8 @@ TYPED_TEST(ErrorsTest, TestSQLErrorConnError) {
   // DM passes 512 as buffer length to SQLError.
 
   // Attempt to set unsupported attribute
-  SQLRETURN ret = SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, nullptr);
-
-  ASSERT_EQ(SQL_ERROR, ret);
+  ASSERT_EQ(SQL_ERROR,
+            SQLGetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION, 0, 0, nullptr));
 
   SQLWCHAR sql_state[6] = {0};
   SQLINTEGER native_error = 0;
@@ -399,8 +411,10 @@ TYPED_TEST(ErrorsTest, TestSQLErrorStmtError) {
   SQLINTEGER native_error = 0;
   SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
   SQLSMALLINT message_length = 0;
-  ASSERT_EQ(SQL_SUCCESS, SQLError(nullptr, nullptr, this->stmt, sql_state, &native_error,
-                                  message, SQL_MAX_MESSAGE_LENGTH, &message_length));
+  SQLRETURN ret = SQLError(nullptr, this->conn, this->stmt, sql_state, &native_error,
+                           message, SQL_MAX_MESSAGE_LENGTH, &message_length);
+
+  EXPECT_TRUE(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO);
 
   EXPECT_GT(message_length, 70);
 
@@ -434,8 +448,9 @@ TYPED_TEST(ErrorsTest, TestSQLErrorStmtWarning) {
   SQLINTEGER native_error = 0;
   SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
   SQLSMALLINT message_length = 0;
-  ASSERT_EQ(SQL_SUCCESS, SQLError(nullptr, nullptr, this->stmt, sql_state, &native_error,
-                                  message, SQL_MAX_MESSAGE_LENGTH, &message_length));
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLError(SQL_NULL_HENV, this->conn, this->stmt, sql_state, &native_error,
+                     message, SQL_MAX_MESSAGE_LENGTH, &message_length));
 
   EXPECT_GT(message_length, 50);
 
@@ -447,7 +462,7 @@ TYPED_TEST(ErrorsTest, TestSQLErrorStmtWarning) {
   EXPECT_FALSE(std::wstring(message).empty());
 }
 
-TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorEnvErrorODBCVer2FromDriverManager) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorEnvErrorFromDriverManager) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -474,7 +489,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorEnvErrorODBCVer2FromDriverManager) {
   EXPECT_FALSE(std::wstring(message).empty());
 }
 
-TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnErrorODBCVer2) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnError) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -501,7 +516,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnErrorODBCVer2) {
   EXPECT_FALSE(std::wstring(message).empty());
 }
 
-TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtErrorODBCVer2) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtError) {
   // Test ODBC 2.0 API SQLError with ODBC ver 2.
   // Known Windows Driver Manager (DM) behavior:
   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
@@ -530,7 +545,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtErrorODBCVer2) {
   EXPECT_FALSE(std::wstring(message).empty());
 }
 
-TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtWarningODBCVer2) {
+TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtWarning) {
   // Test ODBC 2.0 API SQLError.
 
   std::wstring wsql = L"SELECT 'VERY LONG STRING here' AS string_col;";
@@ -553,8 +568,9 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtWarningODBCVer2) {
   SQLINTEGER native_error = 0;
   SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
   SQLSMALLINT message_length = 0;
-  ASSERT_EQ(SQL_SUCCESS, SQLError(nullptr, nullptr, this->stmt, sql_state, &native_error,
-                                  message, SQL_MAX_MESSAGE_LENGTH, &message_length));
+  ASSERT_EQ(SQL_SUCCESS,
+            SQLError(SQL_NULL_HENV, this->conn, this->stmt, sql_state, &native_error,
+                     message, SQL_MAX_MESSAGE_LENGTH, &message_length));
 
   EXPECT_GT(message_length, 50);
 
