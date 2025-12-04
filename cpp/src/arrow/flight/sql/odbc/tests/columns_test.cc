@@ -2198,7 +2198,7 @@ TEST_F(ColumnsMockTest, TestSQLDescribeColValidateInput) {
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1002);
 #else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorState07009);
-#endif // __APPLE__
+#endif  // __APPLE__
 
   // Invalid descriptor index - index out of range
   EXPECT_EQ(SQL_ERROR, SQLDescribeCol(this->stmt, out_of_range_column, column_name,

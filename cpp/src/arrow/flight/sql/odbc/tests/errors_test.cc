@@ -308,11 +308,11 @@ TYPED_TEST(ErrorsTest, TestSQLGetDiagRecInputData) {
 
   // Invalid handle
 #ifdef __APPLE__
-  // MacOS ODBC driver manager requires connection handle 
+  // MacOS ODBC driver manager requires connection handle
   EXPECT_EQ(SQL_INVALID_HANDLE, SQLGetDiagRec(0, this->conn, 1, 0, 0, 0, 0, 0));
 #else
   EXPECT_EQ(SQL_INVALID_HANDLE, SQLGetDiagRec(0, 0, 0, 0, 0, 0, 0, 0));
-#endif // __APPLE__
+#endif  // __APPLE__
 }
 
 TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorInputData) {
@@ -328,7 +328,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorInputData) {
   EXPECT_EQ(SQL_NO_DATA, SQLError(SQL_NULL_HENV, this->conn, this->stmt, 0, 0, 0, 0, 0));
 #else
   EXPECT_EQ(SQL_NO_DATA, SQLError(0, 0, this->stmt, 0, 0, 0, 0, 0));
-#endif // __APPLE__
+#endif  // __APPLE__
 
   // Invalid handle
   EXPECT_EQ(SQL_INVALID_HANDLE, SQLError(0, 0, 0, 0, 0, 0, 0, 0));
