@@ -1918,7 +1918,7 @@ TYPED_TEST(StatementTest, TestSQLMoreResultsInvalidFunctionSequence) {
 
 TYPED_TEST(StatementTest, TestSQLNativeSqlReturnsInputString) {
   SQLWCHAR buf[1024];
-  SQLINTEGER buf_char_len = sizeof(buf) / ODBC::GetSqlWCharSize();
+  SQLINTEGER buf_char_len = sizeof(buf) / GetSqlWCharSize();
   SQLWCHAR input_str[] = L"SELECT * FROM mytable WHERE id == 1";
   SQLINTEGER input_char_len = static_cast<SQLINTEGER>(wcslen(input_str));
   SQLINTEGER output_char_len = 0;
@@ -1937,7 +1937,7 @@ TYPED_TEST(StatementTest, TestSQLNativeSqlReturnsInputString) {
 
 TYPED_TEST(StatementTest, TestSQLNativeSqlReturnsNTSInputString) {
   SQLWCHAR buf[1024];
-  SQLINTEGER buf_char_len = sizeof(buf) / ODBC::GetSqlWCharSize();
+  SQLINTEGER buf_char_len = sizeof(buf) / GetSqlWCharSize();
   SQLWCHAR input_str[] = L"SELECT * FROM mytable WHERE id == 1";
   SQLINTEGER input_char_len = static_cast<SQLINTEGER>(wcslen(input_str));
   SQLINTEGER output_char_len = 0;
@@ -1974,7 +1974,7 @@ TYPED_TEST(StatementTest, TestSQLNativeSqlReturnsInputStringLength) {
 TYPED_TEST(StatementTest, TestSQLNativeSqlReturnsTruncatedString) {
   const SQLINTEGER small_buf_size_in_char = 11;
   SQLWCHAR small_buf[small_buf_size_in_char];
-  SQLINTEGER small_buf_char_len = sizeof(small_buf) / ODBC::GetSqlWCharSize();
+  SQLINTEGER small_buf_char_len = sizeof(small_buf) / GetSqlWCharSize();
   SQLWCHAR input_str[] = L"SELECT * FROM mytable WHERE id == 1";
   SQLINTEGER input_char_len = static_cast<SQLINTEGER>(wcslen(input_str));
   SQLINTEGER output_char_len = 0;
@@ -2001,7 +2001,7 @@ TYPED_TEST(StatementTest, TestSQLNativeSqlReturnsTruncatedString) {
 
 TYPED_TEST(StatementTest, TestSQLNativeSqlReturnsErrorOnBadInputs) {
   SQLWCHAR buf[1024];
-  SQLINTEGER buf_char_len = sizeof(buf) / ODBC::GetSqlWCharSize();
+  SQLINTEGER buf_char_len = sizeof(buf) / GetSqlWCharSize();
   SQLWCHAR input_str[] = L"SELECT * FROM mytable WHERE id == 1";
   SQLINTEGER input_char_len = static_cast<SQLINTEGER>(wcslen(input_str));
   SQLINTEGER output_char_len = 0;

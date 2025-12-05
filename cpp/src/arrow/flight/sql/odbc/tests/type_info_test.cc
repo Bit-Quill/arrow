@@ -48,7 +48,7 @@ void CheckSQLDescribeCol(SQLHSTMT stmt, const SQLUSMALLINT column_index,
                          const SQLSMALLINT& expected_nullable) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;

@@ -1244,7 +1244,7 @@ TYPED_TEST(ColumnsTest, SQLColAttributeGetCharacterLen) {
   // Check length of character attribute
   ASSERT_EQ(SQL_SUCCESS, SQLColAttribute(this->stmt, 1, SQL_DESC_BASE_COLUMN_NAME, 0, 0,
                                          &character_attr_len, 0));
-  EXPECT_EQ(4 * ODBC::GetSqlWCharSize(), character_attr_len);
+  EXPECT_EQ(4 * GetSqlWCharSize(), character_attr_len);
 }
 
 TYPED_TEST(ColumnsTest, SQLColAttributeInvalidFieldId) {
@@ -2178,7 +2178,7 @@ TEST_F(ColumnsMockTest, TestSQLDescribeColValidateInput) {
   SQLUSMALLINT negative_column = -1;
   SQLWCHAR column_name[1024] = {0};
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT data_type = 0;
   SQLULEN column_size = 0;
@@ -2219,7 +2219,7 @@ TEST_F(ColumnsMockTest, SQLDescribeColQueryAllDataTypesMetadata) {
 
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;
@@ -2301,7 +2301,7 @@ TEST_F(ColumnsMockTest, SQLDescribeColQueryAllDataTypesMetadata) {
 TEST_F(ColumnsRemoteTest, SQLDescribeColQueryAllDataTypesMetadata) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;
@@ -2392,7 +2392,7 @@ TEST_F(ColumnsRemoteTest, SQLDescribeColODBCTestTableMetadata) {
 
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;
@@ -2450,7 +2450,7 @@ TEST_F(ColumnsOdbcV2RemoteTest, SQLDescribeColODBCTestTableMetadataODBC2) {
   // Test assumes there is a table $scratch.ODBCTest in remote server
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;
@@ -2509,7 +2509,7 @@ TEST_F(ColumnsMockTest, SQLDescribeColAllTypesTableMetadata) {
 
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;
@@ -2560,7 +2560,7 @@ TEST_F(ColumnsMockTest, SQLDescribeColUnicodeTableMetadata) {
 
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;
@@ -2596,7 +2596,7 @@ TEST_F(ColumnsMockTest, SQLDescribeColUnicodeTableMetadata) {
 TYPED_TEST(ColumnsTest, SQLColumnsGetMetadataBySQLDescribeCol) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;
@@ -2659,7 +2659,7 @@ TYPED_TEST(ColumnsTest, SQLColumnsGetMetadataBySQLDescribeCol) {
 TYPED_TEST(ColumnsOdbcV2Test, SQLColumnsGetMetadataBySQLDescribeColODBC2) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;

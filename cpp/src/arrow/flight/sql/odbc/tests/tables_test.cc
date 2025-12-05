@@ -56,7 +56,7 @@ std::wstring GetStringColumnW(SQLHSTMT stmt, int colId) {
   }
 
   // indicator is in bytes, so convert to character count
-  size_t char_count = static_cast<size_t>(len_indicator) / ODBC::GetSqlWCharSize();
+  size_t char_count = static_cast<size_t>(len_indicator) / GetSqlWCharSize();
   return std::wstring(buf, buf + char_count);
 }
 }  // namespace
@@ -509,7 +509,7 @@ TEST_F(TablesRemoteTest, SQLTablesGetSupportedTableTypes) {
 TYPED_TEST(TablesTest, SQLTablesGetMetadataBySQLDescribeCol) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;
@@ -556,7 +556,7 @@ TYPED_TEST(TablesTest, SQLTablesGetMetadataBySQLDescribeCol) {
 TYPED_TEST(TablesOdbcV2Test, SQLTablesGetMetadataBySQLDescribeColODBC2) {
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / ODBC::GetSqlWCharSize());
+      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
   SQLSMALLINT column_data_type = 0;
   SQLULEN column_size = 0;
