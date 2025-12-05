@@ -75,8 +75,6 @@ if(WIN32)
                 ARROW_FLIGHT_SQL_ODBC_LIBRARIES
                 SOURCES
                 ${ARROW_FLIGHT_SQL_ODBC_SRCS}
-                DEPENDENCIES
-                arrow_flight_sql
                 DEFINITIONS
                 UNICODE
                 SHARED_LINK_FLAGS
@@ -104,16 +102,14 @@ else()
                 ARROW_FLIGHT_SQL_ODBC_LIBRARIES
                 SOURCES
                 ${ARROW_FLIGHT_SQL_ODBC_SRCS}
-                DEPENDENCIES
-                arrow_flight_sql
                 DEFINITIONS
                 UNICODE
                 SHARED_LINK_FLAGS
                 ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
                 SHARED_LINK_LIBS
-                arrow_flight_sql_shared
+                arrow_flight_sql_static
                 SHARED_INSTALL_INTERFACE_LIBS
-                ArrowFlight::arrow_flight_sql_shared
+                ArrowFlight::arrow_flight_sql_static
                 STATIC_LINK_LIBS
                 arrow_flight_sql_static
                 ODBC::ODBC
@@ -127,6 +123,11 @@ endif()
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
 endforeach()
+
+if(APPLE)
+  # CMAKE_FIND_LIBRARY_SUFFIXES.
+  set(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+endif()
 
 # Construct ODBC Windows installer. Only Release installer is supported
 if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
