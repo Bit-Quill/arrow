@@ -33,6 +33,8 @@ else()
   set(ODBCINST odbcinst)
 endif()
 
+message(STATUS "-AL- random msg in odbc cmake")
+
 add_subdirectory(odbc_impl)
 add_subdirectory(tests)
 
@@ -106,14 +108,24 @@ else()
                 UNICODE
                 SHARED_LINK_FLAGS
                 ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
-                SHARED_LINK_LIBS
-                arrow_flight_sql_shared
-                SHARED_INSTALL_INTERFACE_LIBS
-                ArrowFlight::arrow_flight_sql_shared
-                STATIC_LINK_LIBS
-                arrow_flight_sql_static
-                STATIC_INSTALL_INTERFACE_LIBS
-                ArrowFlight::arrow_flight_sql_static
+
+                # -AL- remove shared link libs
+                # SHARED_LINK_LIBS
+                # arrow_flight_sql_shared
+                # SHARED_INSTALL_INTERFACE_LIBS
+                # ArrowFlight::arrow_flight_sql_shared
+
+
+                # -AL- remove static link libs to avoid error
+                # File already exists in database: FlightSql.proto
+                # arrow_odbc_spi_impl brings in the `arrow_flight_sql_static` dependencies.
+
+                # without static lib, the build works but still get same error.
+
+                # STATIC_LINK_LIBS
+                # arrow_flight_sql_static
+                # STATIC_INSTALL_INTERFACE_LIBS
+                # ArrowFlight::arrow_flight_sql_static
                 SHARED_PRIVATE_LINK_LIBS
                 ODBC::ODBC
                 ${ODBCINST}
