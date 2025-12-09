@@ -129,16 +129,42 @@ if(WIN32)
                          system_dsn.h)
 endif()
 
-# -AL- if I can link arrow_odbc_spi_impl with static libs, I will begin to understand how it works.
-# (it is also possible that both ODBC and `flightsql-odbc` are needed to be statically linking to work)
-target_link_libraries(arrow_odbc_spi_impl
+message(STATUS "-AL- random msg in odbc_impl")
+
+if(WIN32)
+  target_link_libraries(arrow_odbc_spi_impl
                       PUBLIC arrow_flight_sql_shared
                              arrow_compute_shared
                              Boost::locale
+                             ${ODBCINST})
+else()
+  # unix
+
+# find_package(Arrow REQUIRED) #-AL- tried this line for static linking, but it doesn't work because when we build
+# `arrow_odbc_spi_impl`, we are still in the process of building the Arrow library
+
+# message(STATUS "-AL- 2 random msg in odbc_impl 2 ")
+# find_dependency(Arrow CONFIG) # -AL- new issue: Could NOT find Arrow (missing: Arrow_DIR) error
+# message(STATUS "-AL- 3 random msg in odbc_impl 3")
+# find_dependency(ArrowCompute CONFIG)
+
+
+# -AL- if I can link arrow_odbc_spi_impl with static libs, I will begin to understand how it works.
+# (it is also possible that both ODBC and `flightsql-odbc` are needed to be statically linking to work)
+target_link_libraries(arrow_odbc_spi_impl
+                      
                              # -AL- shared libs are required for linking to work properly.
                              # -AL- used to switch to `_static` when shared libraries are turned off.
-                             # PUBLIC arrow_flight_sql_static arrow_compute_static Boost::locale
+                             
+                             # Requires `find_package(Arrow REQUIRED)` so it won't work.
+                            #  PUBLIC Arrow::arrow_flight_sql_static ArrowCompute::arrow_compute_static 
+
+                            # -AL- below is the format used by ARROW_EXAMPLE_LINK_LIBS example.
+                            PUBLIC arrow_flight_sql_static arrow_compute_static 
+                            
+                             Boost::locale Boost::headers
                              ${ODBCINST})
+endif()
 
 set_target_properties(arrow_odbc_spi_impl
                       PROPERTIES ARCHIVE_OUTPUT_DIRECTORY
