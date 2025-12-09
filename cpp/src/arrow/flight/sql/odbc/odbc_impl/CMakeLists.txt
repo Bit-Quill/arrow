@@ -129,8 +129,15 @@ if(WIN32)
                          system_dsn.h)
 endif()
 
+# -AL- if I can link arrow_odbc_spi_impl with static libs, I will begin to understand how it works.
+# (it is also possible that both ODBC and `flightsql-odbc` are needed to be statically linking to work)
 target_link_libraries(arrow_odbc_spi_impl
-                      PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
+                      PUBLIC arrow_flight_sql_shared
+                             arrow_compute_shared
+                             Boost::locale
+                             # -AL- shared libs are required for linking to work properly.
+                             # -AL- used to switch to `_static` when shared libraries are turned off.
+                             # PUBLIC arrow_flight_sql_static arrow_compute_static Boost::locale
                              ${ODBCINST})
 
 set_target_properties(arrow_odbc_spi_impl
