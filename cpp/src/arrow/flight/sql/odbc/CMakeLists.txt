@@ -126,9 +126,12 @@ else()
                 # arrow_flight_sql_static
                 # STATIC_INSTALL_INTERFACE_LIBS
                 # ArrowFlight::arrow_flight_sql_static
-                SHARED_PRIVATE_LINK_LIBS
+
+                # SHARED_PRIVATE_LINK_LIBS
+                STATIC_LINK_LIBS
                 ODBC::ODBC
                 ${ODBCINST}
+                SHARED_PRIVATE_LINK_LIBS
                 arrow_odbc_spi_impl)
 endif()
 
