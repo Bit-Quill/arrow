@@ -222,6 +222,10 @@ function(ADD_ARROW_LIB LIB_NAME)
     message(SEND_ERROR "Error: unrecognized arguments: ${ARG_UNPARSED_ARGUMENTS}")
   endif()
 
+  if("${LIB_NAME}" MATCHES "odbc")
+    message(STATUS "-AL- LIB_NAME contains odbc (arrow flight sql odbc)")
+  endif()
+
   if(ARG_OUTPUTS)
     set(${ARG_OUTPUTS})
   endif()
@@ -321,6 +325,8 @@ function(ADD_ARROW_LIB LIB_NAME)
   endif()
 
   if(BUILD_SHARED)
+    message(STATUS "-AL- LIB_DEPS:${LIB_DEPS}, EXTRA_DEPS: ${EXTRA_DEPS}"
+    )
     add_library(${LIB_NAME}_shared SHARED ${LIB_DEPS})
     if(EXTRA_DEPS)
       add_dependencies(${LIB_NAME}_shared ${EXTRA_DEPS})
@@ -366,6 +372,8 @@ function(ADD_ARROW_LIB LIB_NAME)
                                      VERSION "${ARROW_FULL_SO_VERSION}"
                                      SOVERSION "${ARROW_SO_VERSION}")
 
+    message(STATUS "-AL- ARG_SHARED_LINK_LIBS:${ARG_SHARED_LINK_LIBS}, ARG_SHARED_INSTALL_INTERFACE_LIBS: ${ARG_SHARED_INSTALL_INTERFACE_LIBS}, ARG_SHARED_PRIVATE_LINK_LIBS: ${ARG_SHARED_PRIVATE_LINK_LIBS}"
+    )
     target_link_libraries(${LIB_NAME}_shared
                           PUBLIC "$<BUILD_INTERFACE:${ARG_SHARED_LINK_LIBS}>"
                                  "$<INSTALL_INTERFACE:${ARG_SHARED_INSTALL_INTERFACE_LIBS}>"
