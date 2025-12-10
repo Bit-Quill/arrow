@@ -182,6 +182,7 @@ set_target_properties(arrow_odbc_spi_impl_cli
 target_link_libraries(arrow_odbc_spi_impl_cli arrow_odbc_spi_impl)
 
 # Unit tests
+# if(WIN32)
 add_arrow_test(odbc_spi_impl_test
                SOURCES
                accessors/boolean_array_accessor_test.cc
@@ -201,3 +202,29 @@ add_arrow_test(odbc_spi_impl_test
                EXTRA_LINK_LIBS
                arrow_odbc_spi_impl
                arrow_flight_testing_shared)
+# Using below code causes build issues
+# else()
+# # Unix
+# # Link Arrow libs statically on Unix for unit tests
+# #-AL- nicer way to do it might be like example in cpp/src/arrow/c/CMakeLists.txt
+# add_arrow_test(odbc_spi_impl_test
+#                SOURCES
+#                accessors/boolean_array_accessor_test.cc
+#                accessors/binary_array_accessor_test.cc
+#                accessors/date_array_accessor_test.cc
+#                accessors/decimal_array_accessor_test.cc
+#                accessors/primitive_array_accessor_test.cc
+#                accessors/string_array_accessor_test.cc
+#                accessors/time_array_accessor_test.cc
+#                accessors/timestamp_array_accessor_test.cc
+#                flight_sql_connection_test.cc
+#                flight_sql_stream_chunk_buffer_test.cc
+#                parse_table_types_test.cc
+#                json_converter_test.cc
+#                record_batch_transformer_test.cc
+#                util_test.cc
+#                EXTRA_LINK_LIBS
+#                arrow_odbc_spi_impl
+#                STATIC_LINK_LIBS
+#                arrow_flight_testing_static)
+# endif()              
