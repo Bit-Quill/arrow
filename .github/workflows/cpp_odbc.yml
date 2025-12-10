@@ -193,6 +193,8 @@ jobs:
             macos-version: "14"
     env:
       ARROW_BUILD_TESTS: ON
+      # -AL- for linking dependencies statically.
+      # ARROW_DEPENDENCY_USE_SHARED: OFF
       ARROW_FLIGHT_SQL_ODBC: ON
       ARROW_HOME: /tmp/local
     steps:
@@ -207,6 +209,9 @@ jobs:
           export LIBIODBC_DIR="$(brew --cellar libiodbc)/$(brew list --versions libiodbc | awk '{print $2}')"
           echo ODBC_INCLUDE_DIR="$LIBIODBC_DIR/include" >> $GITHUB_ENV
           echo ODBC_LIB_DIR="$LIBIODBC_DIR/lib" >> $GITHUB_ENV
+        # -AL- uncomment below if having icu4c missing issues, not tested.
+        # export LIBICU4C_DIR="$(brew --cellar icu4c)/$(brew list --versions icu4c | awk '{print $2}')"
+        # echo ICU4C_LIB_DIR="$LIBICU4C_DIR/lib" >> $GITHUB_ENV
       - name: Setup ccache
         run: |
           ci/scripts/ccache_setup.sh
