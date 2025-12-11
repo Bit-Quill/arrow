@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-add_library(arrow_odbc_spi_impl
+add_library(arrow_odbc_spi_impl STATIC
             accessors/binary_array_accessor.cc
             accessors/binary_array_accessor.h
             accessors/boolean_array_accessor.cc

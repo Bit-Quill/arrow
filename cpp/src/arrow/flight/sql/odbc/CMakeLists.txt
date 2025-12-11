@@ -111,6 +111,7 @@ else()
                 STATIC_LINK_LIBS
                 ODBC::ODBC
                 ${ODBCINST}
+                # -AL- below line removed = driver not loaded?
                 SHARED_PRIVATE_LINK_LIBS
                 arrow_odbc_spi_impl)
 endif()
