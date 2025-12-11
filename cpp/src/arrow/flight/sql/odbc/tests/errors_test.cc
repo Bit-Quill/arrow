@@ -486,7 +486,13 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorEnvErrorFromDriverManager) {
   EXPECT_EQ(0, native_error);
 
   // Function sequence error state from driver manager
+#ifdef _WIN32
+  // Windows Driver Manager returns S1010
+  EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateS1010);
+#else
+  // unix Driver Manager returns HY010
   EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateHY010);
+#endif  // _WIN32
 
   EXPECT_FALSE(std::wstring(message).empty());
 }
