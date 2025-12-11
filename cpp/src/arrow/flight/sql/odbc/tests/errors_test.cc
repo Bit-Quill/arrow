@@ -121,7 +121,7 @@ TYPED_TEST(ErrorsHandleTest, TestSQLGetDiagFieldWForConnectFailure) {
       SQLGetDiagField(SQL_HANDLE_DBC, this->conn, RECORD_1, SQL_DIAG_SQLSTATE, sql_state,
                       sql_state_size * GetSqlWCharSize(), &sql_state_length));
 
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorState28000);
+  EXPECT_EQ(kErrorState28000, SqlWcharToString(sql_state));
 }
 
 TYPED_TEST(ErrorsHandleTest, DISABLED_TestSQLGetDiagFieldWForConnectFailureNTS) {
@@ -220,7 +220,7 @@ TYPED_TEST(ErrorsTest, TestSQLGetDiagFieldWForDescriptorFailureFromDriverManager
       SQLGetDiagField(SQL_HANDLE_DESC, descriptor, RECORD_1, SQL_DIAG_SQLSTATE, sql_state,
                       sql_state_size * GetSqlWCharSize(), &sql_state_length));
 
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateIM001);
+  EXPECT_EQ(kErrorStateIM001, SqlWcharToString(sql_state));
 
   // Free descriptor handle
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_DESC, descriptor));
@@ -249,7 +249,7 @@ TYPED_TEST(ErrorsTest, TestSQLGetDiagRecForDescriptorFailureFromDriverManager) {
   EXPECT_EQ(0, native_error);
 
   // API not implemented error from driver manager
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateIM001);
+  EXPECT_EQ(kErrorStateIM001, SqlWcharToString(sql_state));
 
   EXPECT_FALSE(std::wstring(message).empty());
 
@@ -286,7 +286,7 @@ TYPED_TEST(ErrorsHandleTest, TestSQLGetDiagRecForConnectFailure) {
 
   EXPECT_EQ(200, native_error);
 
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorState28000);
+  EXPECT_EQ(kErrorState28000, SqlWcharToString(sql_state));
 
   EXPECT_FALSE(std::wstring(message).empty());
 }
@@ -365,7 +365,7 @@ TYPED_TEST(ErrorsTest, TestSQLErrorEnvErrorFromDriverManager) {
   EXPECT_EQ(0, native_error);
 
   // Function sequence error state from driver manager
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateHY010);
+  EXPECT_EQ(kErrorStateHY010, SqlWcharToString(sql_state));
 
   EXPECT_FALSE(std::wstring(message).empty());
 }
@@ -392,7 +392,7 @@ TYPED_TEST(ErrorsTest, TestSQLErrorConnError) {
   EXPECT_EQ(100, native_error);
 
   // optional feature not supported error state
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateHYC00);
+  EXPECT_EQ(kErrorStateHYC00, SqlWcharToString(sql_state));
 
   EXPECT_FALSE(std::wstring(message).empty());
 }
@@ -422,7 +422,7 @@ TYPED_TEST(ErrorsTest, TestSQLErrorStmtError) {
 
   EXPECT_EQ(100, native_error);
 
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateHY000);
+  EXPECT_EQ(kErrorStateHY000, SqlWcharToString(sql_state));
 
   EXPECT_FALSE(std::wstring(message).empty());
 }
@@ -459,7 +459,7 @@ TYPED_TEST(ErrorsTest, TestSQLErrorStmtWarning) {
   EXPECT_EQ(1000100, native_error);
 
   // Verify string truncation warning is reported
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorState01004);
+  EXPECT_EQ(kErrorState01004, SqlWcharToString(sql_state));
 
   EXPECT_FALSE(std::wstring(message).empty());
 }
@@ -488,10 +488,10 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorEnvErrorFromDriverManager) {
   // Function sequence error state from driver manager
 #ifdef _WIN32
   // Windows Driver Manager returns S1010
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateS1010);
+  EXPECT_EQ(kErrorStateS1010, SqlWcharToString(sql_state));
 #else
   // unix Driver Manager returns HY010
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateHY010);
+  EXPECT_EQ(kErrorStateHY010, SqlWcharToString(sql_state));
 #endif  // _WIN32
 
   EXPECT_FALSE(std::wstring(message).empty());
@@ -526,7 +526,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnError) {
   EXPECT_EQ(100, native_error);
 
   // optional feature not supported error state. Driver Manager maps state to S1C00
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateS1C00);
+  EXPECT_EQ(kErrorStateS1C00, SqlWcharToString(sql_state));
 
   EXPECT_FALSE(std::wstring(message).empty());
 }
@@ -556,7 +556,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtError) {
   EXPECT_EQ(100, native_error);
 
   // Driver Manager maps error state to S1000
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorStateS1000);
+  EXPECT_EQ(kErrorStateS1000, SqlWcharToString(sql_state));
 
   EXPECT_FALSE(std::wstring(message).empty());
 }
@@ -593,7 +593,7 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtWarning) {
   EXPECT_EQ(1000100, native_error);
 
   // Verify string truncation warning is reported
-  EXPECT_EQ(SqlWcharToString(sql_state), kErrorState01004);
+  EXPECT_EQ(kErrorState01004, SqlWcharToString(sql_state));
 
   EXPECT_FALSE(std::wstring(message).empty());
 }
