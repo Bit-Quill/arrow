@@ -21,6 +21,11 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_custom_target(arrow_flight_sql_odbc)
 
+if(APPLE)
+  # CMAKE_FIND_LIBRARY_SUFFIXES.
+  set(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+endif()
+
 if(WIN32)
   if(MSVC_VERSION GREATER_EQUAL 1900)
     set(ODBCINST legacy_stdio_definitions odbccp32 shlwapi)
@@ -119,11 +124,6 @@ endif()
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
 endforeach()
-
-if(APPLE)
-  # CMAKE_FIND_LIBRARY_SUFFIXES.
-  set(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-endif()
 
 # Construct ODBC Windows installer. Only Release installer is supported
 if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
