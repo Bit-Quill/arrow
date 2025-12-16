@@ -64,8 +64,21 @@ else()
   # File already exists in database: FlightSql.proto
   # Error. This error is likely from the test, as ODBC driver can work with DriverManager.
 
-  add_arrow_test(flight_sql_odbc_test
-               SOURCES
+  # -AL- temp, gradually add things to see which one breaks the build.
+  # add_arrow_test(flight_sql_odbc_test
+  #              SOURCES
+  #              odbc_test_suite.cc
+  #              odbc_test_suite.h
+  #              temp_odbc_test.cc
+  #              STATIC_LINK_LIBS
+  #              ${ODBC_LIBRARIES}
+  #              ${ODBCINST}
+  #              arrow_testing_static
+  #              EXTRA_LINK_LIBS
+  #              arrow_odbc_spi_impl)
+
+
+  add_executable(arrow-flight-sql-odbc-test 
                odbc_test_suite.cc
                odbc_test_suite.h
                columns_test.cc
@@ -81,16 +94,41 @@ else()
                # Enable Protobuf cleanup after test execution
                # GH-46889: move protobuf_test_util to a more common location
                ../../../../engine/substrait/protobuf_test_util.cc
-               ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
+               ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS})
+  target_link_libraries(arrow-flight-sql-odbc-test
+                        ${ODBC_LIBRARIES}
+                        ${ODBCINST}
+                        ${SQLite3_LIBRARIES}
+                        arrow_odbc_spi_impl
+                        ${ARROW_TEST_LINK_LIBS})
 
-              # -AL- below code might not work to make test link statically.
-              #  STATIC_LINK_LIBS
-              #  arrow_testing_static
-               EXTRA_LINK_LIBS
-               ${ODBC_LIBRARIES}
-               ${ODBCINST}
-               ${SQLite3_LIBRARIES}
-               arrow_odbc_spi_impl)
+  add_dependencies(arrow-flight-sql-odbc-test arrow arrow_testing)
+
+  # add_arrow_test(flight_sql_odbc_test
+  #              SOURCES
+  #              odbc_test_suite.cc
+  #              odbc_test_suite.h
+  #              columns_test.cc
+  #              connection_attr_test.cc
+  #              connection_info_test.cc
+  #              connection_test.cc
+  #              errors_test.cc
+  #              get_functions_test.cc
+  #              statement_attr_test.cc
+  #              statement_test.cc
+  #              tables_test.cc
+  #              type_info_test.cc
+  #              # Enable Protobuf cleanup after test execution
+  #              # GH-46889: move protobuf_test_util to a more common location
+  #              ../../../../engine/substrait/protobuf_test_util.cc
+  #              ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
+               
+  #              STATIC_LINK_LIBS
+  #              ${ODBC_LIBRARIES}
+  #              ${ODBCINST}
+  #              ${SQLite3_LIBRARIES}
+  #              ${ARROW_TEST_LINK_LIBS}
+  #              arrow_odbc_spi_impl)
 endif()              
 
 # Disable unity build due to sqlite_sql_info.cc conflict with sql.h and sqlext.h headers.

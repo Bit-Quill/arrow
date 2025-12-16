@@ -15,8 +15,10 @@
 # specific language governing permissions and limitations
 # under the License.
 
-add_library(arrow_odbc_spi_impl STATIC
-            accessors/binary_array_accessor.cc
+# -AL- TODO try to  create a arrow_odbc_spi_impl_static/shared static build AND shared build.
+# The ODBC driver can still link to static build as before on unix, and test can link to the shared build.
+
+set(ARROW_ODBC_SPI_IMPL_SOURCES accessors/binary_array_accessor.cc
             accessors/binary_array_accessor.h
             accessors/boolean_array_accessor.cc
             accessors/boolean_array_accessor.h
@@ -110,6 +112,9 @@ add_library(arrow_odbc_spi_impl STATIC
             type_utilities.h
             util.cc
             util.h)
+
+add_library(arrow_odbc_spi_impl STATIC
+            ${ARROW_ODBC_SPI_IMPL_SOURCES})
 target_compile_definitions(arrow_odbc_spi_impl PUBLIC UNICODE)
 target_include_directories(arrow_odbc_spi_impl PUBLIC include include/odbc_impl)
 target_include_directories(arrow_odbc_spi_impl PUBLIC ${CMAKE_CURRENT_LIST_DIR})
