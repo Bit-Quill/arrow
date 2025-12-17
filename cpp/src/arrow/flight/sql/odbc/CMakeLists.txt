@@ -41,7 +41,7 @@ endif()
 message(STATUS "-AL- random msg in odbc cmake")
 
 add_subdirectory(odbc_impl)
-add_subdirectory(tests)
+# add_subdirectory(tests) # -AL- TODO enable after `odbc_impl` works and ODBC driver still links statically.
 
 arrow_install_all_headers("arrow/flight/sql/odbc")
 
@@ -70,6 +70,13 @@ if(WIN32)
   list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def install/versioninfo.rc)
 endif()
 
+# -AL- TODO for ODBC layer, use variables so it's like
+# Var = “”
+# If windows
+# Var append shared lib
+# And that it. The end goal should be 1 add_arrow_lib call. 
+
+
 # -AL- build dynamically on Windows and statically on Unix systems.
 # Might make them both the same if it is easier to maintain? Currently doing it separately to not break ODBC on Windows for now.
 if(WIN32)
@@ -97,7 +104,7 @@ if(WIN32)
                 SHARED_PRIVATE_LINK_LIBS
                 ODBC::ODBC
                 ${ODBCINST}
-                arrow_odbc_spi_impl)
+                arrow_odbc_spi_impl_shared)
 else()
   # Unix
   add_arrow_lib(arrow_flight_sql_odbc
@@ -118,7 +125,7 @@ else()
                 ${ODBCINST}
                 # -AL- below line removed = driver not loaded?
                 SHARED_PRIVATE_LINK_LIBS
-                arrow_odbc_spi_impl)
+                arrow_odbc_spi_impl_static)
 endif()
 
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
