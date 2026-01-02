@@ -38,7 +38,6 @@ add_arrow_test(flight_sql_odbc_test
                connection_attr_test.cc
                connection_info_test.cc
                connection_test.cc
-               # delay_test_util.cc # -AL- can remove later?
                errors_test.cc
                get_functions_test.cc
                statement_attr_test.cc
