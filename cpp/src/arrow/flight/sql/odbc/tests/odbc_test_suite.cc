@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+#include <thread> //-AL- for sleep
+
 // For DSN registration. flight_sql_connection.h needs to included first due to conflicts
 // with windows.h
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
@@ -378,8 +380,8 @@ void FlightSQLODBCMockTestBase::SetUp() {
 void ODBCMockTestBase::TearDown() {
   ASSERT_OK(server_->Shutdown());
   ASSERT_OK(server_->Wait());
-  //std::this_thread::sleep_for(std::chrono::seconds(1));
-  SleepABit();
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  //SleepABit(); -AL- sleep for 1 second seems to work better
 }
 
 void FlightSQLODBCMockTestBase::TearDown() {
