@@ -378,6 +378,8 @@ void FlightSQLODBCMockTestBase::SetUp() {
 void ODBCMockTestBase::TearDown() {
   ASSERT_OK(server_->Shutdown());
   ASSERT_OK(server_->Wait());
+  //std::this_thread::sleep_for(std::chrono::seconds(1));
+  SleepABit();
 }
 
 void FlightSQLODBCMockTestBase::TearDown() {
