@@ -169,6 +169,7 @@ void FlightSQLODBCRemoteTestBase::TearDown() {
   if (connected_) {
     this->Disconnect();
     connected_ = false;
+    //std::this_thread::sleep_for(std::chrono::seconds(3)); // -AL- for potential deadlock
   }
 }
 
@@ -380,7 +381,7 @@ void FlightSQLODBCMockTestBase::SetUp() {
 void ODBCMockTestBase::TearDown() {
   ASSERT_OK(server_->Shutdown());
   ASSERT_OK(server_->Wait());
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  //std::this_thread::sleep_for(std::chrono::seconds(1)); // -AL- it can only reduce too many operations error
   //SleepABit(); -AL- sleep for 1 second seems to work better
 }
 
