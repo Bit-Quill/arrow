@@ -38,3 +38,24 @@
 typedef SSIZE_T ssize_t;
 
 #endif
+
+// -AL- below fix doesn't completely eliminate deadlock issue.
+// HACK: Workaround absl::Mutex ABI incompatibility by making sure the
+// non-debug version of Abseil is included. Disables deadlock detection. -AL-
+// (https://github.com/conda-forge/abseil-cpp-feedstock/issues/104,
+//  https://github.com/abseil/abseil-cpp/issues/1624)
+
+#if __has_include(<absl/synchronization/mutex.h>)
+
+#  ifndef NDEBUG
+#    define ARROW_NO_NDEBUG
+#    define NDEBUG
+#  endif
+
+#  include <absl/synchronization/mutex.h>
+
+#  ifdef ARROW_NO_NDEBUG
+#    undef NDEBUG
+#  endif
+
+#endif

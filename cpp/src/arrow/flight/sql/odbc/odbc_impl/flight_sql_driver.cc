@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Disable Abseil deadlock detection from upstream projects
+#include <absl/synchronization/mutex.h>
+
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_driver.h"
 
 #include "arrow/compute/api.h"
@@ -37,6 +40,8 @@ FlightSqlDriver::FlightSqlDriver()
   RegisterComputeKernels();
   // Register log after compute kernels check to avoid segfaults
   RegisterLog();
+  // Disable Deadlock detection
+  absl::SetMutexDeadlockDetectionMode(absl::OnDeadlockCycle::kIgnore);
 }
 
 FlightSqlDriver::~FlightSqlDriver() {
