@@ -78,4 +78,6 @@ add_arrow_lib(arrow_flight_sql_odbc
 
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
+  # -AL- Attempt to disable Abseil deadlock detection, doesn't work.
+  # target_compile_definitions(${LIB_TARGET} PRIVATE NDEBUG)
 endforeach()

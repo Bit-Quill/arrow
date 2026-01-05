@@ -22,6 +22,23 @@
 #include "arrow/flight/sql/odbc/odbc_impl/diagnostics.h"
 #include "arrow/flight/sql/odbc/odbc_impl/types.h"
 
+// -AL- below fix doesn't work for me either, maybe `mutex.h` is not included inside here yet.
+// HACK: Workaround absl::Mutex ABI incompatibility by making sure the
+// non-debug version of Abseil is included. Disables deadlock detection.
+// (https://github.com/conda-forge/abseil-cpp-feedstock/issues/104,
+//  https://github.com/abseil/abseil-cpp/issues/1624)
+
+#  ifndef NDEBUG
+#    define ARROW_NO_NDEBUG
+#    define NDEBUG
+#  endif
+
+#  include <absl/synchronization/mutex.h>
+
+#  ifdef ARROW_NO_NDEBUG
+#    undef NDEBUG
+#  endif
+
 namespace arrow::flight::sql::odbc {
 
 class Connection;
