@@ -19,6 +19,10 @@
 # GH-44792: Arrow will switch to C++ 20
 set(CMAKE_CXX_STANDARD 20)
 
+# Disable deadlock detection in Abseil -AL- this doesn't work, because the flag
+# is needed before Abseil is enabled.
+# add_definitions(-DSYNCH_DEADLOCK_DETECTION=0)
+
 add_custom_target(arrow_flight_sql_odbc)
 
 if(WIN32)
