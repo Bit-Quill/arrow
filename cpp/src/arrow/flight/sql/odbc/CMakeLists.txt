@@ -115,25 +115,22 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   # GH-47876 TODO: set up `flight_sql_odbc_lib` component for macOS Installer
   # GH-47877 TODO: set up `flight_sql_odbc_lib` component for Linux Installer
   if(WIN32)
-    install(DIRECTORY "${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_BUILD_TYPE}/"
+    # Install ODBC and its Arrow dependencies
+    install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
             DESTINATION bin
-            COMPONENT flight_sql_odbc_lib
-            FILES_MATCHING
-            # Use regex for dll name patterns with versions
-            PATTERN "abseil_dll.dll"
-            PATTERN "arrow.dll"
-            PATTERN "arrow_compute.dll"
-            PATTERN "arrow_flight.dll"
-            PATTERN "arrow_flight_sql.dll"
-            PATTERN "arrow_flight_sql_odbc.dll"
-            PATTERN "boost_locale*.dll"
-            PATTERN "cares.dll"
-            PATTERN "libcrypto*.dll"
-            PATTERN "libprotobuf.dll"
-            PATTERN "libssl*.dll"
-            PATTERN "re2.dll"
-            PATTERN "utf8proc.dll"
-            PATTERN "zlib1.dll")
+            COMPONENT arrow_flight_sql_odbc)
+    install(TARGETS arrow_shared
+                    arrow_compute_shared
+                    arrow_flight_shared
+                    arrow_flight_sql_shared
+                    arrow_flight_sql_odbc_shared
+                    RUNTIME_DEPENDENCIES
+                    PRE_EXCLUDE_REGEXES
+                    "api-ms-.*"
+                    "ext-ms-.*"
+                    POST_EXCLUDE_REGEXES
+                    ".*system32/.*\\.dll"
+            RUNTIME DESTINATION bin COMPONENT arrow_flight_sql_odbc)
 
     set(CPACK_WIX_EXTRA_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/install/windows/arrow-flight-sql-odbc.wxs")
@@ -145,8 +142,7 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   endif()
 
   get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
-  set(CPACK_COMPONENTS_ALL Unspecified)
-  list(APPEND CPACK_COMPONENTS_ALL "flight_sql_odbc_lib")
+  set(CPACK_COMPONENTS_ALL "arrow_flight_sql_odbc")
 
   if(WIN32)
     # WiX msi installer on Windows
