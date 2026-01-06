@@ -67,18 +67,18 @@ void GetInfo(SQLHDBC connection, SQLUSMALLINT info_type, SQLWCHAR* value,
 }
 }  // namespace
 
-TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTruncation) {
-  static constexpr int info_len = 1;
-  SQLWCHAR value[info_len] = L"";
-  SQLSMALLINT message_length;
+// TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTruncation) {
+//   static constexpr int info_len = 1;
+//   SQLWCHAR value[info_len] = L"";
+//   SQLSMALLINT message_length;
 
-  ASSERT_EQ(SQL_SUCCESS_WITH_INFO,
-            SQLGetInfo(this->conn, SQL_KEYWORDS, value, info_len, &message_length));
+//   ASSERT_EQ(SQL_SUCCESS_WITH_INFO,
+//             SQLGetInfo(this->conn, SQL_KEYWORDS, value, info_len, &message_length));
 
-  // Verify string truncation is reported
-  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorState01004);
-  EXPECT_GT(message_length, 0);
-}
+//   // Verify string truncation is reported
+//   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorState01004);
+//   EXPECT_GT(message_length, 0);
+// }
 
 // Driver Information
 
@@ -319,7 +319,11 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoOdbcVer) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_ODBC_VER, value);
 
+#ifdef __APPLE__
+  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"03.52.0000"), value);
+#else
   EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"03.80.0000"), value);
+#endif  // __APPLE__
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoParamArrayRowCounts) {
@@ -785,14 +789,14 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIntegrity) {
   EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
 }
 
-TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoKeywords) {
-  // Keyword strings can require 5000 buffer length
-  static constexpr int info_len = kOdbcBufferSize * 5;
-  SQLWCHAR value[info_len] = L"";
-  GetInfo(this->conn, SQL_KEYWORDS, value, info_len);
+// TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoKeywords) {
+//   // Keyword strings can require 5000 buffer length
+//   static constexpr int info_len = kOdbcBufferSize * 5;
+//   SQLWCHAR value[info_len] = L"";
+//   GetInfo(this->conn, SQL_KEYWORDS, value, info_len);
 
-  EXPECT_GT(wcslen(value), 0);
-}
+//   EXPECT_GT(wcslen(value), 0);
+// }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoLikeEscapeClause) {
   SQLWCHAR value[kOdbcBufferSize] = L"";

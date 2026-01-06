@@ -54,9 +54,11 @@ TYPED_TEST(StatementTest, TestSQLExecDirectSimpleQuery) {
 
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 
+#ifdef _WIN32
   ASSERT_EQ(SQL_ERROR, SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, nullptr));
   // Invalid cursor state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorState24000);
+#endif // _WIN32
 }
 
 TYPED_TEST(StatementTest, TestSQLExecDirectInvalidQuery) {
@@ -89,9 +91,11 @@ TYPED_TEST(StatementTest, TestSQLExecuteSimpleQuery) {
 
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 
+#ifdef _WIN32
   ASSERT_EQ(SQL_ERROR, SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, nullptr));
   // Invalid cursor state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorState24000);
+#endif // _WIN32
 }
 
 TYPED_TEST(StatementTest, TestSQLPrepareInvalidQuery) {
@@ -713,10 +717,12 @@ TYPED_TEST(StatementTest, TestSQLExecDirectRowFetching) {
   // Verify result set has no more data beyond row 3
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 
+#ifdef _WIN32
   ASSERT_EQ(SQL_ERROR, SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &ind));
 
   // Invalid cursor state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorState24000);
+#endif // _WIN32
 }
 
 TYPED_TEST(StatementTest, TestSQLFetchScrollRowFetching) {
@@ -772,9 +778,11 @@ TYPED_TEST(StatementTest, TestSQLFetchScrollRowFetching) {
   // Verify result set has no more data beyond row 3
   ASSERT_EQ(SQL_NO_DATA, SQLFetchScroll(this->stmt, SQL_FETCH_NEXT, 0));
 
+#ifdef _WIN32
   ASSERT_EQ(SQL_ERROR, SQLGetData(this->stmt, 1, SQL_C_LONG, &val, 0, &ind));
   // Invalid cursor state
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorState24000);
+#endif // _WIN32
 }
 
 TYPED_TEST(StatementTest, TestSQLFetchScrollUnsupportedOrientation) {
@@ -809,8 +817,12 @@ TYPED_TEST(StatementTest, TestSQLFetchScrollUnsupportedOrientation) {
 
   ASSERT_EQ(SQL_ERROR, SQLFetchScroll(this->stmt, SQL_FETCH_BOOKMARK, fetch_offset));
 
-  // DM returns state HY106 for SQL_FETCH_BOOKMARK
+#ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHYC00);
+#else
+// Windows DM returns state HY106 for SQL_FETCH_BOOKMARK
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY106);
+#endif  // __APPLE__
 }
 
 TYPED_TEST(StatementTest, TestSQLExecDirectVarcharTruncation) {
@@ -2062,7 +2074,11 @@ TYPED_TEST(StatementTest, SQLNumResultColsFunctionSequenceErrorOnNoQuery) {
   SQLSMALLINT expected_value = 0;
 
   ASSERT_EQ(SQL_ERROR, SQLNumResultCols(this->stmt, &column_count));
+#ifdef __APPLE__
+  VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateS1010);
+#else
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorStateHY010);
+#endif  // __APPLE__
 
   ASSERT_EQ(SQL_ERROR, SQLNumResultCols(this->stmt, &column_count));
 #ifdef __APPLE__

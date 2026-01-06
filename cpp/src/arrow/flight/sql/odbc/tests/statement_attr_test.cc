@@ -109,7 +109,8 @@ void ValidateSetStmtAttrErrorCode(SQLHSTMT statement, SQLINTEGER attribute,
 
   ASSERT_EQ(SQL_ERROR,
             SQLSetStmtAttr(statement, attribute, reinterpret_cast<SQLPOINTER>(new_value),
-                           string_length_ptr));
+                           string_length_ptr))
+            << GetOdbcErrorMessage(SQL_HANDLE_STMT, statement);
 
   VerifyOdbcErrorState(SQL_HANDLE_STMT, statement, error_code);
 }

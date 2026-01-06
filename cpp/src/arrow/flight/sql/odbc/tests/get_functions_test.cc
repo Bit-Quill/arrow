@@ -40,6 +40,8 @@ using TestTypesOdbcV2 =
     ::testing::Types<FlightSQLOdbcV2MockTestBase, FlightSQLOdbcV2RemoteTestBase>;
 TYPED_TEST_SUITE(GetFunctionsOdbcV2Test, TestTypesOdbcV2);
 
+// MacOS driver manager iODBC does not support SQL_API_ODBC3_ALL_FUNCTIONS.
+#ifndef __APPLE__
 TYPED_TEST(GetFunctionsTest, TestSQLGetFunctionsAllFunctions) {
   // Verify driver manager return values for SQLGetFunctions
 
@@ -122,6 +124,7 @@ TYPED_TEST(GetFunctionsOdbcV2Test, TestSQLGetFunctionsAllFunctions) {
     EXPECT_EQ(SQL_FALSE, api_exists[api]);
   }
 }
+#endif  // __APPLE__
 
 TYPED_TEST(GetFunctionsTest, TestSQLGetFunctionsSupportedSingleAPI) {
   const std::vector<SQLUSMALLINT> supported_functions = {
@@ -175,6 +178,7 @@ TYPED_TEST(GetFunctionsTest, TestSQLGetFunctionsUnsupportedSingleAPI) {
   }
 }
 
+#ifndef __APPLE__
 TYPED_TEST(GetFunctionsOdbcV2Test, TestSQLGetFunctionsSupportedSingleAPI) {
   const std::vector<SQLUSMALLINT> supported_functions = {
       SQL_API_SQLCONNECT, SQL_API_SQLGETINFO, SQL_API_SQLDESCRIBECOL,
@@ -216,5 +220,6 @@ TYPED_TEST(GetFunctionsOdbcV2Test, TestSQLGetFunctionsUnsupportedSingleAPI) {
     api_exists = -1;
   }
 }
+#endif  // __APPLE__
 
 }  // namespace arrow::flight::sql::odbc
