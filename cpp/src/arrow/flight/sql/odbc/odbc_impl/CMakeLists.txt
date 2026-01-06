@@ -129,9 +129,22 @@ if(WIN32)
                          system_dsn.h)
 endif()
 
+if(APPLE)
+    # iODBC from Homebrew (Intel + ARM)
+    target_include_directories(arrow_odbc_spi_impl SYSTEM BEFORE PUBLIC ${ODBC_INCLUDE_DIR})
+
+    target_link_libraries(arrow_odbc_spi_impl
+        PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale iodbc)
+else()
+    find_package(ODBC REQUIRED)
+    target_include_directories(arrow_odbc_spi_impl PUBLIC ${ODBC_INCLUDE_DIR})
+    target_link_libraries(arrow_odbc_spi_impl
+        PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
+               ${ODBC_LIBRARIES})
+endif()
+
 target_link_libraries(arrow_odbc_spi_impl
-                      PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
-                             ${ODBCINST})
+                      PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale)
 
 set_target_properties(arrow_odbc_spi_impl
                       PROPERTIES ARCHIVE_OUTPUT_DIRECTORY
