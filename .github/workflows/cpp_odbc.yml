@@ -27,12 +27,12 @@ on:
     paths:
       - '.github/workflows/cpp_odbc.yml'
       - 'ci/scripts/cpp_*'
-      - 'cpp/src/arrow/flight/sql/odbc/*'
+      - 'cpp/src/arrow/flight/sql/odbc/**'
   pull_request:
     paths:
       - '.github/workflows/cpp_odbc.yml'
       - 'ci/scripts/cpp_*'
-      - 'cpp/src/arrow/flight/sql/odbc/*'
+      - 'cpp/src/arrow/flight/sql/odbc/**'
   schedule:
     - cron: '0 13 * * *'
 
@@ -206,7 +206,6 @@ jobs:
           brew bundle --file=cpp/Brewfile
           export LIBIODBC_DIR="$(brew --cellar libiodbc)/$(brew list --versions libiodbc | awk '{print $2}')"
           echo ODBC_INCLUDE_DIR="$LIBIODBC_DIR/include" >> $GITHUB_ENV
-          echo ODBC_LIB_DIR="$LIBIODBC_DIR/lib" >> $GITHUB_ENV
       - name: Setup ccache
         run: |
           ci/scripts/ccache_setup.sh
@@ -231,7 +230,8 @@ jobs:
           # include path. So we disable -Werror to avoid build error
           # by warnings from packages installed by Homebrew.
           export BUILD_WARNING_LEVEL=PRODUCTION
-          ci/scripts/cpp_build.sh $(pwd) $(pwd)/build
+          export CXXFLAGS="$CXXFLAGS -I$ODBC_INCLUDE_DIR"
+          bash ci/scripts/cpp_build.sh $(pwd) $(pwd)/build
       - name: Register Flight SQL ODBC Driver
         run: |
            chmod +x cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh
@@ -239,4 +239,4 @@ jobs:
       - name: Test
         shell: bash
         run: |
-          ci/scripts/cpp_test.sh $(pwd) $(pwd)/build
+          bash ci/scripts/cpp_test.sh $(pwd) $(pwd)/build
