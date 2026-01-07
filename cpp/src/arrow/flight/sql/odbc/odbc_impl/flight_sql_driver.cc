@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// -AL- Test change, see if this line triggers ODBC CI
+
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_driver.h"
 
 #include "arrow/compute/api.h"
