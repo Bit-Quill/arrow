@@ -247,6 +247,56 @@ SQLRETURN SQLFreeStmt(SQLHSTMT handle, SQLUSMALLINT option) {
   return SQL_ERROR;
 }
 
+#if defined(__APPLE__)
+SQLRETURN SQLError(SQLHENV env, SQLHDBC conn, SQLHSTMT stmt, SQLWCHAR* sql_state,
+                   SQLINTEGER* native_error_ptr, SQLWCHAR* message_text,
+                   SQLSMALLINT buffer_length, SQLSMALLINT* text_length_ptr) {
+  ARROW_LOG(DEBUG) << "SQLError called with env: " << env << ", conn: " << conn
+                   << ", stmt: " << stmt
+                   << ", sql_state: " << static_cast<const void*>(sql_state)
+                   << ", native_error_ptr: " << static_cast<const void*>(native_error_ptr)
+                   << ", message_text: " << static_cast<const void*>(message_text)
+                   << ", buffer_length: " << buffer_length
+                   << ", text_length_ptr: " << static_cast<const void*>(text_length_ptr);
+
+  SQLSMALLINT handle_type;
+  SQLHANDLE handle;
+
+  if (env) {
+    handle_type = SQL_HANDLE_ENV;
+    handle = static_cast<SQLHANDLE>(env);
+  } else if (conn) {
+    handle_type = SQL_HANDLE_DBC;
+    handle = static_cast<SQLHANDLE>(conn);
+  } else if (stmt) {
+    handle_type = SQL_HANDLE_STMT;
+    handle = static_cast<SQLHANDLE>(stmt);
+  } else {
+    return static_cast<SQLRETURN>(SQL_INVALID_HANDLE);
+  }
+
+  // Use the last record
+  SQLINTEGER diag_number;
+  SQLSMALLINT diag_number_length;
+
+  SQLRETURN ret = arrow::flight::sql::odbc::SQLGetDiagField(
+      handle_type, handle, 0, SQL_DIAG_NUMBER, &diag_number, sizeof(SQLINTEGER), 0);
+  if (ret != SQL_SUCCESS) {
+    return ret;
+  }
+
+  if (diag_number == 0) {
+    return SQL_NO_DATA;
+  }
+
+  SQLSMALLINT rec_number = static_cast<SQLSMALLINT>(diag_number);
+
+  return arrow::flight::sql::odbc::SQLGetDiagRec(
+      handle_type, handle, rec_number, sql_state, native_error_ptr, message_text,
+      buffer_length, text_length_ptr);
+}
+#endif  // __APPLE__
+
 inline bool IsValidStringFieldArgs(SQLPOINTER diag_info_ptr, SQLSMALLINT buffer_length,
                                    SQLSMALLINT* string_length_ptr, bool is_unicode) {
   const SQLSMALLINT char_size = is_unicode ? GetSqlWCharSize() : sizeof(char);
@@ -536,7 +586,6 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT handle_type, SQLHANDLE handle, SQLSMALLINT r
                    << ", message_text: " << static_cast<const void*>(message_text)
                    << ", buffer_length: " << buffer_length
                    << ", text_length_ptr: " << static_cast<const void*>(text_length_ptr);
-  using arrow::flight::sql::odbc::Diagnostics;
   using ODBC::GetStringAttribute;
   using ODBC::ODBCConnection;
   using ODBC::ODBCDescriptor;
@@ -736,7 +785,6 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC conn, SQLINTEGER attribute, SQLPOINTER value
                    << ", attribute: " << attribute << ", value_ptr: " << value_ptr
                    << ", buffer_length: " << buffer_length << ", string_length_ptr: "
                    << static_cast<const void*>(string_length_ptr);
-
   using ODBC::ODBCConnection;
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
@@ -855,7 +903,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
     }
 #else
     // Attempt connection without loading DSN window on macOS/Linux
-    connection->Connect(dsn, properties, missing_properties);
+    connection->Connect(dsn_value, properties, missing_properties);
 #endif
     // Copy connection string to out_connection_string after connection attempt
     return ODBC::GetStringAttribute(true, connection_string, false, out_connection_string,
@@ -1384,7 +1432,7 @@ SQLRETURN SQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT record_number,
 }
 
 SQLRETURN SQLGetTypeInfo(SQLHSTMT stmt, SQLSMALLINT data_type) {
-  // GH-47237 TODO: return SQL_PRED_CHAR and SQL_PRED_BASIC for
+  // GH-47237 return SQL_PRED_CHAR and SQL_PRED_BASIC for
   // appropriate data types in `SEARCHABLE` field
   ARROW_LOG(DEBUG) << "SQLGetTypeInfoW called with stmt: " << stmt
                    << " data_type: " << data_type;
@@ -1489,8 +1537,110 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT column_number, SQLWCHAR* co
                    << ", decimal_digits_ptr: "
                    << static_cast<const void*>(decimal_digits_ptr)
                    << ", nullable_ptr: " << static_cast<const void*>(nullable_ptr);
-  // GH-47724 TODO: Implement SQLDescribeCol
-  return SQL_INVALID_HANDLE;
+
+  using ODBC::ODBCDescriptor;
+  using ODBC::ODBCStatement;
+
+  return ODBCStatement::ExecuteWithDiagnostics(stmt, SQL_ERROR, [=]() {
+    ODBCStatement* statement = reinterpret_cast<ODBCStatement*>(stmt);
+    ODBCDescriptor* ird = statement->GetIRD();
+    SQLINTEGER output_length_int;
+    SQLSMALLINT sql_type;
+
+    // Column SQL Type
+    ird->GetField(column_number, SQL_DESC_CONCISE_TYPE, &sql_type, sizeof(SQLSMALLINT),
+                  nullptr);
+    if (data_type_ptr) {
+      *data_type_ptr = sql_type;
+    }
+
+    // Column Name
+    if (column_name || name_length_ptr) {
+      ird->GetField(column_number, SQL_DESC_NAME, column_name, buffer_length,
+                    &output_length_int);
+      if (name_length_ptr) {
+        // returned length should be in characters
+        *name_length_ptr =
+            static_cast<SQLSMALLINT>(output_length_int / GetSqlWCharSize());
+      }
+    }
+
+    // Column Size
+    if (column_size_ptr) {
+      switch (sql_type) {
+        // All numeric types
+        case SQL_DECIMAL:
+        case SQL_NUMERIC:
+        case SQL_TINYINT:
+        case SQL_SMALLINT:
+        case SQL_INTEGER:
+        case SQL_BIGINT:
+        case SQL_REAL:
+        case SQL_FLOAT:
+        case SQL_DOUBLE: {
+          ird->GetField(column_number, SQL_DESC_PRECISION, column_size_ptr,
+                        sizeof(SQLULEN), nullptr);
+          break;
+        }
+
+        default: {
+          ird->GetField(column_number, SQL_DESC_LENGTH, column_size_ptr, sizeof(SQLULEN),
+                        nullptr);
+        }
+      }
+    }
+
+    // Column Decimal Digits
+    if (decimal_digits_ptr) {
+      switch (sql_type) {
+        // All exact numeric types
+        case SQL_TINYINT:
+        case SQL_SMALLINT:
+        case SQL_INTEGER:
+        case SQL_BIGINT:
+        case SQL_DECIMAL:
+        case SQL_NUMERIC: {
+          ird->GetField(column_number, SQL_DESC_SCALE, decimal_digits_ptr,
+                        sizeof(SQLULEN), nullptr);
+          break;
+        }
+
+        // All datetime types (ODBC2)
+        case SQL_DATE:
+        case SQL_TIME:
+        case SQL_TIMESTAMP:
+        // All datetime types (ODBC3)
+        case SQL_TYPE_DATE:
+        case SQL_TYPE_TIME:
+        case SQL_TYPE_TIMESTAMP:
+        // All interval types with a seconds component
+        case SQL_INTERVAL_SECOND:
+        case SQL_INTERVAL_MINUTE_TO_SECOND:
+        case SQL_INTERVAL_HOUR_TO_SECOND:
+        case SQL_INTERVAL_DAY_TO_SECOND: {
+          ird->GetField(column_number, SQL_DESC_PRECISION, decimal_digits_ptr,
+                        sizeof(SQLULEN), nullptr);
+          break;
+        }
+
+        default: {
+          // All character and binary types
+          // SQL_BIT
+          // All approximate numeric types
+          // All interval types with no seconds component
+          *decimal_digits_ptr = static_cast<SQLSMALLINT>(0);
+        }
+      }
+    }
+
+    // Column Nullable
+    if (nullable_ptr) {
+      ird->GetField(column_number, SQL_DESC_NULLABLE, nullable_ptr, sizeof(SQLSMALLINT),
+                    nullptr);
+    }
+
+    return SQL_SUCCESS;
+  });
 }
 
 }  // namespace arrow::flight::sql::odbc
