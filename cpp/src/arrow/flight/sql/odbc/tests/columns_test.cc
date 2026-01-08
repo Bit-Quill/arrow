@@ -1123,7 +1123,7 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColumnsAllTypesODBCVer2) {
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(stmt));
 }
 
-TEST_F(ColumnsMockTest, TestSQLColumnsColumnPattern) {
+TEST_F(ColumnsMockTest, TestSQLColumnsColumnPatternSegFault) {
   // Checks filtering table with column name pattern.
   // Only check table and column name
 
@@ -2254,7 +2254,7 @@ TEST_F(ColumnsMockTest, SQLDescribeColValidateInput) {
   SQLUSMALLINT bookmark_column = 0;
   SQLUSMALLINT out_of_range_column = 4;
   SQLUSMALLINT negative_column = -1;
-  SQLWCHAR column_name[1024];
+  SQLWCHAR column_name[1024] = {0};
   SQLSMALLINT buf_char_len =
       static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
   SQLSMALLINT name_length = 0;
