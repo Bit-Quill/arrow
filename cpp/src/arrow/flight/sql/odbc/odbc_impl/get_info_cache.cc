@@ -34,10 +34,7 @@
 #include <sql.h>
 #include <sqlext.h>
 
-#ifdef SQL_IDENTIFIER_CASE
-constexpr int SQL_IDENTIFIER_CASE_ODBC = SQL_IDENTIFIER_CASE;
-#undef SQL_IDENTIFIER_CASE
-#endif
+#include "arrow/flight/sql/odbc/odbc_macros.h"
 
 // Aliases for entries in SqlInfoOptions::SqlInfo that are defined here
 // due to causing compilation errors conflicting with ODBC definitions.

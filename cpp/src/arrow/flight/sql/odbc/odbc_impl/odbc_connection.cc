@@ -41,10 +41,10 @@
 #include <optional>
 #include <utility>
 
-#ifdef SQL_IDENTIFIER_CASE
-constexpr int SQL_IDENTIFIER_CASE_ODBC = SQL_IDENTIFIER_CASE;
-#undef SQL_IDENTIFIER_CASE
-#endif
+#include <sql.h>
+#include <sqlext.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
 
 using ODBC::ODBCConnection;
 using ODBC::ODBCDescriptor;
