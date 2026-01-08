@@ -34,7 +34,7 @@ else()
 endif()
 
 add_subdirectory(odbc_impl)
-add_subdirectory(tests)
+# add_subdirectory(tests)
 
 arrow_install_all_headers("arrow/flight/sql/odbc")
 

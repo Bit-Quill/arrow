@@ -41,6 +41,11 @@
 #include <optional>
 #include <utility>
 
+#ifdef SQL_IDENTIFIER_CASE
+constexpr int SQL_IDENTIFIER_CASE_ODBC = SQL_IDENTIFIER_CASE;
+#undef SQL_IDENTIFIER_CASE
+#endif
+
 using ODBC::ODBCConnection;
 using ODBC::ODBCDescriptor;
 using ODBC::ODBCStatement;
@@ -366,7 +371,7 @@ SQLRETURN ODBCConnection::GetInfo(SQLUSMALLINT info_type, SQLPOINTER value,
     case SQL_CATALOG_LOCATION:
     case SQL_CORRELATION_NAME:
     case SQL_GROUP_BY:
-    case SQL_IDENTIFIER_CASE:
+    case SQL_IDENTIFIER_CASE_ODBC:
     case SQL_NON_NULLABLE_COLUMNS:
     case SQL_QUOTED_IDENTIFIER_CASE:
     case SQL_MAX_CATALOG_NAME_LEN:

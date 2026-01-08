@@ -34,6 +34,11 @@
 #include <sql.h>
 #include <sqlext.h>
 
+#ifdef SQL_IDENTIFIER_CASE
+constexpr int SQL_IDENTIFIER_CASE_ODBC = SQL_IDENTIFIER_CASE;
+#undef SQL_IDENTIFIER_CASE
+#endif
+
 // Aliases for entries in SqlInfoOptions::SqlInfo that are defined here
 // due to causing compilation errors conflicting with ODBC definitions.
 #define ARROW_SQL_IDENTIFIER_CASE 503
@@ -551,7 +556,7 @@ bool GetInfoCache::LoadInfoFromServer() {
                   value = SQL_IC_SENSITIVE;
                   break;
               }
-              info_[SQL_IDENTIFIER_CASE] = value;
+              info_[SQL_IDENTIFIER_CASE_ODBC] = value;
               break;
             }
             case SqlInfoOptions::SQL_NULL_ORDERING: {
@@ -1190,7 +1195,7 @@ void GetInfoCache::LoadDefaultsForMissingEntries() {
                       static_cast<uint32_t>(SQL_GD_ANY_COLUMN | SQL_GD_ANY_ORDER));
   SetDefaultIfMissing(info_, SQL_GROUP_BY,
                       static_cast<uint16_t>(SQL_GB_GROUP_BY_CONTAINS_SELECT));
-  SetDefaultIfMissing(info_, SQL_IDENTIFIER_CASE, static_cast<uint16_t>(SQL_IC_MIXED));
+  SetDefaultIfMissing(info_, SQL_IDENTIFIER_CASE_ODBC, static_cast<uint16_t>(SQL_IC_MIXED));
   SetDefaultIfMissing(info_, SQL_IDENTIFIER_QUOTE_CHAR, "\"");
   SetDefaultIfMissing(info_, SQL_INDEX_KEYWORDS, static_cast<uint32_t>(SQL_IK_NONE));
   SetDefaultIfMissing(

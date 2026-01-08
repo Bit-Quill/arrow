@@ -36,29 +36,44 @@ static const char DEFAULT_USE_CERT_STORE[] = TRUE_STR;
 static const char DEFAULT_DISABLE_CERT_VERIFICATION[] = FALSE_STR;
 
 namespace {
+#define BUFFER_SIZE (1024)
+
 std::string ReadDsnString(const std::string& dsn, std::string_view key,
                           const std::string& dflt = "") {
-  CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
-  CONVERT_WIDE_STR(const std::wstring wkey, key);
-  CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
-
-#define BUFFER_SIZE (1024)
-  std::vector<wchar_t> buf(BUFFER_SIZE);
-  int ret =
-      SQLGetPrivateProfileString(wdsn.c_str(), wkey.c_str(), wdflt.c_str(), buf.data(),
-                                 static_cast<int>(buf.size()), L"ODBC.INI");
+#if defined __APPLE__
+  const std::string key_str(key);
+  std::vector<char> buf(BUFFER_SIZE);
+  int ret = SQLGetPrivateProfileString(dsn.c_str(), key_str.c_str(), dflt.c_str(), buf.data(),
+                                       static_cast<int>(buf.size()), "ODBC.INI");
 
   if (ret > BUFFER_SIZE) {
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
-    ret =
-        SQLGetPrivateProfileString(wdsn.c_str(), wkey.c_str(), wdflt.c_str(), buf.data(),
-                                   static_cast<int>(buf.size()), L"ODBC.INI");
+    ret = SQLGetPrivateProfileString(dsn.c_str(), key_str.c_str(), dflt.c_str(), buf.data(),
+                                     static_cast<int>(buf.size()), "ODBC.INI");
+  }
+
+  return std::string(buf.data(), ret);
+#else
+  CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
+  CONVERT_WIDE_STR(const std::wstring wkey, key);
+  CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
+
+  std::vector<wchar_t> buf(BUFFER_SIZE);
+  int ret = SQLGetPrivateProfileString(wdsn.c_str(), wkey.c_str(), wdflt.c_str(), buf.data(),
+                                       static_cast<int>(buf.size()), L"ODBC.INI");
+
+  if (ret > BUFFER_SIZE) {
+    // If there wasn't enough space, try again with the right size buffer.
+    buf.resize(ret + 1);
+    ret = SQLGetPrivateProfileString(wdsn.c_str(), wkey.c_str(), wdflt.c_str(), buf.data(),
+                                     static_cast<int>(buf.size()), L"ODBC.INI");
   }
 
   std::wstring wresult = std::wstring(buf.data(), ret);
   CONVERT_UTF8_STR(const std::string result, wresult);
   return result;
+#endif
 }
 
 void RemoveAllKnownKeys(std::vector<std::string>& keys) {
@@ -75,6 +90,17 @@ void RemoveAllKnownKeys(std::vector<std::string>& keys) {
 }
 
 std::vector<std::string> ReadAllKeys(const std::string& dsn) {
+#if defined __APPLE__
+  std::vector<char> buf(BUFFER_SIZE);
+  int ret = SQLGetPrivateProfileString(dsn.c_str(), NULL, "", buf.data(),
+                                       static_cast<int>(buf.size()), "ODBC.INI");
+  if (ret > BUFFER_SIZE) {
+    // If there wasn't enough space, try again with the right size buffer.
+    buf.resize(ret + 1);
+    ret = SQLGetPrivateProfileString(dsn.c_str(), NULL, "", buf.data(),
+                                     static_cast<int>(buf.size()), "ODBC.INI");
+  }
+#else
   CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
 
   std::vector<wchar_t> buf(BUFFER_SIZE);
@@ -88,11 +114,19 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
     ret = SQLGetPrivateProfileString(wdsn.c_str(), NULL, L"", buf.data(),
                                      static_cast<int>(buf.size()), L"ODBC.INI");
   }
+#endif
 
   // When you pass NULL to SQLGetPrivateProfileString it gives back a \0 delimited list of
   // all the keys. The below loop simply tokenizes all the keys and places them into a
   // vector.
   std::vector<std::string> keys;
+#if defined __APPLE__
+  const char* cur = buf.data();
+  while (*cur != '\0') {
+      keys.emplace_back(cur);
+      cur += std::strlen(cur) + 1;
+  }
+#else
   wchar_t* begin = buf.data();
   while (begin && *begin != '\0') {
     wchar_t* cur;
@@ -103,6 +137,7 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
     keys.emplace_back(key);
     begin = ++cur;
   }
+#endif
   return keys;
 }
 }  // namespace
