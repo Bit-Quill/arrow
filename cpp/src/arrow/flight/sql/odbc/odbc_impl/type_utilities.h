@@ -20,6 +20,8 @@
 #include <sql.h>
 #include <sqlext.h>
 
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
 namespace ODBC {
 inline SQLSMALLINT GetSqlTypeForODBCVersion(SQLSMALLINT type, bool is_odbc_2x) {
   switch (type) {

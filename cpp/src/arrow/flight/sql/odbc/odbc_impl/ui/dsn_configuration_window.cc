@@ -18,17 +18,20 @@
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
 
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
-#include "arrow/flight/sql/odbc/odbc_impl/ui/add_property_window.h"
-#include "arrow/flight/sql/odbc/odbc_impl/ui/dsn_configuration_window.h"
-#include "arrow/flight/sql/odbc/odbc_impl/util.h"
-
 #include <Shlwapi.h>
 #include <Windowsx.h>
 #include <commctrl.h>
 #include <commdlg.h>
-#include <sql.h>
 #include <sstream>
+
+#include <sql.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
+#include "arrow/flight/sql/odbc/odbc_impl/ui/add_property_window.h"
+#include "arrow/flight/sql/odbc/odbc_impl/ui/dsn_configuration_window.h"
+#include "arrow/flight/sql/odbc/odbc_impl/util.h"
 
 #define COMMON_TAB 0
 #define ADVANCED_TAB 1

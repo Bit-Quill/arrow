@@ -20,11 +20,13 @@
 #include <map>
 #include <memory>
 
+#include <sqltypes.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/types.h"
-
-#include <sqltypes.h>
 
 namespace arrow::flight::sql::odbc {
 

@@ -17,14 +17,17 @@
 
 #pragma once
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_handle.h"
+#include <memory>
+#include <string>
+#include <vector>
 
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <memory>
-#include <string>
-#include <vector>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/odbc_handle.h"
 
 namespace arrow::flight::sql::odbc {
 class ResultSetMetadata;

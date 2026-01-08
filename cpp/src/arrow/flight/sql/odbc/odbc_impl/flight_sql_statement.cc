@@ -15,10 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_statement.h"
+#include "arrow/io/memory.h"
+
+#include <optional>
+#include <utility>
 
 #include <sql.h>
 #include <sqlext.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_statement.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_result_set.h"
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_result_set_metadata.h"
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_statement_get_columns.h"
@@ -27,11 +36,6 @@
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 #include "arrow/flight/sql/odbc/odbc_impl/record_batch_transformer.h"
 #include "arrow/flight/sql/odbc/odbc_impl/util.h"
-#include "arrow/io/memory.h"
-
-#include <optional>
-#include <utility>
-#include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
 
 namespace arrow::flight::sql::odbc {
 

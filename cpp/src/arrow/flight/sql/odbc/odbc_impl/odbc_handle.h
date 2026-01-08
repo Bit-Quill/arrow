@@ -17,13 +17,16 @@
 
 #pragma once
 
-// platform.h includes windows.h, so it needs to be included first
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#include <functional>
+#include <mutex>
 
 #include <sql.h>
 #include <sqltypes.h>
-#include <functional>
-#include <mutex>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+// platform.h includes windows.h, so it needs to be included first
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 #include "arrow/flight/sql/odbc/odbc_impl/diagnostics.h"
 
 /**

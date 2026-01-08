@@ -15,11 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
+#include <algorithm>
 
 #include <sql.h>
 #include <sqlext.h>
-#include <algorithm>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
+
 #include "arrow/flight/sql/odbc/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"

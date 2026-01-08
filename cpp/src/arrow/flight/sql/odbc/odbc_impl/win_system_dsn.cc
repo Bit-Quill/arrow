@@ -15,17 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/system_dsn.h"
-
-// platform.h includes windows.h, so it needs to be included
-// before winuser.h
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
-
 #include <winuser.h>
 #include <utility>
 
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
+
+#include "arrow/util/logging.h"
+
+#include <codecvt>
+#include <locale>
+#include <sstream>
+
+#include <odbcinst.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/system_dsn.h"
+
+// platform.h includes windows.h, so it needs to be included
+// before winuser.h
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
 #include "arrow/flight/sql/odbc/odbc_impl/config/connection_string_parser.h"
@@ -33,12 +43,6 @@
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
 #include "arrow/flight/sql/odbc/odbc_impl/ui/dsn_configuration_window.h"
 #include "arrow/flight/sql/odbc/odbc_impl/ui/window.h"
-#include "arrow/util/logging.h"
-
-#include <odbcinst.h>
-#include <codecvt>
-#include <locale>
-#include <sstream>
 
 namespace arrow::flight::sql::odbc {
 using config::Configuration;

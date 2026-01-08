@@ -15,16 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
-
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
-
 #include "arrow/flight/client_cookie_middleware.h"
-#include "arrow/flight/sql/odbc/odbc_impl/address_info.h"
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_auth_method.h"
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_ssl_config.h"
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_statement.h"
-#include "arrow/flight/sql/odbc/odbc_impl/util.h"
+
 #include "arrow/flight/types.h"
 
 #include <boost/algorithm/string.hpp>
@@ -36,7 +28,16 @@
 #include <sql.h>
 #include <sqlext.h>
 
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/address_info.h"
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_auth_method.h"
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_ssl_config.h"
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_statement.h"
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 #include "arrow/flight/sql/odbc/odbc_impl/system_trust_store.h"
+#include "arrow/flight/sql/odbc/odbc_impl/util.h"
 
 #ifndef NI_MAXHOST
 #  define NI_MAXHOST 1025

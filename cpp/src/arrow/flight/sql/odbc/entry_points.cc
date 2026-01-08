@@ -15,13 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// platform.h includes windows.h, so it needs to be included first
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+#include "arrow/util/logging.h"
 
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
 #include <sqlucode.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+// platform.h includes windows.h, so it needs to be included first
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include "arrow/flight/sql/odbc/odbc_api_internal.h"
 #include "arrow/flight/sql/odbc/visibility.h"
@@ -30,8 +34,6 @@
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_environment.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
-
-#include "arrow/util/logging.h"
 
 SQLRETURN SQL_API SQLAllocHandle(SQLSMALLINT type, SQLHANDLE parent, SQLHANDLE* result) {
   return arrow::flight::sql::odbc::SQLAllocHandle(type, parent, result);

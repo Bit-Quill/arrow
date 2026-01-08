@@ -17,14 +17,17 @@
 
 #pragma once
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_handle.h"
-#include "arrow/flight/sql/odbc/odbc_impl/spi/connection.h"
-
-#include <sql.h>
 #include <map>
 #include <memory>
 #include <optional>
 #include <vector>
+
+#include <sql.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/odbc_handle.h"
+#include "arrow/flight/sql/odbc/odbc_impl/spi/connection.h"
 
 namespace ODBC {
 class ODBCEnvironment;

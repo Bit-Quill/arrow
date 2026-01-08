@@ -15,13 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_result_set.h"
-
-#include <sql.h>
-
 #include <utility>
 #include "arrow/flight/types.h"
 #include "arrow/scalar.h"
+
+#include <sql.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_result_set.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_result_set_column.h"
 #include "arrow/flight/sql/odbc/odbc_impl/flight_sql_result_set_metadata.h"

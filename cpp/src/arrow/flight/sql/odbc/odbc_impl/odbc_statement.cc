@@ -15,6 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
+#include <boost/variant.hpp>
+#include <optional>
+#include <utility>
+
+#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/attribute_utils.h"
@@ -25,13 +35,6 @@
 #include "arrow/flight/sql/odbc/odbc_impl/spi/result_set_metadata.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/types.h"
-
-#include <sql.h>
-#include <sqlext.h>
-#include <sqltypes.h>
-#include <boost/variant.hpp>
-#include <optional>
-#include <utility>
 
 using ODBC::DescriptorRecord;
 using ODBC::ODBCConnection;

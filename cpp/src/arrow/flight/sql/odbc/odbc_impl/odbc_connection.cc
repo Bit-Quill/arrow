@@ -15,10 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
-
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
+
+#include <boost/algorithm/string.hpp>
+#include <boost/xpressive/xpressive.hpp>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <utility>
+
+// Include ODBC headers after arrow headers to avoid conflicts with sql_info_undef.h
+#include <odbcinst.h>
+#include <sql.h>
+#include <sqlext.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
@@ -29,22 +43,6 @@
 #include "arrow/flight/sql/odbc/odbc_impl/spi/connection.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/util.h"
-
-// Include ODBC headers after arrow headers to avoid conflicts with sql_info_undef.h
-#include <odbcinst.h>
-#include <sql.h>
-#include <sqlext.h>
-#include <boost/algorithm/string.hpp>
-#include <boost/xpressive/xpressive.hpp>
-#include <iterator>
-#include <memory>
-#include <optional>
-#include <utility>
-
-#include <sql.h>
-#include <sqlext.h>
-
-#include "arrow/flight/sql/odbc/odbc_macros.h"
 
 using ODBC::ODBCConnection;
 using ODBC::ODBCDescriptor;

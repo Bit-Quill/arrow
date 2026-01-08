@@ -15,13 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
+#include <string>
+#include <unordered_map>
+
+#include <sqlext.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
 #include "arrow/flight/sql/odbc/odbc_impl/scalar_function_reporter.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
-
-#include <sqlext.h>
-#include <string>
-#include <unordered_map>
 
 namespace arrow::flight::sql::odbc {
 

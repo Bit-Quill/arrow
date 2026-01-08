@@ -17,14 +17,16 @@
 
 #pragma once
 
+#if defined __APPLE__
+
 #ifdef SQL_IDENTIFIER_CASE
 constexpr int SQL_IDENTIFIER_CASE_ODBC = SQL_IDENTIFIER_CASE;
 #undef SQL_IDENTIFIER_CASE
 #endif
 
-#ifdef BOOL
-#undef BOOL
-#endif
+// #ifdef BOOL
+// #undef BOOL
+// #endif
 
 #ifdef TRUE
 #undef TRUE
@@ -33,3 +35,5 @@ constexpr int SQL_IDENTIFIER_CASE_ODBC = SQL_IDENTIFIER_CASE;
 #ifdef FALSE
 #undef FALSE
 #endif
+
+#endif  // defined __APPLE__

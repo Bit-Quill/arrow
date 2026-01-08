@@ -17,11 +17,15 @@
 
 #pragma once
 
-#include <sql.h>
-#include <sqlext.h>
 #include <algorithm>
 #include <cstring>
 #include <memory>
+
+#include <sql.h>
+#include <sqlext.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
 #include "arrow/flight/sql/odbc/odbc_impl/diagnostics.h"
 #include "arrow/flight/sql/odbc/odbc_impl/encoding_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"

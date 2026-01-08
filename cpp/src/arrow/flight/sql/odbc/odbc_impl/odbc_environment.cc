@@ -15,16 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
+#include <algorithm>
+#include <utility>
+
+#include <sqlext.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_environment.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/connection.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/driver.h"
 #include "arrow/flight/sql/odbc/odbc_impl/types.h"
-
-#include <sqlext.h>
-#include <algorithm>
-#include <utility>
 
 using ODBC::ODBCConnection;
 using ODBC::ODBCEnvironment;

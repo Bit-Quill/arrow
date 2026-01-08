@@ -17,11 +17,14 @@
 
 #pragma once
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_handle.h"
-
-#include <sql.h>
 #include <memory>
 #include <vector>
+
+#include <sql.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/odbc_handle.h"
 
 namespace arrow::flight::sql::odbc {
 class Driver;

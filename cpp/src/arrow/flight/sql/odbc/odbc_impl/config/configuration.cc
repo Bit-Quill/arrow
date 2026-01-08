@@ -15,18 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
-
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
-#include "arrow/flight/sql/odbc/odbc_impl/util.h"
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
 
-#include <odbcinst.h>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <iterator>
 #include <sstream>
+
+#include <odbcinst.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
+#include "arrow/flight/sql/odbc/odbc_impl/util.h"
 
 namespace arrow::flight::sql::odbc {
 namespace config {

@@ -16,17 +16,21 @@
 // under the License.
 
 #pragma once
-#include "arrow/flight/sql/odbc/odbc_impl/encoding.h"
-#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
-#include <sql.h>
-#include <sqlext.h>
 #include <algorithm>
 #include <codecvt>
 #include <cstring>
 #include <locale>
 #include <memory>
 #include <string>
+
+#include <sql.h>
+#include <sqlext.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/encoding.h"
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 

@@ -17,14 +17,17 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
+#include <sql.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
 // platform.h platform.h includes windows.h so it needs to be included first
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_handle.h"
-
-#include <sql.h>
-#include <memory>
-#include <string>
 
 namespace arrow::flight::sql::odbc {
 class Statement;

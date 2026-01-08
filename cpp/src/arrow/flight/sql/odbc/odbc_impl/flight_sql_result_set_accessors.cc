@@ -15,9 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_result_set_accessors.h"
-
 #include <boost/functional/hash.hpp>
+
+#include <sql.h>
+#include <sqlext.h>
+
+#include "arrow/flight/sql/odbc/odbc_macros.h"
+
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_result_set_accessors.h"
 
 #include "arrow/flight/sql/odbc/odbc_impl/accessors/binary_array_accessor.h"
 #include "arrow/flight/sql/odbc/odbc_impl/accessors/boolean_array_accessor.h"
@@ -28,11 +33,6 @@
 #include "arrow/flight/sql/odbc/odbc_impl/accessors/time_array_accessor.h"
 #include "arrow/flight/sql/odbc/odbc_impl/accessors/timestamp_array_accessor.h"
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
-
-#include <sql.h>
-#include <sqlext.h>
-
-#include "arrow/flight/sql/odbc/odbc_macros.h"
 
 namespace arrow::flight::sql::odbc {
 
