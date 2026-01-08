@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-add_custom_target(tests)
+# add_custom_target(tests) # -AL- I don't think this does anything.
 
 if(WIN32)
   include_directories(${ODBC_INCLUDE_DIRS})
@@ -32,6 +32,18 @@ set(ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS
     ../../example/sqlite_statement_batch_reader.cc
     ../../example/sqlite_server.cc
     ../../example/sqlite_tables_schema_batch_reader.cc)
+
+if(ARROW_TEST_LINKAGE STREQUAL "static")
+  set(ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS arrow_odbc_spi_impl_static 
+  # protobuf::libprotobuf # -AL- need to resolve double registration issue
+  # ${ARROW_TEST_STATIC_LINK_LIBS}
+  )
+else()
+  set(ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS arrow_odbc_spi_impl_shared 
+  # protobuf::libprotobuf 
+  # ${ARROW_TEST_SHARED_LINK_LIBS}
+  )
+endif()
 
 if(WIN32)
 add_arrow_test(flight_sql_odbc_test
@@ -61,50 +73,13 @@ else()
   # unix
 
   # -AL- todo after ODBC can build statically, resolve 
-  # File already exists in database: FlightSql.proto
-  # Error. This error is likely from the test, as ODBC driver can work with DriverManager.
+  # ODBC test issue. It doesn't need to change, but may need to act differently depending
+  # on `arrow_odbc_spi_impl` change.
+              #  # -AL- 1st difference from Windows build
+              #  DEFINITIONS
+              #  UNICODE
 
-  # -AL- temp, gradually add things to see which one breaks the build.
-  # add_arrow_test(flight_sql_odbc_test
-  #              SOURCES
-  #              odbc_test_suite.cc
-  #              odbc_test_suite.h
-  #              temp_odbc_test.cc
-  #              STATIC_LINK_LIBS
-  #              ${ODBC_LIBRARIES}
-  #              ${ODBCINST}
-  #              arrow_testing_static
-  #              EXTRA_LINK_LIBS
-  #              arrow_odbc_spi_impl)
-
-
-  # add_executable(arrow-flight-sql-odbc-test 
-  #              odbc_test_suite.cc
-  #              odbc_test_suite.h
-  #              columns_test.cc
-  #              connection_attr_test.cc
-  #              connection_info_test.cc
-  #              connection_test.cc
-  #              errors_test.cc
-  #              get_functions_test.cc
-  #              statement_attr_test.cc
-  #              statement_test.cc
-  #              tables_test.cc
-  #              type_info_test.cc
-  #              # Enable Protobuf cleanup after test execution
-  #              # GH-46889: move protobuf_test_util to a more common location
-  #              ../../../../engine/substrait/protobuf_test_util.cc
-  #              ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS})
-  # target_link_libraries(arrow-flight-sql-odbc-test
-  #                       ${ODBC_LIBRARIES}
-  #                       ${ODBCINST}
-  #                       ${SQLite3_LIBRARIES}
-  #                       arrow_odbc_spi_impl_shared
-  #                       ${ARROW_TEST_LINK_LIBS})
-
-  # add_dependencies(arrow-flight-sql-odbc-test arrow arrow_testing)
-
-  add_arrow_test(flight_sql_odbc_test
+add_arrow_test(flight_sql_odbc_test
                SOURCES
                odbc_test_suite.cc
                odbc_test_suite.h
@@ -120,16 +95,28 @@ else()
                type_info_test.cc
                # Enable Protobuf cleanup after test execution
                # GH-46889: move protobuf_test_util to a more common location
-               ../../../../engine/substrait/protobuf_test_util.cc
+               # ../../../../engine/substrait/protobuf_test_util.cc
+               # -AL- todo raise GitHub issue to enable this on macOS/Linux where static ODBC is needed.
                ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
-               
-               STATIC_LINK_LIBS
+               # -AL- 1st difference from Windows build
+               DEFINITIONS
+               UNICODE
+               EXTRA_LINK_LIBS
+               # -AL- below commented out code are tries to get the protobuf issue resolved.
+              #  arrow_flight_testing_shared # -AL- tentative, doesn't fix the issue.
+              #  arrow_flight_sql_shared # -AL- tentative, doesn't fix the issue.
+               # ${ARROW_TEST_LINK_LIBS} # -AL- tentative, doesn't fix the issue.
+               # protobuf::libprotobuf  # -AL- tentative, adds required gtest dependency but doesn't fix the issue.
+               # arrow_compute_testing # -AL- tentative, doesn't fix the issue.
                ${ODBC_LIBRARIES}
                ${ODBCINST}
                ${SQLite3_LIBRARIES}
+               # arrow_odbc_spi_impl_shared  <- -AL- moved to ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS
+               STATIC_LINK_LIBS
+               GTest::gtest
+               GTest::gtest_main
                # ${ARROW_TEST_LINK_LIBS}
-               EXTRA_LINK_LIBS
-               arrow_odbc_spi_impl_shared)
+               ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS})
 endif()              
 
 # Disable unity build due to sqlite_sql_info.cc conflict with sql.h and sqlext.h headers.

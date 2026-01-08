@@ -40,7 +40,7 @@ endif()
 message(STATUS "-AL- random msg in odbc cmake")
 
 add_subdirectory(odbc_impl)
-# add_subdirectory(tests) # -AL- TODO enable after `odbc_impl` works and ODBC driver still links statically.
+add_subdirectory(tests) # -AL- TODO enable after `odbc_impl` works and ODBC driver still links statically.
 
 arrow_install_all_headers("arrow/flight/sql/odbc")
 
