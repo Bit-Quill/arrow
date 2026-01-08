@@ -2200,7 +2200,7 @@ TYPED_TEST(StatementTest, TestSQLCloseCursor) {
 }
 
 TYPED_TEST(StatementTest, TestSQLFreeStmtSQLCloseWithoutCursor) {
-  // Verify SQLFreeStmt(SQL_CLOSE) does not throw error with invalid cursor
+  // SQLFreeStmt(SQL_CLOSE) does not throw error with invalid cursor
 
   ASSERT_EQ(SQL_SUCCESS, SQLFreeStmt(stmt, SQL_CLOSE));
 }

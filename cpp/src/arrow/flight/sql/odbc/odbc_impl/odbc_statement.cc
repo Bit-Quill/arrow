@@ -15,22 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
+// platform.h platform.h includes windows.h so it needs to be included first
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
+#include "arrow/type.h"
+
+// Include ODBC headers after arrow fwd type header to avoid conflicts
 #include "arrow/flight/sql/odbc/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
+#include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/result_set.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/result_set_metadata.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/types.h"
-#include "arrow/type.h"
 
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
-#include <boost/variant.hpp>
 #include <optional>
 #include <utility>
 
@@ -251,7 +254,7 @@ void ODBCStatement::CopyAttributesFromConnection(ODBCConnection& connection) {
   ODBCStatement& tracking_statement = connection.GetTrackingStatement();
 
   // Get abstraction attributes and copy to this spi_statement_.
-  // Possible ODBC attributes are below, but many of these are not supported by warpdrive
+  // Possible ODBC attributes are below, but many of these are not supported by Arrow ODBC
   // or ODBCAbstaction:
   // SQL_ATTR_ASYNC_ENABLE:
   // SQL_ATTR_METADATA_ID:
@@ -329,7 +332,7 @@ bool ODBCStatement::Fetch(size_t rows, SQLULEN* row_count_ptr,
   }
 
   if (current_ard_->HaveBindingsChanged()) {
-    // TODO: Deal handle when offset != buffer_length.
+    // GH-47871 TODO: handle when offset != buffer_length.
 
     // Wipe out all bindings in the ResultSet.
     // Note that the number of ARD records can both be more or less
@@ -537,7 +540,7 @@ void ODBCStatement::GetStmtAttr(SQLINTEGER statement_attribute, SQLPOINTER outpu
   }
 
   if (spi_attribute) {
-    GetAttribute(static_cast<SQLULEN>(boost::get<size_t>(*spi_attribute)), output,
+    GetAttribute(static_cast<SQLULEN>(std::get<size_t>(*spi_attribute)), output,
                  buffer_size, str_len_ptr);
     return;
   }
@@ -621,6 +624,7 @@ void ODBCStatement::SetStmtAttr(SQLINTEGER statement_attribute, SQLPOINTER value
       return;
 
     case SQL_ATTR_ASYNC_ENABLE:
+      throw DriverException("Unsupported attribute", "HYC00");
 #ifdef SQL_ATTR_ASYNC_STMT_EVENT
     case SQL_ATTR_ASYNC_STMT_EVENT:
       throw DriverException("Unsupported attribute", "HYC00");
@@ -737,7 +741,7 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT record_number, SQLSMALLINT c_type,
                                  SQLLEN* indicator_ptr) {
   if (record_number == 0) {
     throw DriverException("Bookmarks are not supported", "07009");
-  } else if (record_number > ird_->GetRecords().size()) {
+  } else if (static_cast<size_t>(record_number) > ird_->GetRecords().size()) {
     throw DriverException("Invalid column index: " + std::to_string(record_number),
                           "07009");
   }
@@ -752,7 +756,7 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT record_number, SQLSMALLINT c_type,
   int scale = ird_record.scale;
 
   if (c_type == SQL_ARD_TYPE) {
-    if (record_number > current_ard_->GetRecords().size()) {
+    if (static_cast<size_t>(record_number) > current_ard_->GetRecords().size()) {
       throw DriverException("Invalid column index: " + std::to_string(record_number),
                             "07009");
     }
@@ -765,7 +769,7 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT record_number, SQLSMALLINT c_type,
   // Note: this is intentionally not an else if, since the type can be SQL_C_DEFAULT in
   // the ARD.
   if (evaluated_c_type == SQL_C_DEFAULT) {
-    if (record_number <= current_ard_->GetRecords().size()) {
+    if (static_cast<size_t>(record_number) <= current_ard_->GetRecords().size()) {
       const DescriptorRecord& ard_record = current_ard_->GetRecords()[record_number - 1];
       precision = ard_record.precision;
       scale = ard_record.scale;

@@ -17,8 +17,6 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
 
-#include <sql.h>
-#include <sqlext.h>
 #include <algorithm>
 #include "arrow/flight/sql/odbc/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
@@ -27,6 +25,10 @@
 #include "arrow/flight/sql/odbc/odbc_impl/spi/result_set_metadata.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/type_utilities.h"
+
+// Include ODBC headers after arrow headers to avoid conflicts
+#include <sql.h>
+#include <sqlext.h>
 
 using ODBC::DescriptorRecord;
 using ODBC::ODBCConnection;
@@ -62,7 +64,7 @@ ODBCDescriptor::ODBCDescriptor(Diagnostics& base_diagnostics, ODBCConnection* co
       parent_statement_(stmt),
       array_status_ptr_(nullptr),
       bind_offset_ptr_(nullptr),
-      rows_processed_ptr_(nullptr),
+      rows_proccessed_ptr_(nullptr),
       array_size_(1),
       bind_type_(SQL_BIND_BY_COLUMN),
       highest_one_based_bound_record_(0),
@@ -109,7 +111,7 @@ void ODBCDescriptor::SetHeaderField(SQLSMALLINT field_identifier, SQLPOINTER val
       has_bindings_changed_ = true;
       break;
     case SQL_DESC_ROWS_PROCESSED_PTR:
-      SetPointerAttribute(value, rows_processed_ptr_);
+      SetPointerAttribute(value, rows_proccessed_ptr_);
       has_bindings_changed_ = true;
       break;
     case SQL_DESC_COUNT: {
@@ -155,7 +157,7 @@ void ODBCDescriptor::SetField(SQLSMALLINT record_number, SQLSMALLINT field_ident
     throw DriverException("Bookmarks are unsupported.", "07009");
   }
 
-  if (record_number > records_.size()) {
+  if (static_cast<size_t>(record_number) > records_.size()) {
     throw DriverException("Invalid descriptor index", "HY009");
   }
 
@@ -273,7 +275,7 @@ void ODBCDescriptor::GetHeaderField(SQLSMALLINT field_identifier, SQLPOINTER val
       GetAttribute(bind_type_, value, buffer_length, output_length);
       break;
     case SQL_DESC_ROWS_PROCESSED_PTR:
-      GetAttribute(rows_processed_ptr_, value, buffer_length, output_length);
+      GetAttribute(rows_proccessed_ptr_, value, buffer_length, output_length);
       break;
     case SQL_DESC_COUNT: {
       // highest_one_based_bound_record_ equals number of records + 1
@@ -308,7 +310,7 @@ void ODBCDescriptor::GetField(SQLSMALLINT record_number, SQLSMALLINT field_ident
     throw DriverException("Bookmarks are unsupported.", "07009");
   }
 
-  if (record_number > records_.size()) {
+  if (static_cast<size_t>(record_number) > records_.size()) {
     throw DriverException("Invalid descriptor index", "07009");
   }
 
@@ -507,10 +509,12 @@ void ODBCDescriptor::PopulateFromResultSetMetadata(ResultSetMetadata* rsmd) {
         rsmd->IsAutoUnique(one_based_index) ? SQL_TRUE : SQL_FALSE;
     records_[i].case_sensitive =
         rsmd->IsCaseSensitive(one_based_index) ? SQL_TRUE : SQL_FALSE;
-    records_[i].datetime_interval_precision;  // TODO - update when rsmd adds this
+    records_[i].datetime_interval_precision;  // GH-47869 TODO implement
+                                              // `SQL_DESC_DATETIME_INTERVAL_PRECISION`
     SQLINTEGER num_prec_radix = rsmd->GetNumPrecRadix(one_based_index);
     records_[i].num_prec_radix = num_prec_radix > 0 ? num_prec_radix : 0;
-    records_[i].datetime_interval_code;  // TODO
+    records_[i].datetime_interval_code;  // GH-47868 TODO implement
+                                         // `SQL_DESC_DATETIME_INTERVAL_CODE`
     records_[i].fixed_prec_scale =
         rsmd->IsFixedPrecScale(one_based_index) ? SQL_TRUE : SQL_FALSE;
     records_[i].nullable = rsmd->IsNullable(one_based_index);
@@ -539,7 +543,7 @@ void ODBCDescriptor::BindCol(SQLSMALLINT record_number, SQLSMALLINT c_type,
   assert(is_writable_);
 
   // The set of records auto-expands to the supplied record number.
-  if (records_.size() < record_number) {
+  if (records_.size() < static_cast<size_t>(record_number)) {
     records_.resize(record_number);
   }
 
@@ -559,7 +563,7 @@ void ODBCDescriptor::BindCol(SQLSMALLINT record_number, SQLSMALLINT c_type,
 }
 
 void ODBCDescriptor::SetDataPtrOnRecord(SQLPOINTER data_ptr, SQLSMALLINT record_number) {
-  assert(record_number <= records_.size());
+  assert(static_cast<size_t>(record_number) <= records_.size());
   DescriptorRecord& record = records_[record_number - 1];
   if (data_ptr) {
     record.CheckConsistency();
@@ -579,5 +583,5 @@ void ODBCDescriptor::SetDataPtrOnRecord(SQLPOINTER data_ptr, SQLSMALLINT record_
 }
 
 void DescriptorRecord::CheckConsistency() {
-  // TODO
+  // GH-47870 TODO implement
 }

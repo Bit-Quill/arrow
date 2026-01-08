@@ -1124,7 +1124,7 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColumnsAllTypesODBCVer2) {
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(stmt));
 }
 
-TEST_F(ColumnsMockTest, TestSQLColumnsColumnPattern) {
+TEST_F(ColumnsMockTest, TestSQLColumnsColumnPatternSegFault) {
   // Checks filtering table with column name pattern.
   // Only check table and column name
 
