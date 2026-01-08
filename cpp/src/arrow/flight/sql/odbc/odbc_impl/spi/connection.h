@@ -17,12 +17,13 @@
 
 #pragma once
 
+#define BOOST_NO_CXX98_FUNCTION_BASE  // ARROW-17805
 #include <boost/algorithm/string.hpp>
-#include <boost/variant.hpp>
 #include <functional>
 #include <map>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include "arrow/flight/sql/odbc/odbc_impl/diagnostics.h"
@@ -36,7 +37,11 @@ struct CaseInsensitiveComparator {
   using is_transparent = std::true_type;
 
   bool operator()(std::string_view s1, std::string_view s2) const {
-    return boost::lexicographical_compare(s1, s2, boost::is_iless());
+    return std::lexicographical_compare(
+        s1.begin(), s1.end(), s2.begin(), s2.end(), [](char a, char b) {
+          return std::tolower(static_cast<unsigned char>(a)) <
+                 std::tolower(static_cast<unsigned char>(b));
+        });
   }
 };
 
@@ -62,8 +67,8 @@ class Connection {
     PACKET_SIZE,         // uint32_t - The Packet Size
   };
 
-  typedef boost::variant<std::string, void*, uint64_t, uint32_t> Attribute;
-  typedef boost::variant<std::string, uint32_t, uint16_t> Info;
+  typedef std::variant<std::string, void*, uint64_t, uint32_t> Attribute;
+  typedef std::variant<std::string, uint32_t, uint16_t> Info;
   typedef PropertyMap ConnPropertyMap;
 
   /// \brief Establish the connection.

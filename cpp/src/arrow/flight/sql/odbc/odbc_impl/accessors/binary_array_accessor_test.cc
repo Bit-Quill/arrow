@@ -18,11 +18,12 @@
 #include "arrow/flight/sql/odbc/odbc_impl/accessors/binary_array_accessor.h"
 #include "arrow/testing/builder.h"
 #include "arrow/testing/gtest_util.h"
-#include "gtest/gtest.h"
+
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
 
-TEST(BinaryArrayAccessor, Test_CDataType_BINARY_Basic) {
+TEST(BinaryArrayAccessor, TestCDataTypeBinaryBasic) {
   std::vector<std::string> values = {"foo", "barx", "baz123"};
   std::shared_ptr<Array> array;
   ArrayFromVector<BinaryType, std::string>(values, &array);
@@ -42,7 +43,7 @@ TEST(BinaryArrayAccessor, Test_CDataType_BINARY_Basic) {
             accessor.GetColumnarData(&binding, 0, values.size(), value_offset, false,
                                      diagnostics, nullptr));
 
-  for (int i = 0; i < values.size(); ++i) {
+  for (size_t i = 0; i < values.size(); ++i) {
     ASSERT_EQ(values[i].length(), str_len_buffer[i]);
     // Beware that CDataType_BINARY values are not null terminated.
     // It's safe to create a std::string from this data because we know it's
@@ -53,7 +54,7 @@ TEST(BinaryArrayAccessor, Test_CDataType_BINARY_Basic) {
   }
 }
 
-TEST(BinaryArrayAccessor, Test_CDataType_BINARY_Truncation) {
+TEST(BinaryArrayAccessor, TestCDataTypeBinaryTruncation) {
   std::vector<std::string> values = {"ABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEF"};
   std::shared_ptr<Array> array;
   ArrayFromVector<BinaryType, std::string>(values, &array);

@@ -134,6 +134,7 @@ x-hierarchy:
   - debian-cpp:
     - debian-c-glib:
       - debian-ruby
+    - debian-cpp-odbc
     - debian-python:
       - debian-docs
   - fedora-cpp:
@@ -151,6 +152,7 @@ x-hierarchy:
     - ubuntu-r-only-r
   - ubuntu-cpp-bundled
   - ubuntu-cpp-bundled-offline
+  - ubuntu-cpp-odbc
   - ubuntu-cpp-minimal
   - ubuntu-cuda-cpp:
     - ubuntu-cuda-python
@@ -371,6 +373,54 @@ services:
         /arrow/ci/scripts/cpp_build.sh /arrow /build &&
         /arrow/ci/scripts/cpp_test.sh /arrow /build"
 
+  debian-cpp-odbc:
+    # Usage:
+    #   docker compose build debian-cpp-odbc
+    #   docker compose run --rm debian-cpp-odbc
+    # Parameters:
+    #   ARCH: amd64, arm64v8, ...
+    #   DEBIAN: 12, experimental
+    image: ${REPO}:${ARCH}-debian-${DEBIAN}-cpp
+    build:
+      context: .
+      dockerfile: ci/docker/debian-${DEBIAN}-cpp.dockerfile
+      cache_from:
+        - ${REPO}:${ARCH}-debian-${DEBIAN}-cpp
+      args:
+        arch: ${ARCH}
+        gcc: ${GCC}
+        llvm: ${LLVM}
+    shm_size: *shm-size
+    ulimits: *ulimits
+    environment:
+      <<: [*common, *ccache, *sccache, *cpp]
+      ARROW_ACERO: "OFF"
+      ARROW_AZURE: "OFF"
+      ARROW_BUILD_TYPE: RELEASE
+      ARROW_CSV: "OFF"
+      ARROW_DATASET: "OFF"
+      ARROW_ENABLE_TIMING_TESTS:  # inherit
+      ARROW_DEPENDENCY_SOURCE: BUNDLED
+      ARROW_DEPENDENCY_USE_SHARED: "OFF"
+      ARROW_FILESYSTEM: "OFF"
+      ARROW_FLIGHT_SQL_ODBC: "ON"
+      ARROW_GANDIVA: "OFF"
+      ARROW_GCS: "OFF"
+      ARROW_HDFS: "OFF"
+      ARROW_ORC: "OFF"
+      ARROW_PARQUET: "OFF"
+      ARROW_S3: "OFF"
+      ARROW_SUBSTRAIT: "OFF"
+    volumes: &debian-volumes
+      - .:/arrow:delegated
+      - ${DOCKER_VOLUME_PREFIX}debian-ccache:/ccache:delegated
+    # Register ODBC before running tests
+    command: >
+      /bin/bash -c "
+        /arrow/ci/scripts/cpp_build.sh /arrow /build &&
+        sudo /arrow/cpp/src/arrow/flight/sql/odbc/install/unix/install_odbc.sh /usr/local/lib/libarrow_flight_sql_odbc.so &&
+        /arrow/ci/scripts/cpp_test.sh /arrow /build"
+
   ubuntu-cpp:
     # Usage:
     #   docker compose build ubuntu-cpp
@@ -495,6 +545,43 @@ services:
       CMAKE_GENERATOR: "Unix Makefiles"
     volumes: *ubuntu-volumes
     command: *cpp-command
+
+  ubuntu-cpp-odbc:
+    # Arrow Flight SQL ODBC build with BUNDLED dependencies with downloaded dependencies.
+    image: ${REPO}:${ARCH}-ubuntu-${UBUNTU}-cpp
+    build:
+      context: .
+      dockerfile: ci/docker/ubuntu-${UBUNTU}-cpp.dockerfile
+      cache_from:
+        - ${REPO}:${ARCH}-ubuntu-${UBUNTU}-cpp
+      args:
+        arch: ${ARCH}
+        base: "${ARCH}/ubuntu:${UBUNTU}"
+        clang_tools: ${CLANG_TOOLS}
+        cmake: ${CMAKE}
+        gcc: ${GCC}
+        llvm: ${LLVM}
+    shm_size: *shm-size
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - "/dev/fuse:/dev/fuse"
+    security_opt:
+      - apparmor:unconfined
+    ulimits: *ulimits
+    environment:
+      <<: [*common, *ccache, *sccache, *cpp]
+      ARROW_BUILD_TYPE: RELEASE
+      ARROW_DEPENDENCY_SOURCE: BUNDLED
+      ARROW_DEPENDENCY_USE_SHARED: OFF
+      ARROW_FLIGHT_SQL_ODBC: ON
+    volumes: *ubuntu-volumes
+    # Register ODBC before running tests
+    command: >
+      /bin/bash -c "
+        /arrow/ci/scripts/cpp_build.sh /arrow /build &&
+        sudo /arrow/cpp/src/arrow/flight/sql/odbc/install/unix/install_odbc.sh /usr/local/lib/libarrow_flight_sql_odbc.so &&
+        /arrow/ci/scripts/cpp_test.sh /arrow /build"
 
   ubuntu-cpp-minimal:
     # Arrow build with minimal components/dependencies

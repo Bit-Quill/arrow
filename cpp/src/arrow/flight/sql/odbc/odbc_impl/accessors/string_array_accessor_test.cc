@@ -19,11 +19,12 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/encoding.h"
 #include "arrow/testing/builder.h"
-#include "gtest/gtest.h"
+
+#include <gtest/gtest.h>
 
 namespace arrow::flight::sql::odbc {
 
-TEST(StringArrayAccessor, Test_CDataType_CHAR_Basic) {
+TEST(StringArrayAccessor, TestCDataTypeCharBasic) {
   std::vector<std::string> values = {"foo", "barx", "baz123"};
   std::shared_ptr<Array> array;
   ArrayFromVector<StringType, std::string>(values, &array);
@@ -43,13 +44,13 @@ TEST(StringArrayAccessor, Test_CDataType_CHAR_Basic) {
             accessor.GetColumnarData(&binding, 0, values.size(), value_offset, false,
                                      diagnostics, nullptr));
 
-  for (int i = 0; i < values.size(); ++i) {
+  for (size_t i = 0; i < values.size(); ++i) {
     ASSERT_EQ(values[i].length(), str_len_buffer[i]);
     ASSERT_EQ(values[i], std::string(buffer.data() + i * max_str_len));
   }
 }
 
-TEST(StringArrayAccessor, Test_CDataType_CHAR_Truncation) {
+TEST(StringArrayAccessor, TestCDataTypeCharTruncation) {
   std::vector<std::string> values = {"ABCDEFABCDEFABCDEFABCDEFABCDEFABCDEFABCDEF"};
   std::shared_ptr<Array> array;
   ArrayFromVector<StringType, std::string>(values, &array);
@@ -82,7 +83,7 @@ TEST(StringArrayAccessor, Test_CDataType_CHAR_Truncation) {
   ASSERT_EQ(values[0], ss.str());
 }
 
-TEST(StringArrayAccessor, Test_CDataType_WCHAR_Basic) {
+TEST(StringArrayAccessor, TestCDataTypeWcharBasic) {
   std::vector<std::string> values = {"foo", "barx", "baz123"};
   std::shared_ptr<Array> array;
   ArrayFromVector<StringType, std::string>(values, &array);
@@ -102,7 +103,7 @@ TEST(StringArrayAccessor, Test_CDataType_WCHAR_Basic) {
             accessor->GetColumnarData(&binding, 0, values.size(), value_offset, false,
                                       diagnostics, nullptr));
 
-  for (int i = 0; i < values.size(); ++i) {
+  for (size_t i = 0; i < values.size(); ++i) {
     ASSERT_EQ(values[i].length() * GetSqlWCharSize(), str_len_buffer[i]);
     std::vector<uint8_t> expected;
     Utf8ToWcs(values[i].c_str(), &expected);
@@ -112,7 +113,7 @@ TEST(StringArrayAccessor, Test_CDataType_WCHAR_Basic) {
   }
 }
 
-TEST(StringArrayAccessor, Test_CDataType_WCHAR_Truncation) {
+TEST(StringArrayAccessor, TestCDataTypeWcharTruncation) {
   std::vector<std::string> values = {"ABCDEFA"};
   std::shared_ptr<Array> array;
   ArrayFromVector<StringType, std::string>(values, &array);

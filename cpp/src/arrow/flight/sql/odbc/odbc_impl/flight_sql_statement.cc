@@ -58,9 +58,9 @@ FlightSqlStatement::FlightSqlStatement(const Diagnostics& diagnostics,
                                        const MetadataSettings& metadata_settings)
     : diagnostics_("Apache Arrow", diagnostics.GetDataSourceComponent(),
                    diagnostics.GetOdbcVersion()),
-      sql_client_(sql_client),
       client_options_(std::move(client_options)),
       call_options_(std::move(call_options)),
+      sql_client_(sql_client),
       metadata_settings_(metadata_settings) {
   attribute_[METADATA_ID] = static_cast<size_t>(SQL_FALSE);
   attribute_[MAX_LENGTH] = static_cast<size_t>(0);
@@ -83,13 +83,13 @@ bool FlightSqlStatement::SetAttribute(StatementAttributeId attribute,
     case MAX_LENGTH:
       return CheckIfSetToOnlyValidValue(value, static_cast<size_t>(0));
     case QUERY_TIMEOUT:
-      if (boost::get<size_t>(value) > 0) {
+      if (std::get<size_t>(value) > 0) {
         call_options_.timeout =
-            TimeoutDuration{static_cast<double>(boost::get<size_t>(value))};
+            TimeoutDuration{static_cast<double>(std::get<size_t>(value))};
       } else {
         call_options_.timeout = TimeoutDuration{-1};
-        // Intentional fall-through.
       }
+      [[fallthrough]];
     default:
       attribute_[attribute] = value;
       return true;
