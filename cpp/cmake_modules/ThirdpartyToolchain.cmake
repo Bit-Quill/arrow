@@ -1116,19 +1116,10 @@ function(build_boost)
   endif()
   if(ARROW_FLIGHT_SQL_ODBC)
     # GH-49244: Replace boost beast with alternatives in ODBC
-    # GH-49243: Replace boost variant with std::variant in ODBC
     # GH-49245: Replace boost xpressive with alternatives in ODBC
-    list(APPEND
-         BOOST_INCLUDE_LIBRARIES
-         beast
-         variant
-         xpressive)
+    list(APPEND BOOST_INCLUDE_LIBRARIES beast xpressive)
   else()
-    list(APPEND
-         BOOST_EXCLUDE_LIBRARIES
-         beast
-         variant
-         xpressive)
+    list(APPEND BOOST_EXCLUDE_LIBRARIES beast xpressive)
   endif()
   set(BOOST_SKIP_INSTALL_RULES ON)
   if(NOT ARROW_ENABLE_THREADING)
