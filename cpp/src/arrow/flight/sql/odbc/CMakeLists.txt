@@ -95,6 +95,10 @@ foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})
   target_compile_definitions(${LIB_TARGET} PRIVATE ARROW_FLIGHT_SQL_ODBC_EXPORTING)
 endforeach()
 
+if(APPLE)
+  target_compile_definitions(arrow_flight_sql_odbc PRIVATE SQL_NOUNICODE)
+endif()
+
 # Construct ODBC Windows installer. Only Release installer is supported
 if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
 
