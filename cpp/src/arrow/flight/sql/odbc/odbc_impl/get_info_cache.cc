@@ -86,45 +86,45 @@ namespace {
 int32_t GetInfoTypeForArrowConvertEntry(int32_t convert_entry) {
   switch (convert_entry) {
     case ARROW_CONVERT_BIGINT:
-      return SQL_CONVERT_BIGINT;
+      return SQL_CONVERT_BIGINT_ODBC;
     case ARROW_CONVERT_BINARY:
-      return SQL_CONVERT_BINARY;
+      return SQL_CONVERT_BINARY_ODBC;
     case ARROW_CONVERT_BIT:
-      return SQL_CONVERT_BIT;
+      return SQL_CONVERT_BIT_ODBC;
     case ARROW_CONVERT_CHAR:
-      return SQL_CONVERT_CHAR;
+      return SQL_CONVERT_CHAR_ODBC;
     case ARROW_CONVERT_DATE:
-      return SQL_CONVERT_DATE;
+      return SQL_CONVERT_DATE_ODBC;
     case ARROW_CONVERT_DECIMAL:
-      return SQL_CONVERT_DECIMAL;
+      return SQL_CONVERT_DECIMAL_ODBC;
     case ARROW_CONVERT_FLOAT:
-      return SQL_CONVERT_FLOAT;
+      return SQL_CONVERT_FLOAT_ODBC;
     case ARROW_CONVERT_INTEGER:
-      return SQL_CONVERT_INTEGER;
+      return SQL_CONVERT_INTEGER_ODBC;
     case ARROW_CONVERT_INTERVAL_DAY_TIME:
-      return SQL_CONVERT_INTERVAL_DAY_TIME;
+      return SQL_CONVERT_INTERVAL_DAY_TIME_ODBC;
     case ARROW_CONVERT_INTERVAL_YEAR_MONTH:
-      return SQL_CONVERT_INTERVAL_YEAR_MONTH;
+      return SQL_CONVERT_INTERVAL_YEAR_MONTH_ODBC;
     case ARROW_CONVERT_LONGVARBINARY:
-      return SQL_CONVERT_LONGVARBINARY;
+      return SQL_CONVERT_LONGVARBINARY_ODBC;
     case ARROW_CONVERT_LONGVARCHAR:
-      return SQL_CONVERT_LONGVARCHAR;
+      return SQL_CONVERT_LONGVARCHAR_ODBC;
     case ARROW_CONVERT_NUMERIC:
-      return SQL_CONVERT_NUMERIC;
+      return SQL_CONVERT_NUMERIC_ODBC;
     case ARROW_CONVERT_REAL:
-      return SQL_CONVERT_REAL;
+      return SQL_CONVERT_REAL_ODBC;
     case ARROW_CONVERT_SMALLINT:
-      return SQL_CONVERT_SMALLINT;
+      return SQL_CONVERT_SMALLINT_ODBC;
     case ARROW_CONVERT_TIME:
-      return SQL_CONVERT_TIME;
+      return SQL_CONVERT_TIME_ODBC;
     case ARROW_CONVERT_TIMESTAMP:
-      return SQL_CONVERT_TIMESTAMP;
+      return SQL_CONVERT_TIMESTAMP_ODBC;
     case ARROW_CONVERT_TINYINT:
-      return SQL_CONVERT_TINYINT;
+      return SQL_CONVERT_TINYINT_ODBC;
     case ARROW_CONVERT_VARBINARY:
-      return SQL_CONVERT_VARBINARY;
+      return SQL_CONVERT_VARBINARY_ODBC;
     case ARROW_CONVERT_VARCHAR:
-      return SQL_CONVERT_VARCHAR;
+      return SQL_CONVERT_VARCHAR_ODBC;
   }
   // Arbitrarily return a negative value
   return -1;
@@ -260,7 +260,7 @@ GetInfoCache::GetInfoCache(FlightClientOptions& client_options,
 
   // Assume catalogs are not supported by default. ODBC checks if SQL_CATALOG_NAME is
   // "Y" or "N" to determine if catalogs are supported.
-  info_[SQL_CATALOG_TERM] = "";
+  info_[SQL_CATALOG_TERM_ODBC] = "";
   info_[SQL_CATALOG_NAME] = "N";
   info_[SQL_CATALOG_NAME_SEPARATOR] = "";
   info_[SQL_CATALOG_LOCATION] = static_cast<uint16_t>(0);
@@ -345,7 +345,7 @@ bool GetInfoCache::LoadInfoFromServer() {
               break;
             }
             case ARROW_SQL_IDENTIFIER_QUOTE_CHAR: {
-              info_[SQL_IDENTIFIER_QUOTE_CHAR] = std::string(
+              info_[SQL_IDENTIFIER_QUOTE_CHAR_ODBC] = std::string(
                   reinterpret_cast<StringScalar*>(scalar->child_value().get())->view());
               break;
             }
@@ -355,12 +355,12 @@ bool GetInfoCache::LoadInfoFromServer() {
               break;
             }
             case ARROW_SQL_SCHEMA_TERM: {
-              info_[SQL_SCHEMA_TERM] = std::string(
+              info_[SQL_SCHEMA_TERM_ODBC] = std::string(
                   reinterpret_cast<StringScalar*>(scalar->child_value().get())->view());
               break;
             }
             case ARROW_SQL_PROCEDURE_TERM: {
-              info_[SQL_PROCEDURE_TERM] = std::string(
+              info_[SQL_PROCEDURE_TERM_ODBC] = std::string(
                   reinterpret_cast<StringScalar*>(scalar->child_value().get())->view());
               break;
             }
@@ -376,7 +376,7 @@ bool GetInfoCache::LoadInfoFromServer() {
                 info_[SQL_CATALOG_NAME_SEPARATOR] = ".";
                 info_[SQL_CATALOG_LOCATION] = static_cast<uint16_t>(SQL_CL_START);
               }
-              info_[SQL_CATALOG_TERM] = std::string(
+              info_[SQL_CATALOG_TERM_ODBC] = std::string(
                   reinterpret_cast<StringScalar*>(scalar->child_value().get())->view());
 
               break;
@@ -598,7 +598,7 @@ bool GetInfoCache::LoadInfoFromServer() {
                   value = SQL_IC_SENSITIVE;
                   break;
               }
-              info_[SQL_QUOTED_IDENTIFIER_CASE] = value;
+              info_[SQL_QUOTED_IDENTIFIER_CASE_ODBC] = value;
               break;
             }
             case SqlInfoOptions::SQL_MAX_BINARY_LITERAL_LENGTH: {
@@ -617,27 +617,27 @@ bool GetInfoCache::LoadInfoFromServer() {
               break;
             }
             case ARROW_SQL_MAX_COLUMNS_IN_GROUP_BY: {
-              info_[SQL_MAX_COLUMNS_IN_GROUP_BY] =
+              info_[SQL_MAX_COLUMNS_IN_GROUP_BY_ODBC] =
                   static_cast<uint16_t>(ScalarToInt64(scalar));
               break;
             }
             case ARROW_SQL_MAX_COLUMNS_IN_INDEX: {
-              info_[SQL_MAX_COLUMNS_IN_INDEX] =
+              info_[SQL_MAX_COLUMNS_IN_INDEX_ODBC] =
                   static_cast<uint16_t>(ScalarToInt64(scalar));
               break;
             }
             case ARROW_SQL_MAX_COLUMNS_IN_ORDER_BY: {
-              info_[SQL_MAX_COLUMNS_IN_ORDER_BY] =
+              info_[SQL_MAX_COLUMNS_IN_ORDER_BY_ODBC] =
                   static_cast<uint16_t>(ScalarToInt64(scalar));
               break;
             }
             case ARROW_SQL_MAX_COLUMNS_IN_SELECT: {
-              info_[SQL_MAX_COLUMNS_IN_SELECT] =
+              info_[SQL_MAX_COLUMNS_IN_SELECT_ODBC] =
                   static_cast<uint16_t>(ScalarToInt64(scalar));
               break;
             }
             case ARROW_SQL_MAX_COLUMNS_IN_TABLE: {
-              info_[SQL_MAX_COLUMNS_IN_TABLE] =
+              info_[SQL_MAX_COLUMNS_IN_TABLE_ODBC] =
                   static_cast<uint16_t>(ScalarToInt64(scalar));
               break;
             }
@@ -671,7 +671,7 @@ bool GetInfoCache::LoadInfoFromServer() {
               break;
             }
             case ARROW_SQL_MAX_ROW_SIZE: {
-              info_[SQL_MAX_ROW_SIZE] = static_cast<uint32_t>(ScalarToInt64(scalar));
+              info_[SQL_MAX_ROW_SIZE_ODBC] = static_cast<uint32_t>(ScalarToInt64(scalar));
               break;
             }
             case SqlInfoOptions::SQL_MAX_STATEMENT_LENGTH: {
@@ -689,7 +689,7 @@ bool GetInfoCache::LoadInfoFromServer() {
               break;
             }
             case ARROW_SQL_MAX_TABLES_IN_SELECT: {
-              info_[SQL_MAX_TABLES_IN_SELECT] =
+              info_[SQL_MAX_TABLES_IN_SELECT_ODBC] =
                   static_cast<uint16_t>(ScalarToInt64(scalar));
               break;
             }
@@ -951,7 +951,7 @@ bool GetInfoCache::LoadInfoFromServer() {
                                         result_val);
                 }
               }
-              info_[SQL_NUMERIC_FUNCTIONS] = result_val;
+              info_[SQL_NUMERIC_FUNCTIONS_ODBC] = result_val;
               break;
             }
 
@@ -967,7 +967,7 @@ bool GetInfoCache::LoadInfoFromServer() {
                                        result_val);
                 }
               }
-              info_[SQL_STRING_FUNCTIONS] = result_val;
+              info_[SQL_STRING_FUNCTIONS_ODBC] = result_val;
               break;
             }
             case ARROW_SQL_SYSTEM_FUNCTIONS: {
@@ -984,7 +984,7 @@ bool GetInfoCache::LoadInfoFromServer() {
                 }
               }
               info_[SQL_CONVERT_FUNCTIONS] = convert_result;
-              info_[SQL_SYSTEM_FUNCTIONS] = sys_result;
+              info_[SQL_SYSTEM_FUNCTIONS_ODBC] = sys_result;
               break;
             }
             case SqlInfoOptions::SQL_DATETIME_FUNCTIONS: {
@@ -1018,7 +1018,7 @@ bool GetInfoCache::LoadInfoFromServer() {
                                     ->GetString(list_index);
                 }
               }
-              info_[SQL_KEYWORDS] = std::move(result_str);
+              info_[SQL_KEYWORDS_ODBC] = std::move(result_str);
               break;
             }
 
@@ -1121,35 +1121,35 @@ void GetInfoCache::LoadDefaultsForMissingEntries() {
   SetDefaultIfMissing(info_, SQL_CATALOG_LOCATION, static_cast<uint16_t>(0));
   SetDefaultIfMissing(info_, SQL_CATALOG_NAME, "N");
   SetDefaultIfMissing(info_, SQL_CATALOG_NAME_SEPARATOR, "");
-  SetDefaultIfMissing(info_, SQL_CATALOG_TERM, "");
+  SetDefaultIfMissing(info_, SQL_CATALOG_TERM_ODBC, "");
   SetDefaultIfMissing(info_, SQL_CATALOG_USAGE, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_COLLATION_SEQ, "");
   SetDefaultIfMissing(info_, SQL_COLUMN_ALIAS, "Y");
   SetDefaultIfMissing(info_, SQL_CONCAT_NULL_BEHAVIOR,
                       static_cast<uint16_t>(SQL_CB_NULL));
-  SetDefaultIfMissing(info_, SQL_CONVERT_BIGINT, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_BINARY, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_BIT, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_CHAR, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_DATE, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_DECIMAL, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_BIGINT_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_BINARY_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_BIT_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_CHAR_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_DATE_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_DECIMAL_ODBC, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_CONVERT_DOUBLE, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_FLOAT, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_FLOAT_ODBC, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_CONVERT_FUNCTIONS, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_CONVERT_GUID, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_INTEGER, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_INTERVAL_YEAR_MONTH, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_INTERVAL_DAY_TIME, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_LONGVARBINARY, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_LONGVARCHAR, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_NUMERIC, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_REAL, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_SMALLINT, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_TIME, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_TIMESTAMP, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_TINYINT, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_VARBINARY, static_cast<uint32_t>(0));
-  SetDefaultIfMissing(info_, SQL_CONVERT_VARCHAR, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_INTEGER_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_INTERVAL_YEAR_MONTH_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_INTERVAL_DAY_TIME_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_LONGVARBINARY_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_LONGVARCHAR_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_NUMERIC_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_REAL_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_SMALLINT_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_TIME_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_TIMESTAMP_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_TINYINT_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_VARBINARY_ODBC, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_CONVERT_VARCHAR_ODBC, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_CONVERT_WCHAR, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_CONVERT_WVARCHAR, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_CONVERT_WLONGVARCHAR, static_cast<uint32_t>(0));
@@ -1192,7 +1192,7 @@ void GetInfoCache::LoadDefaultsForMissingEntries() {
   SetDefaultIfMissing(info_, SQL_GROUP_BY,
                       static_cast<uint16_t>(SQL_GB_GROUP_BY_CONTAINS_SELECT));
   SetDefaultIfMissing(info_, SQL_IDENTIFIER_CASE_ODBC, static_cast<uint16_t>(SQL_IC_MIXED));
-  SetDefaultIfMissing(info_, SQL_IDENTIFIER_QUOTE_CHAR, "\"");
+  SetDefaultIfMissing(info_, SQL_IDENTIFIER_QUOTE_CHAR_ODBC, "\"");
   SetDefaultIfMissing(info_, SQL_INDEX_KEYWORDS, static_cast<uint32_t>(SQL_IK_NONE));
   SetDefaultIfMissing(
       info_, SQL_INFO_SCHEMA_VIEWS,
@@ -1201,7 +1201,7 @@ void GetInfoCache::LoadDefaultsForMissingEntries() {
                       static_cast<uint32_t>(SQL_IS_INSERT_LITERALS |
                                             SQL_IS_INSERT_SEARCHED | SQL_IS_SELECT_INTO));
   SetDefaultIfMissing(info_, SQL_INTEGRITY, "N");
-  SetDefaultIfMissing(info_, SQL_KEYWORDS, "");
+  SetDefaultIfMissing(info_, SQL_KEYWORDS_ODBC, "");
   SetDefaultIfMissing(info_, SQL_LIKE_ESCAPE_CLAUSE, "Y");
   SetDefaultIfMissing(info_, SQL_MAX_ASYNC_CONCURRENT_STATEMENTS,
                       static_cast<uint32_t>(0));
@@ -1209,37 +1209,37 @@ void GetInfoCache::LoadDefaultsForMissingEntries() {
   SetDefaultIfMissing(info_, SQL_MAX_CATALOG_NAME_LEN, static_cast<uint16_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_CHAR_LITERAL_LEN, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_COLUMN_NAME_LEN, static_cast<uint16_t>(0));
-  SetDefaultIfMissing(info_, SQL_MAX_COLUMNS_IN_GROUP_BY, static_cast<uint16_t>(0));
-  SetDefaultIfMissing(info_, SQL_MAX_COLUMNS_IN_INDEX, static_cast<uint16_t>(0));
-  SetDefaultIfMissing(info_, SQL_MAX_COLUMNS_IN_ORDER_BY, static_cast<uint16_t>(0));
-  SetDefaultIfMissing(info_, SQL_MAX_COLUMNS_IN_SELECT, static_cast<uint16_t>(0));
-  SetDefaultIfMissing(info_, SQL_MAX_COLUMNS_IN_TABLE, static_cast<uint16_t>(0));
+  SetDefaultIfMissing(info_, SQL_MAX_COLUMNS_IN_GROUP_BY_ODBC, static_cast<uint16_t>(0));
+  SetDefaultIfMissing(info_, SQL_MAX_COLUMNS_IN_INDEX_ODBC, static_cast<uint16_t>(0));
+  SetDefaultIfMissing(info_, SQL_MAX_COLUMNS_IN_ORDER_BY_ODBC, static_cast<uint16_t>(0));
+  SetDefaultIfMissing(info_, SQL_MAX_COLUMNS_IN_SELECT_ODBC, static_cast<uint16_t>(0));
+  SetDefaultIfMissing(info_, SQL_MAX_COLUMNS_IN_TABLE_ODBC, static_cast<uint16_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_CONCURRENT_ACTIVITIES, static_cast<uint16_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_CURSOR_NAME_LEN, static_cast<uint16_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_DRIVER_CONNECTIONS, static_cast<uint16_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_IDENTIFIER_LEN, static_cast<uint16_t>(65535));
   SetDefaultIfMissing(info_, SQL_MAX_INDEX_SIZE, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_PROCEDURE_NAME_LEN, static_cast<uint16_t>(0));
-  SetDefaultIfMissing(info_, SQL_MAX_ROW_SIZE, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_MAX_ROW_SIZE_ODBC, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_ROW_SIZE_INCLUDES_LONG, "N");
   SetDefaultIfMissing(info_, SQL_MAX_SCHEMA_NAME_LEN, static_cast<uint16_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_STATEMENT_LEN, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_TABLE_NAME_LEN, static_cast<uint16_t>(0));
-  SetDefaultIfMissing(info_, SQL_MAX_TABLES_IN_SELECT, static_cast<uint16_t>(0));
+  SetDefaultIfMissing(info_, SQL_MAX_TABLES_IN_SELECT_ODBC, static_cast<uint16_t>(0));
   SetDefaultIfMissing(info_, SQL_MAX_USER_NAME_LEN, static_cast<uint16_t>(0));
   SetDefaultIfMissing(info_, SQL_NON_NULLABLE_COLUMNS,
                       static_cast<uint16_t>(SQL_NNC_NULL));
   SetDefaultIfMissing(info_, SQL_NULL_COLLATION, static_cast<uint16_t>(SQL_NC_END));
-  SetDefaultIfMissing(info_, SQL_NUMERIC_FUNCTIONS, static_cast<uint32_t>(0));
+  SetDefaultIfMissing(info_, SQL_NUMERIC_FUNCTIONS_ODBC, static_cast<uint32_t>(0));
   SetDefaultIfMissing(info_, SQL_OJ_CAPABILITIES,
                       static_cast<uint32_t>(SQL_OJ_LEFT | SQL_OJ_RIGHT | SQL_OJ_FULL));
   SetDefaultIfMissing(info_, SQL_ORDER_BY_COLUMNS_IN_SELECT, "Y");
   SetDefaultIfMissing(info_, SQL_OUTER_JOINS, "N");
-  SetDefaultIfMissing(info_, SQL_PROCEDURE_TERM, "");
+  SetDefaultIfMissing(info_, SQL_PROCEDURE_TERM_ODBC, "");
   SetDefaultIfMissing(info_, SQL_PROCEDURES, "N");
-  SetDefaultIfMissing(info_, SQL_QUOTED_IDENTIFIER_CASE,
+  SetDefaultIfMissing(info_, SQL_QUOTED_IDENTIFIER_CASE_ODBC,
                       static_cast<uint16_t>(SQL_IC_SENSITIVE));
-  SetDefaultIfMissing(info_, SQL_SCHEMA_TERM, "schema");
+  SetDefaultIfMissing(info_, SQL_SCHEMA_TERM_ODBC, "schema");
   SetDefaultIfMissing(info_, SQL_SCHEMA_USAGE,
                       static_cast<uint32_t>(SQL_SU_DML_STATEMENTS));
   SetDefaultIfMissing(info_, SQL_SEARCH_PATTERN_ESCAPE, "\\");
@@ -1278,7 +1278,7 @@ void GetInfoCache::LoadDefaultsForMissingEntries() {
                                             SQL_SVE_COALESCE | SQL_SVE_NULLIF));
   SetDefaultIfMissing(info_, SQL_STANDARD_CLI_CONFORMANCE, static_cast<uint32_t>(0));
   SetDefaultIfMissing(
-      info_, SQL_STRING_FUNCTIONS,
+      info_, SQL_STRING_FUNCTIONS_ODBC,
       static_cast<uint32_t>(SQL_FN_STR_CONCAT | SQL_FN_STR_LCASE | SQL_FN_STR_LENGTH |
                             SQL_FN_STR_LTRIM | SQL_FN_STR_RTRIM | SQL_FN_STR_SPACE |
                             SQL_FN_STR_SUBSTRING | SQL_FN_STR_UCASE));
@@ -1286,7 +1286,7 @@ void GetInfoCache::LoadDefaultsForMissingEntries() {
       info_, SQL_SUBQUERIES,
       static_cast<uint32_t>(SQL_SQ_CORRELATED_SUBQUERIES | SQL_SQ_COMPARISON |
                             SQL_SQ_EXISTS | SQL_SQ_IN | SQL_SQ_QUANTIFIED));
-  SetDefaultIfMissing(info_, SQL_SYSTEM_FUNCTIONS,
+  SetDefaultIfMissing(info_, SQL_SYSTEM_FUNCTIONS_ODBC,
                       static_cast<uint32_t>(SQL_FN_SYS_IFNULL | SQL_FN_SYS_USERNAME));
   SetDefaultIfMissing(info_, SQL_TIMEDATE_ADD_INTERVALS,
                       static_cast<uint32_t>(
