@@ -15,6 +15,11 @@
 # specific language governing permissions and limitations
 # under the License.
 
+"Component: Documentation":
+- changed-files:
+  - any-glob-to-any-file:
+    - cpp/src/arrow/flight/sql/odbc/**/*
+
 "Component: C++":
 - changed-files:
   - any-glob-to-any-file:
@@ -67,8 +72,3 @@
     - cpp/src/parquet/**/*
     - r/R/parquet.*
     - ruby/red-parquet/**/*
-
-"Component: Documentation":
-- changed-files:
-  - any-glob-to-any-file:
-    - cpp/src/arrow/flight/sql/odbc/**/*
