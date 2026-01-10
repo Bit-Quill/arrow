@@ -28,50 +28,50 @@
 #   - any-glob-to-any-file:
 #     - cpp/**/*
 
-"Component: GLib":
-- changed-files:
-  - any-glob-to-any-file:
-    - c_glib/**/*
+# "Component: GLib":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - c_glib/**/*
 
-"Component: MATLAB":
-- changed-files:
-  - any-glob-to-any-file:
-    - matlab/**/*
+# "Component: MATLAB":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - matlab/**/*
 
-"Component: Python":
-- changed-files:
-  - any-glob-to-any-file:
-    - python/**/*
+# "Component: Python":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - python/**/*
 
-"Component: R":
-- changed-files:
-  - any-glob-to-any-file:
-    - r/**/*
+# "Component: R":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - r/**/*
 
-"Component: Ruby":
-- changed-files:
-  - any-glob-to-any-file:
-    - ruby/**/*
+# "Component: Ruby":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - ruby/**/*
 
-"Component: FlightRPC":
-- changed-files:
-  - any-glob-to-any-file:
-    - cpp/src/arrow/flight/**/*
-    - r/R/flight.*
-    - python/pyarrow/*flight.*
+# "Component: FlightRPC":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - cpp/src/arrow/flight/**/*
+#     - r/R/flight.*
+#     - python/pyarrow/*flight.*
 
-"Component: Gandiva":
-- changed-files:
-  - any-glob-to-any-file:
-    - c_glib/gandiva-glib/**/*
-    - cpp/src/gandiva/**/*
-    - python/pyarrow/gandiva.*
-    - ruby/red-gandiva/**/*
+# "Component: Gandiva":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - c_glib/gandiva-glib/**/*
+#     - cpp/src/gandiva/**/*
+#     - python/pyarrow/gandiva.*
+#     - ruby/red-gandiva/**/*
 
-"Component: Parquet":
-- changed-files:
-  - any-glob-to-any-file:
-    - c_glib/parquet-glib/**/*
-    - cpp/src/parquet/**/*
-    - r/R/parquet.*
-    - ruby/red-parquet/**/*
+# "Component: Parquet":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - c_glib/parquet-glib/**/*
+#     - cpp/src/parquet/**/*
+#     - r/R/parquet.*
+#     - ruby/red-parquet/**/*
