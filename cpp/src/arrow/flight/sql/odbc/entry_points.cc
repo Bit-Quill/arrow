@@ -19,7 +19,7 @@
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
 
-// -AL- test trigger ODBC-test label (documentation)
+// -AL- test trigger ODBC-test label (documentation) 
 
 #include <sql.h>
 #include <sqlext.h>
