@@ -15,10 +15,12 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"Component: Documentation":
+# Test with existing label
+"Component: ODBC":
 - changed-files:
   - any-glob-to-any-file:
-    - cpp/src/arrow/flight/sql/odbc/**/*
+    - cpp/src/arrow/flight/**/*
+    # - cpp/src/arrow/flight/sql/odbc/**
 
 "Component: C++":
 - changed-files:
