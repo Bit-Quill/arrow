@@ -15,67 +15,63 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"Component: C++":
-- changed-files:
-  - any-glob-to-any-file:
-    - cpp/**/*
-
-"Component: GLib":
-- changed-files:
-  - any-glob-to-any-file:
-    - c_glib/**/*
-
-"Component: MATLAB":
-- changed-files:
-  - any-glob-to-any-file:
-    - matlab/**/*
-
-"Component: Python":
-- changed-files:
-  - any-glob-to-any-file:
-    - python/**/*
-
-"Component: R":
-- changed-files:
-  - any-glob-to-any-file:
-    - r/**/*
-
-"Component: Ruby":
-- changed-files:
-  - any-glob-to-any-file:
-    - ruby/**/*
-
-"Component: FlightRPC":
-- changed-files:
-  - any-glob-to-any-file:
-    - cpp/src/arrow/flight/**/*
-    - r/R/flight.*
-    - python/pyarrow/*flight.*
-
-"Component: Gandiva":
-- changed-files:
-  - any-glob-to-any-file:
-    - c_glib/gandiva-glib/**/*
-    - cpp/src/gandiva/**/*
-    - python/pyarrow/gandiva.*
-    - ruby/red-gandiva/**/*
-
-"Component: Parquet":
-- changed-files:
-  - any-glob-to-any-file:
-    - c_glib/parquet-glib/**/*
-    - cpp/src/parquet/**/*
-    - r/R/parquet.*
-    - ruby/red-parquet/**/*
-
-"Component: Documentation":
-- changed-files:
-  - any-glob-to-any-file:
-    - docs/**/*
-    - "**/*.{md, rst, Rmd, Rd}"
-
+# Test with existing label
+# "Component: ODBC":
 "CI: Extra: C++":
 - changed-files:
   - any-glob-to-any-file:
-    - .github/workflows/cpp_extra.yml
-    - cpp/src/arrow/flight/sql/odbc/**/*
+    - cpp/src/arrow/flight/**/*
+    # - cpp/src/arrow/flight/sql/odbc/**
+
+# "Component: C++":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - cpp/**/*
+
+# "Component: GLib":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - c_glib/**/*
+
+# "Component: MATLAB":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - matlab/**/*
+
+# "Component: Python":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - python/**/*
+
+# "Component: R":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - r/**/*
+
+# "Component: Ruby":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - ruby/**/*
+
+# "Component: FlightRPC":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - cpp/src/arrow/flight/**/*
+#     - r/R/flight.*
+#     - python/pyarrow/*flight.*
+
+# "Component: Gandiva":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - c_glib/gandiva-glib/**/*
+#     - cpp/src/gandiva/**/*
+#     - python/pyarrow/gandiva.*
+#     - ruby/red-gandiva/**/*
+
+# "Component: Parquet":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - c_glib/parquet-glib/**/*
+#     - cpp/src/parquet/**/*
+#     - r/R/parquet.*
+#     - ruby/red-parquet/**/*

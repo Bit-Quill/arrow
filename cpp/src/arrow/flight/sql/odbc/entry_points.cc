@@ -18,6 +18,11 @@
 // platform.h includes windows.h, so it needs to be included first
 #include "arrow/flight/sql/odbc/odbc_impl/platform.h"
 
+
+// -AL- test trigger ODBC-test label (documentation)
+// new line
+// NEW LINE 2
+
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
