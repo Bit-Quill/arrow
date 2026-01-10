@@ -20,6 +20,7 @@
 
 
 // -AL- test trigger ODBC-test label (documentation)
+// new line
 
 #include <sql.h>
 #include <sqlext.h>
