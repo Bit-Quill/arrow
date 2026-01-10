@@ -21,6 +21,7 @@
 
 // -AL- test trigger ODBC-test label (documentation)
 // new line
+// NEW LINE 2
 
 #include <sql.h>
 #include <sqlext.h>
