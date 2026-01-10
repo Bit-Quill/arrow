@@ -16,16 +16,17 @@
 # under the License.
 
 # Test with existing label
-"Component: ODBC":
+# "Component: ODBC":
+"CI: Extra: C++":
 - changed-files:
   - any-glob-to-any-file:
     - cpp/src/arrow/flight/**/*
     # - cpp/src/arrow/flight/sql/odbc/**
 
-"Component: C++":
-- changed-files:
-  - any-glob-to-any-file:
-    - cpp/**/*
+# "Component: C++":
+# - changed-files:
+#   - any-glob-to-any-file:
+#     - cpp/**/*
 
 "Component: GLib":
 - changed-files:
