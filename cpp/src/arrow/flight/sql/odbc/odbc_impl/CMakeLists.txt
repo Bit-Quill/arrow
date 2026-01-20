@@ -135,19 +135,6 @@ if(WIN32)
                          system_dsn.h)
 endif()
 
-if(APPLE)
-  target_include_directories(arrow_odbc_spi_impl SYSTEM BEFORE PUBLIC ${ODBC_INCLUDE_DIR})
-  target_link_libraries(arrow_odbc_spi_impl
-                        PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
-                               iodbc)
-else()
-  find_package(ODBC REQUIRED)
-  target_include_directories(arrow_odbc_spi_impl PUBLIC ${ODBC_INCLUDE_DIR})
-  target_link_libraries(arrow_odbc_spi_impl
-                        PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
-                               ${ODBCINST})
-endif()
-
 # if(WIN32)
 #   target_link_libraries(arrow_odbc_spi_impl
 #                         PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
@@ -178,6 +165,29 @@ endif()
 #                                RapidJSON)
 # endif()
 
+set(ODBC_SPI_IMPL_SHARED_LINK_LIBS             
+            arrow_flight_sql_shared
+            arrow_compute_shared
+            Boost::locale
+            Boost::headers
+            RapidJSON)
+
+set(ODBC_SPI_IMPL_STATIC_LINK_LIBS             
+            arrow_flight_sql_static
+            arrow_compute_static
+            Boost::locale
+            Boost::headers
+            RapidJSON)
+
+# if(APPLE)
+#   list(APPEND ODBC_SPI_IMPL_SHARED_LINK_LIBS iodbc)
+#   list(APPEND ODBC_SPI_IMPL_STATIC_LINK_LIBS iodbc)
+# else()
+#   find_package(ODBC REQUIRED)
+#   list(APPEND ODBC_SPI_IMPL_SHARED_LINK_LIBS ${ODBCINST})
+#   list(APPEND ODBC_SPI_IMPL_STATIC_LINK_LIBS ${ODBCINST})
+# endif()
+
 # -AL- TODO: if below works, need to refactor to add
 # ${ODBC_SPI_IMPL_STATIC_LINK_LIBS} ${ODBC_SPI_IMPL_SHARED_LINK_LIBS}
 add_arrow_lib(arrow_odbc_spi_impl
@@ -186,22 +196,28 @@ add_arrow_lib(arrow_odbc_spi_impl
             DEFINITIONS
             UNICODE
             SHARED_LINK_LIBS
-            arrow_flight_sql_shared
-            arrow_compute_shared
-            Boost::locale
-            Boost::headers
-            RapidJSON
+            ${ODBC_SPI_IMPL_SHARED_LINK_LIBS}
             STATIC_LINK_LIBS
-            arrow_flight_sql_static
-            arrow_compute_static
-            Boost::locale
-            Boost::headers
-            RapidJSON
+            ${ODBC_SPI_IMPL_STATIC_LINK_LIBS}
             # PUBLIC_INCLUDES #-AL- turns out Arrow doesn't have a `PUBLIC_INCLUDES` var
             # include
             # include/odbc_impl
             # ${CMAKE_CURRENT_LIST_DIR}
             )                                 
+
+# if(APPLE)
+#   #-AL- temp comment out
+#   target_include_directories(arrow_odbc_spi_impl SYSTEM BEFORE PUBLIC ${ODBC_INCLUDE_DIR})
+#   # target_link_libraries(arrow_odbc_spi_impl
+#   #                       PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
+#   #                              iodbc)
+# else()
+#   # find_package(ODBC REQUIRED)
+#   target_include_directories(arrow_odbc_spi_impl PUBLIC ${ODBC_INCLUDE_DIR})
+#   # target_link_libraries(arrow_odbc_spi_impl
+#   #                       PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
+#   #                              ${ODBCINST})
+# endif()
 
 # CLI
 add_executable(arrow_odbc_spi_impl_cli main.cc)

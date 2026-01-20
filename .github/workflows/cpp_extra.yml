@@ -357,6 +357,8 @@ jobs:
       ARROW_BUILD_TESTS: ON
       ARROW_FLIGHT_SQL_ODBC: ON
       ARROW_HOME: /tmp/local
+      ARROW_DEPENDENCY_USE_SHARED: OFF
+      ARROW_DEPENDENCY_SOURCE: BUNDLED 
     steps:
       - name: Checkout Arrow
         uses: actions/checkout@v6.0.0

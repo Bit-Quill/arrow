@@ -40,7 +40,7 @@ endif()
 message(STATUS "-AL- random msg in odbc cmake")
 
 add_subdirectory(odbc_impl)
-add_subdirectory(tests) # -AL- TODO enable after `odbc_impl` works and ODBC driver still links statically.
+add_subdirectory(tests)
 
 arrow_install_all_headers("arrow/flight/sql/odbc")
 
@@ -122,9 +122,7 @@ else()
                 STATIC_LINK_LIBS
                 ODBC::ODBC
                 ${ODBCINST}
-                # -AL- below line removed = driver not loaded?
-                # SHARED_PRIVATE_LINK_LIBS
-                SHARED_LINK_LIBS #-AL- make odbc calls exported too?
+                SHARED_LINK_LIBS #-AL- make odbc calls exported too
                 arrow_odbc_spi_impl_static)
 endif()
 
