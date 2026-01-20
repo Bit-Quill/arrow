@@ -469,6 +469,12 @@ TYPED_TEST(ConnectionTest, TestConnect) {
   // Verifies connect and disconnect works on its own
 }
 
+// -AL- dummy test without using ODBC passed without double registration issue
+TEST(DummyTest, AlinaDummyTest) {
+  bool boolvar = true;
+  EXPECT_EQ(boolvar, true);
+}
+
 TYPED_TEST(ConnectionTest, TestSQLAllocFreeStmt) {
   SQLHSTMT statement;
 
