@@ -462,6 +462,7 @@ jobs:
 
       # -AL- reusing code from package Linux
       - name: Wait for creating GitHub Release
+        shell: bash
         if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -473,6 +474,7 @@ jobs:
             ${GITHUB_REF_NAME} \
             release_candidate.yml
       - name: Upload the artifacts to GitHub Release
+        shell: bash
         if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
