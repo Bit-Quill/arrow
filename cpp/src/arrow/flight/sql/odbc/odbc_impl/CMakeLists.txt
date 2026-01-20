@@ -200,31 +200,17 @@ target_link_libraries(arrow_odbc_spi_impl_cli arrow_odbc_spi_impl_shared)
 
 # Unit tests
 
-# -AL- todo create a new var for `EXTRA_LINK_LIBS` (ODBC_SPI_IMPL_LINK_LIBS) to hold the libraries.
-# Append `${ARROW_TEST_LINK_LIBS}` for macOS only. Then make the 2 libs the same.
+# -AL- add comment
+# On Windows, dynamic linking ODBC is supported.
+# On unix systems, static linking ODBC is supported, thus the test linking is different.
 
-if(WIN32)
-add_arrow_test(odbc_spi_impl_test
-               SOURCES
-               accessors/boolean_array_accessor_test.cc
-               accessors/binary_array_accessor_test.cc
-               accessors/date_array_accessor_test.cc
-               accessors/decimal_array_accessor_test.cc
-               accessors/primitive_array_accessor_test.cc
-               accessors/string_array_accessor_test.cc
-               accessors/time_array_accessor_test.cc
-               accessors/timestamp_array_accessor_test.cc
-               flight_sql_connection_test.cc
-               flight_sql_stream_chunk_buffer_test.cc
-               parse_table_types_test.cc
-               json_converter_test.cc
-               record_batch_transformer_test.cc
-               util_test.cc
-               EXTRA_LINK_LIBS
-               arrow_odbc_spi_impl_shared
+# -AL- todo: test this on Windows.
+set(ODBC_SPI_IMPL_TEST_LINK_LIBS arrow_odbc_spi_impl_shared
                arrow_flight_testing_shared)
-else()
-# Unix
+
+if(APPLE)
+  list(APPEND ODBC_SPI_IMPL_TEST_LINK_LIBS ${ARROW_TEST_LINK_LIBS})
+endif()
 
 add_arrow_test(odbc_spi_impl_test
                SOURCES
@@ -243,8 +229,4 @@ add_arrow_test(odbc_spi_impl_test
                record_batch_transformer_test.cc
                util_test.cc
                EXTRA_LINK_LIBS
-               arrow_odbc_spi_impl_shared
-              #  arrow_odbc_spi_impl_static # -AL- building lib statically breaks the build.
-              arrow_flight_testing_shared
-              ${ARROW_TEST_LINK_LIBS})
-endif()
+               ${ODBC_SPI_IMPL_TEST_LINK_LIBS})

@@ -15,8 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# add_custom_target(tests) # -AL- I don't think this does anything.
-
 if(WIN32)
   include_directories(${ODBC_INCLUDE_DIRS})
 else()
@@ -63,7 +61,7 @@ set(ARROW_FLIGHT_SQL_ODBC_TEST_SRCS
 
 # -AL- todo write comment:
 # On Windows, dynamic linking ODBC is supported.
-# On unix systems, static linking ODBC is supported.
+# On unix systems, static linking ODBC is supported, thus the test linking is different.
 if(WIN32)
 add_arrow_test(flight_sql_odbc_test
                SOURCES
