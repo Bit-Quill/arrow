@@ -123,7 +123,8 @@ else()
                 ODBC::ODBC
                 ${ODBCINST}
                 # -AL- below line removed = driver not loaded?
-                SHARED_PRIVATE_LINK_LIBS
+                # SHARED_PRIVATE_LINK_LIBS
+                SHARED_LINK_LIBS #-AL- make odbc calls exported too?
                 arrow_odbc_spi_impl_static)
 endif()
 
