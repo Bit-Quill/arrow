@@ -347,6 +347,8 @@ jobs:
     timeout-minutes: 240
     permissions:
       packages: write
+      # Upload to GitHub Release
+      contents: write
     env:
       ARROW_BUILD_SHARED: ON
       ARROW_BUILD_STATIC: OFF
@@ -470,6 +472,7 @@ jobs:
         # -AL- `--branch "${TAG}"` checks for branches triggered by tag
         # -AL- ${GITHUB_REF_NAME}: tag name such as 23.0.0
         run: |
+          echo "-AL-: GITHUB_REF_NAME: ${GITHUB_REF_NAME}"
           dev/release/utils-watch-gh-workflow.sh \
             ${GITHUB_REF_NAME} \
             release_candidate.yml
@@ -479,6 +482,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          echo "-AL-: GITHUB_REF_NAME: ${GITHUB_REF_NAME}"
           gh release upload ${GITHUB_REF_NAME} \
             --clobber \
             "Apache Arrow Flight SQL ODBC-*-win64.msi"
