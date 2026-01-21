@@ -347,6 +347,8 @@ jobs:
     timeout-minutes: 240
     permissions:
       packages: write
+      # Upload to GitHub Release
+      contents: write
     env:
       ARROW_BUILD_SHARED: ON
       ARROW_BUILD_STATIC: OFF
@@ -451,12 +453,33 @@ jobs:
           wix --version
           cd build/cpp
           cpack
+          cd ../..
+          Move-Item -Path "build/cpp/Apache Arrow Flight SQL ODBC-*-win64.msi" -Destination "."
       - name: Upload the artifacts to the job
         uses: actions/upload-artifact@v6
         with:
           name: flight-sql-odbc-msi-installer
-          path: build/cpp/Apache Arrow Flight SQL ODBC-*-win64.msi
+          path: Apache Arrow Flight SQL ODBC-*-win64.msi
           if-no-files-found: error
+      # Upload ODBC as GitHub release if release candidate tag is used
+      - name: Wait for creating GitHub Release
+        shell: bash
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dev/release/utils-watch-gh-workflow.sh \
+            ${GITHUB_REF_NAME} \
+            release_candidate.yml
+      - name: Upload the artifacts to GitHub Release
+        shell: bash
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${GITHUB_REF_NAME} \
+            --clobber \
+            "Apache Arrow Flight SQL ODBC-*-win64.msi"
       # Upload ODBC installer as nightly release in scheduled runs
       - name: Prepare ODBC installer for sync
         if: github.event_name == 'schedule'
