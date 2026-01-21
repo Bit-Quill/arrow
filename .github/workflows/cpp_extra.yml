@@ -358,7 +358,8 @@ jobs:
       ARROW_FLIGHT_SQL_ODBC: ON
       ARROW_HOME: /tmp/local
       ARROW_DEPENDENCY_USE_SHARED: OFF
-      ARROW_DEPENDENCY_SOURCE: BUNDLED 
+      ARROW_DEPENDENCY_SOURCE: BUNDLED
+      CMAKE_CXX_STANDARD: "20"
     steps:
       - name: Checkout Arrow
         uses: actions/checkout@v6.0.0
@@ -370,7 +371,7 @@ jobs:
           # brew install libiodbc
           # -AL- absl header collision on mac
           brew bundle --file=cpp/Brewfile
-          brew uninstall absl
+          # brew uninstall absl
       - name: Setup ccache
         run: |
           ci/scripts/ccache_setup.sh
@@ -432,6 +433,7 @@ jobs:
       CMAKE_INSTALL_PREFIX: /usr
       VCPKG_BINARY_SOURCES: 'clear;nugettimeout,600;nuget,GitHub,readwrite'
       VCPKG_DEFAULT_TRIPLET: x64-windows
+      CMAKE_CXX_STANDARD: "20"
     steps:
       - name: Disable Crash Dialogs
         run: |
