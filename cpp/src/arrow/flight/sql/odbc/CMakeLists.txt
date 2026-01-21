@@ -19,6 +19,7 @@
 # GH-44792: Arrow will switch to C++ 20
 set(CMAKE_CXX_STANDARD 20)
 
+# add_custom_target(arrow_flight_sql_odbc) # -AL- attempt to create optional arrow_flight_sql_odbc.lib
 
 if(APPLE)
   # CMAKE_FIND_LIBRARY_SUFFIXES.
@@ -94,6 +95,7 @@ if(WIN32)
                 ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
                 SHARED_LINK_LIBS
                 arrow_flight_sql_shared
+                arrow_odbc_spi_impl
                 SHARED_INSTALL_INTERFACE_LIBS
                 ArrowFlight::arrow_flight_sql_shared
                 STATIC_LINK_LIBS
@@ -102,10 +104,10 @@ if(WIN32)
                 ArrowFlight::arrow_flight_sql_static
                 SHARED_PRIVATE_LINK_LIBS
                 ODBC::ODBC
-                ${ODBCINST}
-                arrow_odbc_spi_impl_shared)
+                ${ODBCINST})
 else()
   # Unix
+  # -AL- add comment for static build. Static build is recommended in unix system
   add_arrow_lib(arrow_flight_sql_odbc
                 CMAKE_PACKAGE_NAME
                 ArrowFlightSqlOdbc
@@ -123,7 +125,7 @@ else()
                 ODBC::ODBC
                 ${ODBCINST}
                 SHARED_LINK_LIBS #-AL- make odbc calls exported too
-                arrow_odbc_spi_impl_static)
+                arrow_odbc_spi_impl)
 endif()
 
 foreach(LIB_TARGET ${ARROW_FLIGHT_SQL_ODBC_LIBRARIES})

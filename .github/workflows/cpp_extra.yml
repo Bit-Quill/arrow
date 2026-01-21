@@ -478,8 +478,12 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ${{ steps.ccache-info.outputs.cache-dir }}
-          key: cpp-odbc-ccache-windows-x64-${{ hashFiles('cpp/**') }}
-          restore-keys: cpp-odbc-ccache-windows-x64-
+          key: cpp-odbc-ccache-windows-x64-${{ env.CACHE_VERSION }}-${{ hashFiles('cpp/**') }}
+          restore-keys: cpp-odbc-ccache-windows-x64-${{ env.CACHE_VERSION }}-
+        env:
+          # -AL- if needed, can invalidate current cache after resolving Windows build. Can remove this code in PR if not needed
+          # We can invalidate the current cache by updating this.
+          CACHE_VERSION: "2026-01-21"
       - name: Checkout vcpkg
         uses: actions/checkout@v6
         with:

@@ -221,7 +221,7 @@ function(ADD_ARROW_LIB LIB_NAME)
   endif()
 
   if("${LIB_NAME}" MATCHES "odbc")
-    message(STATUS "-AL- LIB_NAME contains odbc (arrow flight sql odbc)")
+    message(STATUS "-AL- LIB_NAME contains odbc (arrow flight sql odbc): ${LIB_NAME}")
   endif()
 
   if(ARG_OUTPUTS)

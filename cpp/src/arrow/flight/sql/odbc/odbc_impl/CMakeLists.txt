@@ -15,10 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# -AL- TODO try to  create a arrow_odbc_spi_impl_static/shared static build AND shared build.
-# The ODBC driver can still link to static build as before on unix, and test can link to the shared build.
-
-set(ARROW_ODBC_SPI_IMPL_SOURCES accessors/binary_array_accessor.cc
+add_library(arrow_odbc_spi_impl STATIC
+            accessors/binary_array_accessor.cc
             accessors/binary_array_accessor.h
             accessors/boolean_array_accessor.cc
             accessors/boolean_array_accessor.h
@@ -113,16 +111,13 @@ set(ARROW_ODBC_SPI_IMPL_SOURCES accessors/binary_array_accessor.cc
             type_utilities.h
             util.cc
             util.h)
-
-# add_library(arrow_odbc_spi_impl STATIC
-#             ${ARROW_ODBC_SPI_IMPL_SOURCES})
-# target_compile_definitions(arrow_odbc_spi_impl PUBLIC UNICODE)
-# target_include_directories(arrow_odbc_spi_impl PUBLIC include include/odbc_impl)
-# target_include_directories(arrow_odbc_spi_impl PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_compile_definitions(arrow_odbc_spi_impl PUBLIC UNICODE)
+target_include_directories(arrow_odbc_spi_impl PUBLIC include include/odbc_impl)
+target_include_directories(arrow_odbc_spi_impl PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 if(WIN32)
-  list(APPEND ARROW_ODBC_SPI_IMPL_SOURCES
-               ui/add_property_window.cc
+  target_sources(arrow_odbc_spi_impl
+                 PRIVATE ui/add_property_window.cc
                          ui/add_property_window.h
                          ui/custom_window.cc
                          ui/custom_window.h
@@ -135,111 +130,27 @@ if(WIN32)
                          system_dsn.h)
 endif()
 
-# if(WIN32)
-#   target_link_libraries(arrow_odbc_spi_impl
-#                         PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
-#                                ${ODBCINST})
-# else()
-#   # unix
-
-#   # find_package(Arrow REQUIRED) #-AL- tried this line for static linking, but it doesn't work because when we build
-#   # `arrow_odbc_spi_impl`, we are still in the process of building the Arrow library
-
-#   # message(STATUS "-AL- 2 random msg in odbc_impl 2 ")
-#   # find_dependency(Arrow CONFIG) # -AL- new issue: Could NOT find Arrow (missing: Arrow_DIR) error
-#   # message(STATUS "-AL- 3 random msg in odbc_impl 3")
-#   # find_dependency(ArrowCompute CONFIG)
-
-#   # -AL- if I can link arrow_odbc_spi_impl with static libs, I will begin to understand how it works.
-#   # (it is also possible that both ODBC and `flightsql-odbc` are needed to be statically linking to work)
-#   target_link_libraries(arrow_odbc_spi_impl
-#                         # -AL- shared libs are required for linking to work properly.
-#                         # -AL- used to switch to `_static` when shared libraries are turned off.
-#                         # Requires `find_package(Arrow REQUIRED)` so it won't work.
-#                         #  PUBLIC Arrow::arrow_flight_sql_static ArrowCompute::arrow_compute_static
-#                         # -AL- below is the format used by ARROW_EXAMPLE_LINK_LIBS example.
-#                         PUBLIC arrow_flight_sql_static
-#                                arrow_compute_static
-#                                Boost::locale
-#                                Boost::headers
-#                                RapidJSON)
-# endif()
-
-set(ODBC_SPI_IMPL_SHARED_LINK_LIBS             
-            arrow_flight_sql_shared
-            arrow_compute_shared
-            Boost::locale
-            Boost::headers
-            RapidJSON)
-
-set(ODBC_SPI_IMPL_STATIC_LINK_LIBS             
-            arrow_flight_sql_static
-            arrow_compute_static
-            Boost::locale
-            Boost::headers
-            RapidJSON)
-
-# if(APPLE)
-#   list(APPEND ODBC_SPI_IMPL_SHARED_LINK_LIBS iodbc)
-#   list(APPEND ODBC_SPI_IMPL_STATIC_LINK_LIBS iodbc)
-# else()
-#   find_package(ODBC REQUIRED)
-#   list(APPEND ODBC_SPI_IMPL_SHARED_LINK_LIBS ${ODBCINST})
-#   list(APPEND ODBC_SPI_IMPL_STATIC_LINK_LIBS ${ODBCINST})
-# endif()
-
-# -AL- TODO: if below works, need to refactor to add
-# ${ODBC_SPI_IMPL_STATIC_LINK_LIBS} ${ODBC_SPI_IMPL_SHARED_LINK_LIBS}
-add_arrow_lib(arrow_odbc_spi_impl
-            SOURCES
-            ${ARROW_ODBC_SPI_IMPL_SOURCES}
-            DEFINITIONS
-            UNICODE
-            SHARED_LINK_LIBS
-            ${ODBC_SPI_IMPL_SHARED_LINK_LIBS}
-            STATIC_LINK_LIBS
-            ${ODBC_SPI_IMPL_STATIC_LINK_LIBS}
-            # PUBLIC_INCLUDES #-AL- turns out Arrow doesn't have a `PUBLIC_INCLUDES` var
-            # include
-            # include/odbc_impl
-            # ${CMAKE_CURRENT_LIST_DIR}
-            )                                 
-
-# if(APPLE)
-#   #-AL- temp comment out
-#   target_include_directories(arrow_odbc_spi_impl SYSTEM BEFORE PUBLIC ${ODBC_INCLUDE_DIR})
-#   # target_link_libraries(arrow_odbc_spi_impl
-#   #                       PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
-#   #                              iodbc)
-# else()
-#   # find_package(ODBC REQUIRED)
-#   target_include_directories(arrow_odbc_spi_impl PUBLIC ${ODBC_INCLUDE_DIR})
-#   # target_link_libraries(arrow_odbc_spi_impl
-#   #                       PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
-#   #                              ${ODBCINST})
-# endif()
+if(APPLE)
+  target_include_directories(arrow_odbc_spi_impl SYSTEM BEFORE PUBLIC ${ODBC_INCLUDE_DIR})
+  target_link_libraries(arrow_odbc_spi_impl
+                        PUBLIC arrow_flight_sql_static arrow_compute_static Boost::locale
+                               iodbc)
+else()
+  find_package(ODBC REQUIRED)
+  target_include_directories(arrow_odbc_spi_impl PUBLIC ${ODBC_INCLUDE_DIR})
+  target_link_libraries(arrow_odbc_spi_impl
+                        PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
+                               ${ODBCINST})
+endif()
 
 # CLI
 add_executable(arrow_odbc_spi_impl_cli main.cc)
 set_target_properties(arrow_odbc_spi_impl_cli
                       PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                                  ${CMAKE_BINARY_DIR}/$<CONFIG>/bin)
-target_link_libraries(arrow_odbc_spi_impl_cli arrow_odbc_spi_impl_shared)
+target_link_libraries(arrow_odbc_spi_impl_cli arrow_odbc_spi_impl)
 
 # Unit tests
-
-# -AL- add comment
-# On Windows, dynamic linking ODBC is supported.
-# On unix systems, static linking ODBC is supported, thus the test linking is different.
-
-# -AL- todo: test this on Windows.
-set(ODBC_SPI_IMPL_TEST_LINK_LIBS arrow_odbc_spi_impl_shared
-               arrow_flight_testing_shared)
-
-if(APPLE)
-  list(APPEND ODBC_SPI_IMPL_TEST_LINK_LIBS ${ARROW_TEST_LINK_LIBS})
-endif()
-
 add_arrow_test(odbc_spi_impl_test
                SOURCES
                accessors/boolean_array_accessor_test.cc
@@ -257,4 +168,5 @@ add_arrow_test(odbc_spi_impl_test
                record_batch_transformer_test.cc
                util_test.cc
                EXTRA_LINK_LIBS
-               ${ODBC_SPI_IMPL_TEST_LINK_LIBS})
+               arrow_odbc_spi_impl
+               arrow_flight_testing_shared)

@@ -67,11 +67,15 @@ add_arrow_test(flight_sql_odbc_test
                SOURCES
                ${ARROW_FLIGHT_SQL_ODBC_TEST_SRCS}
                ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
+               DEFINITIONS
+               UNICODE
                EXTRA_LINK_LIBS
                ${ODBC_LIBRARIES}
                ${ODBCINST}
                ${SQLite3_LIBRARIES}
-               arrow_odbc_spi_impl_shared)
+               ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS}
+               # arrow_odbc_spi_impl_shared # -AL-
+)
 else()
   # unix
 add_arrow_test(flight_sql_odbc_test
