@@ -368,10 +368,18 @@ jobs:
           submodules: recursive
       - name: Install Dependencies
         run: |
-          # brew install libiodbc
-          # -AL- absl header collision on mac
           brew bundle --file=cpp/Brewfile
-          # brew uninstall absl
+          # We want to use bundled RE2 for static linking. If
+          # Homebrew's RE2 is installed, its header file may be used.
+          # We uninstall Homebrew's RE2 to ensure using bundled RE2.
+          brew uninstall grpc || : # gRPC depends on RE2
+          brew uninstall grpc@1.54 || : # gRPC 1.54 may be installed too
+          brew uninstall re2
+          # We want to use bundled Protobuf for static linking. If
+          # Homebrew's Protobuf is installed, its library file may be
+          # used on test  We uninstall Homebrew's Protobuf to ensure using
+          # bundled Protobuf.
+          brew uninstall protobuf
       - name: Setup ccache
         run: |
           ci/scripts/ccache_setup.sh
@@ -399,11 +407,6 @@ jobs:
           LIBIODBC_DIR="$(brew --cellar libiodbc)/$(brew list --versions libiodbc | awk '{print $2}')"
           export ODBC_INCLUDE_DIR=$LIBIODBC_DIR/include
           export CXXFLAGS="$CXXFLAGS -I$ODBC_INCLUDE_DIR"
-          
-          if [ "${{ matrix.macos-version }}" = "15-intel" ]; then
-            # -AL- fix absl issue on Intel mac
-            rm -rf /usr/local/include/absl
-          fi
           ci/scripts/cpp_build.sh $(pwd) $(pwd)/build
       - name: Test
         shell: bash
