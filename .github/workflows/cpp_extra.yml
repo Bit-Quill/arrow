@@ -399,6 +399,11 @@ jobs:
           LIBIODBC_DIR="$(brew --cellar libiodbc)/$(brew list --versions libiodbc | awk '{print $2}')"
           export ODBC_INCLUDE_DIR=$LIBIODBC_DIR/include
           export CXXFLAGS="$CXXFLAGS -I$ODBC_INCLUDE_DIR"
+          
+          if [ "${{ matrix.macos-version }}" = "15-intel" ]; then
+            # -AL- fix absl issue on Intel mac
+            rm -rf /usr/local/include/absl
+          fi
           ci/scripts/cpp_build.sh $(pwd) $(pwd)/build
       - name: Test
         shell: bash
