@@ -367,7 +367,8 @@ jobs:
           submodules: recursive
       - name: Install Dependencies
         run: |
-          brew bundle --file=cpp/Brewfile
+          brew install libiodbc
+          # brew bundle --file=cpp/Brewfile
       - name: Setup ccache
         run: |
           ci/scripts/ccache_setup.sh
