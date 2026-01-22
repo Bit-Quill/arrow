@@ -380,6 +380,8 @@ jobs:
           # used on test  We uninstall Homebrew's Protobuf to ensure using
           # bundled Protobuf.
           brew uninstall protobuf
+          # We want to use bundled Boost for static linking.
+          brew uninstall boost
       - name: Setup ccache
         run: |
           ci/scripts/ccache_setup.sh
