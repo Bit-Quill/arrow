@@ -64,8 +64,8 @@ size_t CaseInsensitiveHash::operator()(const std::string& key) const {
   return std::hash<std::string>{}(upper_string);
 }
 
-bool CaseInsensitiveEqual::operator()(std::string_view lhs,
-                                      std::string_view rhs) const {
+bool CaseInsensitiveEqual::operator()(std::string& lhs,
+                                      std::string& rhs) const {
   if (lhs.size() != rhs.size()) return false;
   return strcasecmp(std::string(lhs).c_str(), std::string(rhs).c_str()) == 0;
 }
