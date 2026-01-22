@@ -485,7 +485,7 @@ jobs:
           echo "-AL-: GITHUB_REF_NAME: ${GITHUB_REF_NAME}"
           gh release upload ${GITHUB_REF_NAME} \
             --clobber \
-            "Apache Arrow Flight SQL ODBC-*-win64.msi"
+            Apache\ Arrow\ Flight\ SQL\ ODBC-*-win64.msi
       # -AL- end of re-used code from package Linux
 
       # `test-gh-48872-odbc-nighly-release` tests GitHub Release CI 
