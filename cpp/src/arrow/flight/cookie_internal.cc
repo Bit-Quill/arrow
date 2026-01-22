@@ -64,10 +64,9 @@ size_t CaseInsensitiveHash::operator()(const std::string& key) const {
   return std::hash<std::string>{}(upper_string);
 }
 
-bool CaseInsensitiveEqual::operator()(std::string& lhs,
-                                      std::string& rhs) const {
-  if (lhs.size() != rhs.size()) return false;
-  return strcasecmp(std::string(lhs).c_str(), std::string(rhs).c_str()) == 0;
+bool CaseInsensitiveEqual::operator()(const std::string& lhs,
+                                      const std::string& rhs) const {
+  return strcasecmp(lhs.c_str(), rhs.c_str()) == 0;
 }
 
 Cookie Cookie::Parse(std::string_view cookie_header_value) {
