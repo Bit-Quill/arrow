@@ -486,8 +486,9 @@ jobs:
   odbc-release:
     needs: odbc
     name: ODBC release
-    runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' && github.repository == 'apache/arrow'
+    runs-on: windows-2022
+    # -AL- todo next: add tag filter"apache-arrow-*-rc*"
+    if: github.ref_type == 'tag' # && github.repository == 'apache/arrow'
     steps:
       - name: Download the artifacts
         uses: actions/download-artifact@v7
@@ -498,9 +499,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+          #   -AL- temp step to check MSI path
+      - name: Check msi path -AL-
+        run: |
+          tree
       # Upload ODBC as GitHub release if release candidate tag is used
       - name: Wait for creating GitHub Release
-        if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -508,7 +512,6 @@ jobs:
             ${GITHUB_REF_NAME} \
             release_candidate.yml
       - name: Upload the artifacts to GitHub Release
-        if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
