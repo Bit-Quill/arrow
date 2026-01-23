@@ -461,25 +461,6 @@ jobs:
           name: flight-sql-odbc-msi-installer
           path: Apache Arrow Flight SQL ODBC-*-win64.msi
           if-no-files-found: error
-      # Upload ODBC as GitHub release if release candidate tag is used
-      - name: Wait for creating GitHub Release
-        shell: bash
-        if: github.ref_type == 'tag'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          dev/release/utils-watch-gh-workflow.sh \
-            ${GITHUB_REF_NAME} \
-            release_candidate.yml
-      - name: Upload the artifacts to GitHub Release
-        shell: bash
-        if: github.ref_type == 'tag'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload ${GITHUB_REF_NAME} \
-            --clobber \
-            Apache\ Arrow\ Flight\ SQL\ ODBC-*-win64.msi
       # Upload ODBC installer as nightly release in scheduled runs
       - name: Prepare ODBC installer for sync
         if: github.event_name == 'schedule'
@@ -500,6 +481,40 @@ jobs:
           remote_user: ${{ secrets.NIGHTLIES_RSYNC_USER }}
           remote_key: ${{ secrets.NIGHTLIES_RSYNC_KEY }}
           remote_host_key: ${{ secrets.NIGHTLIES_RSYNC_HOST_KEY }}
+
+# -AL- draft code for GitHub release
+  odbc-release:
+    needs: odbc
+    name: ODBC release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' && github.repository == 'apache/arrow'
+    steps:
+      - name: Download the artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: flight-sql-odbc-msi-installer
+      - name: Checkout Arrow
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      # Upload ODBC as GitHub release if release candidate tag is used
+      - name: Wait for creating GitHub Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dev/release/utils-watch-gh-workflow.sh \
+            ${GITHUB_REF_NAME} \
+            release_candidate.yml
+      - name: Upload the artifacts to GitHub Release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${GITHUB_REF_NAME} \
+            --clobber \
+            Apache\ Arrow\ Flight\ SQL\ ODBC-*-win64.msi
 
   report-extra-cpp:
     if: github.event_name == 'schedule' && always()
