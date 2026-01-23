@@ -479,7 +479,7 @@ jobs:
         run: |
           gh release upload ${GITHUB_REF_NAME} \
             --clobber \
-            "Apache Arrow Flight SQL ODBC-*-win64.msi"
+            Apache\ Arrow\ Flight\ SQL\ ODBC-*-win64.msi
       # Upload ODBC installer as nightly release in scheduled runs
       - name: Prepare ODBC installer for sync
         if: github.event_name == 'schedule'
