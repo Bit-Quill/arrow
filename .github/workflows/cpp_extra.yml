@@ -504,7 +504,14 @@ jobs:
       # GH-48270 TODO: Resolve segementation fault during Arrow library unload
       # GH-48269 TODO: Enable Flight & Flight SQL testing in MSVC CI
       # GH-48547 TODO: enable ODBC tests after GH-48270 and GH-48269 are resolved.
-
+      - name: Run ODBC Unit Tests
+        shell: pwsh
+        run: |
+          ${{ github.workspace }}\build\cpp\%ARROW_BUILD_TYPE%\arrow-odbc-spi-impl-test.exe
+      - name: Run ODBC Driver Tests
+        shell: pwsh
+        run: |
+          ${{ github.workspace }}\build\cpp\%ARROW_BUILD_TYPE%\arrow-flight-sql-odbc-test.exe
       - name: Install WiX Toolset
         shell: pwsh
         run: |
