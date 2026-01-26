@@ -486,7 +486,7 @@ jobs:
   odbc-release:
     needs: odbc
     name: ODBC release
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     # -AL- todo next: add tag filter"apache-arrow-*-rc*"
     if: github.ref_type == 'tag' # && github.repository == 'apache/arrow'
     steps:
@@ -517,7 +517,7 @@ jobs:
         run: |
           gh release upload ${GITHUB_REF_NAME} \
             --clobber \
-            Apache\ Arrow\ Flight\ SQL\ ODBC-*-win64.msi
+            "Apache Arrow Flight SQL ODBC"-*-win64.msi
 
   report-extra-cpp:
     if: github.event_name == 'schedule' && always()
