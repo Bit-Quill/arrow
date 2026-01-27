@@ -347,8 +347,6 @@ jobs:
     timeout-minutes: 240
     permissions:
       packages: write
-      # Upload to GitHub Release
-      contents: write
     env:
       ARROW_BUILD_SHARED: ON
       ARROW_BUILD_STATIC: OFF
@@ -489,6 +487,9 @@ jobs:
     runs-on: ubuntu-latest
     # -AL- todo next: add tag filter"apache-arrow-*-rc*"
     if: github.ref_type == 'tag' # && github.repository == 'apache/arrow'
+    permissions:
+      # Upload to GitHub Release
+      contents: write
     steps:
       - name: Checkout Arrow
         uses: actions/checkout@v6
