@@ -391,7 +391,8 @@ jobs:
           # by warnings from packages installed by Homebrew.
           export BUILD_WARNING_LEVEL=PRODUCTION
           LIBIODBC_DIR="$(brew --cellar libiodbc)/$(brew list --versions libiodbc | awk '{print $2}')"
-          export ODBC_INCLUDE_DIR=$LIBIODBC_DIR/include
+          ODBC_INCLUDE_DIR=$LIBIODBC_DIR/include
+          export ARROW_CMAKE_ARGS="-DODBC_INCLUDE_DIR=$ODBC_INCLUDE_DIR"
           export CXXFLAGS="$CXXFLAGS -I$ODBC_INCLUDE_DIR"
           ci/scripts/cpp_build.sh $(pwd) $(pwd)/build
       - name: Test
