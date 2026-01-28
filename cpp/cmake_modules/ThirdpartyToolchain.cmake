@@ -41,8 +41,6 @@ set(ARROW_RE2_LINKAGE
 # ----------------------------------------------------------------------
 # Resolve the dependencies
 
-# -AL- I believe this is the place where gRPC is linked. (or somewhere else related)
-
 set(ARROW_THIRDPARTY_DEPENDENCIES
     absl
     AWSSDK
@@ -1109,7 +1107,6 @@ function(build_boost)
   else()
     list(APPEND BOOST_EXCLUDE_LIBRARIES uuid)
   endif()
-  #-al- Add ODBC-specific dependencies
   if(ARROW_FLIGHT_SQL_ODBC)
     list(APPEND BOOST_INCLUDE_LIBRARIES beast xpressive)
   else()
@@ -3029,7 +3026,6 @@ function(build_cares)
   set(CARES_BUILD_TOOLS OFF)
   fetchcontent_makeavailable(cares)
 
-  # -AL- getting issue here. Resolved issue on macOS Intel with `c-ares`
   if(APPLE)
     # libresolv must be linked from c-ares version 1.16.1
     find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv REQUIRED)
