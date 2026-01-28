@@ -19,8 +19,6 @@
 # GH-44792: Arrow will switch to C++ 20
 set(CMAKE_CXX_STANDARD 20)
 
-# add_custom_target(arrow_flight_sql_odbc) # -AL- attempt to create optional arrow_flight_sql_odbc.lib
-
 if(APPLE)
   # CMAKE_FIND_LIBRARY_SUFFIXES.
   set(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".a")
@@ -37,8 +35,6 @@ elseif(APPLE)
 else()
   set(ODBCINST odbcinst)
 endif()
-
-message(STATUS "-AL- random msg in odbc cmake")
 
 add_subdirectory(odbc_impl)
 add_subdirectory(tests)
@@ -70,15 +66,8 @@ if(WIN32)
   list(APPEND ARROW_FLIGHT_SQL_ODBC_SRCS odbc.def install/versioninfo.rc)
 endif()
 
-# -AL- TODO for ODBC layer, use variables so it's like
-# Var = “”
-# If windows
-# Var append shared lib
-# And that it. The end goal should be 1 add_arrow_lib call. 
-
-
-# -AL- build dynamically on Windows and statically on Unix systems.
-# Might make them both the same if it is easier to maintain? Currently doing it separately to not break ODBC on Windows for now.
+# On Windows, dynmaic build for ODBC is supported.
+# On unix systems, static build for ODBC is supported, all libraries are linked statically on unix.
 if(WIN32)
   add_arrow_lib(arrow_flight_sql_odbc
                 CMAKE_PACKAGE_NAME
@@ -107,7 +96,6 @@ if(WIN32)
                 ${ODBCINST})
 else()
   # Unix
-  # -AL- add comment for static build. Static build is recommended in unix system
   add_arrow_lib(arrow_flight_sql_odbc
                 CMAKE_PACKAGE_NAME
                 ArrowFlightSqlOdbc
@@ -124,7 +112,7 @@ else()
                 STATIC_LINK_LIBS
                 ODBC::ODBC
                 ${ODBCINST}
-                SHARED_LINK_LIBS #-AL- make odbc calls exported too
+                SHARED_LINK_LIBS
                 arrow_odbc_spi_impl)
 endif()
 

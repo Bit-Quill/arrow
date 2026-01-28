@@ -32,13 +32,11 @@ set(ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS
     ../../example/sqlite_tables_schema_batch_reader.cc)
 
 if(ARROW_TEST_LINKAGE STREQUAL "static")
-  set(ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS arrow_flight_sql_odbc_static 
-  ${ARROW_TEST_STATIC_LINK_LIBS}
-  )
+  set(ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS arrow_flight_sql_odbc_static
+                                           ${ARROW_TEST_STATIC_LINK_LIBS})
 else()
   set(ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS arrow_flight_sql_odbc_shared
-  ${ARROW_TEST_SHARED_LINK_LIBS}
-  )
+                                           ${ARROW_TEST_SHARED_LINK_LIBS})
 endif()
 
 set(ARROW_FLIGHT_SQL_ODBC_TEST_SRCS
@@ -56,40 +54,36 @@ set(ARROW_FLIGHT_SQL_ODBC_TEST_SRCS
     type_info_test.cc
     # Enable Protobuf cleanup after test execution
     # GH-46889: move protobuf_test_util to a more common location
-    ../../../../engine/substrait/protobuf_test_util.cc
-)
+    ../../../../engine/substrait/protobuf_test_util.cc)
 
-# -AL- todo write comment:
-# On Windows, dynamic linking ODBC is supported.
-# On unix systems, static linking ODBC is supported, thus the test linking is different.
+# On Windows, dynamic linking ODBC is supported, tests link libraries dynamically.
+# On unix systems, static linking ODBC is supported, thus tests link libraries statically.
 if(WIN32)
-add_arrow_test(flight_sql_odbc_test
-               SOURCES
-               ${ARROW_FLIGHT_SQL_ODBC_TEST_SRCS}
-               ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
-               DEFINITIONS
-               UNICODE
-               EXTRA_LINK_LIBS
-               ${ODBC_LIBRARIES}
-               ${ODBCINST}
-               ${SQLite3_LIBRARIES}
-               ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS}
-               # arrow_odbc_spi_impl_shared # -AL-
-)
+  add_arrow_test(flight_sql_odbc_test
+                 SOURCES
+                 ${ARROW_FLIGHT_SQL_ODBC_TEST_SRCS}
+                 ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
+                 DEFINITIONS
+                 UNICODE
+                 EXTRA_LINK_LIBS
+                 ${ODBC_LIBRARIES}
+                 ${ODBCINST}
+                 ${SQLite3_LIBRARIES}
+                 ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS})
 else()
   # unix
-add_arrow_test(flight_sql_odbc_test
-               SOURCES
-               ${ARROW_FLIGHT_SQL_ODBC_TEST_SRCS}
-               ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
-               DEFINITIONS
-               UNICODE
-               STATIC_LINK_LIBS
-               ${ODBC_LIBRARIES}
-               ${ODBCINST}
-               ${SQLite3_LIBRARIES}
-               ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS})
-endif()              
+  add_arrow_test(flight_sql_odbc_test
+                 SOURCES
+                 ${ARROW_FLIGHT_SQL_ODBC_TEST_SRCS}
+                 ${ARROW_FLIGHT_SQL_MOCK_SERVER_SRCS}
+                 DEFINITIONS
+                 UNICODE
+                 STATIC_LINK_LIBS
+                 ${ODBC_LIBRARIES}
+                 ${ODBCINST}
+                 ${SQLite3_LIBRARIES}
+                 ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS})
+endif()
 
 # Disable unity build due to sqlite_sql_info.cc conflict with sql.h and sqlext.h headers.
 set_target_properties(arrow-flight-sql-odbc-test PROPERTIES UNITY_BUILD OFF)

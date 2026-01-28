@@ -154,6 +154,9 @@ set_target_properties(arrow_odbc_spi_impl_cli
 target_link_libraries(arrow_odbc_spi_impl_cli arrow_odbc_spi_impl)
 
 # Unit tests
+
+# On Windows, dynamic linking ODBC is supported.
+# On unix systems, static linking ODBC is supported, thus the library linking is static.
 if(WIN32)
   set(ODBC_SPI_IMPL_TEST_LINK_LIBS arrow_flight_testing_shared)
 else()
@@ -161,8 +164,6 @@ else()
   set(ODBC_SPI_IMPL_TEST_LINK_LIBS arrow_flight_testing_static)
 endif()
 
-# On Windows, dynamic linking ODBC is supported.
-# On unix systems, static linking ODBC is supported, thus the test linking is different.
 add_arrow_test(odbc_spi_impl_test
                SOURCES
                accessors/boolean_array_accessor_test.cc
