@@ -3029,12 +3029,8 @@ function(build_cares)
   if(APPLE)
     # libresolv must be linked from c-ares version 1.16.1
     find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv REQUIRED)
-    set_target_properties(c-ares::cares PROPERTIES INTERFACE_LINK_LIBRARIES
-                                                   "${LIBRESOLV_LIBRARY}")
-    # -AL- Changed to below code to get pass
-    # `set_target_properties can not be used on an ALIAS target.` error.
-    # set_target_properties(c-ares PROPERTIES INTERFACE_LINK_LIBRARIES
-    #                                         "${LIBRESOLV_LIBRARY}")
+    set_target_properties(c-ares PROPERTIES INTERFACE_LINK_LIBRARIES
+                                            "${LIBRESOLV_LIBRARY}")
   endif()
 
   set(ARROW_BUNDLED_STATIC_LIBS
