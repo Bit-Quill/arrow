@@ -411,7 +411,7 @@ jobs:
           export ODBC_INCLUDE_DIR=$LIBIODBC_DIR/include
           export CXXFLAGS="$CXXFLAGS -I$ODBC_INCLUDE_DIR"
           ci/scripts/cpp_build.sh $(pwd) $(pwd)/build
-      - name: Register Flight SQL ODBC Driver
+      - name: Register Arrow Flight SQL ODBC Driver
         run: |
           chmod +x cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh
           sudo cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh $(pwd)/build/cpp/debug/libarrow_flight_sql_odbc.dylib
@@ -519,7 +519,7 @@ jobs:
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
           set VCPKG_ROOT=%VCPKG_ROOT_KEEP%
           bash -c "ci/scripts/cpp_build.sh $(pwd) $(pwd)/build"
-      - name: Register Flight SQL ODBC Driver
+      - name: Register Arrow Flight SQL ODBC Driver
         shell: cmd
         run: |
           call "cpp\src\arrow\flight\sql\odbc\tests\install_odbc.cmd" ${{ github.workspace }}\build\cpp\%ARROW_BUILD_TYPE%\arrow_flight_sql_odbc.dll
