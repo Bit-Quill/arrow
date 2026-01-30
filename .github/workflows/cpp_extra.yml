@@ -359,6 +359,7 @@ jobs:
       ARROW_HOME: /tmp/local
       ARROW_DEPENDENCY_USE_SHARED: OFF
       ARROW_DEPENDENCY_SOURCE: BUNDLED
+      ARROW_MIMALLOC: OFF
       CMAKE_CXX_STANDARD: "20"
     steps:
       - name: Checkout Arrow
