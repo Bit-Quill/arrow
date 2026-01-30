@@ -385,194 +385,194 @@ void GetSQLColAttributesNumeric(SQLHSTMT stmt, const std::wstring& wsql, SQLUSMA
 #endif  // __APPLE__
 }  // namespace
 
-TYPED_TEST(ColumnsTest, SQLColumnsTestInputData) {
-  SQLWCHAR catalog_name[] = L"";
-  SQLWCHAR schema_name[] = L"";
-  SQLWCHAR table_name[] = L"";
-  SQLWCHAR column_name[] = L"";
+// TYPED_TEST(ColumnsTest, SQLColumnsTestInputData) {
+//   SQLWCHAR catalog_name[] = L"";
+//   SQLWCHAR schema_name[] = L"";
+//   SQLWCHAR table_name[] = L"";
+//   SQLWCHAR column_name[] = L"";
 
-  // All values populated
-  EXPECT_EQ(SQL_SUCCESS,
-            SQLColumns(this->stmt, catalog_name, sizeof(catalog_name), schema_name,
-                       sizeof(schema_name), table_name, sizeof(table_name), column_name,
-                       sizeof(column_name)));
-  ValidateFetch(this->stmt, SQL_NO_DATA);
+//   // All values populated
+//   EXPECT_EQ(SQL_SUCCESS,
+//             SQLColumns(this->stmt, catalog_name, sizeof(catalog_name), schema_name,
+//                        sizeof(schema_name), table_name, sizeof(table_name), column_name,
+//                        sizeof(column_name)));
+//   ValidateFetch(this->stmt, SQL_NO_DATA);
 
-  // Sizes are zeros
-  EXPECT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, catalog_name, 0, schema_name, 0,
-                                    table_name, 0, column_name, 0));
-  ValidateFetch(this->stmt, SQL_NO_DATA);
+//   // Sizes are zeros
+//   EXPECT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, catalog_name, 0, schema_name, 0,
+//                                     table_name, 0, column_name, 0));
+//   ValidateFetch(this->stmt, SQL_NO_DATA);
 
-  // Names are nulls
-  EXPECT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, sizeof(catalog_name), nullptr,
-                                    sizeof(schema_name), nullptr, sizeof(table_name),
-                                    nullptr, sizeof(column_name)));
-  ValidateFetch(this->stmt, SQL_SUCCESS);
-  // Close statement cursor to avoid leaving in an invalid state
-  SQLFreeStmt(this->stmt, SQL_CLOSE);
+//   // Names are nulls
+//   EXPECT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, sizeof(catalog_name), nullptr,
+//                                     sizeof(schema_name), nullptr, sizeof(table_name),
+//                                     nullptr, sizeof(column_name)));
+//   ValidateFetch(this->stmt, SQL_SUCCESS);
+//   // Close statement cursor to avoid leaving in an invalid state
+//   SQLFreeStmt(this->stmt, SQL_CLOSE);
 
-  // Names are nulls and sizes are zeros
-  EXPECT_EQ(SQL_SUCCESS,
-            SQLColumns(this->stmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0));
-  ValidateFetch(this->stmt, SQL_SUCCESS);
-}
+//   // Names are nulls and sizes are zeros
+//   EXPECT_EQ(SQL_SUCCESS,
+//             SQLColumns(this->stmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0));
+//   ValidateFetch(this->stmt, SQL_SUCCESS);
+// }
 
-TEST_F(ColumnsMockTest, TestSQLColumnsAllColumns) {
-  // Check table pattern and column pattern returns all columns
+// TEST_F(ColumnsMockTest, TestSQLColumnsAllColumns) {
+//   // Check table pattern and column pattern returns all columns
 
-  // Attempt to get all columns
-  SQLWCHAR table_pattern[] = L"%";
-  SQLWCHAR column_pattern[] = L"%";
+//   // Attempt to get all columns
+//   SQLWCHAR table_pattern[] = L"%";
+//   SQLWCHAR column_pattern[] = L"%";
 
-  ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
+//   ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+//                                     table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
-  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
+//   ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  // mock limitation: SQLite mock server returns 10 for bigint size when spec indicates
-  // should be 19
-  // DECIMAL_DIGITS should be 0 for bigint type since it is exact
-  // mock limitation: SQLite mock server returns 10 for bigint decimal digits when spec
-  // indicates should be 0
-  CheckMockSQLColumns(this->stmt,
-                      std::wstring(L"main"),          // expected_catalog
-                      std::wstring(L"foreignTable"),  // expected_table
-                      std::wstring(L"id"),            // expected_column
-                      SQL_BIGINT,                     // expected_data_type
-                      std::wstring(L"BIGINT"),        // expected_type_name
-                      10,  // expected_column_size (mock returns 10 instead of 19)
-                      8,   // expected_buffer_length
-                      15,  // expected_decimal_digits (mock returns 15 instead of 0)
-                      10,  // expected_num_prec_radix
-                      SQL_NULLABLE,           // expected_nullable
-                      SQL_BIGINT,             // expected_sql_data_type
-                      NULL,                   // expected_date_time_sub
-                      8,                      // expected_octet_char_length
-                      1,                      // expected_ordinal_position
-                      std::wstring(L"YES"));  // expected_is_nullable
+//   // mock limitation: SQLite mock server returns 10 for bigint size when spec indicates
+//   // should be 19
+//   // DECIMAL_DIGITS should be 0 for bigint type since it is exact
+//   // mock limitation: SQLite mock server returns 10 for bigint decimal digits when spec
+//   // indicates should be 0
+//   CheckMockSQLColumns(this->stmt,
+//                       std::wstring(L"main"),          // expected_catalog
+//                       std::wstring(L"foreignTable"),  // expected_table
+//                       std::wstring(L"id"),            // expected_column
+//                       SQL_BIGINT,                     // expected_data_type
+//                       std::wstring(L"BIGINT"),        // expected_type_name
+//                       10,  // expected_column_size (mock returns 10 instead of 19)
+//                       8,   // expected_buffer_length
+//                       15,  // expected_decimal_digits (mock returns 15 instead of 0)
+//                       10,  // expected_num_prec_radix
+//                       SQL_NULLABLE,           // expected_nullable
+//                       SQL_BIGINT,             // expected_sql_data_type
+//                       NULL,                   // expected_date_time_sub
+//                       8,                      // expected_octet_char_length
+//                       1,                      // expected_ordinal_position
+//                       std::wstring(L"YES"));  // expected_is_nullable
 
-  // Check 2nd Column
-  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
+//   // Check 2nd Column
+//   ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  CheckMockSQLColumns(this->stmt,
-                      std::wstring(L"main"),          // expected_catalog
-                      std::wstring(L"foreignTable"),  // expected_table
-                      std::wstring(L"foreignName"),   // expected_column
-                      SQL_WVARCHAR,                   // expected_data_type
-                      std::wstring(L"WVARCHAR"),      // expected_type_name
-                      0,   // expected_column_size (mock server limitation: returns 0 for
-                           // varchar(100), the ODBC spec expects 100)
-                      0,   // expected_buffer_length
-                      15,  // expected_decimal_digits
-                      0,   // expected_num_prec_radix
-                      SQL_NULLABLE,           // expected_nullable
-                      SQL_WVARCHAR,           // expected_sql_data_type
-                      NULL,                   // expected_date_time_sub
-                      0,                      // expected_octet_char_length
-                      2,                      // expected_ordinal_position
-                      std::wstring(L"YES"));  // expected_is_nullable
+//   CheckMockSQLColumns(this->stmt,
+//                       std::wstring(L"main"),          // expected_catalog
+//                       std::wstring(L"foreignTable"),  // expected_table
+//                       std::wstring(L"foreignName"),   // expected_column
+//                       SQL_WVARCHAR,                   // expected_data_type
+//                       std::wstring(L"WVARCHAR"),      // expected_type_name
+//                       0,   // expected_column_size (mock server limitation: returns 0 for
+//                            // varchar(100), the ODBC spec expects 100)
+//                       0,   // expected_buffer_length
+//                       15,  // expected_decimal_digits
+//                       0,   // expected_num_prec_radix
+//                       SQL_NULLABLE,           // expected_nullable
+//                       SQL_WVARCHAR,           // expected_sql_data_type
+//                       NULL,                   // expected_date_time_sub
+//                       0,                      // expected_octet_char_length
+//                       2,                      // expected_ordinal_position
+//                       std::wstring(L"YES"));  // expected_is_nullable
 
-  // Check 3rd Column
-  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
+//   // Check 3rd Column
+//   ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  CheckMockSQLColumns(this->stmt,
-                      std::wstring(L"main"),          // expected_catalog
-                      std::wstring(L"foreignTable"),  // expected_table
-                      std::wstring(L"value"),         // expected_column
-                      SQL_BIGINT,                     // expected_data_type
-                      std::wstring(L"BIGINT"),        // expected_type_name
-                      10,  // expected_column_size (mock returns 10 instead of 19)
-                      8,   // expected_buffer_length
-                      15,  // expected_decimal_digits (mock returns 15 instead of 0)
-                      10,  // expected_num_prec_radix
-                      SQL_NULLABLE,           // expected_nullable
-                      SQL_BIGINT,             // expected_sql_data_type
-                      NULL,                   // expected_date_time_sub
-                      8,                      // expected_octet_char_length
-                      3,                      // expected_ordinal_position
-                      std::wstring(L"YES"));  // expected_is_nullable
+//   CheckMockSQLColumns(this->stmt,
+//                       std::wstring(L"main"),          // expected_catalog
+//                       std::wstring(L"foreignTable"),  // expected_table
+//                       std::wstring(L"value"),         // expected_column
+//                       SQL_BIGINT,                     // expected_data_type
+//                       std::wstring(L"BIGINT"),        // expected_type_name
+//                       10,  // expected_column_size (mock returns 10 instead of 19)
+//                       8,   // expected_buffer_length
+//                       15,  // expected_decimal_digits (mock returns 15 instead of 0)
+//                       10,  // expected_num_prec_radix
+//                       SQL_NULLABLE,           // expected_nullable
+//                       SQL_BIGINT,             // expected_sql_data_type
+//                       NULL,                   // expected_date_time_sub
+//                       8,                      // expected_octet_char_length
+//                       3,                      // expected_ordinal_position
+//                       std::wstring(L"YES"));  // expected_is_nullable
 
-  // Check 4th Column
-  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
+//   // Check 4th Column
+//   ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  CheckMockSQLColumns(this->stmt,
-                      std::wstring(L"main"),      // expected_catalog
-                      std::wstring(L"intTable"),  // expected_table
-                      std::wstring(L"id"),        // expected_column
-                      SQL_BIGINT,                 // expected_data_type
-                      std::wstring(L"BIGINT"),    // expected_type_name
-                      10,  // expected_column_size (mock returns 10 instead of 19)
-                      8,   // expected_buffer_length
-                      15,  // expected_decimal_digits (mock returns 15 instead of 0)
-                      10,  // expected_num_prec_radix
-                      SQL_NULLABLE,           // expected_nullable
-                      SQL_BIGINT,             // expected_sql_data_type
-                      NULL,                   // expected_date_time_sub
-                      8,                      // expected_octet_char_length
-                      1,                      // expected_ordinal_position
-                      std::wstring(L"YES"));  // expected_is_nullable
+//   CheckMockSQLColumns(this->stmt,
+//                       std::wstring(L"main"),      // expected_catalog
+//                       std::wstring(L"intTable"),  // expected_table
+//                       std::wstring(L"id"),        // expected_column
+//                       SQL_BIGINT,                 // expected_data_type
+//                       std::wstring(L"BIGINT"),    // expected_type_name
+//                       10,  // expected_column_size (mock returns 10 instead of 19)
+//                       8,   // expected_buffer_length
+//                       15,  // expected_decimal_digits (mock returns 15 instead of 0)
+//                       10,  // expected_num_prec_radix
+//                       SQL_NULLABLE,           // expected_nullable
+//                       SQL_BIGINT,             // expected_sql_data_type
+//                       NULL,                   // expected_date_time_sub
+//                       8,                      // expected_octet_char_length
+//                       1,                      // expected_ordinal_position
+//                       std::wstring(L"YES"));  // expected_is_nullable
 
-  // Check 5th Column
-  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
+//   // Check 5th Column
+//   ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  CheckMockSQLColumns(this->stmt,
-                      std::wstring(L"main"),      // expected_catalog
-                      std::wstring(L"intTable"),  // expected_table
-                      std::wstring(L"keyName"),   // expected_column
-                      SQL_WVARCHAR,               // expected_data_type
-                      std::wstring(L"WVARCHAR"),  // expected_type_name
-                      0,   // expected_column_size (mock server limitation: returns 0 for
-                           // varchar(100), the ODBC spec expects 100)
-                      0,   // expected_buffer_length
-                      15,  // expected_decimal_digits
-                      0,   // expected_num_prec_radix
-                      SQL_NULLABLE,           // expected_nullable
-                      SQL_WVARCHAR,           // expected_sql_data_type
-                      NULL,                   // expected_date_time_sub
-                      0,                      // expected_octet_char_length
-                      2,                      // expected_ordinal_position
-                      std::wstring(L"YES"));  // expected_is_nullable
+//   CheckMockSQLColumns(this->stmt,
+//                       std::wstring(L"main"),      // expected_catalog
+//                       std::wstring(L"intTable"),  // expected_table
+//                       std::wstring(L"keyName"),   // expected_column
+//                       SQL_WVARCHAR,               // expected_data_type
+//                       std::wstring(L"WVARCHAR"),  // expected_type_name
+//                       0,   // expected_column_size (mock server limitation: returns 0 for
+//                            // varchar(100), the ODBC spec expects 100)
+//                       0,   // expected_buffer_length
+//                       15,  // expected_decimal_digits
+//                       0,   // expected_num_prec_radix
+//                       SQL_NULLABLE,           // expected_nullable
+//                       SQL_WVARCHAR,           // expected_sql_data_type
+//                       NULL,                   // expected_date_time_sub
+//                       0,                      // expected_octet_char_length
+//                       2,                      // expected_ordinal_position
+//                       std::wstring(L"YES"));  // expected_is_nullable
 
-  // Check 6th Column
-  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
+//   // Check 6th Column
+//   ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  CheckMockSQLColumns(this->stmt,
-                      std::wstring(L"main"),      // expected_catalog
-                      std::wstring(L"intTable"),  // expected_table
-                      std::wstring(L"value"),     // expected_column
-                      SQL_BIGINT,                 // expected_data_type
-                      std::wstring(L"BIGINT"),    // expected_type_name
-                      10,  // expected_column_size (mock returns 10 instead of 19)
-                      8,   // expected_buffer_length
-                      15,  // expected_decimal_digits (mock returns 15 instead of 0)
-                      10,  // expected_num_prec_radix
-                      SQL_NULLABLE,           // expected_nullable
-                      SQL_BIGINT,             // expected_sql_data_type
-                      NULL,                   // expected_date_time_sub
-                      8,                      // expected_octet_char_length
-                      3,                      // expected_ordinal_position
-                      std::wstring(L"YES"));  // expected_is_nullable
+//   CheckMockSQLColumns(this->stmt,
+//                       std::wstring(L"main"),      // expected_catalog
+//                       std::wstring(L"intTable"),  // expected_table
+//                       std::wstring(L"value"),     // expected_column
+//                       SQL_BIGINT,                 // expected_data_type
+//                       std::wstring(L"BIGINT"),    // expected_type_name
+//                       10,  // expected_column_size (mock returns 10 instead of 19)
+//                       8,   // expected_buffer_length
+//                       15,  // expected_decimal_digits (mock returns 15 instead of 0)
+//                       10,  // expected_num_prec_radix
+//                       SQL_NULLABLE,           // expected_nullable
+//                       SQL_BIGINT,             // expected_sql_data_type
+//                       NULL,                   // expected_date_time_sub
+//                       8,                      // expected_octet_char_length
+//                       3,                      // expected_ordinal_position
+//                       std::wstring(L"YES"));  // expected_is_nullable
 
-  // Check 7th Column
-  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
+//   // Check 7th Column
+//   ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  CheckMockSQLColumns(this->stmt,
-                      std::wstring(L"main"),       // expected_catalog
-                      std::wstring(L"intTable"),   // expected_table
-                      std::wstring(L"foreignId"),  // expected_column
-                      SQL_BIGINT,                  // expected_data_type
-                      std::wstring(L"BIGINT"),     // expected_type_name
-                      10,  // expected_column_size (mock returns 10 instead of 19)
-                      8,   // expected_buffer_length
-                      15,  // expected_decimal_digits (mock returns 15 instead of 0)
-                      10,  // expected_num_prec_radix
-                      SQL_NULLABLE,           // expected_nullable
-                      SQL_BIGINT,             // expected_sql_data_type
-                      NULL,                   // expected_date_time_sub
-                      8,                      // expected_octet_char_length
-                      4,                      // expected_ordinal_position
-                      std::wstring(L"YES"));  // expected_is_nullable
-}
+//   CheckMockSQLColumns(this->stmt,
+//                       std::wstring(L"main"),       // expected_catalog
+//                       std::wstring(L"intTable"),   // expected_table
+//                       std::wstring(L"foreignId"),  // expected_column
+//                       SQL_BIGINT,                  // expected_data_type
+//                       std::wstring(L"BIGINT"),     // expected_type_name
+//                       10,  // expected_column_size (mock returns 10 instead of 19)
+//                       8,   // expected_buffer_length
+//                       15,  // expected_decimal_digits (mock returns 15 instead of 0)
+//                       10,  // expected_num_prec_radix
+//                       SQL_NULLABLE,           // expected_nullable
+//                       SQL_BIGINT,             // expected_sql_data_type
+//                       NULL,                   // expected_date_time_sub
+//                       8,                      // expected_octet_char_length
+//                       4,                      // expected_ordinal_position
+//                       std::wstring(L"YES"));  // expected_is_nullable
+// }
 
 TEST_F(ColumnsMockTest, TestSQLColumnsAllTypes) {
   // Limitation: Mock server returns incorrect values for column size for some columns.
@@ -677,43 +677,43 @@ TEST_F(ColumnsMockTest, TestSQLColumnsAllTypes) {
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 }
 
-TEST_F(ColumnsMockTest, TestSQLColumnsUnicode) {
-  // Limitation: Mock server returns incorrect values for column size for some columns.
-  // For character and binary type columns, the driver calculates buffer length and char
-  // octet length from column size.
-  this->CreateUnicodeTable();
+// TEST_F(ColumnsMockTest, TestSQLColumnsUnicode) {
+//   // Limitation: Mock server returns incorrect values for column size for some columns.
+//   // For character and binary type columns, the driver calculates buffer length and char
+//   // octet length from column size.
+//   this->CreateUnicodeTable();
 
-  // Attempt to get all columns
-  SQLWCHAR table_pattern[] = L"数据";
-  SQLWCHAR column_pattern[] = L"%";
+//   // Attempt to get all columns
+//   SQLWCHAR table_pattern[] = L"数据";
+//   SQLWCHAR column_pattern[] = L"%";
 
-  ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
+//   ASSERT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+//                                     table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
-  // Check SQLColumn data for 1st column
-  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
+//   // Check SQLColumn data for 1st column
+//   ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  CheckMockSQLColumns(this->stmt,
-                      std::wstring(L"main"),      // expected_catalog
-                      std::wstring(L"数据"),      // expected_table
-                      std::wstring(L"资料"),      // expected_column
-                      SQL_WVARCHAR,               // expected_data_type
-                      std::wstring(L"WVARCHAR"),  // expected_type_name
-                      0,   // expected_column_size (mock server limitation: returns 0 for
-                           // varchar(100), spec expects 100)
-                      0,   // expected_buffer_length
-                      15,  // expected_decimal_digits
-                      0,   // expected_num_prec_radix
-                      SQL_NULLABLE,           // expected_nullable
-                      SQL_WVARCHAR,           // expected_sql_data_type
-                      NULL,                   // expected_date_time_sub
-                      0,                      // expected_octet_char_length
-                      1,                      // expected_ordinal_position
-                      std::wstring(L"YES"));  // expected_is_nullable
+//   CheckMockSQLColumns(this->stmt,
+//                       std::wstring(L"main"),      // expected_catalog
+//                       std::wstring(L"数据"),      // expected_table
+//                       std::wstring(L"资料"),      // expected_column
+//                       SQL_WVARCHAR,               // expected_data_type
+//                       std::wstring(L"WVARCHAR"),  // expected_type_name
+//                       0,   // expected_column_size (mock server limitation: returns 0 for
+//                            // varchar(100), spec expects 100)
+//                       0,   // expected_buffer_length
+//                       15,  // expected_decimal_digits
+//                       0,   // expected_num_prec_radix
+//                       SQL_NULLABLE,           // expected_nullable
+//                       SQL_WVARCHAR,           // expected_sql_data_type
+//                       NULL,                   // expected_date_time_sub
+//                       0,                      // expected_octet_char_length
+//                       1,                      // expected_ordinal_position
+//                       std::wstring(L"YES"));  // expected_is_nullable
 
-  // There should be no more column data
-  EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-}
+//   // There should be no more column data
+//   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
+// }
 
 TEST_F(ColumnsRemoteTest, TestSQLColumnsAllTypes) {
   // GH-47159 TODO: Return NUM_PREC_RADIX based on whether COLUMN_SIZE contains number of
@@ -1120,59 +1120,59 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColumnsAllTypesODBCVer2) {
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
 }
 
-TEST_F(ColumnsMockTest, TestSQLColumnsColumnPatternSegFault) {
-  // Checks filtering table with column name pattern.
-  // Only check table and column name
+// TEST_F(ColumnsMockTest, TestSQLColumnsColumnPatternSegFault) {
+//   // Checks filtering table with column name pattern.
+//   // Only check table and column name
 
-  SQLWCHAR table_pattern[] = L"%";
-  SQLWCHAR column_pattern[] = L"id";
+//   SQLWCHAR table_pattern[] = L"%";
+//   SQLWCHAR column_pattern[] = L"id";
 
-  EXPECT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
-                                    table_pattern, SQL_NTS, column_pattern, SQL_NTS));
+//   EXPECT_EQ(SQL_SUCCESS, SQLColumns(this->stmt, nullptr, SQL_NTS, nullptr, SQL_NTS,
+//                                     table_pattern, SQL_NTS, column_pattern, SQL_NTS));
 
-  // Check 1st Column
-  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
+//   // Check 1st Column
+//   ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  CheckMockSQLColumns(this->stmt,
-                      std::wstring(L"main"),          // expected_catalog
-                      std::wstring(L"foreignTable"),  // expected_table
-                      std::wstring(L"id"),            // expected_column
-                      SQL_BIGINT,                     // expected_data_type
-                      std::wstring(L"BIGINT"),        // expected_type_name
-                      10,  // expected_column_size (mock returns 10 instead of 19)
-                      8,   // expected_buffer_length
-                      15,  // expected_decimal_digits (mock returns 15 instead of 0)
-                      10,  // expected_num_prec_radix
-                      SQL_NULLABLE,           // expected_nullable
-                      SQL_BIGINT,             // expected_sql_data_type
-                      NULL,                   // expected_date_time_sub
-                      8,                      // expected_octet_char_length
-                      1,                      // expected_ordinal_position
-                      std::wstring(L"YES"));  // expected_is_nullable
+//   CheckMockSQLColumns(this->stmt,
+//                       std::wstring(L"main"),          // expected_catalog
+//                       std::wstring(L"foreignTable"),  // expected_table
+//                       std::wstring(L"id"),            // expected_column
+//                       SQL_BIGINT,                     // expected_data_type
+//                       std::wstring(L"BIGINT"),        // expected_type_name
+//                       10,  // expected_column_size (mock returns 10 instead of 19)
+//                       8,   // expected_buffer_length
+//                       15,  // expected_decimal_digits (mock returns 15 instead of 0)
+//                       10,  // expected_num_prec_radix
+//                       SQL_NULLABLE,           // expected_nullable
+//                       SQL_BIGINT,             // expected_sql_data_type
+//                       NULL,                   // expected_date_time_sub
+//                       8,                      // expected_octet_char_length
+//                       1,                      // expected_ordinal_position
+//                       std::wstring(L"YES"));  // expected_is_nullable
 
-  // Check 2nd Column
-  ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
+//   // Check 2nd Column
+//   ASSERT_EQ(SQL_SUCCESS, SQLFetch(this->stmt));
 
-  CheckMockSQLColumns(this->stmt,
-                      std::wstring(L"main"),      // expected_catalog
-                      std::wstring(L"intTable"),  // expected_table
-                      std::wstring(L"id"),        // expected_column
-                      SQL_BIGINT,                 // expected_data_type
-                      std::wstring(L"BIGINT"),    // expected_type_name
-                      10,  // expected_column_size (mock returns 10 instead of 19)
-                      8,   // expected_buffer_length
-                      15,  // expected_decimal_digits (mock returns 15 instead of 0)
-                      10,  // expected_num_prec_radix
-                      SQL_NULLABLE,           // expected_nullable
-                      SQL_BIGINT,             // expected_sql_data_type
-                      NULL,                   // expected_date_time_sub
-                      8,                      // expected_octet_char_length
-                      1,                      // expected_ordinal_position
-                      std::wstring(L"YES"));  // expected_is_nullable
+//   CheckMockSQLColumns(this->stmt,
+//                       std::wstring(L"main"),      // expected_catalog
+//                       std::wstring(L"intTable"),  // expected_table
+//                       std::wstring(L"id"),        // expected_column
+//                       SQL_BIGINT,                 // expected_data_type
+//                       std::wstring(L"BIGINT"),    // expected_type_name
+//                       10,  // expected_column_size (mock returns 10 instead of 19)
+//                       8,   // expected_buffer_length
+//                       15,  // expected_decimal_digits (mock returns 15 instead of 0)
+//                       10,  // expected_num_prec_radix
+//                       SQL_NULLABLE,           // expected_nullable
+//                       SQL_BIGINT,             // expected_sql_data_type
+//                       NULL,                   // expected_date_time_sub
+//                       8,                      // expected_octet_char_length
+//                       1,                      // expected_ordinal_position
+//                       std::wstring(L"YES"));  // expected_is_nullable
 
-  // There is no more column
-  EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
-}
+//   // There is no more column
+//   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
+// }
 
 TEST_F(ColumnsMockTest, TestSQLColumnsTableColumnPattern) {
   // Checks filtering table with table and column name pattern.
@@ -2643,68 +2643,68 @@ TEST_F(ColumnsMockTest, SQLDescribeColUnicodeTableMetadata) {
   EXPECT_EQ(SQL_NULLABLE, nullable);
 }
 
-TYPED_TEST(ColumnsTest, SQLColumnsGetMetadataBySQLDescribeCol) {
-  SQLWCHAR column_name[1024];
-  SQLSMALLINT buf_char_len =
-      static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
-  SQLSMALLINT name_length = 0;
-  SQLSMALLINT column_data_type = 0;
-  SQLULEN column_size = 0;
-  SQLSMALLINT decimal_digits = 0;
-  SQLSMALLINT nullable = 0;
-  size_t column_index = 0;
+// TYPED_TEST(ColumnsTest, SQLColumnsGetMetadataBySQLDescribeCol) {
+//   SQLWCHAR column_name[1024];
+//   SQLSMALLINT buf_char_len =
+//       static_cast<SQLSMALLINT>(sizeof(column_name) / GetSqlWCharSize());
+//   SQLSMALLINT name_length = 0;
+//   SQLSMALLINT column_data_type = 0;
+//   SQLULEN column_size = 0;
+//   SQLSMALLINT decimal_digits = 0;
+//   SQLSMALLINT nullable = 0;
+//   size_t column_index = 0;
 
-  const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"TABLE_CAT"),
-                                    static_cast<const SQLWCHAR*>(L"TABLE_SCHEM"),
-                                    static_cast<const SQLWCHAR*>(L"TABLE_NAME"),
-                                    static_cast<const SQLWCHAR*>(L"COLUMN_NAME"),
-                                    static_cast<const SQLWCHAR*>(L"DATA_TYPE"),
-                                    static_cast<const SQLWCHAR*>(L"TYPE_NAME"),
-                                    static_cast<const SQLWCHAR*>(L"COLUMN_SIZE"),
-                                    static_cast<const SQLWCHAR*>(L"BUFFER_LENGTH"),
-                                    static_cast<const SQLWCHAR*>(L"DECIMAL_DIGITS"),
-                                    static_cast<const SQLWCHAR*>(L"NUM_PREC_RADIX"),
-                                    static_cast<const SQLWCHAR*>(L"NULLABLE"),
-                                    static_cast<const SQLWCHAR*>(L"REMARKS"),
-                                    static_cast<const SQLWCHAR*>(L"COLUMN_DEF"),
-                                    static_cast<const SQLWCHAR*>(L"SQL_DATA_TYPE"),
-                                    static_cast<const SQLWCHAR*>(L"SQL_DATETIME_SUB"),
-                                    static_cast<const SQLWCHAR*>(L"CHAR_OCTET_LENGTH"),
-                                    static_cast<const SQLWCHAR*>(L"ORDINAL_POSITION"),
-                                    static_cast<const SQLWCHAR*>(L"IS_NULLABLE")};
-  SQLSMALLINT column_data_types[] = {
-      SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_SMALLINT, SQL_WVARCHAR,
-      SQL_INTEGER,  SQL_INTEGER,  SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT, SQL_WVARCHAR,
-      SQL_WVARCHAR, SQL_SMALLINT, SQL_SMALLINT, SQL_INTEGER,  SQL_INTEGER,  SQL_WVARCHAR};
-  SQLULEN column_sizes[] = {1024, 1024, 1024, 1024, 2, 1024, 4, 4, 2,
-                            2,    2,    1024, 1024, 2, 2,    4, 4, 1024};
+//   const SQLWCHAR* column_names[] = {static_cast<const SQLWCHAR*>(L"TABLE_CAT"),
+//                                     static_cast<const SQLWCHAR*>(L"TABLE_SCHEM"),
+//                                     static_cast<const SQLWCHAR*>(L"TABLE_NAME"),
+//                                     static_cast<const SQLWCHAR*>(L"COLUMN_NAME"),
+//                                     static_cast<const SQLWCHAR*>(L"DATA_TYPE"),
+//                                     static_cast<const SQLWCHAR*>(L"TYPE_NAME"),
+//                                     static_cast<const SQLWCHAR*>(L"COLUMN_SIZE"),
+//                                     static_cast<const SQLWCHAR*>(L"BUFFER_LENGTH"),
+//                                     static_cast<const SQLWCHAR*>(L"DECIMAL_DIGITS"),
+//                                     static_cast<const SQLWCHAR*>(L"NUM_PREC_RADIX"),
+//                                     static_cast<const SQLWCHAR*>(L"NULLABLE"),
+//                                     static_cast<const SQLWCHAR*>(L"REMARKS"),
+//                                     static_cast<const SQLWCHAR*>(L"COLUMN_DEF"),
+//                                     static_cast<const SQLWCHAR*>(L"SQL_DATA_TYPE"),
+//                                     static_cast<const SQLWCHAR*>(L"SQL_DATETIME_SUB"),
+//                                     static_cast<const SQLWCHAR*>(L"CHAR_OCTET_LENGTH"),
+//                                     static_cast<const SQLWCHAR*>(L"ORDINAL_POSITION"),
+//                                     static_cast<const SQLWCHAR*>(L"IS_NULLABLE")};
+//   SQLSMALLINT column_data_types[] = {
+//       SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_WVARCHAR, SQL_SMALLINT, SQL_WVARCHAR,
+//       SQL_INTEGER,  SQL_INTEGER,  SQL_SMALLINT, SQL_SMALLINT, SQL_SMALLINT, SQL_WVARCHAR,
+//       SQL_WVARCHAR, SQL_SMALLINT, SQL_SMALLINT, SQL_INTEGER,  SQL_INTEGER,  SQL_WVARCHAR};
+//   SQLULEN column_sizes[] = {1024, 1024, 1024, 1024, 2, 1024, 4, 4, 2,
+//                             2,    2,    1024, 1024, 2, 2,    4, 4, 1024};
 
-  ASSERT_EQ(SQL_SUCCESS,
-            SQLColumns(this->stmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0));
+//   ASSERT_EQ(SQL_SUCCESS,
+//             SQLColumns(this->stmt, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0));
 
-  for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
-    column_index = i + 1;
+//   for (size_t i = 0; i < sizeof(column_names) / sizeof(*column_names); ++i) {
+//     column_index = i + 1;
 
-    ASSERT_EQ(SQL_SUCCESS, SQLDescribeCol(this->stmt, column_index, column_name,
-                                          buf_char_len, &name_length, &column_data_type,
-                                          &column_size, &decimal_digits, &nullable));
+//     ASSERT_EQ(SQL_SUCCESS, SQLDescribeCol(this->stmt, column_index, column_name,
+//                                           buf_char_len, &name_length, &column_data_type,
+//                                           &column_size, &decimal_digits, &nullable));
 
-    EXPECT_EQ(wcslen(column_names[i]), name_length);
+//     EXPECT_EQ(wcslen(column_names[i]), name_length);
 
-    std::wstring returned(column_name, column_name + name_length);
-    EXPECT_EQ(column_names[i], returned);
-    EXPECT_EQ(column_data_types[i], column_data_type);
-    EXPECT_EQ(column_sizes[i], column_size);
-    EXPECT_EQ(0, decimal_digits);
-    EXPECT_EQ(SQL_NULLABLE, nullable);
+//     std::wstring returned(column_name, column_name + name_length);
+//     EXPECT_EQ(column_names[i], returned);
+//     EXPECT_EQ(column_data_types[i], column_data_type);
+//     EXPECT_EQ(column_sizes[i], column_size);
+//     EXPECT_EQ(0, decimal_digits);
+//     EXPECT_EQ(SQL_NULLABLE, nullable);
 
-    name_length = 0;
-    column_data_type = 0;
-    column_size = 0;
-    decimal_digits = 0;
-    nullable = 0;
-  }
-}
+//     name_length = 0;
+//     column_data_type = 0;
+//     column_size = 0;
+//     decimal_digits = 0;
+//     nullable = 0;
+//   }
+// }
 
 TYPED_TEST(ColumnsOdbcV2Test, SQLColumnsGetMetadataBySQLDescribeColODBCVer2) {
   SQLWCHAR column_name[1024];

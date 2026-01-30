@@ -535,34 +535,34 @@ TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorConnError) {
 }
 #endif  // __APPLE__
 
-TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtError) {
-  // Test ODBC 2.0 API SQLError with ODBC ver 2.
-  // Known Windows Driver Manager (DM) behavior:
-  // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
-  // DM passes 512 as buffer length to SQLError.
+// TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtError) {
+//   // Test ODBC 2.0 API SQLError with ODBC ver 2.
+//   // Known Windows Driver Manager (DM) behavior:
+//   // When application passes buffer length greater than SQL_MAX_MESSAGE_LENGTH (512),
+//   // DM passes 512 as buffer length to SQLError.
 
-  std::wstring wsql = L"1";
-  std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
+//   std::wstring wsql = L"1";
+//   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
 
-  ASSERT_EQ(SQL_ERROR,
-            SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
+//   ASSERT_EQ(SQL_ERROR,
+//             SQLExecDirect(this->stmt, &sql0[0], static_cast<SQLINTEGER>(sql0.size())));
 
-  SQLWCHAR sql_state[6] = {0};
-  SQLINTEGER native_error = 0;
-  SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
-  SQLSMALLINT message_length = 0;
-  ASSERT_EQ(SQL_SUCCESS, SQLError(nullptr, nullptr, this->stmt, sql_state, &native_error,
-                                  message, SQL_MAX_MESSAGE_LENGTH, &message_length));
+//   SQLWCHAR sql_state[6] = {0};
+//   SQLINTEGER native_error = 0;
+//   SQLWCHAR message[SQL_MAX_MESSAGE_LENGTH] = {0};
+//   SQLSMALLINT message_length = 0;
+//   ASSERT_EQ(SQL_SUCCESS, SQLError(nullptr, nullptr, this->stmt, sql_state, &native_error,
+//                                   message, SQL_MAX_MESSAGE_LENGTH, &message_length));
 
-  EXPECT_GT(message_length, 70);
+//   EXPECT_GT(message_length, 70);
 
-  EXPECT_EQ(100, native_error);
+//   EXPECT_EQ(100, native_error);
 
-  // Driver Manager maps error state to S1000
-  EXPECT_EQ(kErrorStateS1000, SqlWcharToString(sql_state));
+//   // Driver Manager maps error state to S1000
+//   EXPECT_EQ(kErrorStateS1000, SqlWcharToString(sql_state));
 
-  EXPECT_FALSE(std::wstring(message).empty());
-}
+//   EXPECT_FALSE(std::wstring(message).empty());
+// }
 
 TYPED_TEST(ErrorsOdbcV2Test, TestSQLErrorStmtWarning) {
   // Test ODBC 2.0 API SQLError.

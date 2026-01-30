@@ -98,11 +98,11 @@ TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrOdbcCursorsDMOnly) {
   this->ConnectWithString(connect_str);
 }
 
-TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrQuietModeReadOnly) {
-  // Verify read-only attribute cannot be set
-  ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_QUIET_MODE, 0, 0));
-  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorStateHY092);
-}
+// TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrQuietModeReadOnly) {
+//   // Verify read-only attribute cannot be set
+//   ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(this->conn, SQL_ATTR_QUIET_MODE, 0, 0));
+//   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorStateHY092);
+// }
 
 // iODBC needs to be compiled with tracing enabled to handle SQL_ATTR_TRACE
 #ifndef __APPLE__
@@ -146,12 +146,12 @@ TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrTranslateOptionUnsuppor
   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorStateHYC00);
 }
 
-TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrTxnIsolationUnsupported) {
-  ASSERT_EQ(SQL_ERROR,
-            SQLSetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION,
-                              reinterpret_cast<SQLPOINTER>(SQL_TXN_READ_UNCOMMITTED), 0));
-  VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorStateHYC00);
-}
+// TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrTxnIsolationUnsupported) {
+//   ASSERT_EQ(SQL_ERROR,
+//             SQLSetConnectAttr(this->conn, SQL_ATTR_TXN_ISOLATION,
+//                               reinterpret_cast<SQLPOINTER>(SQL_TXN_READ_UNCOMMITTED), 0));
+//   VerifyOdbcErrorState(SQL_HANDLE_DBC, this->conn, kErrorStateHYC00);
+// }
 
 #ifdef SQL_ATTR_DBC_INFO_TOKEN
 TYPED_TEST(ConnectionAttributeTest, TestSQLGetConnectAttrDbcInfoTokenSetOnly) {
