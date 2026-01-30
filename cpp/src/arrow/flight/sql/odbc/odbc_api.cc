@@ -1550,10 +1550,11 @@ SQLRETURN SQLDescribeCol(SQLHSTMT stmt, SQLUSMALLINT column_number, SQLWCHAR* co
     // Column SQL Type
     ird->GetField(column_number, SQL_DESC_CONCISE_TYPE, &sql_type, sizeof(SQLSMALLINT),
                   nullptr);
+    ARROW_LOG(DEBUG) << "-AL- SQLDescribeColW sql_type: " << sql_type;
     if (data_type_ptr) {
       *data_type_ptr = sql_type;
     }
-
+    ARROW_LOG(DEBUG) << "-AL- SQLDescribeColW *data_type_ptr: " << *data_type_ptr;
     // Column Name
     if (column_name || name_length_ptr) {
       ird->GetField(column_number, SQL_DESC_NAME, column_name, buffer_length,
