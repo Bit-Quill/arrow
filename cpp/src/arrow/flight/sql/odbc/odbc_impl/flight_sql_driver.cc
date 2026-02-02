@@ -27,6 +27,8 @@
 #include "arrow/util/logging.h"
 #include "arrow/util/string.h"
 
+#include <iostream>
+
 using arrow::util::ArrowLog;
 using arrow::util::ArrowLogLevel;
 
@@ -75,9 +77,12 @@ void FlightSqlDriver::RegisterLog() {
                                   .Map(arrow::internal::AsciiToLower)
                                   .Map(arrow::internal::TrimString)
                                   .ValueOr("");
-  if (log_level_str.empty()) {
-    return;
-  }
+  std::cout << "TestLog: Inside FlightSqlDriver::RegisterLog(). log_level_str =" << log_level_str << std::endl;
+  // if (log_level_str.empty()) {
+  //   return;
+  // }
+
+  log_level_str = "fatal";
 
   auto log_level = ArrowLogLevel::ARROW_DEBUG;
 
@@ -99,8 +104,10 @@ void FlightSqlDriver::RegisterLog() {
   // tested fully on Windows.
   // Info log level is enabled by default.
   if (log_level != ArrowLogLevel::ARROW_INFO) {
+    std::cout << "TestLog: Starting ArrowLog with level: " << static_cast<int>(log_level) << std::endl;
     ArrowLog::StartArrowLog("arrow-flight-sql-odbc", log_level);
   }
+  std::cout << "TestLog: Exiting FlightSqlDriver::RegisterLog()" << std::endl;
 }
 
 }  // namespace arrow::flight::sql::odbc

@@ -28,6 +28,8 @@
 #include <memory>
 #include <string>
 
+#include <iostream>
+
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 
 namespace ODBC {
@@ -84,18 +86,23 @@ inline size_t ConvertToSqlWChar(std::string_view str, SQLWCHAR* buffer,
 /// \param[in] msg_len Number of characters in wchar_msg
 /// \return wchar_msg in std::string format
 inline std::string SqlWcharToString(SQLWCHAR* wchar_msg, SQLINTEGER msg_len = SQL_NTS) {
+  std::cout << "TestLog: Inside ODBC::SqlWcharToString()" << std::endl;
   if (msg_len == 0 || !wchar_msg || wchar_msg[0] == 0) {
+    std::cout << "TestLog: Exiting ODBC::SqlWcharToString() with empty string" << std::endl;
     return std::string();
   }
 
   thread_local std::vector<uint8_t> utf8_str;
 
   if (msg_len == SQL_NTS) {
+    std::cout << "TestLog: Calling WcsToUtf8() with NTS" << std::endl;
     WcsToUtf8((void*)wchar_msg, &utf8_str);
   } else {
+    std::cout << "TestLog: Calling WcsToUtf8() with msg_len = " << msg_len << std::endl;
     WcsToUtf8((void*)wchar_msg, msg_len, &utf8_str);
   }
 
+  std::cout << "TestLog: Exiting ODBC::SqlWcharToString()" << std::endl;
   return std::string(utf8_str.begin(), utf8_str.end());
 }
 

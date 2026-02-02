@@ -42,6 +42,8 @@
 #include "arrow/flight/types.h"
 #include "arrow/flight/types_async.h"
 
+#include <iostream>
+
 namespace arrow {
 
 namespace flight {
@@ -571,8 +573,12 @@ arrow::Result<std::unique_ptr<FlightClient>> FlightClient::Connect(
 
 Status FlightClient::Authenticate(const FlightCallOptions& options,
                                   std::unique_ptr<ClientAuthHandler> auth_handler) {
+  std::cout << "TestLog: Inside FlightClient::Authenticate()" << std::endl;
   RETURN_NOT_OK(CheckOpen());
-  return transport_->Authenticate(options, std::move(auth_handler));
+  std::cout << "TestLog: Calling transport_->Authenticate()" << std::endl;
+  auto ret = transport_->Authenticate(options, std::move(auth_handler));
+  std::cout << "TestLog: transport_->Authenticate() returned: " << ret.ToString() << std::endl;
+  return ret;
 }
 
 arrow::Result<std::pair<std::string, std::string>> FlightClient::AuthenticateBasicToken(

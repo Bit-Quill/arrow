@@ -25,6 +25,8 @@
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
 #include "arrow/util/macros.h"
 
+#include <iostream>
+
 #if defined(__APPLE__)
 #  include <atomic>
 #endif
@@ -107,34 +109,53 @@ ARROW_SUPPRESS_DEPRECATION_WARNING
 template <typename CHAR_TYPE>
 inline void WcsToUtf8(const void* wcs_string, size_t length_in_code_units,
                       std::vector<uint8_t>* result) {
+  std::cout << "TestLog: Inside WcsToUtf8<CHAR_TYPE>() with wcs_string=" << (char*)wcs_string << ", length_in_code_units=" << length_in_code_units << std::endl;
+
   thread_local std::wstring_convert<std::codecvt_utf8<CHAR_TYPE>, CHAR_TYPE> converter;
-  auto byte_string = converter.to_bytes((CHAR_TYPE*)wcs_string,
+  try {
+    auto byte_string = converter.to_bytes((CHAR_TYPE*)wcs_string,
                                         (CHAR_TYPE*)wcs_string + length_in_code_units);
 
-  uint32_t length_in_bytes = static_cast<uint32_t>(byte_string.size());
-  const uint8_t* data = (uint8_t*)byte_string.data();
+    uint32_t length_in_bytes = static_cast<uint32_t>(byte_string.size());
+    const uint8_t* data = (uint8_t*)byte_string.data();
 
-  result->reserve(length_in_bytes);
-  result->assign(data, data + length_in_bytes);
+    result->reserve(length_in_bytes);
+    result->assign(data, data + length_in_bytes);
+  } catch (const std::exception& e) {
+    std::cout << "TestLog: Caught exception during WcsToUtf8(): " << e.what()
+              << std::endl;
+  } catch (...) {
+    std::cout << "Caught an unknown/non-standard exception during WcsToUtf8()" << std::endl;
+  }
+  std::cout << "TestLog: Exiting WcsToUtf8<CHAR_TYPE>()" << std::endl;
 }
 ARROW_UNSUPPRESS_DEPRECATION_WARNING
 
 inline void WcsToUtf8(const void* wcs_string, size_t length_in_code_units,
                       std::vector<uint8_t>* result) {
+  std::cout << "TestLog: Inside arrow::flight::sql::odbc::WcsToUtf8()" << std::endl;
   switch (GetSqlWCharSize()) {
     case sizeof(char16_t):
+      std::cout << "TestLog: Calling WcsToUtf8<char16_t>()" << std::endl;
       return WcsToUtf8<char16_t>(wcs_string, length_in_code_units, result);
     case sizeof(char32_t):
+      std::cout << "TestLog: Calling WcsToUtf8<char32_t>()" << std::endl;
       return WcsToUtf8<char32_t>(wcs_string, length_in_code_units, result);
     default:
-      assert(false);
+      // assert(false);
+      std::cout << "TestLog: Throwing DriverException" << std::endl;
+      auto sqlwcharsize = GetSqlWCharSize();
+      std::cout << "TestLog: sqlwcharsize = " << sqlwcharsize << std::endl;
       throw DriverException("Encoding is unsupported, SQLWCHAR size: " +
-                            std::to_string(GetSqlWCharSize()));
+                            std::to_string(sqlwcharsize));
   }
 }
 
 inline void WcsToUtf8(const void* wcs_string, std::vector<uint8_t>* result) {
-  return WcsToUtf8(wcs_string, wcsstrlen(wcs_string), result);
+  std::cout << "TestLog: Inside arrow::flight::sql::odbc::WcsToUtf8()" << std::endl;
+  auto wcs_len = wcsstrlen(wcs_string);
+  std::cout << "TestLog: wcs_len = " << wcs_len << std::endl;
+  return WcsToUtf8(wcs_string, wcs_len, result);
 }
 
 }  // namespace arrow::flight::sql::odbc

@@ -41,6 +41,8 @@
 #include <optional>
 #include <utility>
 
+#include <iostream>
+
 using ODBC::ODBCConnection;
 using ODBC::ODBCDescriptor;
 using ODBC::ODBCStatement;
@@ -79,15 +81,19 @@ const std::string& ODBCConnection::GetDSN() const { return dsn_; }
 void ODBCConnection::Connect(std::string dsn,
                              const Connection::ConnPropertyMap& properties,
                              std::vector<std::string_view>& missing_properties) {
+  std::cout << "TestLog: Inside ODBCConnection::Connect()" << std::endl;
   if (is_connected_) {
     throw DriverException("Already connected.", "HY010");
   }
 
   dsn_ = std::move(dsn);
+  std::cout << "TestLog: Calling spi_connection_->Connect()" << std::endl;
   spi_connection_->Connect(properties, missing_properties);
   is_connected_ = true;
+  std::cout << "TestLog: Calling spi_connection_->CreateStatement()" << std::endl;
   std::shared_ptr<Statement> spi_statement = spi_connection_->CreateStatement();
   attribute_tracking_statement_ = std::make_shared<ODBCStatement>(*this, spi_statement);
+  std::cout << "TestLog: Finished ODBCConnection::Connect()" << std::endl;
 }
 
 SQLRETURN ODBCConnection::GetInfo(SQLUSMALLINT info_type, SQLPOINTER value,

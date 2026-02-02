@@ -26,6 +26,8 @@
 #include "arrow/flight/sql/odbc/odbc_impl/encoding_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 
+#include <iostream>
+
 namespace arrow::flight::sql::odbc {
 
 void ODBCRemoteTestBase::AllocEnvConnHandles(SQLINTEGER odbc_ver) {
@@ -42,24 +44,42 @@ void ODBCRemoteTestBase::AllocEnvConnHandles(SQLINTEGER odbc_ver) {
 }
 
 void ODBCRemoteTestBase::Connect(SQLINTEGER odbc_ver) {
+  std::cout << "TestLog: ODBCRemoteTestBase::Connect()" << std::endl;
   ASSERT_NO_FATAL_FAILURE(AllocEnvConnHandles(odbc_ver));
   std::string connect_str = GetConnectionString();
   ASSERT_NO_FATAL_FAILURE(ConnectWithString(connect_str));
 }
 
 void ODBCRemoteTestBase::ConnectWithString(std::string connect_str) {
+  std::cout << "TestLog: ODBCRemoteTestBase::ConnectWithString() with connect_str = " << connect_str << std::endl;
+
   // Connect string
   std::vector<SQLWCHAR> connect_str0(connect_str.begin(), connect_str.end());
+
+  std::cout << "TestLog: created connect_str0" << std::endl;
 
   SQLWCHAR out_str[kOdbcBufferSize];
   SQLSMALLINT out_str_len;
 
-  // Connecting to ODBC server.
-  ASSERT_EQ(SQL_SUCCESS,
-            SQLDriverConnect(conn, NULL, &connect_str0[0],
+  SQLRETURN rc;
+  try {
+    std::cout << "TestLog: Calling SQLDriverConnect()" << std::endl;
+    rc = SQLDriverConnect(conn, NULL, &connect_str0[0],
                              static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
-                             kOdbcBufferSize, &out_str_len, SQL_DRIVER_NOPROMPT))
+                             kOdbcBufferSize, &out_str_len, SQL_DRIVER_NOPROMPT);
+    std::cout << "TestLog: SQLDriverConnect() returned rc = " << rc << std::endl;
+  } catch (const std::exception& e) {
+    std::cout << "TestLog: Caught exception during SQLDriverConnect(): " << e.what()
+              << std::endl;
+  } catch (...) {
+    std::cout << "Caught an unknown/non-standard exception" << std::endl;
+  }
+
+  // Connecting to ODBC server.
+  ASSERT_EQ(SQL_SUCCESS, rc)
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
+
+  std::cout << "TestLog: Connected to ODBC server successfully" << std::endl;
 
   ASSERT_EQ(SQL_SUCCESS, SQLAllocHandle(SQL_HANDLE_STMT, conn, &stmt));
 }
@@ -370,7 +390,9 @@ void ODBCMockTestBase::SetUp() {
 }
 
 void FlightSQLODBCMockTestBase::SetUp() {
+  std::cout << "TestLog: FlightSQLODBCMockTestBase::SetUp()" << std::endl;
   ODBCMockTestBase::SetUp();
+  std::cout << "TestLog: After ODBCMockTestBase::SetUp()" << std::endl;
   this->Connect();
   connected_ = true;
 }
@@ -439,6 +461,7 @@ void VerifyOdbcErrorState(SQLSMALLINT handle_type, SQLHANDLE handle,
 }
 
 std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle) {
+  std::cout << "TestLog: Inside GetOdbcErrorMessage()" << std::endl;
   using ODBC::SqlWcharToString;
 
   SQLWCHAR sql_state[7] = {};
@@ -449,9 +472,12 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle) {
 
   // On Windows, real_len is in bytes. On Linux, real_len is in chars.
   // So, not using real_len
-  SQLGetDiagRec(handle_type, handle, 1, sql_state, &native_code, message, kOdbcBufferSize,
+  std::cout << "TestLog: Calling SQLGetDiagRec()" << std::endl;
+  SQLRETURN rc = SQLGetDiagRec(handle_type, handle, 1, sql_state, &native_code, message, kOdbcBufferSize,
                 &real_len);
+  std::cout << "TestLog: SQLGetDiagRec() returned rc = " << rc << std::endl;
 
+  std::cout << "TestLog: Calling SqlWcharToString()" << std::endl;
   std::string res = SqlWcharToString(sql_state);
 
   if (res.empty() || !message[0]) {
@@ -460,6 +486,7 @@ std::string GetOdbcErrorMessage(SQLSMALLINT handle_type, SQLHANDLE handle) {
     res.append(": ").append(SqlWcharToString(message));
   }
 
+  std::cout << "TestLog: Exiting GetOdbcErrorMessage() with res: " << res << std::endl;
   return res;
 }
 

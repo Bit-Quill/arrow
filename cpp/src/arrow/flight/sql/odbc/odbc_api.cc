@@ -31,6 +31,8 @@
 #include "arrow/flight/sql/odbc/odbc_impl/spi/connection.h"
 #include "arrow/util/logging.h"
 
+#include <iostream>
+
 #if defined _WIN32
 // For displaying DSN Window
 #  include "arrow/flight/sql/odbc/odbc_impl/system_dsn.h"
@@ -845,6 +847,8 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
                    << static_cast<const void*>(out_connection_string_len)
                    << ", driver_completion: " << driver_completion;
 
+  std::cout << "TestLog: Entered SQLDriverConnect()" << std::endl;
+
   // GH-46449 TODO: Implement FILEDSN and SAVEFILE keywords according to the spec
 
   // GH-46560 TODO: Copy connection string properly in SQLDriverConnect according to the
@@ -854,15 +858,23 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
 
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
+    std::cout << "TestLog: Calling ODBC::SqlWcharToString()" << std::endl;
     std::string connection_string =
         ODBC::SqlWcharToString(in_connection_string, in_connection_string_len);
+    
     Connection::ConnPropertyMap properties;
     std::string dsn_value = "";
+    std::cout << "TestLog: Calling ODBCConnection::GetDsnIfExists()" << std::endl;
     std::optional<std::string> dsn = ODBCConnection::GetDsnIfExists(connection_string);
     if (dsn.has_value()) {
+      std::cout << "TestLog: dsn.has_value()" << dsn.value()
+                << std::endl;
       dsn_value = dsn.value();
+      std::cout << "TestLog: Calling LoadPropertiesFromDSN() with " << dsn_value << std::endl;
       LoadPropertiesFromDSN(dsn_value, properties);
     }
+
+    std::cout << "TestLog: Calling ODBCConnection::GetPropertiesFromConnString()" << std::endl;
     ODBCConnection::GetPropertiesFromConnString(connection_string, properties);
 
     std::vector<std::string_view> missing_properties;
@@ -902,8 +914,10 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
       connection->Connect(dsn_value, properties, missing_properties);
     }
 #else
+    std::cout << "TestLog: Calling connection->Connect()" << std::endl;
     // Attempt connection without loading DSN window on macOS/Linux
     connection->Connect(dsn_value, properties, missing_properties);
+    std::cout << "TestLog: Finished connection->Connect()" << std::endl;
 #endif
     // Copy connection string to out_connection_string after connection attempt
     return ODBC::GetStringAttribute(true, connection_string, false, out_connection_string,

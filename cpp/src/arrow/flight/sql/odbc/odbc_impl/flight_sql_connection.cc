@@ -38,6 +38,8 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/system_trust_store.h"
 
+#include <iostream>
+
 #ifndef NI_MAXHOST
 #  define NI_MAXHOST 1025
 #endif
@@ -152,20 +154,32 @@ std::shared_ptr<FlightSqlSslConfig> LoadFlightSslConfigs(
 void FlightSqlConnection::Connect(const ConnPropertyMap& properties,
                                   std::vector<std::string_view>& missing_attr) {
   try {
+    std::cout << "TestLog: Inside FlightSqlConnection::Connect()" << std::endl;
     auto flight_ssl_configs = LoadFlightSslConfigs(properties);
 
+    std::cout << "TestLog: Calling BuildLocation()" << std::endl;
     Location location = BuildLocation(properties, missing_attr, flight_ssl_configs);
+    std::cout << "TestLog: Finished BuildLocation()" << std::endl;
     client_options_ =
         BuildFlightClientOptions(properties, missing_attr, flight_ssl_configs);
 
     std::unique_ptr<FlightClient> flight_client;
+    std::cout << "TestLog: Calling FlightClient::Connect()" << std::endl;
     ThrowIfNotOK(FlightClient::Connect(location, client_options_).Value(&flight_client));
+    std::cout << "TestLog: Finished FlightClient::Connect()" << std::endl;
+    
+    
     PopulateMetadataSettings(properties);
+    std::cout << "TestLog: Calling PopulateCallOptions()" << std::endl;
     PopulateCallOptions(properties);
 
+    std::cout << "TestLog: Calling FlightSqlAuthMethod::FromProperties()" << std::endl;
     std::unique_ptr<FlightSqlAuthMethod> auth_method =
         FlightSqlAuthMethod::FromProperties(flight_client, properties);
+      
+    std::cout << "TestLog: Calling auth_method->Authenticate()" << std::endl;
     auth_method->Authenticate(*this, call_options_);
+    std::cout << "TestLog: Finished auth_method->Authenticate()" << std::endl;
 
     sql_client_.reset(new FlightSqlClient(std::move(flight_client)));
     closed_ = false;
@@ -174,9 +188,11 @@ void FlightSqlConnection::Connect(const ConnPropertyMap& properties,
     // connection properties to allow reporting a user for other auth mechanisms
     // and also decouple the database user from user credentials.
 
+    std::cout << "TestLog: Calling info_.SetProperty()" << std::endl;
     info_.SetProperty(SQL_USER_NAME, auth_method->GetUser());
     attribute_[CONNECTION_DEAD] = static_cast<uint32_t>(SQL_FALSE);
   } catch (...) {
+    std::cout << "TestLog: Caught exception in FlightSqlConnection::Connect()" << std::endl;
     attribute_[CONNECTION_DEAD] = static_cast<uint32_t>(SQL_TRUE);
     sql_client_.reset();
 

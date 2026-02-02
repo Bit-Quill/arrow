@@ -27,6 +27,8 @@
 #include <optional>
 #include <utility>
 
+#include <iostream>
+
 namespace arrow::flight::sql::odbc {
 
 using arrow::Result;
@@ -123,24 +125,34 @@ class TokenAuthMethod : public FlightSqlAuthMethod {
                     FlightCallOptions& call_options) override {
     // add the token to the front of the headers. For consistency auth headers should be
     // at the front.
+    std::cout << "TestLog: Inside TokenAuthMethod::Authenticate()" << std::endl;
     const std::pair<std::string, std::string> token_header("authorization",
                                                            "Bearer " + token_);
     call_options.headers.insert(call_options.headers.begin(), token_header);
 
+    std::cout << "TestLog: Calling client_.Authenticate()" << std::endl;
     const Status status = client_.Authenticate(
         call_options, std::unique_ptr<ClientAuthHandler>(new NoOpClientAuthHandler()));
     if (!status.ok()) {
+      std::cout << "TestLog: client_.Authenticate() failed: "
+                << status.ToString() << std::endl;
       const auto& flight_status = FlightStatusDetail::UnwrapStatus(status);
+      std::cout << "TestLog: Unwrapped flight status" << std::endl;
       if (flight_status != nullptr) {
+        std::cout << "TestLog: Checking flight status code" << std::endl;
         if (flight_status->code() == FlightStatusCode::Unauthenticated) {
+          std::cout << "TestLog: flight_status->code() == FlightStatusCode::Unauthenticated" << std::endl;
           throw AuthenticationException("Failed to authenticate with token: " + token_ +
                                         " Message: " + status.message());
         } else if (flight_status->code() == FlightStatusCode::Unavailable) {
+          std::cout << "TestLog: flight_status->code() == FlightStatusCode::Unavailable" << std::endl;
           throw CommunicationException(status.message());
         }
       }
+      std::cout << "TestLog: Throwing DriverException" << std::endl;
       throw DriverException(status.message());
     }
+    std::cout << "TestLog: Successfully authenticated with token" << std::endl;
   }
 };
 }  // namespace
