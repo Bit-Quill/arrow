@@ -110,6 +110,7 @@ else()
                 SHARED_LINK_FLAGS
                 ${ARROW_VERSION_SCRIPT_FLAGS} # Defined in cpp/arrow/CMakeLists.txt
                 STATIC_LINK_LIBS
+                iodbc
                 ODBC::ODBC
                 ${ODBCINST}
                 SHARED_LINK_LIBS
