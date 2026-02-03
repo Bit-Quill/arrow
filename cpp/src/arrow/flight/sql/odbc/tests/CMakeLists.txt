@@ -70,8 +70,8 @@ if(WIN32)
                  ${ODBCINST}
                  ${SQLite3_LIBRARIES}
                  ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS})
-else()
-  # unix
+elseif(APPLE)
+  # macOS
   add_arrow_test(flight_sql_odbc_test
                  SOURCES
                  ${ARROW_FLIGHT_SQL_ODBC_TEST_SRCS}
@@ -79,6 +79,7 @@ else()
                  DEFINITIONS
                  UNICODE
                  STATIC_LINK_LIBS
+                 iodbc
                  ${ODBC_LIBRARIES}
                  ${ODBCINST}
                  ${SQLite3_LIBRARIES}
