@@ -535,7 +535,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       rc-tag: ${{ steps.check-rc.outputs.rc-tag }}
-    if: github.ref_type == 'tag' && github.repository == 'apache/arrow'
+    if: github.ref_type == 'tag' # && github.repository == 'apache/arrow' # -AL- for testing purpose
     steps:
       - name: Check Arrow RC Tag
         id: check-rc
