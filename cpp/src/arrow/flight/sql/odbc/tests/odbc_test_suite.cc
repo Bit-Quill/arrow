@@ -27,6 +27,8 @@
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 namespace arrow::flight::sql::odbc {
 
@@ -188,6 +190,7 @@ void FlightSQLODBCRemoteTestBase::TearDown() {
     this->Disconnect();
     connected_ = false;
   }
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 void FlightSQLOdbcV2RemoteTestBase::SetUp() {
@@ -219,6 +222,8 @@ void FlightSQLOdbcEnvConnHandleRemoteTestBase::TearDown() {
 
   // Free environment handle
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
@@ -400,6 +405,7 @@ void FlightSQLODBCMockTestBase::SetUp() {
 void ODBCMockTestBase::TearDown() {
   ASSERT_OK(server_->Shutdown());
   ASSERT_OK(server_->Wait());
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 void FlightSQLODBCMockTestBase::TearDown() {
@@ -429,6 +435,8 @@ void FlightSQLOdbcEnvConnHandleMockTestBase::TearDown() {
   EXPECT_EQ(SQL_SUCCESS, SQLFreeHandle(SQL_HANDLE_ENV, env));
 
   ASSERT_OK(server_->Shutdown());
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 bool CompareConnPropertyMap(Connection::ConnPropertyMap map1,
