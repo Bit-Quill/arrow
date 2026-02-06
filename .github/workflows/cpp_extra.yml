@@ -532,7 +532,7 @@ jobs:
   odbc-release:
     name: ODBC release
     runs-on: ubuntu-latest
-    if: ${{ contains(github.ref_name, 'apache-arrow-*-rc*') }}
+    if: ${{ startsWith(github.ref_name, 'apache-arrow-') && contains(github.ref_name, '-rc') }}
     permissions:
       # Upload to GitHub Release
       contents: write
