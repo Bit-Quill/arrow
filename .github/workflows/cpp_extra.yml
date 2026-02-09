@@ -422,8 +422,8 @@ jobs:
           sudo sysctl -w kern.coredump=1
           sudo sysctl -w kern.corefile=/tmp/core.%N.%P
           ulimit -c unlimited  # must enable within the same shell
-          $(pwd)/build/cpp/debug/arrow-odbc-spi-impl-test
-          $(pwd)/build/cpp/debug/arrow-flight-sql-odbc-test
+          sudo $(pwd)/build/cpp/debug/arrow-odbc-spi-impl-test
+          sudo $(pwd)/build/cpp/debug/arrow-flight-sql-odbc-test
       - name: Test
         shell: bash
         run: |
