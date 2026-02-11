@@ -164,21 +164,25 @@ class ODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   std::wstring GetQueryAllDataTypes() override;
 
   /// \brief Run a SQL query to create default table for table test cases
-  void CreateTestTables();
+  static void CreateTestTable();
+  /// \brief Run a SQL query to drop default table for table test cases
+  static void DropTestTable();
 
   /// \brief run a SQL query to create a table with all data types
-  void CreateTableAllDataType();
-  /// \brief run a SQL query to create a table with unicode name
-  void CreateUnicodeTable();
+  static void CreateAllDataTypeTable();
+  /// \brief run a SQL query to drop a table with all data types
+  static void DropAllDataTypeTable();
 
-  int port;
+  /// \brief run a SQL query to create a table with unicode name
+  static void CreateUnicodeTable();
+  /// \brief run a SQL query to drop a table with unicode name
+  static void DropUnicodeTable();
+
+  inline static int port = 0;
 
  protected:
-  void SetUp() override;
-
-  void TearDown() override;
-
-  std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server_;
+  inline static std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer>
+      server_;
 };
 
 /// \brief Base test fixture for running tests against a mock server.
@@ -186,6 +190,10 @@ class ODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
 /// fixture inheriting from this base fixture.
 class FlightSQLODBCMockTestBase : public ODBCMockTestBase {
  protected:
+  static void SetUpTestSuite();
+
+  static void TearDownTestSuite();
+
   void SetUp() override;
 
   void TearDown() override;
