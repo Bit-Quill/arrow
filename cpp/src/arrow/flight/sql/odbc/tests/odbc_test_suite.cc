@@ -26,7 +26,36 @@
 #include "arrow/flight/sql/odbc/odbc_impl/encoding_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 
+std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> mock_server;
+int mock_server_port = 0;
+
 namespace arrow::flight::sql::odbc {
+
+class MockServerEnvironment : public ::testing::Environment {
+ public:
+  void SetUp() override {
+    ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
+    arrow::flight::FlightServerOptions options(location);
+    options.auth_handler = std::make_unique<NoOpAuthHandler>();
+    options.middleware.push_back(
+        {"bearer-auth-server", std::make_shared<MockServerMiddlewareFactory>()});
+    ASSERT_OK_AND_ASSIGN(mock_server,
+                         arrow::flight::sql::example::SQLiteFlightSqlServer::Create());
+    ASSERT_OK(mock_server->Init(options));
+
+    mock_server_port = mock_server->port();
+    ASSERT_OK_AND_ASSIGN(location, Location::ForGrpcTcp("localhost", mock_server_port));
+    ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
+  }
+
+  void TearDown() override {
+    ASSERT_OK(mock_server->Shutdown());
+    ASSERT_OK(mock_server->Wait());
+  }
+};
+
+::testing::Environment* mock_env =
+    ::testing::AddGlobalTestEnvironment(new MockServerEnvironment);
 
 void ODBCRemoteTestBase::AllocEnvConnHandles(SQLINTEGER odbc_ver) {
   // Allocate an environment handle
@@ -244,7 +273,7 @@ Status MockServerMiddlewareFactory::StartCall(
 std::string ODBCMockTestBase::GetConnectionString() {
   std::string connect_str(
       "driver={Apache Arrow Flight SQL ODBC Driver};HOST=localhost;port=" +
-      std::to_string(port) + ";token=" + std::string(kTestToken) +
+      std::to_string(mock_server_port) + ";token=" + std::string(kTestToken) +
       ";useEncryption=false;UseWideChar=true;");
   return connect_str;
 }
@@ -306,7 +335,7 @@ std::wstring ODBCMockTestBase::GetQueryAllDataTypes() {
 }
 
 void ODBCMockTestBase::CreateTestTable() {
-  ASSERT_OK(server_->ExecuteSql(R"(
+  ASSERT_OK(mock_server->ExecuteSql(R"(
     CREATE TABLE TestTable (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     keyName varchar(100),
@@ -319,14 +348,14 @@ void ODBCMockTestBase::CreateTestTable() {
 }
 
 void ODBCMockTestBase::DropTestTable() {
-  ASSERT_OK(server_->ExecuteSql("DROP TABLE TestTable;"));
+  ASSERT_OK(mock_server->ExecuteSql("DROP TABLE TestTable;"));
 }
 
 void ODBCMockTestBase::CreateAllDataTypeTable() {
   // Limitation on mock SQLite server:
   // Only int64, float64, binary, and utf8 Arrow Types are supported by
   // SQLiteFlightSqlServer::Impl::DoGetTables
-  ASSERT_OK(server_->ExecuteSql(R"(
+  ASSERT_OK(mock_server->ExecuteSql(R"(
     CREATE TABLE AllTypesTable(
     bigint_col INTEGER PRIMARY KEY AUTOINCREMENT,
     char_col varchar(100),
@@ -345,7 +374,7 @@ void ODBCMockTestBase::CreateAllDataTypeTable() {
 }
 
 void ODBCMockTestBase::DropAllDataTypeTable() {
-  ASSERT_OK(server_->ExecuteSql("DROP TABLE AllTypesTable;"));
+  ASSERT_OK(mock_server->ExecuteSql("DROP TABLE AllTypesTable;"));
 }
 
 void ODBCMockTestBase::CreateUnicodeTable() {
@@ -359,33 +388,13 @@ void ODBCMockTestBase::CreateUnicodeTable() {
     INSERT INTO 数据 (资料) VALUES ('3rd Row');
   )")
                                 .ValueOr("");
-  ASSERT_OK(server_->ExecuteSql(unicode_sql));
+  ASSERT_OK(mock_server->ExecuteSql(unicode_sql));
 }
 
 void ODBCMockTestBase::DropUnicodeTable() {
   std::string unicode_sql =
       arrow::util::WideStringToUTF8(L"DROP TABLE 数据;").ValueOr("");
-  ASSERT_OK(server_->ExecuteSql(unicode_sql));
-}
-
-void FlightSQLODBCMockTestBase::SetUpTestSuite() {
-  ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
-  arrow::flight::FlightServerOptions options(location);
-  options.auth_handler = std::make_unique<NoOpAuthHandler>();
-  options.middleware.push_back(
-      {"bearer-auth-server", std::make_shared<MockServerMiddlewareFactory>()});
-  ASSERT_OK_AND_ASSIGN(server_,
-                       arrow::flight::sql::example::SQLiteFlightSqlServer::Create());
-  ASSERT_OK(server_->Init(options));
-
-  port = server_->port();
-  ASSERT_OK_AND_ASSIGN(location, Location::ForGrpcTcp("localhost", port));
-  ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
-}
-
-void FlightSQLODBCMockTestBase::TearDownTestSuite() {
-  ASSERT_OK(server_->Shutdown());
-  ASSERT_OK(server_->Wait());
+  ASSERT_OK(mock_server->ExecuteSql(unicode_sql));
 }
 
 void FlightSQLODBCMockTestBase::SetUp() {

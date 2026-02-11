@@ -177,12 +177,6 @@ class ODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   static void CreateUnicodeTable();
   /// \brief run a SQL query to drop a table with unicode name
   static void DropUnicodeTable();
-
-  inline static int port = 0;
-
- protected:
-  inline static std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer>
-      server_;
 };
 
 /// \brief Base test fixture for running tests against a mock server.
@@ -190,10 +184,6 @@ class ODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
 /// fixture inheriting from this base fixture.
 class FlightSQLODBCMockTestBase : public ODBCMockTestBase {
  protected:
-  static void SetUpTestSuite();
-
-  static void TearDownTestSuite();
-
   void SetUp() override;
 
   void TearDown() override;
