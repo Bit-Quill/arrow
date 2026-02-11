@@ -164,21 +164,19 @@ class ODBCMockTestBase : public FlightSQLODBCRemoteTestBase {
   std::wstring GetQueryAllDataTypes() override;
 
   /// \brief Run a SQL query to create default table for table test cases
-  void CreateTestTables();
+  static void CreateTestTable();
+  /// \brief Run a SQL query to drop default table for table test cases
+  static void DropTestTable();
 
   /// \brief run a SQL query to create a table with all data types
-  void CreateTableAllDataType();
+  static void CreateAllDataTypeTable();
+  /// \brief run a SQL query to drop a table with all data types
+  static void DropAllDataTypeTable();
+
   /// \brief run a SQL query to create a table with unicode name
-  void CreateUnicodeTable();
-
-  int port;
-
- protected:
-  void SetUp() override;
-
-  void TearDown() override;
-
-  std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> server_;
+  static void CreateUnicodeTable();
+  /// \brief run a SQL query to drop a table with unicode name
+  static void DropUnicodeTable();
 };
 
 /// \brief Base test fixture for running tests against a mock server.

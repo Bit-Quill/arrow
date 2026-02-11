@@ -580,7 +580,7 @@ TEST_F(ColumnsMockTest, TestSQLColumnsAllTypes) {
   // octet length from column size.
 
   // Checks filtering table with table name pattern
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   // Attempt to get all columns from AllTypesTable
   SQLWCHAR table_pattern[] = L"AllTypesTable";
@@ -675,13 +675,15 @@ TEST_F(ColumnsMockTest, TestSQLColumnsAllTypes) {
 
   // There should be no more column data
   ASSERT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
+
+  DropAllDataTypeTable();
 }
 
 TEST_F(ColumnsMockTest, TestSQLColumnsUnicode) {
   // Limitation: Mock server returns incorrect values for column size for some columns.
   // For character and binary type columns, the driver calculates buffer length and char
   // octet length from column size.
-  this->CreateUnicodeTable();
+  CreateUnicodeTable();
 
   // Attempt to get all columns
   SQLWCHAR table_pattern[] = L"数据";
@@ -713,6 +715,8 @@ TEST_F(ColumnsMockTest, TestSQLColumnsUnicode) {
 
   // There should be no more column data
   EXPECT_EQ(SQL_NO_DATA, SQLFetch(this->stmt));
+
+  DropUnicodeTable();
 }
 
 TEST_F(ColumnsRemoteTest, TestSQLColumnsAllTypes) {
@@ -1313,7 +1317,7 @@ TYPED_TEST(ColumnsTest, SQLColAttributeInvalidColId) {
 }
 
 TEST_F(ColumnsMockTest, TestSQLColAttributeAllTypes) {
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -1390,13 +1394,15 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeAllTypes) {
                        8,                            // expected_octet_length
                        SQL_PRED_NONE,                // expected_searchable
                        SQL_FALSE);                   // expected_unsigned_column
+
+  DropAllDataTypeTable();
 }
 
 // iODBC does not support SQLColAttributes for ODBC 3.0 attributes.
 #ifndef __APPLE__
 TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesAllTypes) {
   // Tests ODBC 2.0 API SQLColAttributes
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::vector<SQLWCHAR> sql0(wsql.begin(), wsql.end());
@@ -1452,6 +1458,8 @@ TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesAllTypes) {
                         SQL_NULLABLE,                 // expected_column_nullability
                         SQL_PRED_NONE,                // expected_searchable
                         SQL_FALSE);                   // expected_unsigned_column
+
+  DropAllDataTypeTable();
 }
 #endif  // __APPLE__
 
@@ -1787,7 +1795,7 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributeAllTypesODBCVer2) {
 }
 
 // iODBC does not support SQLColAttributes for ODBC 3.0 attributes.
-TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesAllTypesODBCVer2) {
+TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesAllTypes) {
   // Tests ODBC 2.0 API SQLColAttributes
   // Test assumes there is a table $scratch.ODBCTest in remote server
   std::wstring wsql = L"SELECT * from $scratch.ODBCTest;";
@@ -1942,12 +1950,14 @@ TYPED_TEST(ColumnsOdbcV2Test, TestSQLColAttributesCaseSensitive) {
 
 TEST_F(ColumnsMockTest, TestSQLColAttributeUniqueValue) {
   // Mock server limitation: returns false for auto-increment column
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   SQLLEN value;
   GetSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_DESC_AUTO_UNIQUE_VALUE, &value);
   ASSERT_EQ(SQL_FALSE, value);
+
+  DropAllDataTypeTable();
 }
 
 // iODBC does not support SQLColAttributes for ODBC 3.0 attributes.
@@ -1955,46 +1965,54 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeUniqueValue) {
 TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesAutoIncrement) {
   // Tests ODBC 2.0 API SQLColAttributes
   // Mock server limitation: returns false for auto-increment column
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   SQLLEN value;
   GetSQLColAttributeNumeric(this->stmt, wsql, 1, SQL_COLUMN_AUTO_INCREMENT, &value);
   ASSERT_EQ(SQL_FALSE, value);
+
+  DropAllDataTypeTable();
 }
 #endif  // __APPLE__
 
 TEST_F(ColumnsMockTest, TestSQLColAttributeBaseTableName) {
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
   GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_BASE_TABLE_NAME, value);
   ASSERT_EQ(std::wstring(L"AllTypesTable"), value);
+
+  DropAllDataTypeTable();
 }
 
 // iODBC does not support SQLColAttributes for ODBC 3.0 attributes.
 #ifndef __APPLE__
 TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesTableName) {
   // Tests ODBC 2.0 API SQLColAttributes
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
   GetSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_TABLE_NAME, value);
   ASSERT_EQ(std::wstring(L"AllTypesTable"), value);
+
+  DropAllDataTypeTable();
 }
 #endif  // __APPLE__
 
 TEST_F(ColumnsMockTest, TestSQLColAttributeCatalogName) {
   // Mock server limitattion: mock doesn't return catalog for result metadata,
   // and the defautl catalog should be 'main'
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
   GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_CATALOG_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
+
+  DropAllDataTypeTable();
 }
 
 TEST_F(ColumnsRemoteTest, TestSQLColAttributeCatalogName) {
@@ -2012,12 +2030,14 @@ TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesQualifierName) {
   // Mock server limitattion: mock doesn't return catalog for result metadata,
   // and the defautl catalog should be 'main'
   // Tests ODBC 2.0 API SQLColAttributes
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
   GetSQLColAttributeString(this->stmt, wsql, 1, SQL_COLUMN_QUALIFIER_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
+
+  DropAllDataTypeTable();
 }
 
 TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesQualifierName) {
@@ -2054,13 +2074,15 @@ TEST_F(ColumnsRemoteTest, TestSQLColAttributeLocalTypeName) {
 }
 
 TEST_F(ColumnsMockTest, TestSQLColAttributeSchemaName) {
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   // Mock server doesn't have schemas
   std::wstring value;
   GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_SCHEMA_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
+
+  DropAllDataTypeTable();
 }
 
 TEST_F(ColumnsRemoteTest, TestSQLColAttributeSchemaName) {
@@ -2078,13 +2100,15 @@ TEST_F(ColumnsRemoteTest, TestSQLColAttributeSchemaName) {
 #ifndef __APPLE__
 TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesOwnerName) {
   // Tests ODBC 2.0 API SQLColAttributes
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   // Mock server doesn't have schemas
   std::wstring value;
   GetSQLColAttributesString(this->stmt, wsql, 1, SQL_COLUMN_OWNER_NAME, value);
   ASSERT_EQ(std::wstring(L""), value);
+
+  DropAllDataTypeTable();
 }
 
 TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesOwnerName) {
@@ -2100,16 +2124,18 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesOwnerName) {
 #endif  // __APPLE__
 
 TEST_F(ColumnsMockTest, TestSQLColAttributeTableName) {
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
   GetSQLColAttributeString(this->stmt, wsql, 1, SQL_DESC_TABLE_NAME, value);
   ASSERT_EQ(std::wstring(L"AllTypesTable"), value);
+
+  DropAllDataTypeTable();
 }
 
 TEST_F(ColumnsMockTest, TestSQLColAttributeTypeName) {
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   std::wstring value;
@@ -2121,6 +2147,8 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeTypeName) {
   ASSERT_EQ(std::wstring(L"BINARY"), value);
   GetSQLColAttributeString(this->stmt, L"", 4, SQL_DESC_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"DOUBLE"), value);
+
+  DropAllDataTypeTable();
 }
 
 TEST_F(ColumnsRemoteTest, TestSQLColAttributeTypeName) {
@@ -2150,7 +2178,7 @@ TEST_F(ColumnsRemoteTest, TestSQLColAttributeTypeName) {
 #ifndef __APPLE__
 TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesTypeName) {
   // Tests ODBC 2.0 API SQLColAttributes
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   std::wstring wsql = L"SELECT * from AllTypesTable;";
   // Mock server doesn't return data source-dependent data type name
@@ -2163,6 +2191,8 @@ TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesTypeName) {
   ASSERT_EQ(std::wstring(L"BINARY"), value);
   GetSQLColAttributesString(this->stmt, L"", 4, SQL_COLUMN_TYPE_NAME, value);
   ASSERT_EQ(std::wstring(L"DOUBLE"), value);
+
+  DropAllDataTypeTable();
 }
 
 TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesTypeName) {
@@ -2218,7 +2248,7 @@ TYPED_TEST(ColumnsOdbcV2Test, TestSQLColAttributesUpdatable) {
 #endif  // __APPLE__
 
 TEST_F(ColumnsMockTest, SQLDescribeColValidateInput) {
-  this->CreateTestTables();
+  CreateTestTable();
 
   SQLWCHAR sql_query[] = L"SELECT * FROM TestTable LIMIT 1;";
   SQLINTEGER query_length = static_cast<SQLINTEGER>(wcslen(sql_query));
@@ -2261,6 +2291,8 @@ TEST_F(ColumnsMockTest, SQLDescribeColValidateInput) {
                                       buf_char_len, &name_length, &data_type,
                                       &column_size, &decimal_digits, &nullable));
   VerifyOdbcErrorState(SQL_HANDLE_STMT, this->stmt, kErrorState07009);
+
+  DropTestTable();
 }
 
 TEST_F(ColumnsMockTest, SQLDescribeColQueryAllDataTypesMetadata) {
@@ -2555,7 +2587,7 @@ TEST_F(ColumnsOdbcV2RemoteTest, SQLDescribeColODBCTestTableMetadataODBCVer2) {
 }
 
 TEST_F(ColumnsMockTest, SQLDescribeColAllTypesTableMetadata) {
-  this->CreateTableAllDataType();
+  CreateAllDataTypeTable();
 
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
@@ -2603,10 +2635,12 @@ TEST_F(ColumnsMockTest, SQLDescribeColAllTypesTableMetadata) {
     decimal_digits = 0;
     nullable = 0;
   }
+
+  DropAllDataTypeTable();
 }
 
 TEST_F(ColumnsMockTest, SQLDescribeColUnicodeTableMetadata) {
-  this->CreateUnicodeTable();
+  CreateUnicodeTable();
 
   SQLWCHAR column_name[1024];
   SQLSMALLINT buf_char_len =
@@ -2641,6 +2675,8 @@ TEST_F(ColumnsMockTest, SQLDescribeColUnicodeTableMetadata) {
   EXPECT_EQ(column_size, expected_column_size);
   EXPECT_EQ(0, decimal_digits);
   EXPECT_EQ(SQL_NULLABLE, nullable);
+
+  DropUnicodeTable();
 }
 
 TYPED_TEST(ColumnsTest, SQLColumnsGetMetadataBySQLDescribeCol) {

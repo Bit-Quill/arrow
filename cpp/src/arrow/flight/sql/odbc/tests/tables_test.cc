@@ -99,7 +99,7 @@ TEST_F(TablesMockTest, SQLTablesTestGetMetadataForAllCatalogs) {
 }
 
 TEST_F(TablesMockTest, SQLTablesTestGetMetadataForNamedCatalog) {
-  this->CreateTestTables();
+  CreateTestTable();
 
   SQLWCHAR catalog_name[] = L"main";
   const SQLWCHAR* table_names[] = {static_cast<const SQLWCHAR*>(L"TestTable"),
@@ -126,6 +126,8 @@ TEST_F(TablesMockTest, SQLTablesTestGetMetadataForNamedCatalog) {
   }
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  DropTestTable();
 }
 
 TEST_F(TablesMockTest, SQLTablesTestGetSchemaHasNoData) {
@@ -252,7 +254,7 @@ TEST_F(TablesRemoteTest, SQLTablesGetMetadataForNamedSchema) {
 }
 
 TEST_F(TablesMockTest, SQLTablesTestGetMetadataForAllTables) {
-  this->CreateTestTables();
+  CreateTestTable();
 
   SQLWCHAR SQL_ALL_TABLES_W[] = L"%";
   const SQLWCHAR* table_names[] = {static_cast<const SQLWCHAR*>(L"TestTable"),
@@ -279,10 +281,12 @@ TEST_F(TablesMockTest, SQLTablesTestGetMetadataForAllTables) {
   }
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  DropTestTable();
 }
 
 TEST_F(TablesMockTest, SQLTablesTestGetMetadataForTableName) {
-  this->CreateTestTables();
+  CreateTestTable();
 
   // Use mutable arrays to pass SQLWCHAR parameters to SQLTables
   SQLWCHAR test_table[] = L"TestTable";
@@ -311,10 +315,12 @@ TEST_F(TablesMockTest, SQLTablesTestGetMetadataForTableName) {
 
     ValidateFetch(this->stmt, SQL_NO_DATA);
   }
+
+  DropTestTable();
 }
 
 TEST_F(TablesMockTest, SQLTablesTestGetMetadataForUnicodeTableByTableName) {
-  this->CreateUnicodeTable();
+  CreateUnicodeTable();
 
   SQLWCHAR unicodetable_name[] = L"数据";
   std::wstring expected_catalog_name = std::wstring(L"main");
@@ -335,10 +341,12 @@ TEST_F(TablesMockTest, SQLTablesTestGetMetadataForUnicodeTableByTableName) {
   CheckNullColumnW(this->stmt, 5);
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  DropUnicodeTable();
 }
 
 TEST_F(TablesMockTest, SQLTablesTestGetMetadataForInvalidTableNameNoData) {
-  this->CreateTestTables();
+  CreateTestTable();
 
   SQLWCHAR invalid_table_name[] = L"NonExistenttable_name";
 
@@ -347,11 +355,13 @@ TEST_F(TablesMockTest, SQLTablesTestGetMetadataForInvalidTableNameNoData) {
                                    invalid_table_name, SQL_NTS, nullptr, SQL_NTS));
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  DropTestTable();
 }
 
 TEST_F(TablesMockTest, SQLTablesGetMetadataForTableType) {
   // Mock server only supports table type "table" in lowercase
-  this->CreateTestTables();
+  CreateTestTable();
 
   SQLWCHAR table_type_table_lowercase[] = L"table";
   SQLWCHAR table_type_table_uppercase[] = L"TABLE";
@@ -398,6 +408,8 @@ TEST_F(TablesMockTest, SQLTablesGetMetadataForTableType) {
   }
 
   ValidateFetch(this->stmt, SQL_NO_DATA);
+
+  DropTestTable();
 }
 
 TEST_F(TablesRemoteTest, SQLTablesGetMetadataForTableTypeTable) {
