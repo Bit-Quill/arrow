@@ -336,9 +336,9 @@ jobs:
           cd cpp/examples/minimal_build
           ../minimal_build.build/arrow-example
 
-  odbc-macos-debug:
+  odbc-macos:
     needs: check-labels
-    name: ODBC Debug ${{ matrix.architecture }} macOS ${{ matrix.macos-version }}
+    name: ODBC ${{ matrix.build_type }} ${{ matrix.architecture }} macOS ${{ matrix.macos-version }}
     runs-on: macos-${{ matrix.macos-version }}
     if: >-
       needs.check-labels.outputs.force == 'true' ||
@@ -349,12 +349,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - architecture: AMD64
-            macos-version: "15-intel"
-          - architecture: ARM64
-            macos-version: "14"
+          - { architecture: AMD64, macos-version: "15-intel", build_type: debug }
+          - { architecture: AMD64, macos-version: "15-intel", build_type: release }
+          - { architecture: ARM64, macos-version: "14", build_type: debug }
+          - { architecture: ARM64, macos-version: "14", build_type: release }
     env:
       ARROW_BUILD_TESTS: ON
+      ARROW_BUILD_TYPE: ${{ matrix.build_type }}
       ARROW_FLIGHT_SQL_ODBC: ON
       ARROW_HOME: /tmp/local
       ARROW_DEPENDENCY_USE_SHARED: OFF
@@ -397,8 +398,8 @@ jobs:
         uses: actions/cache@v5.0.2
         with:
           path: ${{ steps.ccache-info.outputs.cache-dir }}
-          key: cpp-odbc-ccache-macos-${{ matrix.macos-version }}-${{ hashFiles('cpp/**') }}
-          restore-keys: cpp-odbc-ccache-macos-${{ matrix.macos-version }}-
+          key: cpp-odbc-ccache-macos-${{ matrix.macos-version }}-${{ matrix.build_type }}-${{ hashFiles('cpp/**') }}
+          restore-keys: cpp-odbc-ccache-macos-${{ matrix.macos-version }}-${{ matrix.build_type }}-
       - name: Build
         run: |
           # Homebrew uses /usr/local as prefix. So packages
@@ -418,99 +419,7 @@ jobs:
       - name: Register Flight SQL ODBC Driver
         run: |
           chmod +x cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh
-          sudo cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh $(pwd)/build/cpp/debug/libarrow_flight_sql_odbc.dylib
-      - name: Test
-        shell: bash
-        run: |
-          sudo sysctl -w kern.coredump=1
-          sudo sysctl -w kern.corefile=/tmp/core.%N.%P
-          ulimit -c unlimited  # must enable within the same shell
-          ci/scripts/cpp_test.sh $(pwd) $(pwd)/build
-
-  odbc-macos-release:
-    needs: check-labels
-    name: ODBC Release ${{ matrix.architecture }} macOS ${{ matrix.macos-version }}
-    runs-on: macos-${{ matrix.macos-version }}
-    if: >-
-      needs.check-labels.outputs.force == 'true' ||
-      contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra') ||
-      contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra: C++')
-    timeout-minutes: 75
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - architecture: AMD64
-            macos-version: "15-intel"
-          - architecture: ARM64
-            macos-version: "14"
-    env:
-      ARROW_BUILD_TESTS: ON
-      ARROW_FLIGHT_SQL_ODBC: ON
-      ARROW_HOME: /tmp/local
-      ARROW_DEPENDENCY_USE_SHARED: OFF
-      ARROW_DEPENDENCY_SOURCE: BUNDLED
-      ARROW_MIMALLOC: OFF
-      CMAKE_CXX_STANDARD: "20"
-    steps:
-      - name: Checkout Arrow
-        uses: actions/checkout@v6.0.1
-        with:
-          fetch-depth: 0
-          submodules: recursive
-      - name: Install Dependencies
-        run: |
-          brew bundle --file=cpp/Brewfile
-          
-          # We want to use bundled RE2 for static linking. If
-          # Homebrew's RE2 is installed, its header file may be used.
-          # We uninstall Homebrew's RE2 to ensure using bundled RE2.
-          brew uninstall grpc || : # gRPC depends on RE2
-          brew uninstall grpc@1.54 || : # gRPC 1.54 may be installed too
-          brew uninstall re2
-
-          # We want to use bundled Protobuf for static linking. If
-          # Homebrew's Protobuf is installed, its library file may be
-          # used on test  We uninstall Homebrew's Protobuf to ensure using
-          # bundled Protobuf.
-          brew uninstall protobuf
-
-          # We want to use bundled Boost for static linking.
-          brew uninstall boost
-      - name: Setup ccache
-        run: |
-          ci/scripts/ccache_setup.sh
-      - name: ccache info
-        id: ccache-info
-        run: |
-          echo "cache-dir=$(ccache --get-config cache_dir)" >> $GITHUB_OUTPUT
-      - name: Cache ccache
-        uses: actions/cache@v5.0.2
-        with:
-          path: ${{ steps.ccache-info.outputs.cache-dir }}
-          key: cpp-odbc-ccache-macos-${{ matrix.macos-version }}-${{ hashFiles('cpp/**') }}
-          restore-keys: cpp-odbc-ccache-macos-${{ matrix.macos-version }}-
-      - name: Build
-        run: |
-          # Homebrew uses /usr/local as prefix. So packages
-          # installed by Homebrew also use /usr/local/include. We
-          # want to include headers for packages installed by
-          # Homebrew as system headers to ignore warnings in them.
-          # But "-isystem /usr/local/include" isn't used by CMake
-          # because /usr/local/include is marked as the default
-          # include path. So we disable -Werror to avoid build error
-          # by warnings from packages installed by Homebrew.
-          export BUILD_WARNING_LEVEL=PRODUCTION
-          LIBIODBC_DIR="$(brew --cellar libiodbc)/$(brew list --versions libiodbc | awk '{print $2}')"
-          ODBC_INCLUDE_DIR=$LIBIODBC_DIR/include
-          export ARROW_CMAKE_ARGS="-DODBC_INCLUDE_DIR=$ODBC_INCLUDE_DIR"
-          export CXXFLAGS="$CXXFLAGS -I$ODBC_INCLUDE_DIR"
-          export ARROW_BUILD_TYPE=release
-          ci/scripts/cpp_build.sh $(pwd) $(pwd)/build
-      - name: Register Flight SQL ODBC Driver
-        run: |
-          chmod +x cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh
-          sudo cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh $(pwd)/build/cpp/release/libarrow_flight_sql_odbc.dylib
+          sudo cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh $(pwd)/build/cpp/${{ matrix.build_type }}/libarrow_flight_sql_odbc.dylib
       - name: Test
         shell: bash
         run: |
@@ -771,8 +680,7 @@ jobs:
       - jni-linux
       - jni-macos
       - msvc-arm64
-      - odbc-macos-debug
-      - odbc-macos-release
+      - odbc-macos
       - odbc-msvc
     uses: ./.github/workflows/report_ci.yml
     secrets: inherit
