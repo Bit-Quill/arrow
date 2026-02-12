@@ -821,6 +821,7 @@ void LoadPropertiesFromDSN(const std::string& dsn,
   for (auto& [key, value] : dsn_properties) {
     auto prop_iter = properties.find(key);
     if (prop_iter == properties.end()) {
+      ARROW_LOG(DEBUG) << "-AL-4  " << key << " = " << value;
       properties.emplace(std::make_pair(std::move(key), std::move(value)));
     }
   }
@@ -861,7 +862,13 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
     std::optional<std::string> dsn = ODBCConnection::GetDsnIfExists(connection_string);
     if (dsn.has_value()) {
       dsn_value = dsn.value();
+      ARROW_LOG(DEBUG) << "-AL- dsn_value: " << dsn_value;
       LoadPropertiesFromDSN(dsn_value, properties);
+    ARROW_LOG(DEBUG) << "-AL- Connection properties 1:";
+
+    for (const auto& [key, value] : properties) {
+      ARROW_LOG(DEBUG) << "-AL-1  " << key << " = " << value;
+    }
     }
     ODBCConnection::GetPropertiesFromConnString(connection_string, properties);
 
@@ -903,6 +910,12 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
     }
 #else
     // Attempt connection without loading DSN window on macOS/Linux
+    ARROW_LOG(DEBUG) << "-AL- Connection properties2:";
+
+    for (const auto& [key, value] : properties) {
+      ARROW_LOG(DEBUG) << "-AL-2  " << key << " = " << value;
+    }
+
     connection->Connect(dsn_value, properties, missing_properties);
 #endif
     // Copy connection string to out_connection_string after connection attempt

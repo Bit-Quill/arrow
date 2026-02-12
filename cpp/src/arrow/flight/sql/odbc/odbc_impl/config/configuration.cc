@@ -28,6 +28,8 @@
 #include <iterator>
 #include <sstream>
 
+#include "arrow/util/logging.h" // -AL- TEMP
+
 namespace arrow::flight::sql::odbc {
 namespace config {
 static const char DEFAULT_DSN[] = "Apache Arrow Flight SQL";
@@ -58,6 +60,10 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
 
   std::wstring wresult = std::wstring(buf.data(), ret);
   CONVERT_UTF8_STR(const std::string result, wresult);
+  ARROW_LOG(DEBUG) << "-AL- dsn: " << dsn;
+  ARROW_LOG(DEBUG) << "-AL- key: " << key;
+  ARROW_LOG(DEBUG) << "-AL- dflt: " << dflt;
+  ARROW_LOG(DEBUG) << "-AL- result: " << result;
   return result;
 }
 
@@ -184,6 +190,10 @@ void Configuration::Emplace(std::string_view key, std::string&& value) {
 }
 
 const Connection::ConnPropertyMap& Configuration::GetProperties() const {
+ARROW_LOG(DEBUG) << "-AL- Configuration::GetProperties:";
+    for (const auto& [key, value] : this->properties_) {
+      ARROW_LOG(DEBUG) << "-AL-5  " << key << " = " << value;
+    }
   return this->properties_;
 }
 
