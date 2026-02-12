@@ -26,6 +26,8 @@
 #include "arrow/flight/sql/odbc/odbc_impl/encoding_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 
+#include "arrow/util/logging.h" //-AL- TEMP
+
 std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> mock_server;
 int mock_server_port = 0;
 
@@ -34,6 +36,7 @@ namespace arrow::flight::sql::odbc {
 class MockServerEnvironment : public ::testing::Environment {
  public:
   void SetUp() override {
+    
     ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
     arrow::flight::FlightServerOptions options(location);
     options.auth_handler = std::make_unique<NoOpAuthHandler>();
@@ -46,11 +49,14 @@ class MockServerEnvironment : public ::testing::Environment {
     mock_server_port = mock_server->port();
     ASSERT_OK_AND_ASSIGN(location, Location::ForGrpcTcp("localhost", mock_server_port));
     ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
+    
+    ARROW_LOG(DEBUG) << "-AL- mock server created";
   }
 
   void TearDown() override {
     ASSERT_OK(mock_server->Shutdown());
     ASSERT_OK(mock_server->Wait());
+    ARROW_LOG(DEBUG) << "-AL- mock server shutdown";
   }
 };
 

@@ -25,6 +25,8 @@
 
 #include <gtest/gtest.h>
 
+#include "arrow/util/logging.h" //-AL- TEMP
+
 namespace arrow::flight::sql::odbc {
 
 template <typename T>
@@ -261,13 +263,15 @@ TYPED_TEST(ConnectionHandleTest, TestSQLDriverConnectDsn) {
 
   // Update connection string to use DSN to connect
   connect_str = std::string("DSN=") + std::string(kTestDsn) +
-                std::string(";driver={Apache Arrow Flight SQL ODBC Driver};");
+                std::string(";"); //-AL- temp remove ODBC driver name.
   ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
                        arrow::util::UTF8ToWideString(connect_str));
   std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
 
   SQLWCHAR out_str[kOdbcBufferSize] = L"";
   SQLSMALLINT out_str_len;
+
+  ARROW_LOG(DEBUG) << "-AL- connect_str: " << connect_str;
 
   // Connecting to ODBC server.
   ASSERT_EQ(SQL_SUCCESS,
