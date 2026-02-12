@@ -43,7 +43,7 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
   CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
   CONVERT_WIDE_STR(const std::wstring wkey, key);
   CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
-
+// -AL- something wrong with this call, it doesn't read useEncrption for some reasons
 #define BUFFER_SIZE (1024)
   std::vector<wchar_t> buf(BUFFER_SIZE);
   int ret =
@@ -136,17 +136,27 @@ void Configuration::LoadDsn(const std::string& dsn) {
   Set(FlightSqlConnection::TOKEN, ReadDsnString(dsn, FlightSqlConnection::TOKEN));
   Set(FlightSqlConnection::UID, ReadDsnString(dsn, FlightSqlConnection::UID));
   Set(FlightSqlConnection::PWD, ReadDsnString(dsn, FlightSqlConnection::PWD));
+  Set(FlightSqlConnection::USE_WIDE_CHAR,
+      ReadDsnString(dsn, FlightSqlConnection::USE_WIDE_CHAR));
   Set(FlightSqlConnection::USE_ENCRYPTION,
-      ReadDsnString(dsn, FlightSqlConnection::USE_ENCRYPTION, DEFAULT_ENABLE_ENCRYPTION));
+      ReadDsnString(dsn, FlightSqlConnection::USE_ENCRYPTION)); // -AL- let's try without default on macOS
+  // Set(FlightSqlConnection::USE_ENCRYPTION,
+  //     ReadDsnString(dsn, FlightSqlConnection::USE_ENCRYPTION, DEFAULT_ENABLE_ENCRYPTION));
+  ARROW_LOG(DEBUG) << "-AL- Get(USE_ENCRYPTION) 1: " << Get(FlightSqlConnection::USE_ENCRYPTION);
   Set(FlightSqlConnection::TRUSTED_CERTS,
       ReadDsnString(dsn, FlightSqlConnection::TRUSTED_CERTS));
   Set(FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
-      ReadDsnString(dsn, FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
-                    DEFAULT_USE_CERT_STORE));
+      ReadDsnString(dsn, FlightSqlConnection::USE_SYSTEM_TRUST_STORE));
+  // Set(FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
+  //     ReadDsnString(dsn, FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
+  //                   DEFAULT_USE_CERT_STORE));
+    ARROW_LOG(DEBUG) << "-AL- Get(USE_ENCRYPTION) 2: " << Get(FlightSqlConnection::USE_ENCRYPTION); 
+      ARROW_LOG(DEBUG) << "-AL- Get(USE_SYSTEM_TRUST_STORE): " << Get(FlightSqlConnection::USE_SYSTEM_TRUST_STORE);                 
   Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
       ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
                     DEFAULT_DISABLE_CERT_VERIFICATION));
-
+ARROW_LOG(DEBUG) << "-AL- Get(DISABLE_CERTIFICATE_VERIFICATION): " << Get(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION);                 
+  
   auto customKeys = ReadAllKeys(dsn);
   RemoveAllKnownKeys(customKeys);
   for (auto key : customKeys) {
