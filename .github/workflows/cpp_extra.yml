@@ -425,6 +425,12 @@ jobs:
           sudo sysctl -w kern.coredump=1
           sudo sysctl -w kern.corefile=/tmp/core.%N.%P
           ulimit -c unlimited  # must enable within the same shell
+
+          # -AL- otool statements in CI
+          otool -L $(pwd)/build/cpp/debug/arrow-flight-sql-odbc-test
+          otool -L $(pwd)/build/cpp/debug/libarrow_flight_sql_odbc.dylib
+
+
           ci/scripts/cpp_test.sh $(pwd) $(pwd)/build
 
   odbc-msvc:
