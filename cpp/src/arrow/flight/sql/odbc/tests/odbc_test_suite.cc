@@ -36,7 +36,8 @@ namespace arrow::flight::sql::odbc {
 class MockServerEnvironment : public ::testing::Environment {
  public:
   void SetUp() override {
-    
+    ARROW_LOG(INFO) << "-AL- mock server created 1 ";
+
     ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
     arrow::flight::FlightServerOptions options(location);
     options.auth_handler = std::make_unique<NoOpAuthHandler>();
@@ -50,7 +51,7 @@ class MockServerEnvironment : public ::testing::Environment {
     ASSERT_OK_AND_ASSIGN(location, Location::ForGrpcTcp("localhost", mock_server_port));
     ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
     
-    ARROW_LOG(DEBUG) << "-AL- mock server created";
+    ARROW_LOG(INFO) << "-AL- mock server created 2 ";
   }
 
   void TearDown() override {
