@@ -362,6 +362,7 @@ jobs:
       ARROW_DEPENDENCY_SOURCE: BUNDLED
       ARROW_MIMALLOC: OFF
       CMAKE_CXX_STANDARD: "20"
+      CMAKE_PREFIX_PATH: /tmp/local
     steps:
       - name: Checkout Arrow
         uses: actions/checkout@v6.0.1
