@@ -259,7 +259,6 @@ function(ADD_ARROW_TEST REL_TEST_NAME)
   else()
     set(LABELS "arrow-tests")
   endif()
-
   add_test_case(${REL_TEST_NAME}
                 PREFIX
                 ${PREFIX}

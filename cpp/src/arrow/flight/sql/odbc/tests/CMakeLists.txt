@@ -64,8 +64,8 @@ if(WIN32)
                  ${ODBCINST}
                  ${SQLite3_LIBRARIES}
                  ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS})
-elseif(APPLE)
-  # macOS
+else()
+  # Unix
   add_arrow_test(flight_sql_odbc_test
                  SOURCES
                  ${ARROW_FLIGHT_SQL_ODBC_TEST_SRCS}

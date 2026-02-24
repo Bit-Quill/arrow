@@ -15,9 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// flight_sql_connection.h needs to be included first due to conflicts with windows.h
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
+
 #include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
 
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
+#include "arrow/flight/sql/odbc/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/util.h"
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
@@ -27,6 +30,10 @@
 #include <boost/range/algorithm/copy.hpp>
 #include <iterator>
 #include <sstream>
+
+#include "arrow/util/logging.h"  // -AL- TEMP
+
+using ODBC::SetAttributeSQLWCHAR;
 
 namespace arrow::flight::sql::odbc {
 namespace config {
@@ -42,22 +49,37 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
   CONVERT_WIDE_STR(const std::wstring wkey, key);
   CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
 
+  // -AL- found workaround for `cannot convert 'const wchar_t*' to 'LPCWSTR' {aka
+  // 'const short unsigned int*'}` on Linux.
+
+  // Via CONVERT_WIDE_STR, Arrow correctly converts to UFT-32 on Unix systems,
+  // so the conversion from wchar_t to short unsigned int* will work on Linux.
+
+  // -AL- I just need to wrap `reinterpret_cast<LPCWSTR>()` on all string args for
+  // SQLGetPrivateProfileString.
+
 #define BUFFER_SIZE (1024)
-  std::vector<wchar_t> buf(BUFFER_SIZE);
-  int ret =
-      SQLGetPrivateProfileString(wdsn.c_str(), wkey.c_str(), wdflt.c_str(), buf.data(),
-                                 static_cast<int>(buf.size()), L"ODBC.INI");
+  std::vector<SQLWCHAR> buf(BUFFER_SIZE);
+  int ret = SQLGetPrivateProfileString(
+      reinterpret_cast<LPCWSTR>(wdsn.c_str()), reinterpret_cast<LPCWSTR>(wkey.c_str()),
+      reinterpret_cast<LPCWSTR>(wdflt.c_str()), buf.data(), static_cast<int>(buf.size()),
+      reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
 
   if (ret > BUFFER_SIZE) {
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
-    ret =
-        SQLGetPrivateProfileString(wdsn.c_str(), wkey.c_str(), wdflt.c_str(), buf.data(),
-                                   static_cast<int>(buf.size()), L"ODBC.INI");
+    ret = SQLGetPrivateProfileString(
+        reinterpret_cast<LPCWSTR>(wdsn.c_str()), reinterpret_cast<LPCWSTR>(wkey.c_str()),
+        reinterpret_cast<LPCWSTR>(wdflt.c_str()), buf.data(),
+        static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
   }
 
-  std::wstring wresult = std::wstring(buf.data(), ret);
-  CONVERT_UTF8_STR(const std::string result, wresult);
+  std::string result("");
+  ARROW_LOG(DEBUG) << "-AL- ReadDsnString key: " << key;
+  ARROW_LOG(DEBUG) << "-AL- ReadDsnString result before: " << result;
+  SetAttributeSQLWCHAR(buf.data(), ret * GetSqlWCharSize(), result);
+  ARROW_LOG(DEBUG) << "-AL- ReadDsnString result: " << result;
+  ARROW_LOG(DEBUG) << "-AL- ReadDsnString ret: " << ret;
   return result;
 }
 
@@ -77,30 +99,35 @@ void RemoveAllKnownKeys(std::vector<std::string>& keys) {
 std::vector<std::string> ReadAllKeys(const std::string& dsn) {
   CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
 
-  std::vector<wchar_t> buf(BUFFER_SIZE);
+  std::vector<SQLWCHAR> buf(BUFFER_SIZE);
 
-  int ret = SQLGetPrivateProfileString(wdsn.c_str(), NULL, L"", buf.data(),
-                                       static_cast<int>(buf.size()), L"ODBC.INI");
+  int ret = SQLGetPrivateProfileString(
+      reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL, reinterpret_cast<LPCWSTR>(L""),
+      buf.data(), static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
 
   if (ret > BUFFER_SIZE) {
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
-    ret = SQLGetPrivateProfileString(wdsn.c_str(), NULL, L"", buf.data(),
-                                     static_cast<int>(buf.size()), L"ODBC.INI");
+    ret = SQLGetPrivateProfileString(
+        reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL, reinterpret_cast<LPCWSTR>(L""),
+        buf.data(), static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
   }
 
   // When you pass NULL to SQLGetPrivateProfileString it gives back a \0 delimited list of
   // all the keys. The below loop simply tokenizes all the keys and places them into a
   // vector.
   std::vector<std::string> keys;
-  wchar_t* begin = buf.data();
+  SQLWCHAR* begin = buf.data();
   while (begin && *begin != '\0') {
-    wchar_t* cur;
+    SQLWCHAR* cur;
     for (cur = begin; *cur != '\0'; ++cur) {
     }
 
-    CONVERT_UTF8_STR(const std::string key, std::wstring(begin, cur));
+    std::string key("");
+    SQLINTEGER key_len = cur - begin;
+    SetAttributeSQLWCHAR(begin, key_len * GetSqlWCharSize(), key);
     keys.emplace_back(key);
+    ARROW_LOG(DEBUG) << "-AL- ReadAllKeys key: " << key;
     begin = ++cur;
   }
   return keys;
