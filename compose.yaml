@@ -151,6 +151,7 @@ x-hierarchy:
     - ubuntu-r-only-r
   - ubuntu-cpp-bundled
   - ubuntu-cpp-bundled-offline
+  - ubuntu-cpp-odbc
   - ubuntu-cpp-minimal
   - ubuntu-cuda-cpp:
     - ubuntu-cuda-python
@@ -490,6 +491,29 @@ services:
       <<: [*common, *ccache, *cpp]
       ARROW_DEPENDENCY_SOURCE: BUNDLED
       ARROW_OFFLINE: ON
+      # Apache ORC always uses external orc-format.
+      ARROW_ORC: OFF
+      CMAKE_GENERATOR: "Unix Makefiles"
+    volumes: *ubuntu-volumes
+    command: *cpp-command
+
+  ubuntu-cpp-odbc:
+    # Arrow build with BUNDLED dependencies with downloaded dependencies.
+    image: ${REPO}:${ARCH}-ubuntu-${UBUNTU}-cpp-odbc
+    build:
+      context: .
+      dockerfile: ci/docker/ubuntu-${UBUNTU}-cpp-odbc.dockerfile
+      cache_from:
+        - ${REPO}:${ARCH}-ubuntu-${UBUNTU}-cpp-odbc
+      args:
+        arch: ${ARCH}
+        base: "${ARCH}/ubuntu:${UBUNTU}"
+        llvm: ${LLVM}
+    shm_size: *shm-size
+    ulimits: *ulimits
+    environment:
+      <<: [*common, *ccache, *cpp]
+      ARROW_DEPENDENCY_SOURCE: BUNDLED
       # Apache ORC always uses external orc-format.
       ARROW_ORC: OFF
       CMAKE_GENERATOR: "Unix Makefiles"
