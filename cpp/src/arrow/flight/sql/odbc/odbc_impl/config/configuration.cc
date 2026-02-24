@@ -133,17 +133,7 @@ void Configuration::LoadDsn(const std::string& dsn) {
   Set(FlightSqlConnection::TRUSTED_CERTS,
       ReadDsnString(dsn, FlightSqlConnection::TRUSTED_CERTS));
 
-#ifndef __APPLE__
-  // Windows and Linux
-  Set(FlightSqlConnection::USE_ENCRYPTION,
-      ReadDsnString(dsn, FlightSqlConnection::USE_ENCRYPTION, DEFAULT_ENABLE_ENCRYPTION));
-  Set(FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
-      ReadDsnString(dsn, FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
-                    DEFAULT_USE_CERT_STORE));
-  Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
-      ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
-                    DEFAULT_DISABLE_CERT_VERIFICATION));
-#else
+#ifdef __APPLE__
   // macOS iODBC treats non-empty defaults as the real values when reading from system
   // DSN, so we don't pass defaults on macOS.
   // GH-49387 TODO: enable default values on macOS
@@ -153,6 +143,16 @@ void Configuration::LoadDsn(const std::string& dsn) {
       ReadDsnString(dsn, FlightSqlConnection::USE_SYSTEM_TRUST_STORE));
   Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
       ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION));
+#else
+  // Windows and Linux
+  Set(FlightSqlConnection::USE_ENCRYPTION,
+      ReadDsnString(dsn, FlightSqlConnection::USE_ENCRYPTION, DEFAULT_ENABLE_ENCRYPTION));
+  Set(FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
+      ReadDsnString(dsn, FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
+                    DEFAULT_USE_CERT_STORE));
+  Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
+      ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
+                    DEFAULT_DISABLE_CERT_VERIFICATION));
 #endif
 
   auto customKeys = ReadAllKeys(dsn);
