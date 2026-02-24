@@ -722,6 +722,7 @@ function(ADD_TEST_CASE REL_TEST_NAME)
 
   set(TEST_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TEST_NAME}")
   add_executable(${TEST_NAME} ${SOURCES})
+  message(STATUS "-AL- TEST_NAME: ${TEST_NAME}")
 
   # With OSX and conda, we need to set the correct RPATH so that dependencies
   # are found. The installed libraries with conda have an RPATH that matches

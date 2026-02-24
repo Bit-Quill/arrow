@@ -395,8 +395,10 @@ bool GetInfoCache::LoadInfoFromServer() {
               // Unused by ODBC.
               break;
             case SqlInfoOptions::SQL_DDL_SCHEMA: {
-              bool supports_schema_ddl =
-                  reinterpret_cast<BooleanScalar*>(scalar->child_value().get())->value;
+              // bool supports_schema_ddl =
+              //     reinterpret_cast<BooleanScalar*>(scalar->child_value().get())->value;
+              // -AL- todo raise GitHub issues for finishing this work.
+
               // Note: this is a bitmask and we can't describe cascade or restrict
               // flags.
               info_[SQL_DROP_SCHEMA] = static_cast<uint32_t>(SQL_DS_DROP_SCHEMA);
@@ -407,8 +409,10 @@ bool GetInfoCache::LoadInfoFromServer() {
               break;
             }
             case SqlInfoOptions::SQL_DDL_TABLE: {
-              bool supports_table_ddl =
-                  reinterpret_cast<BooleanScalar*>(scalar->child_value().get())->value;
+              // bool supports_table_ddl =
+              //     reinterpret_cast<BooleanScalar*>(scalar->child_value().get())->value;
+              // -AL- todo raise GitHub issues for finishing this work.
+
               // This is a bitmask and we cannot describe all clauses.
               info_[SQL_CREATE_TABLE] = static_cast<uint32_t>(SQL_CT_CREATE_TABLE);
               info_[SQL_DROP_TABLE] = static_cast<uint32_t>(SQL_DT_DROP_TABLE);
@@ -697,7 +701,6 @@ bool GetInfoCache::LoadInfoFromServer() {
               break;
             }
             case SqlInfoOptions::SQL_DEFAULT_TRANSACTION_ISOLATION: {
-              constexpr int32_t NONE = 0;
               constexpr int32_t READ_UNCOMMITTED = 1;
               constexpr int32_t READ_COMMITTED = 2;
               constexpr int32_t REPEATABLE_READ = 3;

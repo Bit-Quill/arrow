@@ -40,7 +40,7 @@ TEST(BooleanArrayFlightSqlAccessor, TestBooleanArrayCDataTypeBit) {
             accessor.GetColumnarData(&binding, 0, values.size(), value_offset, false,
                                      diagnostics, nullptr));
 
-  for (int i = 0; i < values.size(); ++i) {
+  for (size_t i = 0; i < values.size(); ++i) {
     ASSERT_EQ(sizeof(unsigned char), str_len_buffer[i]);
     ASSERT_EQ(values[i] ? 1 : 0, buffer[i]);
   }
