@@ -498,7 +498,8 @@ services:
     command: *cpp-command
 
   ubuntu-cpp-odbc:
-    # Arrow build with BUNDLED dependencies with downloaded dependencies.
+  # -AL- todo check this later
+    # Arrow Flight SQL ODBC build with BUNDLED dependencies with downloaded dependencies.
     image: ${REPO}:${ARCH}-ubuntu-${UBUNTU}-cpp-odbc
     build:
       context: .
