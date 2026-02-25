@@ -348,7 +348,7 @@ jobs:
     strategy:
       fail-fast: false
     env:
-      ARCH: arm64
+      ARCH: amd64
       CLANG_TOOLS: 18
       LLVM: 18
       UBUNTU: 24.04
