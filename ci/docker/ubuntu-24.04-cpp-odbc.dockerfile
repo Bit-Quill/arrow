@@ -63,6 +63,12 @@ RUN latest_system_llvm=18 && \
     rm -rf /var/lib/apt/lists*
 
 # Installs C++ toolchain and dependencies
+
+# -AL- dependencies 100% needed for ODBC:
+  # libsqlite3-dev
+  # unixodbc-dev 
+  # zlib1g-dev instead of ARROW_WITH_ZLIB=ON
+  # libssl-dev
 RUN apt-get update -y -q && \
     apt-get install -y -q --no-install-recommends \
         autoconf \
@@ -121,6 +127,7 @@ RUN apt-get update -y -q && \
         rsync \
         tzdata \
         tzdata-legacy \
+        unixodbc-dev \
         uuid-runtime \
         wget && \
     apt-get clean && \
@@ -179,7 +186,8 @@ ENV ARROW_ACERO=ON \
     ARROW_AZURE=ON \
     ARROW_BUILD_STATIC=ON \
     ARROW_BUILD_TESTS=ON \
-    ARROW_DEPENDENCY_SOURCE=SYSTEM \
+    ARROW_DEPENDENCY_SOURCE=BUNDLED \
+    ARROW_DEPENDENCY_USE_SHARED=OFF \
     ARROW_DATASET=ON \
     ARROW_FLIGHT=ON \
     ARROW_FLIGHT_SQL=ON \
