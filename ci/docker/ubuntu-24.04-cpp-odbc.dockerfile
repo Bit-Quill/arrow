@@ -168,6 +168,8 @@ RUN /arrow/ci/scripts/install_ceph.sh
 COPY ci/scripts/install_sccache.sh /arrow/ci/scripts/
 RUN /arrow/ci/scripts/install_sccache.sh unknown-linux-musl /usr/local/bin
 
+#-AL- todo: remove non-ODBC related flags
+
 # Prioritize system packages and local installation.
 #
 # The following dependencies will be downloaded due to missing/invalid packages
@@ -181,7 +183,7 @@ ENV ARROW_ACERO=ON \
     ARROW_DATASET=ON \
     ARROW_FLIGHT=ON \
     ARROW_FLIGHT_SQL=ON \
-    # ARROW_FLIGHT_SQL_ODBC=ON \ # -AL- start with just same file as before
+    ARROW_FLIGHT_SQL_ODBC=ON \
     ARROW_GANDIVA=ON \
     ARROW_GCS=ON \
     ARROW_HDFS=ON \
