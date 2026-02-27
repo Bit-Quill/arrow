@@ -43,25 +43,26 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
   CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
 
   // -AL- todo find workaround for `cannot convert 'const wchar_t*' to 'LPCWSTR' {aka
-  // 'const short unsigned int*'}` on Linux. 
+  // 'const short unsigned int*'}` on Linux.
   // Via CONVERT_WIDE_STR, Arrow correctly converts to UFT-32 on Unix systems,
   // so the conversion from wchar_t to short unsigned int* will work on Linux.
   // -AL- I just need to wrap `reinterpret_cast<LPCWSTR>()` on all string args for
   // SQLGetPrivateProfileString.
-  
 
 #define BUFFER_SIZE (1024)
-  std::vector<wchar_t> buf(BUFFER_SIZE);
-  int ret =
-      SQLGetPrivateProfileString(reinterpret_cast<LPCWSTR>(wdsn.c_str()), wkey.c_str(), wdflt.c_str(), buf.data(),
-                                 static_cast<int>(buf.size()), L"ODBC.INI");
+  std::vector<SQLWCHAR> buf(BUFFER_SIZE);
+  int ret = SQLGetPrivateProfileString(
+      reinterpret_cast<LPCWSTR>(wdsn.c_str()), reinterpret_cast<LPCWSTR>(wkey.c_str()),
+      reinterpret_cast<LPCWSTR>(wdflt.c_str()), buf.data(), static_cast<int>(buf.size()),
+      reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
 
   if (ret > BUFFER_SIZE) {
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
-    ret =
-        SQLGetPrivateProfileString(wdsn.c_str(), wkey.c_str(), wdflt.c_str(), buf.data(),
-                                   static_cast<int>(buf.size()), L"ODBC.INI");
+    ret = SQLGetPrivateProfileString(
+        reinterpret_cast<LPCWSTR>(wdsn.c_str()), reinterpret_cast<LPCWSTR>(wkey.c_str()),
+        reinterpret_cast<LPCWSTR>(wdflt.c_str()), buf.data(),
+        static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
   }
 
   std::wstring wresult = std::wstring(buf.data(), ret);
@@ -71,14 +72,14 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
 
 void RemoveAllKnownKeys(std::vector<std::string>& keys) {
   // Remove all known DSN keys from the passed in set of keys, case insensitively.
-  keys.erase(std::remove_if(
-                 keys.begin(), keys.end(),
-                 [&](auto& x) {
-                   return std::find_if(FlightSqlConnection::ALL_KEYS.begin(),
-                                       FlightSqlConnection::ALL_KEYS.end(), [&](auto& s) {
-                                         return boost::iequals(x, s);
-                                       }) != FlightSqlConnection::ALL_KEYS.end();
-                 }),
+  keys.erase(std::remove_if(keys.begin(), keys.end(),
+                            [&](auto& x) {
+                              return std::find_if(
+                                         FlightSqlConnection::ALL_KEYS.begin(),
+                                         FlightSqlConnection::ALL_KEYS.end(),
+                                         [&](auto& s) { return boost::iequals(x, s); }) !=
+                                     FlightSqlConnection::ALL_KEYS.end();
+                            }),
              keys.end());
 }
 
@@ -87,14 +88,16 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
 
   std::vector<wchar_t> buf(BUFFER_SIZE);
 
-  int ret = SQLGetPrivateProfileString(reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL, L"", buf.data(),
-                                       static_cast<int>(buf.size()), L"ODBC.INI");
+  int ret = SQLGetPrivateProfileString(
+      reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL, reinterpret_cast<LPCWSTR>(L""),
+      buf.data(), static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
 
   if (ret > BUFFER_SIZE) {
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
-    ret = SQLGetPrivateProfileString(wdsn.c_str(), NULL, L"", buf.data(),
-                                     static_cast<int>(buf.size()), L"ODBC.INI");
+    ret = SQLGetPrivateProfileString(
+        reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL, reinterpret_cast<LPCWSTR>(L""),
+        buf.data(), static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
   }
 
   // When you pass NULL to SQLGetPrivateProfileString it gives back a \0 delimited list of
