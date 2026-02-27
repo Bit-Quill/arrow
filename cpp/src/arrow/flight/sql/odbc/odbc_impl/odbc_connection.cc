@@ -34,6 +34,8 @@
 #include <odbcinst.h>
 #include <sql.h>
 #include <sqlext.h>
+
+#define BOOST_NO_CXX98_FUNCTION_BASE  // ARROW-17805
 #include <boost/algorithm/string.hpp>
 #include <boost/xpressive/xpressive.hpp>
 #include <iterator>

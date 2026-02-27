@@ -17,7 +17,8 @@
 
 #pragma once
 
-// #include <boost/algorithm/string.hpp> // -AL- TEMP
+#define BOOST_NO_CXX98_FUNCTION_BASE  // ARROW-17805
+#include <boost/algorithm/string.hpp>
 #include <functional>
 #include <map>
 #include <optional>
@@ -36,8 +37,7 @@ struct CaseInsensitiveComparator {
   using is_transparent = std::true_type;
 
   bool operator()(std::string_view s1, std::string_view s2) const {
-    return false; // -AL- TEMP
-   // return boost::lexicographical_compare(s1, s2, boost::is_iless());
+    return boost::lexicographical_compare(s1, s2, boost::is_iless());
   }
 };
 

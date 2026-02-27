@@ -20,8 +20,6 @@
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include <sstream>
 
 namespace arrow::flight::sql::odbc {

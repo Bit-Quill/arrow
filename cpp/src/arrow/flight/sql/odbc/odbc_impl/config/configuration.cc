@@ -23,7 +23,6 @@
 #include "arrow/util/utf8.h"
 
 #include <odbcinst.h>
-#include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <iterator>
@@ -77,8 +76,7 @@ void RemoveAllKnownKeys(std::vector<std::string>& keys) {
                  [&](auto& x) {
                    return std::find_if(FlightSqlConnection::ALL_KEYS.begin(),
                                        FlightSqlConnection::ALL_KEYS.end(), [&](auto& s) {
-                                         return true;  //-AL- temp
-                                         // return boost::iequals(x, s);
+                                         return boost::iequals(x, s);
                                        }) != FlightSqlConnection::ALL_KEYS.end();
                  }),
              keys.end());

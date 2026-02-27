@@ -29,7 +29,6 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/json_converter.h"
 
-#include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <ctime>

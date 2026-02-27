@@ -17,8 +17,6 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/config/connection_string_parser.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include <stdint.h>
 #include <iostream>
 #include <string>
