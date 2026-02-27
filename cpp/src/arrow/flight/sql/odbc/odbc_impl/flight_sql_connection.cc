@@ -30,7 +30,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/asio/ip/address.hpp>
-#include <boost/lexical_cast.hpp>
+// #include <boost/lexical_cast.hpp> // -AL- TEMP
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
 
 #include <sql.h>
@@ -317,7 +317,7 @@ Location FlightSqlConnection::BuildLocation(
   }
 
   const std::string& host = host_iter->second;
-  const int& port = 123;  // -AL- TEMP // boost::lexical_cast<int>(port_iter->second);
+  const int& port = std::stoi(port_iter->second);  // -AL- TEMP // boost::lexical_cast<int>(port_iter->second);
 
   Location location;
   if (ssl_config->UseEncryption()) {

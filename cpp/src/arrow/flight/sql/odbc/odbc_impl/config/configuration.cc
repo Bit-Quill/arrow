@@ -23,6 +23,7 @@
 #include "arrow/util/utf8.h"
 
 #include <odbcinst.h>
+#include <boost/algorithm/string.hpp> 
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <iterator>
