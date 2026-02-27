@@ -317,7 +317,7 @@ Location FlightSqlConnection::BuildLocation(
   }
 
   const std::string& host = host_iter->second;
-  const int& port = boost::lexical_cast<int>(port_iter->second);
+  const int& port =  123; // -AL- TEMP // boost::lexical_cast<int>(port_iter->second);
 
   Location location;
   if (ssl_config->UseEncryption()) {

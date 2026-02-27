@@ -68,7 +68,10 @@ void RemoveAllKnownKeys(std::vector<std::string>& keys) {
                               return std::find_if(
                                          FlightSqlConnection::ALL_KEYS.begin(),
                                          FlightSqlConnection::ALL_KEYS.end(),
-                                         [&](auto& s) { return boost::iequals(x, s); }) !=
+                                         [&](auto& s) {  
+                                          return true; //-AL- temp
+                                          // return boost::iequals(x, s); 
+                                          }) !=
                                      FlightSqlConnection::ALL_KEYS.end();
                             }),
              keys.end());
