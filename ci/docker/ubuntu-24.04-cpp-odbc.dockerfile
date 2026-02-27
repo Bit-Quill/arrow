@@ -69,7 +69,7 @@ RUN latest_system_llvm=18 && \
   # unixodbc-dev 
   # zlib1g-dev instead of ARROW_WITH_ZLIB=ON
   # libssl-dev
-  # libboost-system-dev
+  # libboost-system-dev <- might be causing issues???
 RUN apt-get update -y -q && \
     apt-get install -y -q --no-install-recommends \
         autoconf \
@@ -80,8 +80,6 @@ RUN apt-get update -y -q && \
         gdb \
         git \
         libbenchmark-dev \
-        libboost-filesystem-dev \
-        libboost-system-dev \
         libbrotli-dev \
         libbz2-dev \
         libc-ares-dev \

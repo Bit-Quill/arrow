@@ -65,7 +65,11 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
         static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
   }
 
-  std::wstring wresult = std::wstring(buf.data(), ret);
+  std::wstring wresult =
+      std::wstring(buf.data(), ret);  // -AL- todo work on fixing build error with Linux
+  // -AL- on Linux, SQLWCHAR is unsigned int, so above line fails to build
+  // -AL- maybe I can have something like if Linux, then rest is on macOS/Windows.
+  // Don't even have to use `std::wstring`, just trying to convert sqlwchar to std::string
   CONVERT_UTF8_STR(const std::string result, wresult);
   return result;
 }

@@ -299,7 +299,7 @@ FlightClientOptions FlightSqlConnection::BuildFlightClientOptions(
     }
   }
 
-  return std::move(options);
+  return options;
 }
 
 Location FlightSqlConnection::BuildLocation(

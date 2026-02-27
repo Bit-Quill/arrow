@@ -15,17 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
+#include "arrow/type.h"
 
+// Include ODBC headers after arrow fwd type header to avoid conflicts
 #include "arrow/flight/sql/odbc/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
+#include "arrow/flight/sql/odbc/odbc_impl/odbc_statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/result_set.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/result_set_metadata.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/types.h"
-#include "arrow/type.h"
 
 #include <sql.h>
 #include <sqlext.h>
@@ -752,7 +753,7 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT record_number, SQLSMALLINT c_type,
   int scale = ird_record.scale;
 
   if (c_type == SQL_ARD_TYPE) {
-    if (record_number > current_ard_->GetRecords().size()) {
+    if ((long unsigned int)record_number > current_ard_->GetRecords().size()) {
       throw DriverException("Invalid column index: " + std::to_string(record_number),
                             "07009");
     }
@@ -765,7 +766,7 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT record_number, SQLSMALLINT c_type,
   // Note: this is intentionally not an else if, since the type can be SQL_C_DEFAULT in
   // the ARD.
   if (evaluated_c_type == SQL_C_DEFAULT) {
-    if (record_number <= current_ard_->GetRecords().size()) {
+    if ((long unsigned int)record_number <= current_ard_->GetRecords().size()) {
       const DescriptorRecord& ard_record = current_ard_->GetRecords()[record_number - 1];
       precision = ard_record.precision;
       scale = ard_record.scale;

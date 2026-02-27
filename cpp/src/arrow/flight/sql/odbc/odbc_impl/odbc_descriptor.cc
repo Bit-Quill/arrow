@@ -17,8 +17,6 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_descriptor.h"
 
-#include <sql.h>
-#include <sqlext.h>
 #include <algorithm>
 #include "arrow/flight/sql/odbc/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
@@ -27,6 +25,10 @@
 #include "arrow/flight/sql/odbc/odbc_impl/spi/result_set_metadata.h"
 #include "arrow/flight/sql/odbc/odbc_impl/spi/statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/type_utilities.h"
+
+// Include ODBC headers after arrow headers to avoid conflicts
+#include <sql.h>
+#include <sqlext.h>
 
 using ODBC::DescriptorRecord;
 using ODBC::ODBCConnection;

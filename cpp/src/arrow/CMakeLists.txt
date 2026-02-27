@@ -259,14 +259,12 @@ function(ADD_ARROW_TEST REL_TEST_NAME)
   else()
     set(LABELS "arrow-tests")
   endif()
-  message(STATUS "-AL- REL_TEST_NAME: ${REL_TEST_NAME}")
   add_test_case(${REL_TEST_NAME}
                 PREFIX
                 ${PREFIX}
                 LABELS
                 ${LABELS}
                 ${ARG_UNPARSED_ARGUMENTS})
-  message(STATUS "-AL- REL_TEST_NAME: ${REL_TEST_NAME} finished calling `add_test_case`")
 endfunction()
 
 function(ADD_ARROW_FUZZ_TARGET REL_FUZZING_NAME)

@@ -58,9 +58,9 @@ FlightSqlStatement::FlightSqlStatement(const Diagnostics& diagnostics,
                                        const MetadataSettings& metadata_settings)
     : diagnostics_("Apache Arrow", diagnostics.GetDataSourceComponent(),
                    diagnostics.GetOdbcVersion()),
-      sql_client_(sql_client),
       client_options_(std::move(client_options)),
       call_options_(std::move(call_options)),
+      sql_client_(sql_client),
       metadata_settings_(metadata_settings) {
   attribute_[METADATA_ID] = static_cast<size_t>(SQL_FALSE);
   attribute_[MAX_LENGTH] = static_cast<size_t>(0);
