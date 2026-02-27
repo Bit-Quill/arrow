@@ -317,7 +317,7 @@ Location FlightSqlConnection::BuildLocation(
   }
 
   const std::string& host = host_iter->second;
-  const int& port =  123; // -AL- TEMP // boost::lexical_cast<int>(port_iter->second);
+  const int& port = 123;  // -AL- TEMP // boost::lexical_cast<int>(port_iter->second);
 
   Location location;
   if (ssl_config->UseEncryption()) {
@@ -410,9 +410,9 @@ Connection::Info FlightSqlConnection::GetInfo(uint16_t info_type) {
 
 FlightSqlConnection::FlightSqlConnection(OdbcVersion odbc_version,
                                          const std::string& driver_version)
-    : diagnostics_("Apache Arrow", "Flight SQL", odbc_version),
+    : info_(client_options_, call_options_, sql_client_, driver_version),
+      diagnostics_("Apache Arrow", "Flight SQL", odbc_version),
       odbc_version_(odbc_version),
-      info_(client_options_, call_options_, sql_client_, driver_version),
       closed_(true) {
   attribute_[CONNECTION_DEAD] = static_cast<uint32_t>(SQL_TRUE);
   attribute_[LOGIN_TIMEOUT] = static_cast<uint32_t>(0);
