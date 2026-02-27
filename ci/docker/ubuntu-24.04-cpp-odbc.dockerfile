@@ -69,6 +69,7 @@ RUN latest_system_llvm=18 && \
   # unixodbc-dev 
   # zlib1g-dev instead of ARROW_WITH_ZLIB=ON
   # libssl-dev
+  # libboost-system-dev
 RUN apt-get update -y -q && \
     apt-get install -y -q --no-install-recommends \
         autoconf \
@@ -216,6 +217,7 @@ ENV ARROW_ACERO=ON \
     ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-${llvm}/bin/llvm-symbolizer \
     AWSSDK_SOURCE=BUNDLED \
     Azure_SOURCE=BUNDLED \
+    BUILD_WARNING_LEVEL=PRODUCTION \
     google_cloud_cpp_storage_SOURCE=BUNDLED \
     opentelemetry_cpp_SOURCE=BUNDLED \
     ORC_SOURCE=BUNDLED \
