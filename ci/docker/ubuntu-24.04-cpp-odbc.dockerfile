@@ -217,7 +217,6 @@ ENV ARROW_ACERO=ON \
     ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-${llvm}/bin/llvm-symbolizer \
     AWSSDK_SOURCE=BUNDLED \
     Azure_SOURCE=BUNDLED \
-    BUILD_WARNING_LEVEL=PRODUCTION \
     google_cloud_cpp_storage_SOURCE=BUNDLED \
     opentelemetry_cpp_SOURCE=BUNDLED \
     ORC_SOURCE=BUNDLED \
