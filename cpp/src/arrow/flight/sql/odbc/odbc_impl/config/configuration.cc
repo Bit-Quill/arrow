@@ -15,9 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// flight_sql_connection.h needs to be included first due to conflicts with windows.h
+#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
+
 #include "arrow/flight/sql/odbc/odbc_impl/config/configuration.h"
 
-#include "arrow/flight/sql/odbc/odbc_impl/flight_sql_connection.h"
+#include "arrow/flight/sql/odbc/odbc_impl/attribute_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/util.h"
 #include "arrow/result.h"
 #include "arrow/util/utf8.h"
@@ -27,6 +30,8 @@
 #include <boost/range/algorithm/copy.hpp>
 #include <iterator>
 #include <sstream>
+
+using ODBC::SetAttributeSQLWCHAR;
 
 namespace arrow::flight::sql::odbc {
 namespace config {
@@ -64,14 +69,21 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
         reinterpret_cast<LPCWSTR>(wdflt.c_str()), buf.data(),
         static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
   }
-
+#ifdef __linux__
+  // -AL- todo -> build passes; TODO check ODBC connection later.
+  std::string result;
+  SetAttributeSQLWCHAR(buf.data(), ret * GetSqlWCharSize(), result);
+  return result;
+#else
+  // Windows and macOS
   std::wstring wresult =
       std::wstring(buf.data(), ret);  // -AL- todo work on fixing build error with Linux
-  // -AL- on Linux, SQLWCHAR is unsigned int, so above line fails to build
+  // -AL- on Linux, SQLWCHAR is `short unsigned int*`, so above line fails to build
   // -AL- maybe I can have something like if Linux, then rest is on macOS/Windows.
   // Don't even have to use `std::wstring`, just trying to convert sqlwchar to std::string
   CONVERT_UTF8_STR(const std::string result, wresult);
   return result;
+#endif  // __linux__
 }
 
 void RemoveAllKnownKeys(std::vector<std::string>& keys) {
@@ -90,6 +102,8 @@ void RemoveAllKnownKeys(std::vector<std::string>& keys) {
 std::vector<std::string> ReadAllKeys(const std::string& dsn) {
   CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
 
+  // -AL- todo change `buf` to SQLWCHAR to make it work on Linux;
+  // can refer to solution on `ReadDsnString`
   std::vector<wchar_t> buf(BUFFER_SIZE);
 
   int ret = SQLGetPrivateProfileString(

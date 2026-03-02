@@ -157,7 +157,7 @@ void ODBCDescriptor::SetField(SQLSMALLINT record_number, SQLSMALLINT field_ident
     throw DriverException("Bookmarks are unsupported.", "07009");
   }
 
-  if (record_number > records_.size()) {
+  if (static_cast<size_t>(record_number) > records_.size()) {
     throw DriverException("Invalid descriptor index", "HY009");
   }
 
@@ -310,7 +310,7 @@ void ODBCDescriptor::GetField(SQLSMALLINT record_number, SQLSMALLINT field_ident
     throw DriverException("Bookmarks are unsupported.", "07009");
   }
 
-  if (record_number > records_.size()) {
+  if (static_cast<size_t>(record_number) > records_.size()) {
     throw DriverException("Invalid descriptor index", "07009");
   }
 
@@ -543,7 +543,7 @@ void ODBCDescriptor::BindCol(SQLSMALLINT record_number, SQLSMALLINT c_type,
   assert(is_writable_);
 
   // The set of records auto-expands to the supplied record number.
-  if (records_.size() < record_number) {
+  if (records_.size() < static_cast<size_t>(record_number)) {
     records_.resize(record_number);
   }
 
@@ -563,7 +563,7 @@ void ODBCDescriptor::BindCol(SQLSMALLINT record_number, SQLSMALLINT c_type,
 }
 
 void ODBCDescriptor::SetDataPtrOnRecord(SQLPOINTER data_ptr, SQLSMALLINT record_number) {
-  assert(record_number <= records_.size());
+  assert(static_cast<size_t>(record_number) <= records_.size());
   DescriptorRecord& record = records_[record_number - 1];
   if (data_ptr) {
     record.CheckConsistency();

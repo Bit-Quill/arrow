@@ -742,7 +742,7 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT record_number, SQLSMALLINT c_type,
                                  SQLLEN* indicator_ptr) {
   if (record_number == 0) {
     throw DriverException("Bookmarks are not supported", "07009");
-  } else if (record_number > ird_->GetRecords().size()) {
+  } else if (static_cast<size_t>(record_number) > ird_->GetRecords().size()) {
     throw DriverException("Invalid column index: " + std::to_string(record_number),
                           "07009");
   }
@@ -757,7 +757,7 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT record_number, SQLSMALLINT c_type,
   int scale = ird_record.scale;
 
   if (c_type == SQL_ARD_TYPE) {
-    if ((long unsigned int)record_number > current_ard_->GetRecords().size()) {
+    if (static_cast<size_t>(record_number) > current_ard_->GetRecords().size()) {
       throw DriverException("Invalid column index: " + std::to_string(record_number),
                             "07009");
     }
@@ -770,7 +770,7 @@ SQLRETURN ODBCStatement::GetData(SQLSMALLINT record_number, SQLSMALLINT c_type,
   // Note: this is intentionally not an else if, since the type can be SQL_C_DEFAULT in
   // the ARD.
   if (evaluated_c_type == SQL_C_DEFAULT) {
-    if ((long unsigned int)record_number <= current_ard_->GetRecords().size()) {
+    if (static_cast<size_t>(record_number) <= current_ard_->GetRecords().size()) {
       const DescriptorRecord& ard_record = current_ard_->GetRecords()[record_number - 1];
       precision = ard_record.precision;
       scale = ard_record.scale;

@@ -88,8 +88,8 @@ bool FlightSqlStatement::SetAttribute(StatementAttributeId attribute,
             TimeoutDuration{static_cast<double>(std::get<size_t>(value))};
       } else {
         call_options_.timeout = TimeoutDuration{-1};
-        // Intentional fall-through.
       }
+      [[fallthrough]];
     default:
       attribute_[attribute] = value;
       return true;
