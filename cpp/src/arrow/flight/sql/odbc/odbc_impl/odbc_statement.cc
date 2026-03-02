@@ -15,6 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// platform.h platform.h includes windows.h so it needs to be included first 
+// -AL- this is an attempt to fix the windows build
+#include "arrow/flight/sql/odbc/odbc_impl/platform.h"
+
 #include "arrow/type.h"
 
 // Include ODBC headers after arrow fwd type header to avoid conflicts
