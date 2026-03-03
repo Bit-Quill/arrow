@@ -31,8 +31,7 @@
 #include <iterator>
 #include <sstream>
 
-
-#include "arrow/util/logging.h"// -AL- TEMP
+#include "arrow/util/logging.h"  // -AL- TEMP
 
 using ODBC::SetAttributeSQLWCHAR;
 
@@ -52,7 +51,7 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
 
   // -AL- todo find workaround for `cannot convert 'const wchar_t*' to 'LPCWSTR' {aka
   // 'const short unsigned int*'}` on Linux.
-  
+
   // Via CONVERT_WIDE_STR, Arrow correctly converts to UFT-32 on Unix systems,
   // so the conversion from wchar_t to short unsigned int* will work on Linux.
 
@@ -75,13 +74,12 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
         static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
   }
 
-  std::string result(""); // -AL- initializing result didn't fix it.
+  std::string result("");
   ARROW_LOG(DEBUG) << "-AL- ReadDsnString key: " << key;
   ARROW_LOG(DEBUG) << "-AL- ReadDsnString result before: " << result;
   SetAttributeSQLWCHAR(buf.data(), ret * GetSqlWCharSize(), result);
   ARROW_LOG(DEBUG) << "-AL- ReadDsnString result: " << result;
   ARROW_LOG(DEBUG) << "-AL- ReadDsnString ret: " << ret;
-  // -AL- root cause is here.
   return result;
 }
 
@@ -103,7 +101,7 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
 
   // -AL- todo change `buf` to SQLWCHAR to make it work on Linux;
   // can refer to solution on `ReadDsnString`
-  std::vector<wchar_t> buf(BUFFER_SIZE);
+  std::vector<SQLWCHAR> buf(BUFFER_SIZE);
 
   int ret = SQLGetPrivateProfileString(
       reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL, reinterpret_cast<LPCWSTR>(L""),
@@ -121,13 +119,15 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
   // all the keys. The below loop simply tokenizes all the keys and places them into a
   // vector.
   std::vector<std::string> keys;
-  wchar_t* begin = buf.data();
+  SQLWCHAR* begin = buf.data();
   while (begin && *begin != '\0') {
-    wchar_t* cur;
+    SQLWCHAR* cur;
     for (cur = begin; *cur != '\0'; ++cur) {
     }
 
-    CONVERT_UTF8_STR(const std::string key, std::wstring(begin, cur));
+    std::string key("");
+    SQLINTEGER key_len = cur - begin;
+    SetAttributeSQLWCHAR(begin, key_len * GetSqlWCharSize(), key);
     keys.emplace_back(key);
     ARROW_LOG(DEBUG) << "-AL- ReadAllKeys key: " << key;
     begin = ++cur;
