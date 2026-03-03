@@ -39,6 +39,8 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/system_trust_store.h"
 
+#include "arrow/util/logging.h"// -AL- TEMP
+
 #ifndef NI_MAXHOST
 #  define NI_MAXHOST 1025
 #endif
@@ -316,6 +318,8 @@ Location FlightSqlConnection::BuildLocation(
                                    boost::algorithm::join(missing_attr_string_vec, ", ");
     throw DriverException(missing_attr_str);
   }
+
+    ARROW_LOG(DEBUG) << "-AL- port_iter->second: " << port_iter->second;
 
   const std::string& host = host_iter->second;
   const int& port = boost::lexical_cast<int>(port_iter->second);

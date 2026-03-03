@@ -37,6 +37,9 @@ struct CaseInsensitiveComparator {
   using is_transparent = std::true_type;
 
   bool operator()(std::string_view s1, std::string_view s2) const {
+    // return boost::lexicographical_compare(s1, s2, boost::is_iless());
+    // -AL- previous implementation, not root cause.
+
     return std::lexicographical_compare(
         s1.begin(), s1.end(), s2.begin(), s2.end(), [](char a, char b) {
           return std::tolower(static_cast<unsigned char>(a)) <

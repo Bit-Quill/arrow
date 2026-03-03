@@ -31,6 +31,9 @@
 #include <iterator>
 #include <sstream>
 
+
+#include "arrow/util/logging.h"// -AL- TEMP
+
 using ODBC::SetAttributeSQLWCHAR;
 
 namespace arrow::flight::sql::odbc {
@@ -49,8 +52,10 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
 
   // -AL- todo find workaround for `cannot convert 'const wchar_t*' to 'LPCWSTR' {aka
   // 'const short unsigned int*'}` on Linux.
+  
   // Via CONVERT_WIDE_STR, Arrow correctly converts to UFT-32 on Unix systems,
   // so the conversion from wchar_t to short unsigned int* will work on Linux.
+
   // -AL- I just need to wrap `reinterpret_cast<LPCWSTR>()` on all string args for
   // SQLGetPrivateProfileString.
 
@@ -69,21 +74,15 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
         reinterpret_cast<LPCWSTR>(wdflt.c_str()), buf.data(),
         static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
   }
-#ifdef __linux__
-  // -AL- todo -> build passes; TODO check ODBC connection later.
-  std::string result;
+
+  std::string result(""); // -AL- initializing result didn't fix it.
+  ARROW_LOG(DEBUG) << "-AL- ReadDsnString key: " << key;
+  ARROW_LOG(DEBUG) << "-AL- ReadDsnString result before: " << result;
   SetAttributeSQLWCHAR(buf.data(), ret * GetSqlWCharSize(), result);
+  ARROW_LOG(DEBUG) << "-AL- ReadDsnString result: " << result;
+  ARROW_LOG(DEBUG) << "-AL- ReadDsnString ret: " << ret;
+  // -AL- root cause is here.
   return result;
-#else
-  // Windows and macOS
-  std::wstring wresult =
-      std::wstring(buf.data(), ret);  // -AL- todo work on fixing build error with Linux
-  // -AL- on Linux, SQLWCHAR is `short unsigned int*`, so above line fails to build
-  // -AL- maybe I can have something like if Linux, then rest is on macOS/Windows.
-  // Don't even have to use `std::wstring`, just trying to convert sqlwchar to std::string
-  CONVERT_UTF8_STR(const std::string result, wresult);
-  return result;
-#endif  // __linux__
 }
 
 void RemoveAllKnownKeys(std::vector<std::string>& keys) {
@@ -130,6 +129,7 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
 
     CONVERT_UTF8_STR(const std::string key, std::wstring(begin, cur));
     keys.emplace_back(key);
+    ARROW_LOG(DEBUG) << "-AL- ReadAllKeys key: " << key;
     begin = ++cur;
   }
   return keys;
