@@ -164,13 +164,12 @@ inline void SetAttributeSQLWCHAR(SQLPOINTER new_value, SQLINTEGER input_length_i
     // empty string
     attribute_to_write.clear();
     return;
-  }
-  else {
+  } else {
     WcsToUtf8(new_value,
               input_length_in_bytes / arrow::flight::sql::odbc::GetSqlWCharSize(),
               &utf8_str);
   }
-  
+
   // add null-terminator
   if (utf8_str.back() != '\0') {
     utf8_str.push_back('\0');

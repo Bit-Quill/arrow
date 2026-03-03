@@ -29,7 +29,6 @@
 #  include <atomic>
 #endif
 
-#include "arrow/util/logging.h"// -AL- TEMP
 namespace arrow::flight::sql::odbc {
 
 #if defined(__APPLE__)
@@ -108,7 +107,6 @@ ARROW_SUPPRESS_DEPRECATION_WARNING
 template <typename CHAR_TYPE>
 inline void WcsToUtf8(const void* wcs_string, size_t length_in_code_units,
                       std::vector<uint8_t>* result) {
-  // ARROW_LOG(DEBUG) << "-AL- WcsToUtf8 template length_in_code_units: " << length_in_code_units;                      
   thread_local std::wstring_convert<std::codecvt_utf8<CHAR_TYPE>, CHAR_TYPE> converter;
   auto byte_string = converter.to_bytes((CHAR_TYPE*)wcs_string,
                                         (CHAR_TYPE*)wcs_string + length_in_code_units);
@@ -116,22 +114,17 @@ inline void WcsToUtf8(const void* wcs_string, size_t length_in_code_units,
   uint32_t length_in_bytes = static_cast<uint32_t>(byte_string.size());
   const uint8_t* data = (uint8_t*)byte_string.data();
 
-  // result->reserve(length_in_bytes + 1);
+  result->reserve(length_in_bytes);
   result->assign(data, data + length_in_bytes);
-  // result->push_back('\0'); // -AL- remove these comments later.
-  // ARROW_LOG(DEBUG) << "-AL- WcsToUtf8 template length_in_bytes: " << length_in_bytes;
 }
 ARROW_UNSUPPRESS_DEPRECATION_WARNING
 
 inline void WcsToUtf8(const void* wcs_string, size_t length_in_code_units,
                       std::vector<uint8_t>* result) {
-  // ARROW_LOG(DEBUG) << "-AL- WcsToUtf8 length_in_code_units: " << length_in_code_units;                      
   switch (GetSqlWCharSize()) {
     case sizeof(char16_t):
-      // ARROW_LOG(DEBUG) << "-AL- WcsToUtf8 size is char16_t ";  
       return WcsToUtf8<char16_t>(wcs_string, length_in_code_units, result);
     case sizeof(char32_t):
-      // ARROW_LOG(DEBUG) << "-AL- WcsToUtf8 size is char32_t ";  
       return WcsToUtf8<char32_t>(wcs_string, length_in_code_units, result);
     default:
       assert(false);
