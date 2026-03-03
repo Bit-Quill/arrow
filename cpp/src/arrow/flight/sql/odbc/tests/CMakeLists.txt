@@ -44,10 +44,10 @@ set(ARROW_FLIGHT_SQL_ODBC_TEST_SRCS
 
 if(ARROW_TEST_LINKAGE STREQUAL "static")
   set(ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS arrow_flight_sql_odbc_static
-                                           ${ARROW_TEST_LINK_LIBS})
+                                           ${ARROW_TEST_STATIC_LINK_LIBS})
 else()
   set(ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS arrow_flight_sql_odbc_shared
-                                           ${ARROW_TEST_LINK_LIBS})
+                                           ${ARROW_TEST_SHARED_LINK_LIBS})
 endif()
 
 list(APPEND
