@@ -69,6 +69,13 @@ else()
        ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS})
 endif()
 
+message(staus
+        "-AL- ARROW_FLIGHT_SQL_ODBC_TEST_EXTRA_LINK_LIBS: ${ARROW_FLIGHT_SQL_ODBC_TEST_EXTRA_LINK_LIBS}"
+)
+message(staus
+        "-AL- ARROW_FLIGHT_SQL_ODBC_TEST_STATIC_LINK_LIBS: ${ARROW_FLIGHT_SQL_ODBC_TEST_STATIC_LINK_LIBS}"
+)
+
 add_arrow_test(flight_sql_odbc_test
                SOURCES
                ${ARROW_FLIGHT_SQL_ODBC_TEST_SRCS}
