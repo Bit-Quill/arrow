@@ -250,8 +250,6 @@ TYPED_TEST(ConnectionHandleTest, TestSQLDriverConnectDsn) {
   // Connect string
   std::string connect_str = this->GetConnectionString();
 
-  ASSERT_TRUE(SQLSetConfigMode(ODBC_USER_DSN));
-
   // Write connection string content into a DSN,
   // must succeed before continuing
   ASSERT_TRUE(WriteDSN(connect_str));
@@ -287,8 +285,6 @@ TYPED_TEST(ConnectionHandleTest, TestSQLDriverConnectDsn) {
 TYPED_TEST(ConnectionHandleTest, TestSQLConnect) {
   // Connect string
   std::string connect_str = this->GetConnectionString();
-
-  ASSERT_TRUE(SQLSetConfigMode(ODBC_USER_DSN));
 
   // Write connection string content into a DSN,
   // must succeed before continuing
@@ -375,6 +371,7 @@ TEST_F(ConnectionRemoteTest, TestSQLConnectInvalidUid) {
   // Write connection string content into a DSN,
   // must succeed before continuing
   ASSERT_TRUE(WriteDSN(connect_str));
+  // -AL- the other 2 `WriteDSN(connect_str)` doesn't show because they are remote tests.
 
   std::string dsn(kTestDsn);
   ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
