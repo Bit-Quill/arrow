@@ -49,7 +49,7 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
   CONVERT_WIDE_STR(const std::wstring wkey, key);
   CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
 
-  // -AL- todo find workaround for `cannot convert 'const wchar_t*' to 'LPCWSTR' {aka
+  // -AL- found workaround for `cannot convert 'const wchar_t*' to 'LPCWSTR' {aka
   // 'const short unsigned int*'}` on Linux.
 
   // Via CONVERT_WIDE_STR, Arrow correctly converts to UFT-32 on Unix systems,
@@ -99,8 +99,6 @@ void RemoveAllKnownKeys(std::vector<std::string>& keys) {
 std::vector<std::string> ReadAllKeys(const std::string& dsn) {
   CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
 
-  // -AL- todo change `buf` to SQLWCHAR to make it work on Linux;
-  // can refer to solution on `ReadDsnString`
   std::vector<SQLWCHAR> buf(BUFFER_SIZE);
 
   int ret = SQLGetPrivateProfileString(
