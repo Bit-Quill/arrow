@@ -136,8 +136,7 @@ if(WIN32)
   target_link_libraries(arrow_odbc_spi_impl
                         PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
                                ${ODBCINST})
-else()
-  # Unix
+elseif(APPLE)
   target_include_directories(arrow_odbc_spi_impl SYSTEM BEFORE PUBLIC ${ODBC_INCLUDE_DIR})
   target_link_libraries(arrow_odbc_spi_impl
                         PUBLIC arrow_flight_sql_static
@@ -145,6 +144,17 @@ else()
                                Boost::locale
                                Boost::headers
                                RapidJSON)
+else()
+  # -AL- Linux build
+  message(status "-AL- ODBC_INCLUDE_DIR on Linux: ${ODBC_INCLUDE_DIR}")
+  target_include_directories(arrow_odbc_spi_impl SYSTEM BEFORE PUBLIC ${ODBC_INCLUDE_DIR})
+  target_link_libraries(arrow_odbc_spi_impl
+                        PUBLIC arrow_flight_sql_static
+                               arrow_compute_static
+                               Boost::locale
+                               Boost::headers
+                               RapidJSON
+                               ${ODBCINST}) # -AL- adding ${ODBCINST} as attempt to fix CI remotely
 endif()
 
 # CLI
