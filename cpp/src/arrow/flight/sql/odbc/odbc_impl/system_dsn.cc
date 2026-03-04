@@ -22,6 +22,13 @@
 
 #include <sstream>
 
+#ifdef __linux__
+#  define GET_SQWCHAR_PTR(wstring_var) (ToSqlWCharVector(wstring_var).data())
+#else
+// Windows and macOS
+#  define GET_SQWCHAR_PTR(wstring_var) (wstring_var.c_str())
+#endif
+
 namespace arrow::flight::sql::odbc {
 
 using config::Configuration;
@@ -47,7 +54,6 @@ void PostLastInstallerError() {
   std::vector<SQLWCHAR> msg(BUFFER_SIZE);
   SQLInstallerError(1, &code, msg.data(), BUFFER_SIZE, NULL);
 
-  // -AL- next todo: safely convert SQLWCHAR msg to a SQLWCHAR vector maybe?
   std::wstringstream buf;
 #ifdef __linux__
   buf << L"Message: \"";
@@ -64,15 +70,10 @@ void PostLastInstallerError() {
   PostError(code, (LPWSTR)error_msg.c_str());
 }
 
-inline const SQLWCHAR* ToSqlWCharPtr(const std::wstring& ws) {
-#ifdef __linux__
-  static thread_local std::vector<SQLWCHAR> buf;
+std::vector<SQLWCHAR> ToSqlWCharVector(const std::wstring& ws) {
+  std::vector<SQLWCHAR> buf;
   buf.assign(ws.begin(), ws.end());
-  return buf.data();
-#else
-  // Windows and macOS
-  return ws.c_str();
-#endif
+  return buf;
 }
 
 /**
@@ -82,9 +83,7 @@ inline const SQLWCHAR* ToSqlWCharPtr(const std::wstring& ws) {
  * @return True on success and false on fail.
  */
 bool UnregisterDsn(const std::wstring& dsn) {
-  // -AL- todo convert to SQLWCHAR for safety.
-  // use something like: ToWCHARVector(dsn).data())
-  if (SQLRemoveDSNFromIni(ToSqlWCharPtr(dsn))) {
+  if (SQLRemoveDSNFromIni(GET_SQWCHAR_PTR(dsn))) {
     return true;
   }
 
@@ -108,7 +107,7 @@ bool RegisterDsn(const Configuration& config, LPCWSTR driver) {
   }
   std::wstring wdsn = wdsn_result.ValueOrDie();
 
-  if (!SQLWriteDSNToIni(ToSqlWCharPtr(wdsn), driver)) {
+  if (!SQLWriteDSNToIni(GET_SQWCHAR_PTR(wdsn), driver)) {
     PostLastInstallerError();
     return false;
   }
@@ -135,8 +134,8 @@ bool RegisterDsn(const Configuration& config, LPCWSTR driver) {
     }
     std::wstring wvalue = wvalue_result.ValueOrDie();
 
-    if (!SQLWritePrivateProfileString(ToSqlWCharPtr(wdsn), ToSqlWCharPtr(wkey),
-                                      ToSqlWCharPtr(wvalue),
+    if (!SQLWritePrivateProfileString(GET_SQWCHAR_PTR(wdsn), GET_SQWCHAR_PTR(wkey),
+                                      GET_SQWCHAR_PTR(wvalue),
                                       reinterpret_cast<LPCWSTR>(L"ODBC.INI"))) {
       PostLastInstallerError();
       return false;
