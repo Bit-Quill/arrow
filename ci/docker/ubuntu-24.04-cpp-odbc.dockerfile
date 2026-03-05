@@ -63,13 +63,6 @@ RUN latest_system_llvm=18 && \
     rm -rf /var/lib/apt/lists*
 
 # Installs C++ toolchain and dependencies
-
-# -AL- dependencies 100% needed for ODBC:
-  # libsqlite3-dev
-  # unixodbc-dev 
-  # zlib1g-dev instead of ARROW_WITH_ZLIB=ON
-  # libssl-dev
-  # libboost-system-dev <- might be causing issues???
 RUN apt-get update -y -q && \
     apt-get install -y -q --no-install-recommends \
         autoconf \
@@ -173,8 +166,6 @@ RUN /arrow/ci/scripts/install_ceph.sh
 
 COPY ci/scripts/install_sccache.sh /arrow/ci/scripts/
 RUN /arrow/ci/scripts/install_sccache.sh unknown-linux-musl /usr/local/bin
-
-#-AL- todo: remove non-ODBC related flags
 
 # Prioritize system packages and local installation.
 #
