@@ -371,7 +371,6 @@ TEST_F(ConnectionRemoteTest, TestSQLConnectInvalidUid) {
   // Write connection string content into a DSN,
   // must succeed before continuing
   ASSERT_TRUE(WriteDSN(connect_str));
-  // -AL- the other 2 `WriteDSN(connect_str)` doesn't show because they are remote tests.
 
   std::string dsn(kTestDsn);
   ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
