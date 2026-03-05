@@ -38,6 +38,16 @@
 // For DSN registration
 #include "arrow/flight/sql/odbc/odbc_impl/system_dsn.h"
 
+// static_cast<const SQLWCHAR*>(L"sinteger_max") // <- -AL- original code
+#ifdef __linux__
+#  define TO_SQWCHAR_PTR(wchar_arr) (static_cast<const SQLWCHAR*>(wchar_arr))
+// -AL- todo define alternative.
+// #  define TO_SQWCHAR_PTR(wstring_var) (ToSqlWCharVector(wstring_var).data())
+#else
+// Windows and macOS
+#  define TO_SQWCHAR_PTR(wchar_arr) (static_cast<const SQLWCHAR*>(wchar_arr))
+#endif
+
 static constexpr std::string_view kTestConnectStr = "ARROW_FLIGHT_SQL_ODBC_CONN";
 static constexpr std::string_view kTestDsn = "Apache Arrow Flight SQL Test DSN";
 

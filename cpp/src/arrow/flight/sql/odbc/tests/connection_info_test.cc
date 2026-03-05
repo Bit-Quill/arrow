@@ -132,7 +132,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDataSourceName) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_DATA_SOURCE_NAME, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L""), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L""), value);
 }
 
 #ifdef SQL_DRIVER_AWARE_POOLING_SUPPORTED
@@ -204,21 +204,21 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverName) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_DRIVER_NAME, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"Arrow Flight ODBC Driver"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"Arrow Flight ODBC Driver"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverOdbcVer) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_DRIVER_ODBC_VER, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"03.80"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"03.80"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDriverVer) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_DRIVER_VER, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"00.09.0000.0"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"00.09.0000.0"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDynamicCursorAttributes1) {
@@ -320,9 +320,9 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoOdbcVer) {
   GetInfo(this->conn, SQL_ODBC_VER, value);
 
 #ifdef __APPLE__
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"03.52.0000"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"03.52.0000"), value);
 #else
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"03.80.0000"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"03.80.0000"), value);
 #endif  // __APPLE__
 }
 
@@ -344,14 +344,14 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoRowUpdates) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_ROW_UPDATES, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSearchPatternEscape) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_SEARCH_PATTERN_ESCAPE, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"\\"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"\\"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoServerName) {
@@ -381,7 +381,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDatabaseName) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_DATABASE_NAME, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L""), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L""), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDbmsName) {
@@ -404,14 +404,14 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAccessibleProcedures) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_ACCESSIBLE_PROCEDURES, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAccessibleTables) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_ACCESSIBLE_TABLES, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"Y"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"Y"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoBookmarkPersistence) {
@@ -425,14 +425,14 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogTerm) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_CATALOG_TERM, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L""), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L""), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCollationSeq) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_COLLATION_SEQ, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L""), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L""), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoConcatNullBehavior) {
@@ -467,7 +467,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDataSourceReadOnly) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_DATA_SOURCE_READ_ONLY, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDefaultTxnIsolation) {
@@ -481,28 +481,28 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDescribeParameter) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_DESCRIBE_PARAMETER, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMultResultSets) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_MULT_RESULT_SETS, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMultipleActiveTxn) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_MULTIPLE_ACTIVE_TXN, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoNeedLongDataLen) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_NEED_LONG_DATA_LEN, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoNullCollation) {
@@ -515,14 +515,14 @@ TEST_F(ConnectionInfoMockTest, TestSQLGetInfoProcedureTerm) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_PROCEDURE_TERM, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L""), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L""), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSchemaTerm) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_SCHEMA_TERM, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"schema"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"schema"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoScrollOptions) {
@@ -536,7 +536,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTableTerm) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_TABLE_TERM, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"table"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"table"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoTxnCapable) {
@@ -557,7 +557,7 @@ TEST_F(ConnectionInfoMockTest, TestSQLGetInfoUserName) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_USER_NAME, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L""), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L""), value);
 }
 
 // Supported SQL
@@ -596,14 +596,14 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogName) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_CATALOG_NAME, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogNameSeparator) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_CATALOG_NAME_SEPARATOR, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L""), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L""), value);
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoCatalogUsage) {
@@ -617,7 +617,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoColumnAlias) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_COLUMN_ALIAS, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"Y"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"Y"), value);
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoCorrelationName) {
@@ -743,7 +743,7 @@ TEST_F(ConnectionInfoMockTest, TestSQLGetInfoExpressionsInOrderby) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_EXPRESSIONS_IN_ORDERBY, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoGroupBy) {
@@ -764,7 +764,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIdentifierQuoteChar) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_IDENTIFIER_QUOTE_CHAR, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"\""), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"\""), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIndexKeywords) {
@@ -786,7 +786,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoIntegrity) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_INTEGRITY, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoKeywords) {
@@ -802,7 +802,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoLikeEscapeClause) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_LIKE_ESCAPE_CLAUSE, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"Y"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"Y"), value);
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoNonNullableColumns) {
@@ -823,21 +823,21 @@ TEST_F(ConnectionInfoMockTest, TestSQLGetInfoOrderByColumnsInSelect) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_ORDER_BY_COLUMNS_IN_SELECT, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"Y"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"Y"), value);
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoOuterJoins) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_OUTER_JOINS, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoProcedures) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_PROCEDURES, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoQuotedIdentifierCase) {
@@ -858,7 +858,7 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSpecialCharacters) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_SPECIAL_CHARACTERS, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L""), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L""), value);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoSqlConformance) {
@@ -981,14 +981,14 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoMaxRowSize) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_MAX_ROW_SIZE, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L""), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L""), value);
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxRowSizeIncludesLong) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
   GetInfo(this->conn, SQL_MAX_ROW_SIZE_INCLUDES_LONG, value);
 
-  EXPECT_STREQ(static_cast<const SQLWCHAR*>(L"N"), value);
+  EXPECT_STREQ(TO_SQWCHAR_PTR(L"N"), value);
 }
 
 TEST_F(ConnectionInfoMockTest, TestSQLGetInfoMaxSchemaNameLen) {
