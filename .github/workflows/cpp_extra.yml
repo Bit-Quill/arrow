@@ -383,7 +383,14 @@ jobs:
           # GH-40558: reduce ASLR to avoid ASAN/LSAN crashes
           sudo sysctl -w vm.mmap_rnd_bits=28
           source ci/scripts/util_enable_core_dumps.sh
-          archery docker run ubuntu-cpp-odbc
+          archery docker run \
+            -e ARROW_DEPENDENCY_SOURCE=BUNDLED \
+            -e ARROW_DEPENDENCY_USE_SHARED=OFF \
+            -e ARROW_FLIGHT_SQL_ODBC=ON \
+            ubuntu-cpp
+
+            # ubuntu-cpp \
+            # bash -c "apt-get update -y -q && apt-get install -y -q --no-install-recommends unixodbc unixodbc-dev"
       - name: Docker Push
         if: >-
           success() &&
@@ -394,7 +401,7 @@ jobs:
           ARCHERY_DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
           ARCHERY_DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
         continue-on-error: true
-        run: archery docker push ubuntu-cpp-odbc
+        run: archery docker push ubuntu-cpp
 
   odbc-macos:
     needs: check-labels
