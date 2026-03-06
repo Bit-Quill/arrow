@@ -388,9 +388,6 @@ jobs:
             -e ARROW_DEPENDENCY_USE_SHARED=OFF \
             -e ARROW_FLIGHT_SQL_ODBC=ON \
             ubuntu-cpp
-
-            # ubuntu-cpp \
-            # bash -c "apt-get update -y -q && apt-get install -y -q --no-install-recommends unixodbc unixodbc-dev"
       - name: Docker Push
         if: >-
           success() &&
