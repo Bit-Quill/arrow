@@ -583,14 +583,18 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAlterTable) {
   EXPECT_EQ(static_cast<SQLUINTEGER>(0), value);
 }
 
-#ifdef DISABLE_TEST
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogLocation) {
+  // -AL- impacted test; not investigating the diffs
+  // -AL- todo raise GitHub issues for `SQL_CATALOG_LOCATION`,
+  // `SQL_DROP_TABLE`, and `SQL_DROP_SCHEMA`. SQLGetInfo inconsistent return values
+  // from pre-existing connection; issue is in the driver. `SQL_CATALOG_LOCATION` is
+  // reproduced on remote OS Dremio instance, and `SQL_DROP_TABLE`, and `SQL_DROP_SCHEMA`
+  // can be reproduced on mock server
   SQLUSMALLINT value;
   GetInfo(conn, SQL_CATALOG_LOCATION, &value);
 
   EXPECT_EQ(static_cast<SQLUSMALLINT>(0), value);
 }
-#endif
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogName) {
   SQLWCHAR value[kOdbcBufferSize] = L"";
@@ -711,8 +715,8 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropDomain) {
   EXPECT_EQ(static_cast<SQLUINTEGER>(0), value);
 }
 
-#ifdef DISABLE_TEST
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropSchema) {
+  // -AL- impacted test
   SQLUINTEGER value;
   GetInfo(conn, SQL_DROP_SCHEMA, &value);
 
@@ -720,12 +724,12 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropSchema) {
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropTable) {
+  // -AL- impacted test
   SQLUINTEGER value;
   GetInfo(conn, SQL_DROP_TABLE, &value);
 
   EXPECT_EQ(static_cast<SQLUINTEGER>(0), value);
 }
-#endif
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropTranslation) {
   SQLUINTEGER value;
