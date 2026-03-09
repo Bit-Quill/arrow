@@ -474,7 +474,6 @@ jobs:
       CMAKE_INSTALL_PREFIX: /usr
       VCPKG_BINARY_SOURCES: 'clear;nugettimeout,600;nuget,GitHub,readwrite'
       VCPKG_DEFAULT_TRIPLET: x64-windows
-      CMAKE_CXX_STANDARD: "20"
     steps:
       - name: Disable Crash Dialogs
         run: |
