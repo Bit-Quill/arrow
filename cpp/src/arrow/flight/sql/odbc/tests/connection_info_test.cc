@@ -33,6 +33,12 @@ class ConnectionInfoMockTest : public FlightSQLODBCMockTestBase {};
 using TestTypes = ::testing::Types<ConnectionInfoMockTest, FlightSQLODBCRemoteTestBase>;
 TYPED_TEST_SUITE(ConnectionInfoTest, TestTypes);
 
+template <typename T>
+class ConnectionInfoHandleTest : public T {};
+using TestTypesHandle = ::testing::Types<FlightSQLOdbcEnvConnHandleMockTestBase,
+                                         FlightSQLOdbcEnvConnHandleRemoteTestBase>;
+TYPED_TEST_SUITE(ConnectionInfoHandleTest, TestTypesHandle);
+
 namespace {
 // Helper Functions
 
@@ -583,17 +589,18 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoAlterTable) {
   EXPECT_EQ(static_cast<SQLUINTEGER>(0), value);
 }
 
-TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogLocation) {
-  // -AL- impacted test; not investigating the diffs
-  // -AL- todo raise GitHub issues for `SQL_CATALOG_LOCATION`,
-  // `SQL_DROP_TABLE`, and `SQL_DROP_SCHEMA`. SQLGetInfo inconsistent return values
-  // from pre-existing connection; issue is in the driver. `SQL_CATALOG_LOCATION` is
-  // reproduced on remote OS Dremio instance, and `SQL_DROP_TABLE`, and `SQL_DROP_SCHEMA`
-  // can be reproduced on mock server
+TYPED_TEST(ConnectionInfoHandleTest, TestSQLGetInfoCatalogLocation) {
+  // GH-49482 TODO: resolve inconsitent return value for SQL_CATALOG_LOCATION and change
+  // test type to `ConnectionInfoTest`
+  this->ConnectWithString(this->GetConnectionString());
+
   SQLUSMALLINT value;
   GetInfo(conn, SQL_CATALOG_LOCATION, &value);
 
   EXPECT_EQ(static_cast<SQLUSMALLINT>(0), value);
+
+  EXPECT_EQ(SQL_SUCCESS, SQLDisconnect(conn))
+      << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoCatalogName) {
@@ -715,20 +722,32 @@ TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropDomain) {
   EXPECT_EQ(static_cast<SQLUINTEGER>(0), value);
 }
 
-TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropSchema) {
-  // -AL- impacted test
+TYPED_TEST(ConnectionInfoHandleTest, TestSQLGetInfoDropSchema) {
+  // GH-49482 TODO: resolve inconsitent return value for SQL_DROP_SCHEMA and change test
+  // type to `ConnectionInfoTest`
+  this->ConnectWithString(this->GetConnectionString());
+
   SQLUINTEGER value;
   GetInfo(conn, SQL_DROP_SCHEMA, &value);
 
   EXPECT_EQ(static_cast<SQLUINTEGER>(0), value);
+
+  EXPECT_EQ(SQL_SUCCESS, SQLDisconnect(conn))
+      << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 }
 
-TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropTable) {
-  // -AL- impacted test
+TYPED_TEST(ConnectionInfoHandleTest, TestSQLGetInfoDropTable) {
+  // GH-49482 TODO: resolve inconsitent return value for SQL_DROP_TABLE and change test
+  // type to `ConnectionInfoTest`
+  this->ConnectWithString(this->GetConnectionString());
+
   SQLUINTEGER value;
   GetInfo(conn, SQL_DROP_TABLE, &value);
 
   EXPECT_EQ(static_cast<SQLUINTEGER>(0), value);
+
+  EXPECT_EQ(SQL_SUCCESS, SQLDisconnect(conn))
+      << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 }
 
 TYPED_TEST(ConnectionInfoTest, TestSQLGetInfoDropTranslation) {
