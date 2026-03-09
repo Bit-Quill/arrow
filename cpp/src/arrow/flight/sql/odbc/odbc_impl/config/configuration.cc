@@ -50,7 +50,7 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
   CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
 
   // -AL- found workaround for `cannot convert 'const wchar_t*' to 'LPCWSTR' {aka
-  // 'const short unsigned int*'}` on Linux.
+  // 'const short unsigned int*'}` on Linux. Notes in this file for reference only.
 
   // Via CONVERT_WIDE_STR, Arrow correctly converts to UFT-32 on Unix systems,
   // so the conversion from wchar_t to short unsigned int* will work on Linux.
