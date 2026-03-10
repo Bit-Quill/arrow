@@ -367,10 +367,11 @@ services:
     volumes: &debian-volumes
       - .:/arrow:delegated
       - ${DOCKER_VOLUME_PREFIX}debian-ccache:/ccache:delegated
-    command: &cpp-command >
+    command: &cpp-command > # -AL- &cpp-command is defined here and calls the build + test sh scripts 
       /bin/bash -c "
         /arrow/ci/scripts/cpp_build.sh /arrow /build &&
         /arrow/ci/scripts/cpp_test.sh /arrow /build"
+# -AL- so I can define a new one for odbc-cpp too.
 
   ubuntu-cpp:
     # Usage:

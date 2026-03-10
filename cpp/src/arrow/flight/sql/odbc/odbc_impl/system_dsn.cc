@@ -26,7 +26,8 @@
 #ifdef __linux__
 #  define GET_SQWCHAR_PTR(wstring_var) (ToSqlWCharVector(wstring_var).data())
 #else
-// Windows and macOS
+// Windows and macOS // -AL- TODO raise GitHub issues for Linux functions
+// Can't test it right now anyways without the tests.
 #  define GET_SQWCHAR_PTR(wstring_var) (wstring_var.c_str())
 #endif
 
@@ -73,7 +74,8 @@ void PostLastInstallerError() {
 
 std::vector<SQLWCHAR> ToSqlWCharVector(const std::wstring& ws) {
   std::vector<SQLWCHAR> buf;
-  buf.assign(ws.begin(), ws.end());
+  // buf.assign(ws.begin(), ws.end());
+  // -AL- GitHub issue to implement. Also need to move this function else where like encoding_utils.h?
   return buf;
 }
 
