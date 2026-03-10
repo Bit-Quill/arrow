@@ -383,11 +383,7 @@ jobs:
           # GH-40558: reduce ASLR to avoid ASAN/LSAN crashes
           sudo sysctl -w vm.mmap_rnd_bits=28
           source ci/scripts/util_enable_core_dumps.sh
-          archery docker run \
-            -e ARROW_DEPENDENCY_SOURCE=BUNDLED \
-            -e ARROW_DEPENDENCY_USE_SHARED=OFF \
-            -e ARROW_FLIGHT_SQL_ODBC=ON \
-            ubuntu-cpp
+          archery docker run ubuntu-cpp-odbc
       - name: Docker Push
         if: >-
           success() &&
@@ -499,7 +495,7 @@ jobs:
             "$(pwd)/build/cpp/${{ matrix.build-type }}/libarrow_flight_sql_odbc.dylib"
       - name: Register Flight SQL ODBC Driver
         run: |
-          sudo cpp/src/arrow/flight/sql/odbc/install/mac/install_odbc.sh $(pwd)/build/cpp/${{ matrix.build-type }}/libarrow_flight_sql_odbc.dylib
+          sudo cpp/src/arrow/flight/sql/odbc/install/unix/install_odbc.sh $(pwd)/build/cpp/${{ matrix.build-type }}/libarrow_flight_sql_odbc.dylib
       - name: Test
         shell: bash
         run: |
