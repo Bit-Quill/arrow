@@ -395,9 +395,8 @@ bool GetInfoCache::LoadInfoFromServer() {
               // Unused by ODBC.
               break;
             case SqlInfoOptions::SQL_DDL_SCHEMA: {
-              // bool supports_schema_ddl =
-              //     reinterpret_cast<BooleanScalar*>(scalar->child_value().get())->value;
-              // -AL- todo raise GitHub issues for finishing this work.
+              // GH-49500 TODO: use scalar bool to determine `SQL_CREATE_SCHEMA` and
+              // `SQL_DROP_SCHEMA` values
 
               // Note: this is a bitmask and we can't describe cascade or restrict
               // flags.
@@ -409,9 +408,8 @@ bool GetInfoCache::LoadInfoFromServer() {
               break;
             }
             case SqlInfoOptions::SQL_DDL_TABLE: {
-              // bool supports_table_ddl =
-              //     reinterpret_cast<BooleanScalar*>(scalar->child_value().get())->value;
-              // -AL- todo raise GitHub issues for finishing this work.
+              // GH-49500 TODO: use scalar bool to determine `SQL_CREATE_TABLE` and
+              // `SQL_DROP_TABLE` values
 
               // This is a bitmask and we cannot describe all clauses.
               info_[SQL_CREATE_TABLE] = static_cast<uint32_t>(SQL_CT_CREATE_TABLE);

@@ -117,4 +117,12 @@ inline std::string SqlStringToString(const unsigned char* sql_str,
 
   return res;
 }
+
+inline std::vector<SQLWCHAR> ToSqlWCharVector(const std::wstring& ws) {
+  std::vector<SQLWCHAR> buf;
+  // buf.assign(ws.begin(), ws.end());
+  // TODO implement in separate PR
+  return buf;
+}
+
 }  // namespace ODBC

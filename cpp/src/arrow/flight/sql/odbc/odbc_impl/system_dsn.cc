@@ -23,11 +23,12 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <sstream>
 
+#include "arrow/flight/sql/odbc/odbc_impl/encoding_utils.h"
+
 #ifdef __linux__
-#  define GET_SQWCHAR_PTR(wstring_var) (ToSqlWCharVector(wstring_var).data())
+#  define GET_SQWCHAR_PTR(wstring_var) (ODBC::ToSqlWCharVector(wstring_var).data())
 #else
-// Windows and macOS // -AL- TODO raise GitHub issues for Linux functions
-// Can't test it right now anyways without the tests.
+// Windows and macOS
 #  define GET_SQWCHAR_PTR(wstring_var) (wstring_var.c_str())
 #endif
 
@@ -70,13 +71,6 @@ void PostLastInstallerError() {
   std::wstring error_msg = buf.str();
 
   PostError(code, const_cast<LPWSTR>(error_msg.c_str()));
-}
-
-std::vector<SQLWCHAR> ToSqlWCharVector(const std::wstring& ws) {
-  std::vector<SQLWCHAR> buf;
-  // buf.assign(ws.begin(), ws.end());
-  // -AL- GitHub issue to implement. Also need to move this function else where like encoding_utils.h?
-  return buf;
 }
 
 /**

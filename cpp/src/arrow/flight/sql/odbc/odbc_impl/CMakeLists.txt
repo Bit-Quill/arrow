@@ -137,11 +137,7 @@ if(WIN32)
                         PUBLIC arrow_flight_sql_shared arrow_compute_shared Boost::locale
                                ${ODBCINST})
 else()
-  # -AL- Linux build. share with apple
-  if(NOT APPLE)
-    message(status "-AL- ODBC_INCLUDE_DIR on Linux: ${ODBC_INCLUDE_DIR}")
-  endif()
-
+  # Unix
   target_include_directories(arrow_odbc_spi_impl SYSTEM BEFORE PUBLIC ${ODBC_INCLUDE_DIR})
   target_link_libraries(arrow_odbc_spi_impl
                         PUBLIC arrow_flight_sql_static

@@ -31,8 +31,6 @@
 #include <iterator>
 #include <sstream>
 
-#include "arrow/util/logging.h"  // -AL- TEMP
-
 using ODBC::SetAttributeSQLWCHAR;
 
 namespace arrow::flight::sql::odbc {
@@ -49,14 +47,7 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
   CONVERT_WIDE_STR(const std::wstring wkey, key);
   CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
 
-  // -AL- found workaround for `cannot convert 'const wchar_t*' to 'LPCWSTR' {aka
-  // 'const short unsigned int*'}` on Linux. Notes in this file for reference only.
-
-  // Via CONVERT_WIDE_STR, Arrow correctly converts to UFT-32 on Unix systems,
-  // so the conversion from wchar_t to short unsigned int* will work on Linux.
-
-  // -AL- I just need to wrap `reinterpret_cast<LPCWSTR>()` on all string args for
-  // SQLGetPrivateProfileString.
+  // TODO: implement proper Linux unicode support in separate PR
 
 #define BUFFER_SIZE (1024)
   std::vector<SQLWCHAR> buf(BUFFER_SIZE);
@@ -75,11 +66,7 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
   }
 
   std::string result("");
-  ARROW_LOG(DEBUG) << "-AL- ReadDsnString key: " << key;
-  ARROW_LOG(DEBUG) << "-AL- ReadDsnString result before: " << result;
   SetAttributeSQLWCHAR(buf.data(), ret * GetSqlWCharSize(), result);
-  ARROW_LOG(DEBUG) << "-AL- ReadDsnString result: " << result;
-  ARROW_LOG(DEBUG) << "-AL- ReadDsnString ret: " << ret;
   return result;
 }
 
@@ -127,7 +114,6 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
     SQLINTEGER key_len = cur - begin;
     SetAttributeSQLWCHAR(begin, key_len * GetSqlWCharSize(), key);
     keys.emplace_back(key);
-    ARROW_LOG(DEBUG) << "-AL- ReadAllKeys key: " << key;
     begin = ++cur;
   }
   return keys;

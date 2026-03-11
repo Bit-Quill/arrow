@@ -50,8 +50,6 @@ case "$(uname)" in
     ;;
 esac
 
-echo "-AL- USER_ODBCINST_FILE: $USER_ODBCINST_FILE"
-
 DRIVER_NAME="Apache Arrow Flight SQL ODBC Driver"
 
 mkdir -p "$HOME"/Library/ODBC
