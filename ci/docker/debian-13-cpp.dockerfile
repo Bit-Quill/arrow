@@ -90,6 +90,7 @@ RUN apt-get update -y -q && \
         rustc \
         tzdata \
         tzdata-legacy \
+        unixodbc-dev \
         zlib1g-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
