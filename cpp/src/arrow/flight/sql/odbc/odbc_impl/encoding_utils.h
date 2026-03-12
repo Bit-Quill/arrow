@@ -28,7 +28,25 @@
 #include <memory>
 #include <string>
 
+// Workaround for ODBC `BOOL` def conflict on Linux
+#ifdef __linux__
+#  ifdef BOOL
+#    undef BOOL
+#  endif  // BOOL
+#endif    // __linux__
+// Include fwd.h headers after ODBC headers
+#include "arrow/flight/sql/odbc/odbc_impl/util.h"
+
+#include "arrow/util/logging.h"  // -AL- TEMP
+
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+
+#ifdef __linux__
+#  define GET_SQWCHAR_PTR(wstring_var) (ODBC::ToSqlWCharVector(wstring_var).data())
+#else
+// Windows and macOS
+#  define GET_SQWCHAR_PTR(wstring_var) (wstring_var.c_str())
+#endif
 
 namespace ODBC {
 using arrow::flight::sql::odbc::DriverException;
@@ -118,11 +136,25 @@ inline std::string SqlStringToString(const unsigned char* sql_str,
   return res;
 }
 
+// On Linux, unixodbc defines SQLWCHAR as `unsigned short`
 inline std::vector<SQLWCHAR> ToSqlWCharVector(const std::wstring& ws) {
-  std::vector<SQLWCHAR> buf;
-  // buf.assign(ws.begin(), ws.end());
-  // TODO implement in separate PR
-  return buf;
+  ARROW_LOG(DEBUG) << "-AL- sizeof(SQLWCHAR):" << sizeof(SQLWCHAR)
+                   << ", sizeof(wchar_t):" << sizeof(wchar_t);
+
+  ARROW_LOG(DEBUG) << "-AL- sizeof(char16_t):" << sizeof(char16_t)
+                   << ", sizeof(char32_t):" << sizeof(char32_t);
+  if (sizeof(SQLWCHAR) == sizeof(wchar_t)) {
+    ARROW_LOG(DEBUG) << "-AL- sizeof(SQLWCHAR) equals sizeof(wchar_t) ";
+    return std::vector<SQLWCHAR>(ws.begin(), ws.end());
+  } else {
+    ARROW_LOG(DEBUG) << "-AL- sizeof(SQLWCHAR) != doesn't equal sizeof(wchar_t) ";
+    CONVERT_UTF8_STR(const std::string utf8s, ws);
+    CONVERT_UTF16_STR(const std::u16string utf16s, utf8s);
+    // std::string WideStringToUTF8(input);
+    // std::u16string u16s = UTF8StringToUTF16();
+
+    return std::vector<SQLWCHAR>(utf16s.begin(), utf16s.end());
+  }
 }
 
 }  // namespace ODBC

@@ -49,34 +49,50 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
   CONVERT_WIDE_STR(const std::wstring wkey, key);
   CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
 
-  // -AL- found workaround for `cannot convert 'const wchar_t*' to 'LPCWSTR' {aka
-  // 'const short unsigned int*'}` on Linux. Notes in this file for reference only.
+  // -AL- next up: figure out why `buf` is always empty
+  // (buf is default value if the default value is passed)
+  // Have tried `.odbc.ini` but it doesn't work
+  // DSN name is correct because isql finds it
+  // It should be case-insensitive because unixodbc had been updated
+  // I passed `Host` which is an exact match of the key, and still nothing
+  // is returned.
+  // 
+  // Default value: I also tried passing 
+  // reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(wdflt)),
+  // and it broke the unixodbc to only return default values.
+  // GET_SQWCHAR_PTR(std::wstring(L"")) as default has same issue.
+  // reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(std::wstring(L""))) also has same issue.
+  // NULL also has same issue.
 
-  // Via CONVERT_WIDE_STR, Arrow correctly converts to UFT-32 on Unix systems,
-  // so the conversion from wchar_t to short unsigned int* will work on Linux.
-
-  // -AL- I just need to wrap `reinterpret_cast<LPCWSTR>()` on all string args for
-  // SQLGetPrivateProfileString.
+  // -AL- TODO: remove the `reinterpret_cast<LPCWSTR>` cast
 
 #define BUFFER_SIZE (1024)
   std::vector<SQLWCHAR> buf(BUFFER_SIZE);
   int ret = SQLGetPrivateProfileString(
-      reinterpret_cast<LPCWSTR>(wdsn.c_str()), reinterpret_cast<LPCWSTR>(wkey.c_str()),
-      reinterpret_cast<LPCWSTR>(wdflt.c_str()), buf.data(), static_cast<int>(buf.size()),
-      reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
+      GET_SQWCHAR_PTR(wdsn), GET_SQWCHAR_PTR(wkey),
+      reinterpret_cast<LPCWSTR>(
+          L""),  // -AL- try same default as readallkeys
+                 // -AL- somehow this default value `reinterpret_cast<LPCWSTR>(L"")`
+                 // worked? -AL- todo change default values back
+
+      // GET_SQWCHAR_PTR(wdflt),
+      buf.data(), static_cast<int>(buf.size()),
+      GET_SQWCHAR_PTR(std::wstring(L"ODBC.INI")));
 
   if (ret > BUFFER_SIZE) {
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
     ret = SQLGetPrivateProfileString(
-        reinterpret_cast<LPCWSTR>(wdsn.c_str()), reinterpret_cast<LPCWSTR>(wkey.c_str()),
-        reinterpret_cast<LPCWSTR>(wdflt.c_str()), buf.data(),
-        static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
+        reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(wdsn)),
+        reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(wkey)),
+        reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(wdflt)), buf.data(),
+        static_cast<int>(buf.size()),
+        reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(std::wstring(L"ODBC.INI"))));
   }
 
   std::string result("");
   ARROW_LOG(DEBUG) << "-AL- ReadDsnString key: " << key;
-  ARROW_LOG(DEBUG) << "-AL- ReadDsnString result before: " << result;
+  ARROW_LOG(DEBUG) << "-AL- ReadDsnString result before: (should be empty) " << result;
   SetAttributeSQLWCHAR(buf.data(), ret * GetSqlWCharSize(), result);
   ARROW_LOG(DEBUG) << "-AL- ReadDsnString result: " << result;
   ARROW_LOG(DEBUG) << "-AL- ReadDsnString ret: " << ret;
@@ -102,15 +118,17 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
   std::vector<SQLWCHAR> buf(BUFFER_SIZE);
 
   int ret = SQLGetPrivateProfileString(
-      reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL, reinterpret_cast<LPCWSTR>(L""),
-      buf.data(), static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
+      reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(wdsn)), NULL,
+      reinterpret_cast<LPCWSTR>(L""), buf.data(), static_cast<int>(buf.size()),
+      reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(std::wstring(L"ODBC.INI"))));
 
   if (ret > BUFFER_SIZE) {
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
     ret = SQLGetPrivateProfileString(
-        reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL, reinterpret_cast<LPCWSTR>(L""),
-        buf.data(), static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
+        reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(wdsn)), NULL,
+        reinterpret_cast<LPCWSTR>(L""), buf.data(), static_cast<int>(buf.size()),
+        reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(std::wstring(L"ODBC.INI"))));
   }
 
   // When you pass NULL to SQLGetPrivateProfileString it gives back a \0 delimited list of

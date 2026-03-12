@@ -42,6 +42,13 @@
     return res.ValueOrDie();                                                         \
   }()
 
+#define CONVERT_UTF16_STR(utf16string_var, utf8_target)                              \
+  utf16string_var = [&] {                                                            \
+    arrow::Result<std::u16string> res = arrow::util::UTF8StringToUTF16(utf8_target); \
+    arrow::flight::sql::odbc::util::ThrowIfNotOK(res.status());                      \
+    return res.ValueOrDie();                                                         \
+  }()
+
 namespace arrow::flight::sql::odbc {
 namespace util {
 
