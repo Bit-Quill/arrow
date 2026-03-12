@@ -78,7 +78,7 @@ class ODBCTestBase : public ::testing::Test {
   /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
   static std::string GetInvalidConnectionString();
   /// \brief Return a SQL query that selects all data types
-  static std::wstring GetQueryAllDataTypes();
+  static std::string GetQueryAllDataTypes();
 
  protected:
   void SetUp() override;
@@ -159,7 +159,7 @@ class ODBCMockTestBase : public ODBCTestBase {
   /// \brief Get invalid connection string for mock server
   static std::string GetInvalidConnectionString();
   /// \brief Return a SQL query that selects all data types
-  static std::wstring GetQueryAllDataTypes();
+  static std::string GetQueryAllDataTypes();
 
   /// \brief Run a SQL query to create default table for table test cases
   static void CreateTestTable();
@@ -267,11 +267,13 @@ bool WriteDSN(Connection::ConnPropertyMap properties);
 /// \return wstring
 std::wstring GetStringColumnW(SQLHSTMT stmt, int col_id);
 
-/// \brief Check wide char vector and convert into wstring
-/// \param[in] str_val Vector of SQLWCHAR.
-/// \param[in] str_len length of string, in bytes.
+/// \brief Check wide char buffer and convert into wstring
+/// \param[in] wchar_buf array of SQLWCHAR.
+/// \param[in] wchar_len length of buffer, in bytes.
 /// \return wstring
-std::wstring ConvertToWString(const std::vector<SQLWCHAR>& str_val, SQLSMALLINT str_len);
+std::wstring ConvertToWString(SQLWCHAR* wchar_buf, SQLSMALLINT wchar_len);
+
+std::unique_ptr<SQLWCHAR[]> StringToWCharArray(std::string str);
 
 /// \brief Check wide string column.
 /// \param[in] stmt Statement.

@@ -119,10 +119,11 @@ TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrTracefileDMOnly) {
 
   // Use placeholder value as we want the call to fail, or else
   // the driver manager will produce a trace file.
-  std::wstring trace_file = L"invalid/file/path";
-  std::vector<SQLWCHAR> trace_file0(trace_file.begin(), trace_file.end());
-  ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(conn, SQL_ATTR_TRACEFILE, &trace_file0[0],
-                                         static_cast<SQLINTEGER>(trace_file0.size())));
+  // std::wstring trace_file = L"invalid/file/path";
+  auto trace_file = StringToWCharArray("invalid/file/path");
+  SQLINTEGER trace_file_len = std::wcslen(trace_file.get());
+  ASSERT_EQ(SQL_ERROR, SQLSetConnectAttr(conn, SQL_ATTR_TRACEFILE, trace_file.get(),
+                                         trace_file_len));
 #ifdef __APPLE__
   VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, kErrorStateHYC00);
 #else

@@ -74,15 +74,15 @@ void ODBCTestBase::Connect(std::string connect_str, SQLINTEGER odbc_ver) {
 
 void ODBCTestBase::ConnectWithString(std::string connect_str) {
   // Connect string
-  std::vector<SQLWCHAR> connect_str0(connect_str.begin(), connect_str.end());
+  auto wconnect_str = StringToWCharArray(connect_str);
+  SQLSMALLINT wsql_len = std::wcslen(wconnect_str.get());
 
   SQLWCHAR out_str[kOdbcBufferSize];
   SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ASSERT_EQ(SQL_SUCCESS,
-            SQLDriverConnect(conn, NULL, &connect_str0[0],
-                             static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+            SQLDriverConnect(conn, NULL, wconnect_str.get(), wsql_len, out_str,
                              kOdbcBufferSize, &out_str_len, SQL_DRIVER_NOPROMPT))
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 }
@@ -116,9 +116,9 @@ std::string ODBCTestBase::GetInvalidConnectionString() {
   return connect_str;
 }
 
-std::wstring ODBCTestBase::GetQueryAllDataTypes() {
-  std::wstring wsql =
-      LR"( SELECT
+std::string ODBCTestBase::GetQueryAllDataTypes() {
+  std::string sql =
+      R"( SELECT
            -- Numeric types
           -128 as stiny_int_min, 127 as stiny_int_max,
           0 as utiny_int_min, 255 as utiny_int_max,
@@ -164,7 +164,7 @@ std::wstring ODBCTestBase::GetQueryAllDataTypes() {
           CAST(TIMESTAMP '1400-01-01 00:00:00' AS TIMESTAMP) AS timestamp_min,
           CAST(TIMESTAMP '9999-12-31 23:59:59' AS TIMESTAMP) AS timestamp_max;
       )";
-  return wsql;
+  return sql;
 }
 
 void ODBCTestBase::SetUp() {
@@ -287,9 +287,9 @@ std::string ODBCMockTestBase::GetInvalidConnectionString() {
   return connect_str;
 }
 
-std::wstring ODBCMockTestBase::GetQueryAllDataTypes() {
-  std::wstring wsql =
-      LR"( SELECT
+std::string ODBCMockTestBase::GetQueryAllDataTypes() {
+  std::string sql =
+      R"( SELECT
       -- Numeric types
       -128 AS stiny_int_min, 127 AS stiny_int_max,
       0 AS utiny_int_min, 255 AS utiny_int_max,
@@ -333,7 +333,7 @@ std::wstring ODBCMockTestBase::GetQueryAllDataTypes() {
       DATETIME('1400-01-01 00:00:00') AS timestamp_min,
       DATETIME('9999-12-31 23:59:59') AS timestamp_max;
       )";
-  return wsql;
+  return sql;
 }
 
 void ODBCMockTestBase::CreateTestTable() {
@@ -510,17 +510,19 @@ std::wstring GetStringColumnW(SQLHSTMT stmt, int col_id) {
   return std::wstring(buf, buf + char_count);
 }
 
-std::wstring ConvertToWString(const std::vector<SQLWCHAR>& str_val, SQLSMALLINT str_len) {
-  std::wstring attr_str;
-  if (str_len == 0) {
-    attr_str = std::wstring(&str_val[0]);
-  } else {
-    EXPECT_GT(str_len, 0);
-    EXPECT_LE(str_len, static_cast<SQLSMALLINT>(kOdbcBufferSize));
-    attr_str =
-        std::wstring(str_val.begin(), str_val.begin() + str_len / GetSqlWCharSize());
+std::wstring ConvertToWString(SQLWCHAR* wchar_buf, SQLSMALLINT wchar_len) {
+  if (wchar_len <= 0) {
+    return L"";
   }
-  return attr_str;
+
+  return std::wstring(wchar_buf, wchar_buf + wchar_len);
+}
+
+std::unique_ptr<SQLWCHAR[]> StringToWCharArray(std::string str) {
+  auto wstr = std::make_unique<SQLWCHAR[]>(str.size() + 1);
+  std::copy(str.begin(), str.end(), wstr.get());
+  wstr[str.size()] = 0;
+  return wstr;
 }
 
 void CheckStringColumnW(SQLHSTMT stmt, int col_id, const std::wstring& expected) {

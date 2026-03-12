@@ -218,18 +218,16 @@ TEST(SQLSetEnvAttr, TestSQLSetEnvAttrNullValuePointer) {
 TYPED_TEST(ConnectionHandleTest, TestSQLDriverConnect) {
   // Connect string
   std::string connect_str = this->GetConnectionString();
-  ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
-                       arrow::util::UTF8ToWideString(connect_str));
-  std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
+  auto wsql = StringToWCharArray(connect_str);
+  SQLSMALLINT wsql_len = std::wcslen(wsql.get());
 
   SQLWCHAR out_str[kOdbcBufferSize] = L"";
   SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ASSERT_EQ(SQL_SUCCESS,
-            SQLDriverConnect(conn, NULL, &connect_str0[0],
-                             static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
-                             kOdbcBufferSize, &out_str_len, SQL_DRIVER_NOPROMPT))
+            SQLDriverConnect(conn, NULL, wsql.get(), wsql_len, out_str, kOdbcBufferSize,
+                             &out_str_len, SQL_DRIVER_NOPROMPT))
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 
   // Check that out_str has same content as connect_str
@@ -260,17 +258,15 @@ TYPED_TEST(ConnectionHandleTest, TestSQLDriverConnectDsn) {
   // Update connection string to use DSN to connect
   connect_str = std::string("DSN=") + std::string(kTestDsn) +
                 std::string(";driver={Apache Arrow Flight SQL ODBC Driver};");
-  ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
-                       arrow::util::UTF8ToWideString(connect_str));
-  std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
+  auto wconnect_str = StringToWCharArray(connect_str);
+  SQLSMALLINT wconnect_len = std::wcslen(wconnect_str.get());
 
   SQLWCHAR out_str[kOdbcBufferSize] = L"";
   SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ASSERT_EQ(SQL_SUCCESS,
-            SQLDriverConnect(conn, NULL, &connect_str0[0],
-                             static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+            SQLDriverConnect(conn, NULL, wconnect_str.get(), wconnect_len, out_str,
                              kOdbcBufferSize, &out_str_len, SQL_DRIVER_NOPROMPT))
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 
@@ -292,22 +288,24 @@ TYPED_TEST(ConnectionHandleTest, TestSQLConnect) {
   ASSERT_TRUE(WriteDSN(connect_str));
 
   std::string dsn(kTestDsn);
-  ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
-  ASSERT_OK_AND_ASSIGN(std::wstring wuid, arrow::util::UTF8ToWideString(uid));
-  ASSERT_OK_AND_ASSIGN(std::wstring wpwd, arrow::util::UTF8ToWideString(pwd));
-  std::vector<SQLWCHAR> dsn0(wdsn.begin(), wdsn.end());
-  std::vector<SQLWCHAR> uid0(wuid.begin(), wuid.end());
-  std::vector<SQLWCHAR> pwd0(wpwd.begin(), wpwd.end());
+
+  auto wdsn = StringToWCharArray(dsn);
+  SQLSMALLINT wdsn_len = std::wcslen(wdsn.get());
+
+  auto wuid = StringToWCharArray(uid);
+  SQLSMALLINT wuid_len = std::wcslen(wuid.get());
+
+  auto wpwd = StringToWCharArray(pwd);
+  SQLSMALLINT wpwd_len = std::wcslen(wpwd.get());
 
   // Connecting to ODBC server. Empty uid and pwd should be ignored.
-  ASSERT_EQ(SQL_SUCCESS,
-            SQLConnect(conn, dsn0.data(), static_cast<SQLSMALLINT>(dsn0.size()),
-                       uid0.data(), static_cast<SQLSMALLINT>(uid0.size()), pwd0.data(),
-                       static_cast<SQLSMALLINT>(pwd0.size())))
+  ASSERT_EQ(SQL_SUCCESS, SQLConnect(conn, wdsn.get(), wdsn_len, wuid.get(), wuid_len,
+                                    wpwd.get(), wpwd_len))
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 
   // Remove DSN
-  ASSERT_TRUE(UnregisterDsn(wdsn));
+  std::wstring wdsn_str = ConvertToWString(wdsn.get(), wdsn_len);
+  ASSERT_TRUE(UnregisterDsn(wdsn_str));
 
   // Disconnect from ODBC
   ASSERT_EQ(SQL_SUCCESS, SQLDisconnect(conn))
@@ -333,22 +331,24 @@ TEST_F(ConnectionRemoteTest, TestSQLConnectInputUidPwd) {
   ASSERT_TRUE(WriteDSN(properties));
 
   std::string dsn(kTestDsn);
-  ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
-  ASSERT_OK_AND_ASSIGN(std::wstring wuid, arrow::util::UTF8ToWideString(uid));
-  ASSERT_OK_AND_ASSIGN(std::wstring wpwd, arrow::util::UTF8ToWideString(pwd));
-  std::vector<SQLWCHAR> dsn0(wdsn.begin(), wdsn.end());
-  std::vector<SQLWCHAR> uid0(wuid.begin(), wuid.end());
-  std::vector<SQLWCHAR> pwd0(wpwd.begin(), wpwd.end());
+
+  auto wdsn = StringToWCharArray(dsn);
+  SQLSMALLINT wdsn_len = std::wcslen(wdsn.get());
+
+  auto wuid = StringToWCharArray(uid);
+  SQLSMALLINT wuid_len = std::wcslen(wuid.get());
+
+  auto wpwd = StringToWCharArray(pwd);
+  SQLSMALLINT wpwd_len = std::wcslen(wpwd.get());
 
   // Connecting to ODBC server.
-  ASSERT_EQ(SQL_SUCCESS,
-            SQLConnect(conn, dsn0.data(), static_cast<SQLSMALLINT>(dsn0.size()),
-                       uid0.data(), static_cast<SQLSMALLINT>(uid0.size()), pwd0.data(),
-                       static_cast<SQLSMALLINT>(pwd0.size())))
+  ASSERT_EQ(SQL_SUCCESS, SQLConnect(conn, wdsn.get(), wdsn_len, wuid.get(), wuid_len,
+                                    wpwd.get(), wpwd_len))
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 
   // Remove DSN
-  ASSERT_TRUE(UnregisterDsn(wdsn));
+  std::wstring wdsn_str = ConvertToWString(wdsn.get(), wdsn_len);
+  ASSERT_TRUE(UnregisterDsn(wdsn_str));
 
   // Disconnect from ODBC
   ASSERT_EQ(SQL_SUCCESS, SQLDisconnect(conn))
@@ -373,25 +373,27 @@ TEST_F(ConnectionRemoteTest, TestSQLConnectInvalidUid) {
   ASSERT_TRUE(WriteDSN(connect_str));
 
   std::string dsn(kTestDsn);
-  ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
-  ASSERT_OK_AND_ASSIGN(std::wstring wuid, arrow::util::UTF8ToWideString(uid));
-  ASSERT_OK_AND_ASSIGN(std::wstring wpwd, arrow::util::UTF8ToWideString(pwd));
-  std::vector<SQLWCHAR> dsn0(wdsn.begin(), wdsn.end());
-  std::vector<SQLWCHAR> uid0(wuid.begin(), wuid.end());
-  std::vector<SQLWCHAR> pwd0(wpwd.begin(), wpwd.end());
+
+  auto wdsn = StringToWCharArray(dsn);
+  SQLSMALLINT wdsn_len = std::wcslen(wdsn.get());
+
+  auto wuid = StringToWCharArray(uid);
+  SQLSMALLINT wuid_len = std::wcslen(wuid.get());
+
+  auto wpwd = StringToWCharArray(pwd);
+  SQLSMALLINT wpwd_len = std::wcslen(wpwd.get());
 
   // Connecting to ODBC server.
   // UID specified in DSN will take precedence,
   // so connection still fails despite passing valid uid in SQLConnect call
-  ASSERT_EQ(SQL_ERROR,
-            SQLConnect(conn, dsn0.data(), static_cast<SQLSMALLINT>(dsn0.size()),
-                       uid0.data(), static_cast<SQLSMALLINT>(uid0.size()), pwd0.data(),
-                       static_cast<SQLSMALLINT>(pwd0.size())));
+  ASSERT_EQ(SQL_ERROR, SQLConnect(conn, wdsn.get(), wdsn_len, wuid.get(), wuid_len,
+                                  wpwd.get(), wpwd_len));
 
   VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, kErrorState28000);
 
   // Remove DSN
-  ASSERT_TRUE(UnregisterDsn(wdsn));
+  std::wstring wdsn_str = ConvertToWString(wdsn.get(), wdsn_len);
+  ASSERT_TRUE(UnregisterDsn(wdsn_str));
 }
 
 TEST_F(ConnectionRemoteTest, TestSQLConnectDSNPrecedence) {
@@ -407,22 +409,24 @@ TEST_F(ConnectionRemoteTest, TestSQLConnectDSNPrecedence) {
   ASSERT_TRUE(WriteDSN(connect_str));
 
   std::string dsn(kTestDsn);
-  ASSERT_OK_AND_ASSIGN(std::wstring wdsn, arrow::util::UTF8ToWideString(dsn));
-  ASSERT_OK_AND_ASSIGN(std::wstring wuid, arrow::util::UTF8ToWideString(uid));
-  ASSERT_OK_AND_ASSIGN(std::wstring wpwd, arrow::util::UTF8ToWideString(pwd));
-  std::vector<SQLWCHAR> dsn0(wdsn.begin(), wdsn.end());
-  std::vector<SQLWCHAR> uid0(wuid.begin(), wuid.end());
-  std::vector<SQLWCHAR> pwd0(wpwd.begin(), wpwd.end());
+
+  auto wdsn = StringToWCharArray(dsn);
+  SQLSMALLINT wdsn_len = std::wcslen(wdsn.get());
+
+  auto wuid = StringToWCharArray(uid);
+  SQLSMALLINT wuid_len = std::wcslen(wuid.get());
+
+  auto wpwd = StringToWCharArray(pwd);
+  SQLSMALLINT wpwd_len = std::wcslen(wpwd.get());
 
   // Connecting to ODBC server.
-  ASSERT_EQ(SQL_SUCCESS,
-            SQLConnect(conn, dsn0.data(), static_cast<SQLSMALLINT>(dsn0.size()),
-                       uid0.data(), static_cast<SQLSMALLINT>(uid0.size()), pwd0.data(),
-                       static_cast<SQLSMALLINT>(pwd0.size())))
+  ASSERT_EQ(SQL_SUCCESS, SQLConnect(conn, wdsn.get(), wdsn_len, wuid.get(), wuid_len,
+                                    wpwd.get(), wpwd_len))
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 
   // Remove DSN
-  ASSERT_TRUE(UnregisterDsn(wdsn));
+  std::wstring wdsn_str = ConvertToWString(wdsn.get(), wdsn_len);
+  ASSERT_TRUE(UnregisterDsn(wdsn_str));
 
   // Disconnect from ODBC
   ASSERT_EQ(SQL_SUCCESS, SQLDisconnect(conn))
@@ -432,18 +436,15 @@ TEST_F(ConnectionRemoteTest, TestSQLConnectDSNPrecedence) {
 TEST_F(ConnectionRemoteTest, TestSQLDriverConnectInvalidUid) {
   // Invalid connect string
   std::string connect_str = GetInvalidConnectionString();
-
-  ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
-                       arrow::util::UTF8ToWideString(connect_str));
-  std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
+  auto wconnect_str = StringToWCharArray(connect_str);
+  SQLSMALLINT wconnect_len = std::wcslen(wconnect_str.get());
 
   SQLWCHAR out_str[kOdbcBufferSize] = {0};
   SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ASSERT_EQ(SQL_ERROR,
-            SQLDriverConnect(conn, NULL, &connect_str0[0],
-                             static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+            SQLDriverConnect(conn, NULL, wconnect_str.get(), wconnect_len, out_str,
                              kOdbcBufferSize, &out_str_len, SQL_DRIVER_NOPROMPT));
 
   VerifyOdbcErrorState(SQL_HANDLE_DBC, conn, kErrorState28000);
@@ -478,17 +479,15 @@ TYPED_TEST(ConnectionHandleTest, TestCloseConnectionWithOpenStatement) {
 
   // Connect string
   std::string connect_str = this->GetConnectionString();
-  ASSERT_OK_AND_ASSIGN(std::wstring wconnect_str,
-                       arrow::util::UTF8ToWideString(connect_str));
-  std::vector<SQLWCHAR> connect_str0(wconnect_str.begin(), wconnect_str.end());
+  auto wconnect_str = StringToWCharArray(connect_str);
+  SQLSMALLINT wconnect_len = std::wcslen(wconnect_str.get());
 
   SQLWCHAR out_str[kOdbcBufferSize] = L"";
   SQLSMALLINT out_str_len;
 
   // Connecting to ODBC server.
   ASSERT_EQ(SQL_SUCCESS,
-            SQLDriverConnect(conn, NULL, &connect_str0[0],
-                             static_cast<SQLSMALLINT>(connect_str0.size()), out_str,
+            SQLDriverConnect(conn, NULL, wconnect_str.get(), wconnect_len, out_str,
                              kOdbcBufferSize, &out_str_len, SQL_DRIVER_NOPROMPT))
       << GetOdbcErrorMessage(SQL_HANDLE_DBC, conn);
 
