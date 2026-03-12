@@ -25,13 +25,6 @@
 
 #include "arrow/flight/sql/odbc/odbc_impl/encoding_utils.h"
 
-#ifdef __linux__
-#  define GET_SQWCHAR_PTR(wstring_var) (ODBC::ToSqlWCharVector(wstring_var).data())
-#else
-// Windows and macOS
-#  define GET_SQWCHAR_PTR(wstring_var) (wstring_var.c_str())
-#endif
-
 namespace arrow::flight::sql::odbc {
 
 using config::Configuration;
