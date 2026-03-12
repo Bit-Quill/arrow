@@ -65,7 +65,8 @@ const std::vector<std::string_view> FlightSqlConnection::ALL_KEYS = {
     FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
     FlightSqlConnection::STRING_COLUMN_LENGTH,
     FlightSqlConnection::USE_WIDE_CHAR,
-    FlightSqlConnection::CHUNK_BUFFER_CAPACITY};
+    FlightSqlConnection::CHUNK_BUFFER_CAPACITY
+  };
 
 namespace {
 

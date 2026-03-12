@@ -29,7 +29,7 @@ endif()
 
 add_subdirectory(odbc_impl)
 if(WIN32 OR APPLE)
-  # TODO: Enable Linux test build in separate PR
+  # GH-49552 TODO: Enable Linux test build
   add_subdirectory(tests)
 endif()
 

@@ -41,28 +41,30 @@ static const char DEFAULT_USE_CERT_STORE[] = TRUE_STR;
 static const char DEFAULT_DISABLE_CERT_VERIFICATION[] = FALSE_STR;
 
 namespace {
-std::string ReadDsnString(const std::string& dsn, std::string_view key,
+std::string ReadDsnString(const std::string& dsn, const std::string_view& key,
                           const std::string& dflt = "") {
-  CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
-  CONVERT_WIDE_STR(const std::wstring wkey, key);
-  CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
-
-  // TODO: implement proper Linux unicode support in separate PR
+  CONVERT_SQLWCHAR_STR(wdsn, dsn);
+  CONVERT_SQLWCHAR_STR(wkey, key);
+  CONVERT_SQLWCHAR_STR(wdflt, dflt);
 
 #define BUFFER_SIZE (1024)
   std::vector<SQLWCHAR> buf(BUFFER_SIZE);
   int ret = SQLGetPrivateProfileString(
       reinterpret_cast<LPCWSTR>(wdsn.c_str()), reinterpret_cast<LPCWSTR>(wkey.c_str()),
-      reinterpret_cast<LPCWSTR>(wdflt.c_str()), buf.data(), static_cast<int>(buf.size()),
-      reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
+      reinterpret_cast<LPCWSTR>(wdflt.c_str()),
+      buf.data(), static_cast<int>(buf.size()),
+      ODBC_INI);
 
   if (ret > BUFFER_SIZE) {
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
     ret = SQLGetPrivateProfileString(
-        reinterpret_cast<LPCWSTR>(wdsn.c_str()), reinterpret_cast<LPCWSTR>(wkey.c_str()),
-        reinterpret_cast<LPCWSTR>(wdflt.c_str()), buf.data(),
-        static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
+        reinterpret_cast<LPCWSTR>(wdsn.c_str()),
+        reinterpret_cast<LPCWSTR>(wkey.c_str()),
+        reinterpret_cast<LPCWSTR>(wdflt.c_str()),
+        buf.data(),
+        static_cast<int>(buf.size()),
+        ODBC_INI);
   }
 
   std::string result("");
@@ -84,20 +86,22 @@ void RemoveAllKnownKeys(std::vector<std::string>& keys) {
 }
 
 std::vector<std::string> ReadAllKeys(const std::string& dsn) {
-  CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
+  CONVERT_SQLWCHAR_STR(wdsn, dsn);
 
   std::vector<SQLWCHAR> buf(BUFFER_SIZE);
 
   int ret = SQLGetPrivateProfileString(
-      reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL, reinterpret_cast<LPCWSTR>(L""),
-      buf.data(), static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
+      reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL,
+      reinterpret_cast<LPCWSTR>(L""), buf.data(), static_cast<int>(buf.size()),
+      ODBC_INI);
 
   if (ret > BUFFER_SIZE) {
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
     ret = SQLGetPrivateProfileString(
-        reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL, reinterpret_cast<LPCWSTR>(L""),
-        buf.data(), static_cast<int>(buf.size()), reinterpret_cast<LPCWSTR>(L"ODBC.INI"));
+        reinterpret_cast<LPCWSTR>(wdsn.c_str()), NULL,
+        reinterpret_cast<LPCWSTR>(L""), buf.data(), static_cast<int>(buf.size()),
+        ODBC_INI);
   }
 
   // When you pass NULL to SQLGetPrivateProfileString it gives back a \0 delimited list of
@@ -137,6 +141,10 @@ void Configuration::LoadDefaults() {
 }
 
 void Configuration::LoadDsn(const std::string& dsn) {
+  // Read keys before reading DSN. This is a workaround to unixodbc driver manager
+  // unable to read DSN keys
+  auto customKeys = ReadAllKeys(dsn);
+
   Set(FlightSqlConnection::DSN, dsn);
   Set(FlightSqlConnection::HOST, ReadDsnString(dsn, FlightSqlConnection::HOST));
   Set(FlightSqlConnection::PORT, ReadDsnString(dsn, FlightSqlConnection::PORT));
@@ -145,6 +153,7 @@ void Configuration::LoadDsn(const std::string& dsn) {
   Set(FlightSqlConnection::PWD, ReadDsnString(dsn, FlightSqlConnection::PWD));
   Set(FlightSqlConnection::TRUSTED_CERTS,
       ReadDsnString(dsn, FlightSqlConnection::TRUSTED_CERTS));
+
 #ifdef __APPLE__
   // macOS iODBC treats non-empty defaults as the real values when reading from system
   // DSN, so we don't pass defaults on macOS.
@@ -163,11 +172,10 @@ void Configuration::LoadDsn(const std::string& dsn) {
       ReadDsnString(dsn, FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
                     DEFAULT_USE_CERT_STORE));
   Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
-      ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
-                    DEFAULT_DISABLE_CERT_VERIFICATION));
-#endif
-
-  auto customKeys = ReadAllKeys(dsn);
+    ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
+                  DEFAULT_DISABLE_CERT_VERIFICATION));
+#endif // __APPLE__
+  
   RemoveAllKnownKeys(customKeys);
   for (auto key : customKeys) {
     std::string_view key_sv(key);
