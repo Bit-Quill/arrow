@@ -338,7 +338,8 @@ jobs:
 
   odbc-linux:
     needs: check-labels
-    name: ODBC Linux
+
+    name: ODBC ${{ matrix.title }}
     runs-on: ubuntu-latest
     if: >-
       needs.check-labels.outputs.force == 'true' ||
@@ -347,6 +348,12 @@ jobs:
     timeout-minutes: 75
     strategy:
       fail-fast: false
+      matrix:
+        include:
+          - image: ubuntu-cpp-odbc
+            title: AMD64 Ubuntu C++23
+          - image: debian-cpp-odbc
+            title: AMD64 Debian C++23
     env:
       ARCH: amd64
       ARCHERY_DEBUG: 1
@@ -365,8 +372,8 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .docker
-          key: ubuntu-cpp-odbc-${{ hashFiles('cpp/**') }}
-          restore-keys: ubuntu-cpp-odbc-
+          key: ${{ matrix.image }}-${{ hashFiles('cpp/**') }}
+          restore-keys: ${{ matrix.image }}-
       - name: Setup Python on hosted runner
         uses: actions/setup-python@v6
         with:
@@ -381,7 +388,7 @@ jobs:
           # GH-40558: reduce ASLR to avoid ASAN/LSAN crashes
           sudo sysctl -w vm.mmap_rnd_bits=28
           source ci/scripts/util_enable_core_dumps.sh
-          archery docker run ubuntu-cpp-odbc
+          archery docker run ${{ matrix.image }}
       - name: Docker Push
         if: >-
           success() &&
@@ -392,7 +399,7 @@ jobs:
           ARCHERY_DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
           ARCHERY_DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
         continue-on-error: true
-        run: archery docker push ubuntu-cpp-odbc
+        run: archery docker push ${{ matrix.image }}
 
   odbc-macos:
     needs: check-labels
