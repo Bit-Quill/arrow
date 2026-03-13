@@ -48,7 +48,7 @@ void PostArrowUtilError(arrow::Status error_status) {
   std::wstring werror_msg = arrow::util::UTF8ToWideString(error_msg).ValueOr(
       L"Error during utf8 to wide string conversion");
 
-  PostError(ODBC_ERROR_GENERAL_ERR, const_cast<LPWSTR>(werror_msg.c_str()));
+  PostError(ODBC_ERROR_GENERAL_ERR, const_cast<LPWSTR>(GET_SQWCHAR_PTR(werror_msg)));
 }
 
 void PostLastInstallerError() {
@@ -70,7 +70,7 @@ void PostLastInstallerError() {
 #endif  // __linux__
   std::wstring error_msg = buf.str();
 
-  PostError(code, const_cast<LPWSTR>(error_msg.c_str()));
+  PostError(code, const_cast<LPWSTR>(GET_SQWCHAR_PTR(error_msg)));
 }
 
 /**
