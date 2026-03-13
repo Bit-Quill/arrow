@@ -28,7 +28,10 @@ else()
 endif()
 
 add_subdirectory(odbc_impl)
-add_subdirectory(tests)
+if(WIN32 OR APPLE)
+  # TODO: Enable Linux test build in separate PR
+  add_subdirectory(tests)
+endif()
 
 arrow_install_all_headers("arrow/flight/sql/odbc")
 

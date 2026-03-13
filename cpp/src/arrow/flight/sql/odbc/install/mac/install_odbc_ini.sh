@@ -31,7 +31,7 @@ fi
 
 source_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-odbc_install_script="${source_dir}/install_odbc.sh"
+odbc_install_script="${source_dir}/../unix/install_odbc.sh"
 
 "$odbc_install_script" /Library/ODBC/arrow-odbc/libarrow_flight_sql_odbc.dylib
 
