@@ -43,11 +43,11 @@ static const char DEFAULT_USE_CERT_STORE[] = TRUE_STR;
 static const char DEFAULT_DISABLE_CERT_VERIFICATION[] = FALSE_STR;
 
 namespace {
-std::string ReadDsnString(const std::string& dsn, std::string_view key,
+std::string ReadDsnString(const std::string& dsn, const std::string_view& key,
                           const std::string& dflt = "") {
   CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
   CONVERT_WIDE_STR(const std::wstring wkey, key);
-  // CONVERT_WIDE_STR(const std::wstring wdflt, dflt); // -AL- temp remove
+  CONVERT_WIDE_STR(const std::wstring wdflt, dflt); // -AL- temp remove
 
   // -AL- next up: figure out why `buf` is always empty
   // (buf is default value if the default value is passed)
@@ -183,6 +183,33 @@ void Configuration::LoadDsn(const std::string& dsn) {
   Set(FlightSqlConnection::PWD, ReadDsnString(dsn, FlightSqlConnection::PWD));
   Set(FlightSqlConnection::TRUSTED_CERTS,
       ReadDsnString(dsn, FlightSqlConnection::TRUSTED_CERTS));
+
+  // -AL- trying to copy default values and see which one broke ODBC
+  Set(FlightSqlConnection::USE_ENCRYPTION,
+      ReadDsnString(dsn, FlightSqlConnection::USE_ENCRYPTION, DEFAULT_ENABLE_ENCRYPTION));
+  Set(FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
+      ReadDsnString(dsn, FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
+                    DEFAULT_USE_CERT_STORE));
+  
+  // -AL-  `DISABLE_CERTIFICATE_VERIFICATION` with its default is the reason default cannot be passed.
+  // even with reinterpret_cast<LPCWSTR>(L"") as default
+
+  Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
+      ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION));
+
+  // -AL- what? called `Set(FlightSqlConnection::USE_SYSTEM_TRUST_STORE` again with `false` and
+  // it also works?????
+  // Set(FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
+  //     ReadDsnString(dsn, FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
+  //                   DEFAULT_DISABLE_CERT_VERIFICATION)); // This WORKS
+
+  // Below commented out calls do NOT work
+  // -AL- both `true` and `false` defaults do not work with `DISABLE_CERTIFICATE_VERIFICATION`.
+  // Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
+  //     ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION, DEFAULT_USE_CERT_STORE));
+  // Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
+  //     ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
+  //                   DEFAULT_DISABLE_CERT_VERIFICATION));
 #ifdef __APPLE__
   // macOS iODBC treats non-empty defaults as the real values when reading from system
   // DSN, so we don't pass defaults on macOS.
