@@ -72,6 +72,8 @@ class FlightSqlConnection : public Connection {
   static constexpr std::string_view STRING_COLUMN_LENGTH = "StringColumnLength";
   static constexpr std::string_view USE_WIDE_CHAR = "UseWideChar";
   static constexpr std::string_view CHUNK_BUFFER_CAPACITY = "ChunkBufferCapacity";
+  static constexpr std::string_view NONEXISTENTKEY = "nonExistentkey"; // -AL- temp must remove later
+  // -AL- using this to test my theory
 
   explicit FlightSqlConnection(OdbcVersion odbc_version,
                                const std::string& driver_version = "0.9.0.0");

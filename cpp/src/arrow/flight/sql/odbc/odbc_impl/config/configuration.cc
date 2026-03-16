@@ -47,7 +47,7 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
                           const std::string& dflt = "") {
   CONVERT_WIDE_STR(const std::wstring wdsn, dsn);
   CONVERT_WIDE_STR(const std::wstring wkey, key);
-  CONVERT_WIDE_STR(const std::wstring wdflt, dflt);
+  // CONVERT_WIDE_STR(const std::wstring wdflt, dflt); // -AL- temp remove
 
   // -AL- next up: figure out why `buf` is always empty
   // (buf is default value if the default value is passed)
@@ -80,12 +80,16 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
       GET_SQWCHAR_PTR(std::wstring(L"ODBC.INI")));
 
   if (ret > BUFFER_SIZE) {
+    ARROW_LOG(DEBUG) << "-AL- ReadDsnString ret > BUFFER_SIZE";
     // If there wasn't enough space, try again with the right size buffer.
     buf.resize(ret + 1);
     ret = SQLGetPrivateProfileString(
         reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(wdsn)),
         reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(wkey)),
-        reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(wdflt)), buf.data(),
+        reinterpret_cast<LPCWSTR>(
+          L""),
+        // reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(wdflt)), 
+        buf.data(),
         static_cast<int>(buf.size()),
         reinterpret_cast<LPCWSTR>(GET_SQWCHAR_PTR(std::wstring(L"ODBC.INI"))));
   }
@@ -99,6 +103,7 @@ std::string ReadDsnString(const std::string& dsn, std::string_view key,
   return result;
 }
 
+// -AL- RemoveAllKnownKeys is the only place `ALL_KEYS` is used
 void RemoveAllKnownKeys(std::vector<std::string>& keys) {
   // Remove all known DSN keys from the passed in set of keys, case insensitively.
   keys.erase(std::remove_if(keys.begin(), keys.end(),
@@ -160,6 +165,7 @@ Configuration::~Configuration() {
   // No-op.
 }
 
+// -AL- LoadDefaults is not used on Linux
 void Configuration::LoadDefaults() {
   Set(FlightSqlConnection::DSN, DEFAULT_DSN);
   Set(FlightSqlConnection::USE_ENCRYPTION, DEFAULT_ENABLE_ENCRYPTION);
@@ -187,8 +193,11 @@ void Configuration::LoadDsn(const std::string& dsn) {
       ReadDsnString(dsn, FlightSqlConnection::USE_SYSTEM_TRUST_STORE));
   Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
       ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION));
-#else
-  // Windows and Linux
+#elif _WIN32
+  // Windows
+  // -AL- Once we stop passing default values to calls, unix odbc can retrieve values.
+  // There is a bug inside `ReadDsnString` and how it converts strings.
+  // Likely the key is not read properly whenever a `DEFAULT_` or `std::string(DEFAULT_)` is passed.
   Set(FlightSqlConnection::USE_ENCRYPTION,
       ReadDsnString(dsn, FlightSqlConnection::USE_ENCRYPTION, DEFAULT_ENABLE_ENCRYPTION));
   Set(FlightSqlConnection::USE_SYSTEM_TRUST_STORE,
@@ -198,11 +207,20 @@ void Configuration::LoadDsn(const std::string& dsn) {
       ReadDsnString(dsn, FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
                     DEFAULT_DISABLE_CERT_VERIFICATION));
 #endif
+// Somehow, adding new line to read non-existent key fixes the DSN read.
+// -AL- the root cause is passing std::string("IGNORE THIS DEFAULT") as the last line before
+// reading from RemoveAllKnownKeys. Removing `Set(FlightSqlConnection::NONEXISTENTKEY` and
+// passing std::string(DEFAULT_DISABLE_CERT_VERIFICATION) in above call doesn't fix it.
+// If `Set(FlightSqlConnection::NONEXISTENTKEY` is removed, ODBC breaks again.
 
+  // Set(FlightSqlConnection::NONEXISTENTKEY, 
+  //   ReadDsnString(dsn, FlightSqlConnection::NONEXISTENTKEY, std::string("IGNORE THIS DEFAULT")));
   auto customKeys = ReadAllKeys(dsn);
   RemoveAllKnownKeys(customKeys);
   for (auto key : customKeys) {
     std::string_view key_sv(key);
+    ARROW_LOG(DEBUG) << "-AL- LoadDsn key_sv: " << key_sv;
+    // -AL- here, description, environmentid are called.
     Set(key, ReadDsnString(dsn, key_sv));
   }
 }

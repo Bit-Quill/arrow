@@ -65,7 +65,12 @@ const std::vector<std::string_view> FlightSqlConnection::ALL_KEYS = {
     FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION,
     FlightSqlConnection::STRING_COLUMN_LENGTH,
     FlightSqlConnection::USE_WIDE_CHAR,
-    FlightSqlConnection::CHUNK_BUFFER_CAPACITY};
+    FlightSqlConnection::CHUNK_BUFFER_CAPACITY,
+    FlightSqlConnection::NONEXISTENTKEY // -AL- temp, added for testing
+    // Adding `NONEXISTENTKEY` here doesn't break ODBC, then why does
+    // `Set(FlightSqlConnection::DISABLE_CERTIFICATE_VERIFICATION`
+    // and other lines do?
+  };
 
 namespace {
 
