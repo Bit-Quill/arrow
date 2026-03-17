@@ -17,6 +17,10 @@
   under the License.
 -->
 
+## Steps to Build ODBC on Windows with VCPKG
+1. Install `openssl` with command `vcpkg install openssl:x64-windows`.
+2. Set environment variable `OPENSSL_ROOT_DIR` to `<path/to/vcpkg>/installed/x64-windows`.
+
 ## Steps to Register the 64-bit Apache Arrow ODBC driver on Windows
 
 After the build succeeds, the ODBC DLL will be located in 
