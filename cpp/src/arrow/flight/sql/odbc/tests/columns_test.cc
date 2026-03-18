@@ -127,12 +127,12 @@ void CheckRemoteSQLColumns(
 }
 
 void CheckSQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT idx,
-                          const std::wstring& expected_column_name,
+                          const std::string& expected_column_name,
                           SQLLEN expected_data_type, SQLLEN expected_concise_type,
                           SQLLEN expected_display_size, SQLLEN expected_prec_scale,
                           SQLLEN expected_length,
-                          const std::wstring& expected_literal_prefix,
-                          const std::wstring& expected_literal_suffix,
+                          const std::string& expected_literal_prefix,
+                          const std::string& expected_literal_suffix,
                           SQLLEN expected_column_size, SQLLEN expected_column_scale,
                           SQLLEN expected_column_nullability,
                           SQLLEN expected_num_prec_radix, SQLLEN expected_octet_length,
@@ -215,10 +215,10 @@ void CheckSQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT idx,
   EXPECT_EQ(SQL_SUCCESS,
             SQLColAttribute(stmt, idx, SQL_DESC_UNSIGNED, 0, 0, nullptr, &unsigned_col));
 
-  std::wstring name_str = ConvertToWString(name, name_len);
-  std::wstring base_column_name_str = ConvertToWString(base_column_name, column_name_len);
-  std::wstring label_str = ConvertToWString(label, label_len);
-  std::wstring prefix_str = ConvertToWString(prefix, prefix_len);
+  std::string name_str = ODBC::SqlWcharToString(name);
+  std::string base_column_name_str = ODBC::SqlWcharToString(base_column_name);
+  std::string label_str = ODBC::SqlWcharToString(label);
+  std::string prefix_str = ODBC::SqlWcharToString(prefix);
 
   // Assume column name, base column name, and label are equivalent in the result set
   EXPECT_EQ(expected_column_name, name_str);
@@ -241,7 +241,7 @@ void CheckSQLColAttribute(SQLHSTMT stmt, SQLUSMALLINT idx,
 
 #ifndef __APPLE__
 void CheckSQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT idx,
-                           const std::wstring& expected_column_name,
+                           const std::string& expected_column_name,
                            SQLLEN expected_data_type, SQLLEN expected_display_size,
                            SQLLEN expected_prec_scale, SQLLEN expected_length,
                            SQLLEN expected_column_size, SQLLEN expected_column_scale,
@@ -295,8 +295,8 @@ void CheckSQLColAttributes(SQLHSTMT stmt, SQLUSMALLINT idx,
   EXPECT_EQ(SQL_SUCCESS, SQLColAttributes(stmt, idx, SQL_COLUMN_UNSIGNED, 0, 0, nullptr,
                                           &unsigned_col));
 
-  std::wstring name_str = ConvertToWString(name, name_len);
-  std::wstring label_str = ConvertToWString(label, label_len);
+  std::string name_str = ODBC::SqlWcharToString(name);
+  std::string label_str = ODBC::SqlWcharToString(label);
 
   EXPECT_EQ(expected_column_name, name_str);
   EXPECT_EQ(expected_column_name, label_str);
@@ -1321,72 +1321,72 @@ TEST_F(ColumnsMockTest, TestSQLColAttributeAllTypes) {
   ASSERT_EQ(SQL_SUCCESS, SQLFetch(stmt));
 
   CheckSQLColAttribute(stmt, 1,
-                       std::wstring(L"bigint_col"),  // expected_column_name
-                       SQL_BIGINT,                   // expected_data_type
-                       SQL_BIGINT,                   // expected_concise_type
-                       20,                           // expected_display_size
-                       SQL_FALSE,                    // expected_prec_scale
-                       8,                            // expected_length
-                       std::wstring(L""),            // expected_literal_prefix
-                       std::wstring(L""),            // expected_literal_suffix
-                       8,                            // expected_column_size
-                       0,                            // expected_column_scale
-                       SQL_NULLABLE,                 // expected_column_nullability
-                       10,                           // expected_num_prec_radix
-                       8,                            // expected_octet_length
-                       SQL_PRED_NONE,                // expected_searchable
-                       SQL_FALSE);                   // expected_unsigned_column
+                       "bigint_col",   // expected_column_name
+                       SQL_BIGINT,     // expected_data_type
+                       SQL_BIGINT,     // expected_concise_type
+                       20,             // expected_display_size
+                       SQL_FALSE,      // expected_prec_scale
+                       8,              // expected_length
+                       "",             // expected_literal_prefix
+                       "",             // expected_literal_suffix
+                       8,              // expected_column_size
+                       0,              // expected_column_scale
+                       SQL_NULLABLE,   // expected_column_nullability
+                       10,             // expected_num_prec_radix
+                       8,              // expected_octet_length
+                       SQL_PRED_NONE,  // expected_searchable
+                       SQL_FALSE);     // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 2,
-                       std::wstring(L"char_col"),  // expected_column_name
-                       SQL_WVARCHAR,               // expected_data_type
-                       SQL_WVARCHAR,               // expected_concise_type
-                       0,                          // expected_display_size
-                       SQL_FALSE,                  // expected_prec_scale
-                       0,                          // expected_length
-                       std::wstring(L""),          // expected_literal_prefix
-                       std::wstring(L""),          // expected_literal_suffix
-                       0,                          // expected_column_size
-                       0,                          // expected_column_scale
-                       SQL_NULLABLE,               // expected_column_nullability
-                       0,                          // expected_num_prec_radix
-                       0,                          // expected_octet_length
-                       SQL_PRED_NONE,              // expected_searchable
-                       SQL_TRUE);                  // expected_unsigned_column
+                       "char_col",     // expected_column_name
+                       SQL_WVARCHAR,   // expected_data_type
+                       SQL_WVARCHAR,   // expected_concise_type
+                       0,              // expected_display_size
+                       SQL_FALSE,      // expected_prec_scale
+                       0,              // expected_length
+                       "",             // expected_literal_prefix
+                       "",             // expected_literal_suffix
+                       0,              // expected_column_size
+                       0,              // expected_column_scale
+                       SQL_NULLABLE,   // expected_column_nullability
+                       0,              // expected_num_prec_radix
+                       0,              // expected_octet_length
+                       SQL_PRED_NONE,  // expected_searchable
+                       SQL_TRUE);      // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 3,
-                       std::wstring(L"varbinary_col"),  // expected_column_name
-                       SQL_BINARY,                      // expected_data_type
-                       SQL_BINARY,                      // expected_concise_type
-                       0,                               // expected_display_size
-                       SQL_FALSE,                       // expected_prec_scale
-                       0,                               // expected_length
-                       std::wstring(L""),               // expected_literal_prefix
-                       std::wstring(L""),               // expected_literal_suffix
-                       0,                               // expected_column_size
-                       0,                               // expected_column_scale
-                       SQL_NULLABLE,                    // expected_column_nullability
-                       0,                               // expected_num_prec_radix
-                       0,                               // expected_octet_length
-                       SQL_PRED_NONE,                   // expected_searchable
-                       SQL_TRUE);                       // expected_unsigned_column
+                       "varbinary_col",  // expected_column_name
+                       SQL_BINARY,       // expected_data_type
+                       SQL_BINARY,       // expected_concise_type
+                       0,                // expected_display_size
+                       SQL_FALSE,        // expected_prec_scale
+                       0,                // expected_length
+                       "",               // expected_literal_prefix
+                       "",               // expected_literal_suffix
+                       0,                // expected_column_size
+                       0,                // expected_column_scale
+                       SQL_NULLABLE,     // expected_column_nullability
+                       0,                // expected_num_prec_radix
+                       0,                // expected_octet_length
+                       SQL_PRED_NONE,    // expected_searchable
+                       SQL_TRUE);        // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 4,
-                       std::wstring(L"double_col"),  // expected_column_name
-                       SQL_DOUBLE,                   // expected_data_type
-                       SQL_DOUBLE,                   // expected_concise_type
-                       24,                           // expected_display_size
-                       SQL_FALSE,                    // expected_prec_scale
-                       8,                            // expected_length
-                       std::wstring(L""),            // expected_literal_prefix
-                       std::wstring(L""),            // expected_literal_suffix
-                       8,                            // expected_column_size
-                       0,                            // expected_column_scale
-                       SQL_NULLABLE,                 // expected_column_nullability
-                       2,                            // expected_num_prec_radix
-                       8,                            // expected_octet_length
-                       SQL_PRED_NONE,                // expected_searchable
-                       SQL_FALSE);                   // expected_unsigned_column
+                       "double_col",   // expected_column_name
+                       SQL_DOUBLE,     // expected_data_type
+                       SQL_DOUBLE,     // expected_concise_type
+                       24,             // expected_display_size
+                       SQL_FALSE,      // expected_prec_scale
+                       8,              // expected_length
+                       "",             // expected_literal_prefix
+                       "",             // expected_literal_suffix
+                       8,              // expected_column_size
+                       0,              // expected_column_scale
+                       SQL_NULLABLE,   // expected_column_nullability
+                       2,              // expected_num_prec_radix
+                       8,              // expected_octet_length
+                       SQL_PRED_NONE,  // expected_searchable
+                       SQL_FALSE);     // expected_unsigned_column
 
   DropAllDataTypeTable();
 }
@@ -1404,52 +1404,52 @@ TEST_F(ColumnsOdbcV2MockTest, TestSQLColAttributesAllTypes) {
 
   ASSERT_EQ(SQL_SUCCESS, SQLFetch(stmt));
   CheckSQLColAttributes(stmt, 1,
-                        std::wstring(L"bigint_col"),  // expected_column_name
-                        SQL_BIGINT,                   // expected_data_type
-                        20,                           // expected_display_size
-                        SQL_FALSE,                    // expected_prec_scale
-                        8,                            // expected_length
-                        8,                            // expected_column_size
-                        0,                            // expected_column_scale
-                        SQL_NULLABLE,                 // expected_column_nullability
-                        SQL_PRED_NONE,                // expected_searchable
-                        SQL_FALSE);                   // expected_unsigned_column
+                        "bigint_col",   // expected_column_name
+                        SQL_BIGINT,     // expected_data_type
+                        20,             // expected_display_size
+                        SQL_FALSE,      // expected_prec_scale
+                        8,              // expected_length
+                        8,              // expected_column_size
+                        0,              // expected_column_scale
+                        SQL_NULLABLE,   // expected_column_nullability
+                        SQL_PRED_NONE,  // expected_searchable
+                        SQL_FALSE);     // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 2,
-                        std::wstring(L"char_col"),  // expected_column_name
-                        SQL_WVARCHAR,               // expected_data_type
-                        0,                          // expected_display_size
-                        SQL_FALSE,                  // expected_prec_scale
-                        0,                          // expected_length
-                        0,                          // expected_column_size
-                        0,                          // expected_column_scale
-                        SQL_NULLABLE,               // expected_column_nullability
-                        SQL_PRED_NONE,              // expected_searchable
-                        SQL_TRUE);                  // expected_unsigned_column
+                        "char_col",     // expected_column_name
+                        SQL_WVARCHAR,   // expected_data_type
+                        0,              // expected_display_size
+                        SQL_FALSE,      // expected_prec_scale
+                        0,              // expected_length
+                        0,              // expected_column_size
+                        0,              // expected_column_scale
+                        SQL_NULLABLE,   // expected_column_nullability
+                        SQL_PRED_NONE,  // expected_searchable
+                        SQL_TRUE);      // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 3,
-                        std::wstring(L"varbinary_col"),  // expected_column_name
-                        SQL_BINARY,                      // expected_data_type
-                        0,                               // expected_display_size
-                        SQL_FALSE,                       // expected_prec_scale
-                        0,                               // expected_length
-                        0,                               // expected_column_size
-                        0,                               // expected_column_scale
-                        SQL_NULLABLE,                    // expected_column_nullability
-                        SQL_PRED_NONE,                   // expected_searchable
-                        SQL_TRUE);                       // expected_unsigned_column
+                        "varbinary_col",  // expected_column_name
+                        SQL_BINARY,       // expected_data_type
+                        0,                // expected_display_size
+                        SQL_FALSE,        // expected_prec_scale
+                        0,                // expected_length
+                        0,                // expected_column_size
+                        0,                // expected_column_scale
+                        SQL_NULLABLE,     // expected_column_nullability
+                        SQL_PRED_NONE,    // expected_searchable
+                        SQL_TRUE);        // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 4,
-                        std::wstring(L"double_col"),  // expected_column_name
-                        SQL_DOUBLE,                   // expected_data_type
-                        24,                           // expected_display_size
-                        SQL_FALSE,                    // expected_prec_scale
-                        8,                            // expected_length
-                        8,                            // expected_column_size
-                        0,                            // expected_column_scale
-                        SQL_NULLABLE,                 // expected_column_nullability
-                        SQL_PRED_NONE,                // expected_searchable
-                        SQL_FALSE);                   // expected_unsigned_column
+                        "double_col",   // expected_column_name
+                        SQL_DOUBLE,     // expected_data_type
+                        24,             // expected_display_size
+                        SQL_FALSE,      // expected_prec_scale
+                        8,              // expected_length
+                        8,              // expected_column_size
+                        0,              // expected_column_scale
+                        SQL_NULLABLE,   // expected_column_nullability
+                        SQL_PRED_NONE,  // expected_searchable
+                        SQL_FALSE);     // expected_unsigned_column
 
   DropAllDataTypeTable();
 }
@@ -1466,157 +1466,157 @@ TEST_F(ColumnsRemoteTest, TestSQLColAttributeAllTypes) {
   ASSERT_EQ(SQL_SUCCESS, SQLFetch(stmt));
 
   CheckSQLColAttribute(stmt, 1,
-                       std::wstring(L"sinteger_max"),  // expected_column_name
-                       SQL_INTEGER,                    // expected_data_type
-                       SQL_INTEGER,                    // expected_concise_type
-                       11,                             // expected_display_size
-                       SQL_FALSE,                      // expected_prec_scale
-                       4,                              // expected_length
-                       std::wstring(L""),              // expected_literal_prefix
-                       std::wstring(L""),              // expected_literal_suffix
-                       4,                              // expected_column_size
-                       0,                              // expected_column_scale
-                       SQL_NULLABLE,                   // expected_column_nullability
-                       10,                             // expected_num_prec_radix
-                       4,                              // expected_octet_length
-                       SQL_SEARCHABLE,                 // expected_searchable
-                       SQL_FALSE);                     // expected_unsigned_column
+                       "sinteger_max",  // expected_column_name
+                       SQL_INTEGER,     // expected_data_type
+                       SQL_INTEGER,     // expected_concise_type
+                       11,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       4,               // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       4,               // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       10,              // expected_num_prec_radix
+                       4,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 2,
-                       std::wstring(L"sbigint_max"),  // expected_column_name
-                       SQL_BIGINT,                    // expected_data_type
-                       SQL_BIGINT,                    // expected_concise_type
-                       20,                            // expected_display_size
-                       SQL_FALSE,                     // expected_prec_scale
-                       8,                             // expected_length
-                       std::wstring(L""),             // expected_literal_prefix
-                       std::wstring(L""),             // expected_literal_suffix
-                       8,                             // expected_column_size
-                       0,                             // expected_column_scale
-                       SQL_NULLABLE,                  // expected_column_nullability
-                       10,                            // expected_num_prec_radix
-                       8,                             // expected_octet_length
-                       SQL_SEARCHABLE,                // expected_searchable
-                       SQL_FALSE);                    // expected_unsigned_column
+                       "sbigint_max",   // expected_column_name
+                       SQL_BIGINT,      // expected_data_type
+                       SQL_BIGINT,      // expected_concise_type
+                       20,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       8,               // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       8,               // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       10,              // expected_num_prec_radix
+                       8,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 3,
-                       std::wstring(L"decimal_positive"),  // expected_column_name
-                       SQL_DECIMAL,                        // expected_data_type
-                       SQL_DECIMAL,                        // expected_concise_type
-                       40,                                 // expected_display_size
-                       SQL_FALSE,                          // expected_prec_scale
-                       19,                                 // expected_length
-                       std::wstring(L""),                  // expected_literal_prefix
-                       std::wstring(L""),                  // expected_literal_suffix
-                       19,                                 // expected_column_size
-                       0,                                  // expected_column_scale
-                       SQL_NULLABLE,                       // expected_column_nullability
-                       10,                                 // expected_num_prec_radix
-                       40,                                 // expected_octet_length
-                       SQL_SEARCHABLE,                     // expected_searchable
-                       SQL_FALSE);                         // expected_unsigned_column
+                       "decimal_positive",  // expected_column_name
+                       SQL_DECIMAL,         // expected_data_type
+                       SQL_DECIMAL,         // expected_concise_type
+                       40,                  // expected_display_size
+                       SQL_FALSE,           // expected_prec_scale
+                       19,                  // expected_length
+                       "",                  // expected_literal_prefix
+                       "",                  // expected_literal_suffix
+                       19,                  // expected_column_size
+                       0,                   // expected_column_scale
+                       SQL_NULLABLE,        // expected_column_nullability
+                       10,                  // expected_num_prec_radix
+                       40,                  // expected_octet_length
+                       SQL_SEARCHABLE,      // expected_searchable
+                       SQL_FALSE);          // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 4,
-                       std::wstring(L"float_max"),  // expected_column_name
-                       SQL_FLOAT,                   // expected_data_type
-                       SQL_FLOAT,                   // expected_concise_type
-                       24,                          // expected_display_size
-                       SQL_FALSE,                   // expected_prec_scale
-                       8,                           // expected_length
-                       std::wstring(L""),           // expected_literal_prefix
-                       std::wstring(L""),           // expected_literal_suffix
-                       8,                           // expected_column_size
-                       0,                           // expected_column_scale
-                       SQL_NULLABLE,                // expected_column_nullability
-                       2,                           // expected_num_prec_radix
-                       8,                           // expected_octet_length
-                       SQL_SEARCHABLE,              // expected_searchable
-                       SQL_FALSE);                  // expected_unsigned_column
+                       "float_max",     // expected_column_name
+                       SQL_FLOAT,       // expected_data_type
+                       SQL_FLOAT,       // expected_concise_type
+                       24,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       8,               // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       8,               // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       2,               // expected_num_prec_radix
+                       8,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 5,
-                       std::wstring(L"double_max"),  // expected_column_name
-                       SQL_DOUBLE,                   // expected_data_type
-                       SQL_DOUBLE,                   // expected_concise_type
-                       24,                           // expected_display_size
-                       SQL_FALSE,                    // expected_prec_scale
-                       8,                            // expected_length
-                       std::wstring(L""),            // expected_literal_prefix
-                       std::wstring(L""),            // expected_literal_suffix
-                       8,                            // expected_column_size
-                       0,                            // expected_column_scale
-                       SQL_NULLABLE,                 // expected_column_nullability
-                       2,                            // expected_num_prec_radix
-                       8,                            // expected_octet_length
-                       SQL_SEARCHABLE,               // expected_searchable
-                       SQL_FALSE);                   // expected_unsigned_column
+                       "double_max",    // expected_column_name
+                       SQL_DOUBLE,      // expected_data_type
+                       SQL_DOUBLE,      // expected_concise_type
+                       24,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       8,               // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       8,               // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       2,               // expected_num_prec_radix
+                       8,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 6,
-                       std::wstring(L"bit_true"),  // expected_column_name
-                       SQL_BIT,                    // expected_data_type
-                       SQL_BIT,                    // expected_concise_type
-                       1,                          // expected_display_size
-                       SQL_FALSE,                  // expected_prec_scale
-                       1,                          // expected_length
-                       std::wstring(L""),          // expected_literal_prefix
-                       std::wstring(L""),          // expected_literal_suffix
-                       1,                          // expected_column_size
-                       0,                          // expected_column_scale
-                       SQL_NULLABLE,               // expected_column_nullability
-                       0,                          // expected_num_prec_radix
-                       1,                          // expected_octet_length
-                       SQL_SEARCHABLE,             // expected_searchable
-                       SQL_TRUE);                  // expected_unsigned_column
+                       "bit_true",      // expected_column_name
+                       SQL_BIT,         // expected_data_type
+                       SQL_BIT,         // expected_concise_type
+                       1,               // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       1,               // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       1,               // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       0,               // expected_num_prec_radix
+                       1,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_TRUE);       // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 7,
-                       std::wstring(L"date_max"),  // expected_column_name
-                       SQL_DATETIME,               // expected_data_type
-                       SQL_TYPE_DATE,              // expected_concise_type
-                       10,                         // expected_display_size
-                       SQL_FALSE,                  // expected_prec_scale
-                       10,                         // expected_length
-                       std::wstring(L""),          // expected_literal_prefix
-                       std::wstring(L""),          // expected_literal_suffix
-                       10,                         // expected_column_size
-                       0,                          // expected_column_scale
-                       SQL_NULLABLE,               // expected_column_nullability
-                       0,                          // expected_num_prec_radix
-                       6,                          // expected_octet_length
-                       SQL_SEARCHABLE,             // expected_searchable
-                       SQL_TRUE);                  // expected_unsigned_column
+                       "date_max",      // expected_column_name
+                       SQL_DATETIME,    // expected_data_type
+                       SQL_TYPE_DATE,   // expected_concise_type
+                       10,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       10,              // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       10,              // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       0,               // expected_num_prec_radix
+                       6,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_TRUE);       // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 8,
-                       std::wstring(L"time_max"),  // expected_column_name
-                       SQL_DATETIME,               // expected_data_type
-                       SQL_TYPE_TIME,              // expected_concise_type
-                       12,                         // expected_display_size
-                       SQL_FALSE,                  // expected_prec_scale
-                       12,                         // expected_length
-                       std::wstring(L""),          // expected_literal_prefix
-                       std::wstring(L""),          // expected_literal_suffix
-                       12,                         // expected_column_size
-                       3,                          // expected_column_scale
-                       SQL_NULLABLE,               // expected_column_nullability
-                       0,                          // expected_num_prec_radix
-                       6,                          // expected_octet_length
-                       SQL_SEARCHABLE,             // expected_searchable
-                       SQL_TRUE);                  // expected_unsigned_column
+                       "time_max",      // expected_column_name
+                       SQL_DATETIME,    // expected_data_type
+                       SQL_TYPE_TIME,   // expected_concise_type
+                       12,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       12,              // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       12,              // expected_column_size
+                       3,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       0,               // expected_num_prec_radix
+                       6,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_TRUE);       // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 9,
-                       std::wstring(L"timestamp_max"),  // expected_column_name
-                       SQL_DATETIME,                    // expected_data_type
-                       SQL_TYPE_TIMESTAMP,              // expected_concise_type
-                       23,                              // expected_display_size
-                       SQL_FALSE,                       // expected_prec_scale
-                       23,                              // expected_length
-                       std::wstring(L""),               // expected_literal_prefix
-                       std::wstring(L""),               // expected_literal_suffix
-                       23,                              // expected_column_size
-                       3,                               // expected_column_scale
-                       SQL_NULLABLE,                    // expected_column_nullability
-                       0,                               // expected_num_prec_radix
-                       16,                              // expected_octet_length
-                       SQL_SEARCHABLE,                  // expected_searchable
-                       SQL_TRUE);                       // expected_unsigned_column
+                       "timestamp_max",     // expected_column_name
+                       SQL_DATETIME,        // expected_data_type
+                       SQL_TYPE_TIMESTAMP,  // expected_concise_type
+                       23,                  // expected_display_size
+                       SQL_FALSE,           // expected_prec_scale
+                       23,                  // expected_length
+                       "",                  // expected_literal_prefix
+                       "",                  // expected_literal_suffix
+                       23,                  // expected_column_size
+                       3,                   // expected_column_scale
+                       SQL_NULLABLE,        // expected_column_nullability
+                       0,                   // expected_num_prec_radix
+                       16,                  // expected_octet_length
+                       SQL_SEARCHABLE,      // expected_searchable
+                       SQL_TRUE);           // expected_unsigned_column
 }
 
 // iODBC does not support SQLColAttribute in ODBC 2.0 mode.
@@ -1631,157 +1631,157 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributeAllTypes) {
   ASSERT_EQ(SQL_SUCCESS, SQLFetch(stmt));
 
   CheckSQLColAttribute(stmt, 1,
-                       std::wstring(L"sinteger_max"),  // expected_column_name
-                       SQL_INTEGER,                    // expected_data_type
-                       SQL_INTEGER,                    // expected_concise_type
-                       11,                             // expected_display_size
-                       SQL_FALSE,                      // expected_prec_scale
-                       4,                              // expected_length
-                       std::wstring(L""),              // expected_literal_prefix
-                       std::wstring(L""),              // expected_literal_suffix
-                       4,                              // expected_column_size
-                       0,                              // expected_column_scale
-                       SQL_NULLABLE,                   // expected_column_nullability
-                       10,                             // expected_num_prec_radix
-                       4,                              // expected_octet_length
-                       SQL_SEARCHABLE,                 // expected_searchable
-                       SQL_FALSE);                     // expected_unsigned_column
+                       "sinteger_max",  // expected_column_name
+                       SQL_INTEGER,     // expected_data_type
+                       SQL_INTEGER,     // expected_concise_type
+                       11,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       4,               // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       4,               // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       10,              // expected_num_prec_radix
+                       4,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 2,
-                       std::wstring(L"sbigint_max"),  // expected_column_name
-                       SQL_BIGINT,                    // expected_data_type
-                       SQL_BIGINT,                    // expected_concise_type
-                       20,                            // expected_display_size
-                       SQL_FALSE,                     // expected_prec_scale
-                       8,                             // expected_length
-                       std::wstring(L""),             // expected_literal_prefix
-                       std::wstring(L""),             // expected_literal_suffix
-                       8,                             // expected_column_size
-                       0,                             // expected_column_scale
-                       SQL_NULLABLE,                  // expected_column_nullability
-                       10,                            // expected_num_prec_radix
-                       8,                             // expected_octet_length
-                       SQL_SEARCHABLE,                // expected_searchable
-                       SQL_FALSE);                    // expected_unsigned_column
+                       "sbigint_max",   // expected_column_name
+                       SQL_BIGINT,      // expected_data_type
+                       SQL_BIGINT,      // expected_concise_type
+                       20,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       8,               // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       8,               // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       10,              // expected_num_prec_radix
+                       8,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 3,
-                       std::wstring(L"decimal_positive"),  // expected_column_name
-                       SQL_DECIMAL,                        // expected_data_type
-                       SQL_DECIMAL,                        // expected_concise_type
-                       40,                                 // expected_display_size
-                       SQL_FALSE,                          // expected_prec_scale
-                       19,                                 // expected_length
-                       std::wstring(L""),                  // expected_literal_prefix
-                       std::wstring(L""),                  // expected_literal_suffix
-                       19,                                 // expected_column_size
-                       0,                                  // expected_column_scale
-                       SQL_NULLABLE,                       // expected_column_nullability
-                       10,                                 // expected_num_prec_radix
-                       40,                                 // expected_octet_length
-                       SQL_SEARCHABLE,                     // expected_searchable
-                       SQL_FALSE);                         // expected_unsigned_column
+                       "decimal_positive",  // expected_column_name
+                       SQL_DECIMAL,         // expected_data_type
+                       SQL_DECIMAL,         // expected_concise_type
+                       40,                  // expected_display_size
+                       SQL_FALSE,           // expected_prec_scale
+                       19,                  // expected_length
+                       "",                  // expected_literal_prefix
+                       "",                  // expected_literal_suffix
+                       19,                  // expected_column_size
+                       0,                   // expected_column_scale
+                       SQL_NULLABLE,        // expected_column_nullability
+                       10,                  // expected_num_prec_radix
+                       40,                  // expected_octet_length
+                       SQL_SEARCHABLE,      // expected_searchable
+                       SQL_FALSE);          // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 4,
-                       std::wstring(L"float_max"),  // expected_column_name
-                       SQL_FLOAT,                   // expected_data_type
-                       SQL_FLOAT,                   // expected_concise_type
-                       24,                          // expected_display_size
-                       SQL_FALSE,                   // expected_prec_scale
-                       8,                           // expected_length
-                       std::wstring(L""),           // expected_literal_prefix
-                       std::wstring(L""),           // expected_literal_suffix
-                       8,                           // expected_column_size
-                       0,                           // expected_column_scale
-                       SQL_NULLABLE,                // expected_column_nullability
-                       2,                           // expected_num_prec_radix
-                       8,                           // expected_octet_length
-                       SQL_SEARCHABLE,              // expected_searchable
-                       SQL_FALSE);                  // expected_unsigned_column
+                       "float_max",     // expected_column_name
+                       SQL_FLOAT,       // expected_data_type
+                       SQL_FLOAT,       // expected_concise_type
+                       24,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       8,               // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       8,               // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       2,               // expected_num_prec_radix
+                       8,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 5,
-                       std::wstring(L"double_max"),  // expected_column_name
-                       SQL_DOUBLE,                   // expected_data_type
-                       SQL_DOUBLE,                   // expected_concise_type
-                       24,                           // expected_display_size
-                       SQL_FALSE,                    // expected_prec_scale
-                       8,                            // expected_length
-                       std::wstring(L""),            // expected_literal_prefix
-                       std::wstring(L""),            // expected_literal_suffix
-                       8,                            // expected_column_size
-                       0,                            // expected_column_scale
-                       SQL_NULLABLE,                 // expected_column_nullability
-                       2,                            // expected_num_prec_radix
-                       8,                            // expected_octet_length
-                       SQL_SEARCHABLE,               // expected_searchable
-                       SQL_FALSE);                   // expected_unsigned_column
+                       "double_max",    // expected_column_name
+                       SQL_DOUBLE,      // expected_data_type
+                       SQL_DOUBLE,      // expected_concise_type
+                       24,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       8,               // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       8,               // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       2,               // expected_num_prec_radix
+                       8,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 6,
-                       std::wstring(L"bit_true"),  // expected_column_name
-                       SQL_BIT,                    // expected_data_type
-                       SQL_BIT,                    // expected_concise_type
-                       1,                          // expected_display_size
-                       SQL_FALSE,                  // expected_prec_scale
-                       1,                          // expected_length
-                       std::wstring(L""),          // expected_literal_prefix
-                       std::wstring(L""),          // expected_literal_suffix
-                       1,                          // expected_column_size
-                       0,                          // expected_column_scale
-                       SQL_NULLABLE,               // expected_column_nullability
-                       0,                          // expected_num_prec_radix
-                       1,                          // expected_octet_length
-                       SQL_SEARCHABLE,             // expected_searchable
-                       SQL_TRUE);                  // expected_unsigned_column
+                       "bit_true",      // expected_column_name
+                       SQL_BIT,         // expected_data_type
+                       SQL_BIT,         // expected_concise_type
+                       1,               // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       1,               // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       1,               // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       0,               // expected_num_prec_radix
+                       1,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_TRUE);       // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 7,
-                       std::wstring(L"date_max"),  // expected_column_name
-                       SQL_DATETIME,               // expected_data_type
-                       SQL_DATE,                   // expected_concise_type
-                       10,                         // expected_display_size
-                       SQL_FALSE,                  // expected_prec_scale
-                       10,                         // expected_length
-                       std::wstring(L""),          // expected_literal_prefix
-                       std::wstring(L""),          // expected_literal_suffix
-                       10,                         // expected_column_size
-                       0,                          // expected_column_scale
-                       SQL_NULLABLE,               // expected_column_nullability
-                       0,                          // expected_num_prec_radix
-                       6,                          // expected_octet_length
-                       SQL_SEARCHABLE,             // expected_searchable
-                       SQL_TRUE);                  // expected_unsigned_column
+                       "date_max",      // expected_column_name
+                       SQL_DATETIME,    // expected_data_type
+                       SQL_DATE,        // expected_concise_type
+                       10,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       10,              // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       10,              // expected_column_size
+                       0,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       0,               // expected_num_prec_radix
+                       6,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_TRUE);       // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 8,
-                       std::wstring(L"time_max"),  // expected_column_name
-                       SQL_DATETIME,               // expected_data_type
-                       SQL_TIME,                   // expected_concise_type
-                       12,                         // expected_display_size
-                       SQL_FALSE,                  // expected_prec_scale
-                       12,                         // expected_length
-                       std::wstring(L""),          // expected_literal_prefix
-                       std::wstring(L""),          // expected_literal_suffix
-                       12,                         // expected_column_size
-                       3,                          // expected_column_scale
-                       SQL_NULLABLE,               // expected_column_nullability
-                       0,                          // expected_num_prec_radix
-                       6,                          // expected_octet_length
-                       SQL_SEARCHABLE,             // expected_searchable
-                       SQL_TRUE);                  // expected_unsigned_column
+                       "time_max",      // expected_column_name
+                       SQL_DATETIME,    // expected_data_type
+                       SQL_TIME,        // expected_concise_type
+                       12,              // expected_display_size
+                       SQL_FALSE,       // expected_prec_scale
+                       12,              // expected_length
+                       "",              // expected_literal_prefix
+                       "",              // expected_literal_suffix
+                       12,              // expected_column_size
+                       3,               // expected_column_scale
+                       SQL_NULLABLE,    // expected_column_nullability
+                       0,               // expected_num_prec_radix
+                       6,               // expected_octet_length
+                       SQL_SEARCHABLE,  // expected_searchable
+                       SQL_TRUE);       // expected_unsigned_column
 
   CheckSQLColAttribute(stmt, 9,
-                       std::wstring(L"timestamp_max"),  // expected_column_name
-                       SQL_DATETIME,                    // expected_data_type
-                       SQL_TIMESTAMP,                   // expected_concise_type
-                       23,                              // expected_display_size
-                       SQL_FALSE,                       // expected_prec_scale
-                       23,                              // expected_length
-                       std::wstring(L""),               // expected_literal_prefix
-                       std::wstring(L""),               // expected_literal_suffix
-                       23,                              // expected_column_size
-                       3,                               // expected_column_scale
-                       SQL_NULLABLE,                    // expected_column_nullability
-                       0,                               // expected_num_prec_radix
-                       16,                              // expected_octet_length
-                       SQL_SEARCHABLE,                  // expected_searchable
-                       SQL_TRUE);                       // expected_unsigned_column
+                       "timestamp_max",  // expected_column_name
+                       SQL_DATETIME,     // expected_data_type
+                       SQL_TIMESTAMP,    // expected_concise_type
+                       23,               // expected_display_size
+                       SQL_FALSE,        // expected_prec_scale
+                       23,               // expected_length
+                       "",               // expected_literal_prefix
+                       "",               // expected_literal_suffix
+                       23,               // expected_column_size
+                       3,                // expected_column_scale
+                       SQL_NULLABLE,     // expected_column_nullability
+                       0,                // expected_num_prec_radix
+                       16,               // expected_octet_length
+                       SQL_SEARCHABLE,   // expected_searchable
+                       SQL_TRUE);        // expected_unsigned_column
 }
 
 // iODBC does not support SQLColAttributes for ODBC 3.0 attributes.
@@ -1796,112 +1796,112 @@ TEST_F(ColumnsOdbcV2RemoteTest, TestSQLColAttributesAllTypes) {
   ASSERT_EQ(SQL_SUCCESS, SQLFetch(stmt));
 
   CheckSQLColAttributes(stmt, 1,
-                        std::wstring(L"sinteger_max"),  // expected_column_name
-                        SQL_INTEGER,                    // expected_data_type
-                        11,                             // expected_display_size
-                        SQL_FALSE,                      // expected_prec_scale
-                        4,                              // expected_length
-                        4,                              // expected_column_size
-                        0,                              // expected_column_scale
-                        SQL_NULLABLE,                   // expected_column_nullability
-                        SQL_SEARCHABLE,                 // expected_searchable
-                        SQL_FALSE);                     // expected_unsigned_column
+                        "sinteger_max",  // expected_column_name
+                        SQL_INTEGER,     // expected_data_type
+                        11,              // expected_display_size
+                        SQL_FALSE,       // expected_prec_scale
+                        4,               // expected_length
+                        4,               // expected_column_size
+                        0,               // expected_column_scale
+                        SQL_NULLABLE,    // expected_column_nullability
+                        SQL_SEARCHABLE,  // expected_searchable
+                        SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 2,
-                        std::wstring(L"sbigint_max"),  // expected_column_name
-                        SQL_BIGINT,                    // expected_data_type
-                        20,                            // expected_display_size
-                        SQL_FALSE,                     // expected_prec_scale
-                        8,                             // expected_length
-                        8,                             // expected_column_size
-                        0,                             // expected_column_scale
-                        SQL_NULLABLE,                  // expected_column_nullability
-                        SQL_SEARCHABLE,                // expected_searchable
-                        SQL_FALSE);                    // expected_unsigned_column
+                        "sbigint_max",   // expected_column_name
+                        SQL_BIGINT,      // expected_data_type
+                        20,              // expected_display_size
+                        SQL_FALSE,       // expected_prec_scale
+                        8,               // expected_length
+                        8,               // expected_column_size
+                        0,               // expected_column_scale
+                        SQL_NULLABLE,    // expected_column_nullability
+                        SQL_SEARCHABLE,  // expected_searchable
+                        SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 3,
-                        std::wstring(L"decimal_positive"),  // expected_column_name
-                        SQL_DECIMAL,                        // expected_data_type
-                        40,                                 // expected_display_size
-                        SQL_FALSE,                          // expected_prec_scale
-                        19,                                 // expected_length
-                        19,                                 // expected_column_size
-                        0,                                  // expected_column_scale
-                        SQL_NULLABLE,                       // expected_column_nullability
-                        SQL_SEARCHABLE,                     // expected_searchable
-                        SQL_FALSE);                         // expected_unsigned_column
+                        "decimal_positive",  // expected_column_name
+                        SQL_DECIMAL,         // expected_data_type
+                        40,                  // expected_display_size
+                        SQL_FALSE,           // expected_prec_scale
+                        19,                  // expected_length
+                        19,                  // expected_column_size
+                        0,                   // expected_column_scale
+                        SQL_NULLABLE,        // expected_column_nullability
+                        SQL_SEARCHABLE,      // expected_searchable
+                        SQL_FALSE);          // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 4,
-                        std::wstring(L"float_max"),  // expected_column_name
-                        SQL_FLOAT,                   // expected_data_type
-                        24,                          // expected_display_size
-                        SQL_FALSE,                   // expected_prec_scale
-                        8,                           // expected_length
-                        8,                           // expected_column_size
-                        0,                           // expected_column_scale
-                        SQL_NULLABLE,                // expected_column_nullability
-                        SQL_SEARCHABLE,              // expected_searchable
-                        SQL_FALSE);                  // expected_unsigned_column
+                        "float_max",     // expected_column_name
+                        SQL_FLOAT,       // expected_data_type
+                        24,              // expected_display_size
+                        SQL_FALSE,       // expected_prec_scale
+                        8,               // expected_length
+                        8,               // expected_column_size
+                        0,               // expected_column_scale
+                        SQL_NULLABLE,    // expected_column_nullability
+                        SQL_SEARCHABLE,  // expected_searchable
+                        SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 5,
-                        std::wstring(L"double_max"),  // expected_column_name
-                        SQL_DOUBLE,                   // expected_data_type
-                        24,                           // expected_display_size
-                        SQL_FALSE,                    // expected_prec_scale
-                        8,                            // expected_length
-                        8,                            // expected_column_size
-                        0,                            // expected_column_scale
-                        SQL_NULLABLE,                 // expected_column_nullability
-                        SQL_SEARCHABLE,               // expected_searchable
-                        SQL_FALSE);                   // expected_unsigned_column
+                        "double_max",    // expected_column_name
+                        SQL_DOUBLE,      // expected_data_type
+                        24,              // expected_display_size
+                        SQL_FALSE,       // expected_prec_scale
+                        8,               // expected_length
+                        8,               // expected_column_size
+                        0,               // expected_column_scale
+                        SQL_NULLABLE,    // expected_column_nullability
+                        SQL_SEARCHABLE,  // expected_searchable
+                        SQL_FALSE);      // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 6,
-                        std::wstring(L"bit_true"),  // expected_column_name
-                        SQL_BIT,                    // expected_data_type
-                        1,                          // expected_display_size
-                        SQL_FALSE,                  // expected_prec_scale
-                        1,                          // expected_length
-                        1,                          // expected_column_size
-                        0,                          // expected_column_scale
-                        SQL_NULLABLE,               // expected_column_nullability
-                        SQL_SEARCHABLE,             // expected_searchable
-                        SQL_TRUE);                  // expected_unsigned_column
+                        "bit_true",      // expected_column_name
+                        SQL_BIT,         // expected_data_type
+                        1,               // expected_display_size
+                        SQL_FALSE,       // expected_prec_scale
+                        1,               // expected_length
+                        1,               // expected_column_size
+                        0,               // expected_column_scale
+                        SQL_NULLABLE,    // expected_column_nullability
+                        SQL_SEARCHABLE,  // expected_searchable
+                        SQL_TRUE);       // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 7,
-                        std::wstring(L"date_max"),  // expected_column_name
-                        SQL_DATE,                   // expected_data_type
-                        10,                         // expected_display_size
-                        SQL_FALSE,                  // expected_prec_scale
-                        10,                         // expected_length
-                        10,                         // expected_column_size
-                        0,                          // expected_column_scale
-                        SQL_NULLABLE,               // expected_column_nullability
-                        SQL_SEARCHABLE,             // expected_searchable
-                        SQL_TRUE);                  // expected_unsigned_column
+                        "date_max",      // expected_column_name
+                        SQL_DATE,        // expected_data_type
+                        10,              // expected_display_size
+                        SQL_FALSE,       // expected_prec_scale
+                        10,              // expected_length
+                        10,              // expected_column_size
+                        0,               // expected_column_scale
+                        SQL_NULLABLE,    // expected_column_nullability
+                        SQL_SEARCHABLE,  // expected_searchable
+                        SQL_TRUE);       // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 8,
-                        std::wstring(L"time_max"),  // expected_column_name
-                        SQL_TIME,                   // expected_data_type
-                        12,                         // expected_display_size
-                        SQL_FALSE,                  // expected_prec_scale
-                        12,                         // expected_length
-                        12,                         // expected_column_size
-                        3,                          // expected_column_scale
-                        SQL_NULLABLE,               // expected_column_nullability
-                        SQL_SEARCHABLE,             // expected_searchable
-                        SQL_TRUE);                  // expected_unsigned_column
+                        "time_max",      // expected_column_name
+                        SQL_TIME,        // expected_data_type
+                        12,              // expected_display_size
+                        SQL_FALSE,       // expected_prec_scale
+                        12,              // expected_length
+                        12,              // expected_column_size
+                        3,               // expected_column_scale
+                        SQL_NULLABLE,    // expected_column_nullability
+                        SQL_SEARCHABLE,  // expected_searchable
+                        SQL_TRUE);       // expected_unsigned_column
 
   CheckSQLColAttributes(stmt, 9,
-                        std::wstring(L"timestamp_max"),  // expected_column_name
-                        SQL_TIMESTAMP,                   // expected_data_type
-                        23,                              // expected_display_size
-                        SQL_FALSE,                       // expected_prec_scale
-                        23,                              // expected_length
-                        23,                              // expected_column_size
-                        3,                               // expected_column_scale
-                        SQL_NULLABLE,                    // expected_column_nullability
-                        SQL_SEARCHABLE,                  // expected_searchable
-                        SQL_TRUE);                       // expected_unsigned_column
+                        "timestamp_max",  // expected_column_name
+                        SQL_TIMESTAMP,    // expected_data_type
+                        23,               // expected_display_size
+                        SQL_FALSE,        // expected_prec_scale
+                        23,               // expected_length
+                        23,               // expected_column_size
+                        3,                // expected_column_scale
+                        SQL_NULLABLE,     // expected_column_nullability
+                        SQL_SEARCHABLE,   // expected_searchable
+                        SQL_TRUE);        // expected_unsigned_column
 }
 #endif  // __APPLE__
 
