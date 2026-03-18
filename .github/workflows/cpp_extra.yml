@@ -338,7 +338,6 @@ jobs:
 
   odbc-linux:
     needs: check-labels
-
     name: ODBC ${{ matrix.title }}
     runs-on: ubuntu-latest
     if: >-
@@ -351,9 +350,9 @@ jobs:
       matrix:
         include:
           - image: ubuntu-cpp-odbc
-            title: AMD64 Ubuntu C++23
+            title: AMD64 Ubuntu
           - image: debian-cpp-odbc
-            title: AMD64 Debian C++23
+            title: AMD64 Debian
     env:
       ARCH: amd64
       ARCHERY_DEBUG: 1

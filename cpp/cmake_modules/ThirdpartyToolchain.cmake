@@ -2721,15 +2721,11 @@ macro(build_zlib)
       target_include_directories(ZLIB::ZLIB BEFORE INTERFACE "${ZLIB_INCLUDE_DIRS}")
 
       add_dependencies(ZLIB::ZLIB zlib_ep)
-
       list(APPEND ARROW_BUNDLED_STATIC_LIBS ZLIB::ZLIB)
     endif()
-  else()
-    message(STATUS "-AL- ZLIB::ZLIB already detected")
-  endif()
-  # New if statement attempts to fix https://github.com/Bit-Quill/arrow/actions/runs/23025621291/job/66872649956#step:6:4516 error
 
-  set(ZLIB_VENDORED TRUE)
+    set(ZLIB_VENDORED TRUE)
+  endif()
 endmacro()
 
 if(ARROW_WITH_ZLIB)
