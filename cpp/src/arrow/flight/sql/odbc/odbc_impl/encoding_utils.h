@@ -141,12 +141,14 @@ inline std::vector<SQLWCHAR> ToSqlWCharVector(const std::wstring& ws) {
     case sizeof(wchar_t): {
       return std::vector<SQLWCHAR>(ws.begin(), ws.end());
     }
+#ifdef __linux__
     case sizeof(char16_t): {
       // Linux ODBC driver manager uses char16_t as SQLWCHAR
       CONVERT_UTF8_STR(const std::string utf8s, ws);
       CONVERT_UTF16_STR(const std::u16string utf16s, utf8s);
       return std::vector<SQLWCHAR>(utf16s.begin(), utf16s.end());
     }
+#endif  // __linux__
     default: {
       assert(false);
       throw DriverException("Encoding is unsupported, SQLWCHAR size: " +

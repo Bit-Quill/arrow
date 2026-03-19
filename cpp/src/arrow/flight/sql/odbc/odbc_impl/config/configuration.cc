@@ -109,7 +109,7 @@ std::vector<std::string> ReadAllKeys(const std::string& dsn) {
     }
 
     std::string key("");
-    SQLINTEGER key_len = cur - begin;
+    SQLINTEGER key_len = static_cast<SQLINTEGER>(cur - begin);
     SetAttributeSQLWCHAR(begin, key_len * GetSqlWCharSize(), key);
     keys.emplace_back(key);
     begin = ++cur;
