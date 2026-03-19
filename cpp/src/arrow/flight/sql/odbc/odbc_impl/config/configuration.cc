@@ -135,8 +135,8 @@ void Configuration::LoadDefaults() {
 }
 
 void Configuration::LoadDsn(const std::string& dsn) {
-  // Read keys before reading DSN. This is a workaround to unixodbc driver manager
-  // unable to read DSN keys
+  // Read keys before reading DSN to minimized unexpected behavior from ODBC driver
+  // managers.
   auto customKeys = ReadAllKeys(dsn);
 
   Set(FlightSqlConnection::DSN, dsn);
