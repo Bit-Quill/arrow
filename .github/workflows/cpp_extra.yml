@@ -511,6 +511,18 @@ jobs:
   #         sudo chown -R $USER /Library/ODBC
   #         ci/scripts/cpp_test.sh $(pwd) $(pwd)/build
 
+# -AL- todo create CI A, and CI B.
+# - [get ODBC DLL] Trigger CI A - This CI will build `arrow_flight_sql_odbc.dll` and 
+# upload the DLL to GitHub release as `arrow_flight_sql_odbc_unsigned.dll` 
+# to differentiate from signed DLL.
+# - [get ODBC MSI] Trigger CI B - This CI will generate cpack files (and unsigned ODBC), 
+# then download signed `arrow_flight_sql_odbc.dll` from GitHub release, 
+# and then replace unsigned DLL with the signed DLL locally. 
+# Then run `cpack` and build the unsigned MSI, and upload the MSI to GitHub release.
+#  This MSI will pick up the signed DLL. 
+
+# -AL- TODO to reuse workflows, can try `using: 'composite'`
+
   odbc-msvc:
     needs: check-labels
     name: ODBC Windows
@@ -634,7 +646,7 @@ jobs:
           wix --version
           cd build/cpp
           cpack
-      - name: Upload the artifacts to the job
+      - name: Upload ODBC MSI to the job
         uses: actions/upload-artifact@v7
         with:
           name: flight-sql-odbc-msi-installer
@@ -675,6 +687,18 @@ jobs:
 
           Write-Error "ODBC DLL not found"
           exit 1
+      # -AL- TODO CI A - this step needs to be moved to CI A later. Put here for testing only.
+      - name: Name Unsigned ODBC DLL
+        run: |
+          Rename-Item `
+            -Path build/cpp/%ARROW_BUILD_TYPE%/arrow_flight_sql_odbc.dll `
+            -NewName arrow_flight_sql_odbc_unsigned.dll
+      - name: Upload ODBC DLL to the job
+        uses: actions/upload-artifact@v7
+        with:
+          name: flight-sql-odbc-dll
+          path: build/cpp/%ARROW_BUILD_TYPE%/arrow_flight_sql_odbc_unsigned.dll
+          if-no-files-found: error
 
   odbc-nightly:
     needs: odbc-msvc
@@ -754,6 +778,43 @@ jobs:
           gh release upload ${GITHUB_REF_NAME} \
             --clobber \
             Apache-Arrow-Flight-SQL-ODBC-*-win64.msi
+    
+    # -AL- draft code for upload; I was thinking that in the final product,
+    # the `Download the artifacts` step could have been skipped,
+    # and we do github release directly. Or maybe not because it needs 
+    # ubuntu... nvm
+
+      - name: Download the artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: flight-sql-odbc-dll
+      - name: Upload the artifacts to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download ${GITHUB_REF_NAME} \
+            --clobber \
+            arrow_flight_sql_odbc_unsigned.dll
+
+    # End of ODBC DLL draft code
+
+    # -AL- below is draft code for downloading signed DLL and using it
+    # I think we can have `RELEASE_CANDIDATE_TAG_NAME` as input? that part needs review later though
+
+    # Also for CI B, we don't actually need the `Wait for creating GitHub Release` step, 
+    # so Windows should be ok.
+    
+      - name: Download signed ODBC DLL
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download ${RELEASE_CANDIDATE_TAG_NAME} \
+          --pattern arrow_flight_sql_odbc.dll \
+          --clobber
+    # Let ODBC Build (build should come after download to save time in case signed DLL is not available)
+      - name: Replace signed DLL with unsigned DLL
+        run: |
+          Move-Item -Path .\arrow_flight_sql_odbc.dll -Destination .\build\cpp\release\Release\arrow_flight_sql_odbc.dll -Force
 
   report-extra-cpp:
     if: github.event_name == 'schedule' && always()
@@ -766,5 +827,6 @@ jobs:
       # - odbc-macos
       - odbc-msvc
       - odbc-nightly
+      - odbc-release
     uses: ./.github/workflows/report_ci.yml
     secrets: inherit
