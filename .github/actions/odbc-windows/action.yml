@@ -21,6 +21,7 @@ runs:
   using: "composite"
   steps:
     - name: Disable Crash Dialogs
+      shell: pwsh
       run: |
         reg add `
           "HKCU\SOFTWARE\Microsoft\Windows\Windows Error Reporting" `
@@ -28,11 +29,6 @@ runs:
           /t REG_DWORD `
           /d 1 `
           /f
-    - name: Checkout Arrow
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-        submodules: recursive
     - name: Download Timezone Database
       shell: bash
       run: ci/scripts/download_tz_database.sh
@@ -62,6 +58,7 @@ runs:
         path: vcpkg
         repository: microsoft/vcpkg
     - name: Bootstrap vcpkg
+      shell: pwsh
       run: |
         vcpkg\bootstrap-vcpkg.bat
         $VCPKG_ROOT = $(Resolve-Path -LiteralPath "vcpkg").ToString()
