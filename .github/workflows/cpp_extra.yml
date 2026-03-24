@@ -73,6 +73,24 @@ on:
   schedule:
     - cron: |
         0 0 * * *
+  workflow_dispatch:
+  # Example: gh workflow run cpp_extra.yml --ref apache-arrow-24.0.0-rc0 -f odbc_upload=dll
+  # -AL- todo implement dispatch variables.
+  # -AL- I need to make sure the workflows run first before implementing
+  # dispatch in workflow A and B. Assume that user trigger via tag.
+  # -AL- can use: 
+  # if: inputs.odbc_upload == 'dll' # For CI A, trigger first
+  # if: inputs.odbc_upload == 'msi' # For CI B, trigger after upload signed DLL
+  # And then replace `${RELEASE_CANDIDATE_TAG_NAME}` with `GITHUB_REF_NAME`
+    inputs:
+      odbc_upload:
+        description: 'ODBC Component Upload'
+        required: true
+        default: 'dll'
+        type: choice
+        options:
+          - dll
+          - msi
 
 concurrency:
   group: ${{ github.repository }}-${{ github.head_ref || github.sha }}-${{ github.workflow }}
@@ -521,13 +539,15 @@ jobs:
 # Then run `cpack` and build the unsigned MSI, and upload the MSI to GitHub release.
 #  This MSI will pick up the signed DLL. 
 
-# -AL- TODO to reuse workflows, can try `using: 'composite'`
+# -AL- todo need to add `github.event_name != 'workflow_dispatch' ||` to all existing workflows after uncomment
+# (except CI A and B ofc)
 
   odbc-msvc:
     needs: check-labels
     name: ODBC Windows
     runs-on: windows-2022
     if: >-
+      github.event_name != 'workflow_dispatch' ||
       needs.check-labels.outputs.force == 'true' ||
       contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra') ||
       contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra: C++')
@@ -621,18 +641,6 @@ jobs:
 
           Write-Error "ODBC DLL not found"
           exit 1
-      # -AL- TODO CI A - this step needs to be moved to CI A later. Put here for testing only.
-      - name: Name Unsigned ODBC DLL
-        run: |
-          Rename-Item `
-            -Path build/cpp/${{ env.ARROW_BUILD_TYPE }}/arrow_flight_sql_odbc.dll `
-            -NewName arrow_flight_sql_odbc_unsigned.dll
-      - name: Upload ODBC DLL to the job
-        uses: actions/upload-artifact@v7
-        with:
-          name: flight-sql-odbc-dll
-          path: build/cpp/${{ env.ARROW_BUILD_TYPE }}/arrow_flight_sql_odbc_unsigned.dll
-          if-no-files-found: error
 
 # -AL- todo keep upload dll code in here! Can remove installer upload code. 
 # -AL- This is CI A.
@@ -736,8 +744,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download ${RELEASE_CANDIDATE_TAG_NAME} \
-          --pattern arrow_flight_sql_odbc.dll \
+          gh release download ${RELEASE_CANDIDATE_TAG_NAME} `
+          --pattern arrow_flight_sql_odbc.dll `
           --clobber
     # Let ODBC Build (build should come after download to save time in case signed DLL is not available)
       - name: Replace signed DLL with unsigned DLL
@@ -810,55 +818,56 @@ jobs:
           remote_key: ${{ secrets.NIGHTLIES_RSYNC_KEY }}
           remote_host_key: ${{ secrets.NIGHTLIES_RSYNC_HOST_KEY }}
 
-  odbc-release:
-    needs: odbc-msvc
-    name: ODBC release
-    runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref_name, 'apache-arrow-') && contains(github.ref_name, '-rc') }}
-    permissions:
-      # Upload to GitHub Release
-      contents: write
-    steps:
-      - name: Checkout Arrow
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          submodules: recursive
-      - name: Download the artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: flight-sql-odbc-msi-installer
-      - name: Wait for creating GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          dev/release/utils-watch-gh-workflow.sh \
-            ${GITHUB_REF_NAME} \
-            release_candidate.yml
-      - name: Upload the artifacts to GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload ${GITHUB_REF_NAME} \
-            --clobber \
-            Apache-Arrow-Flight-SQL-ODBC-*-win64.msi
+  # -AL- this can be removed?
+  # odbc-release:
+  #   needs: odbc-msvc
+  #   name: ODBC release
+  #   runs-on: ubuntu-latest
+  #   if: ${{ startsWith(github.ref_name, 'apache-arrow-') && contains(github.ref_name, '-rc') }}
+  #   permissions:
+  #     # Upload to GitHub Release
+  #     contents: write
+  #   steps:
+  #     - name: Checkout Arrow
+  #       uses: actions/checkout@v6
+  #       with:
+  #         fetch-depth: 0
+  #         submodules: recursive
+  #     - name: Download the artifacts
+  #       uses: actions/download-artifact@v8
+  #       with:
+  #         name: flight-sql-odbc-msi-installer
+  #     - name: Wait for creating GitHub Release
+  #       env:
+  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       run: |
+  #         dev/release/utils-watch-gh-workflow.sh \
+  #           ${GITHUB_REF_NAME} \
+  #           release_candidate.yml
+  #     - name: Upload the artifacts to GitHub Release
+  #       env:
+  #         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       run: |
+  #         gh release upload ${GITHUB_REF_NAME} \
+  #           --clobber \
+  #           Apache-Arrow-Flight-SQL-ODBC-*-win64.msi
     
     # -AL- draft code for upload; I was thinking that in the final product,
     # the `Download the artifacts` step could have been skipped,
     # and we do github release directly. Or maybe not because it needs 
     # ubuntu... nvm
 
-      - name: Download the artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: flight-sql-odbc-dll
-      - name: Upload the artifacts to GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release download ${GITHUB_REF_NAME} \
-            --clobber \
-            arrow_flight_sql_odbc_unsigned.dll
+      # - name: Download the artifacts
+      #   uses: actions/download-artifact@v8
+      #   with:
+      #     name: flight-sql-odbc-dll
+      # - name: Upload the artifacts to GitHub Release
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     gh release download ${GITHUB_REF_NAME} \
+      #       --clobber \
+      #       arrow_flight_sql_odbc_unsigned.dll
 
     # End of ODBC DLL draft code
 
@@ -868,17 +877,17 @@ jobs:
     # Also for CI B, we don't actually need the `Wait for creating GitHub Release` step, 
     # so Windows should be ok.
     
-      - name: Download signed ODBC DLL
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release download ${RELEASE_CANDIDATE_TAG_NAME} \
-          --pattern arrow_flight_sql_odbc.dll \
-          --clobber
-    # Let ODBC Build (build should come after download to save time in case signed DLL is not available)
-      - name: Replace signed DLL with unsigned DLL
-        run: |
-          Move-Item -Path .\arrow_flight_sql_odbc.dll -Destination .\build\cpp\release\Release\arrow_flight_sql_odbc.dll -Force
+    #   - name: Download signed ODBC DLL
+    #     env:
+    #       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     run: |
+    #       gh release download ${RELEASE_CANDIDATE_TAG_NAME} \
+    #       --pattern arrow_flight_sql_odbc.dll \
+    #       --clobber
+    # # Let ODBC Build (build should come after download to save time in case signed DLL is not available)
+    #   - name: Replace signed DLL with unsigned DLL
+    #     run: |
+    #       Move-Item -Path .\arrow_flight_sql_odbc.dll -Destination .\build\cpp\release\Release\arrow_flight_sql_odbc.dll -Force
 
   report-extra-cpp:
     if: github.event_name == 'schedule' && always()
@@ -893,6 +902,6 @@ jobs:
       - odbc-msvc-upload-dll
       - odbc-msvc-upload-msi
       - odbc-nightly
-      - odbc-release
+      # - odbc-release # -AL- can be removed after CI A and CI B implement
     uses: ./.github/workflows/report_ci.yml
     secrets: inherit
