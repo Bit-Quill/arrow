@@ -534,7 +534,7 @@ jobs:
     timeout-minutes: 240
     permissions:
       packages: write
-    env:
+    env: &odbc_msvc_env
       ARROW_BUILD_SHARED: ON
       ARROW_BUILD_STATIC: OFF
       ARROW_BUILD_TESTS: ON
@@ -558,16 +558,15 @@ jobs:
           submodules: recursive
       - name: Build ODBC Windows
         uses: ./.github/actions/odbc-windows
-      # -AL- temp disable test step to test CI DLL steps
-      # - name: Test
-      #   shell: cmd
-      #   run: |
-      #     set VCPKG_ROOT_KEEP=%VCPKG_ROOT%
-      #     call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
-      #     set VCPKG_ROOT=%VCPKG_ROOT_KEEP%
-      #     # Convert VCPKG Windows path to MSYS path
-      #     for /f "usebackq delims=" %%I in (`bash -c "cygpath -u \"$VCPKG_ROOT_KEEP\""` ) do set VCPKG_ROOT=%%I
-      #     bash -c "ci/scripts/cpp_test.sh $(pwd) $(pwd)/build"
+      - name: Test
+        shell: cmd
+        run: |
+          set VCPKG_ROOT_KEEP=%VCPKG_ROOT%
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+          set VCPKG_ROOT=%VCPKG_ROOT_KEEP%
+          # Convert VCPKG Windows path to MSYS path
+          for /f "usebackq delims=" %%I in (`bash -c "cygpath -u \"$VCPKG_ROOT_KEEP\""` ) do set VCPKG_ROOT=%%I
+          bash -c "ci/scripts/cpp_test.sh $(pwd) $(pwd)/build"
       - name: Install WiX Toolset
         shell: pwsh
         run: |
@@ -626,14 +625,144 @@ jobs:
       - name: Name Unsigned ODBC DLL
         run: |
           Rename-Item `
-            -Path build/cpp/%ARROW_BUILD_TYPE%/arrow_flight_sql_odbc.dll `
+            -Path build/cpp/${{ env.ARROW_BUILD_TYPE }}/arrow_flight_sql_odbc.dll `
             -NewName arrow_flight_sql_odbc_unsigned.dll
       - name: Upload ODBC DLL to the job
         uses: actions/upload-artifact@v7
         with:
           name: flight-sql-odbc-dll
-          path: build/cpp/%ARROW_BUILD_TYPE%/arrow_flight_sql_odbc_unsigned.dll
+          path: build/cpp/${{ env.ARROW_BUILD_TYPE }}/arrow_flight_sql_odbc_unsigned.dll
           if-no-files-found: error
+
+# -AL- todo keep upload dll code in here! Can remove installer upload code. 
+# -AL- This is CI A.
+  odbc-msvc-upload-dll:
+    needs: check-labels
+    name: ODBC Windows Upload Unsigned DLL
+    runs-on: windows-2022
+    # -AL- todo: change to dispatch workflow instead of trigger by defualt.
+    if: >-
+      needs.check-labels.outputs.force == 'true' ||
+      contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra') ||
+      contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra: C++')
+    timeout-minutes: 240
+    permissions:
+      packages: write
+    env: *odbc_msvc_env
+    steps:
+      - name: Checkout Arrow
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Build ODBC Windows
+        uses: ./.github/actions/odbc-windows
+      - name: Name Unsigned ODBC DLL
+        run: |
+          Rename-Item `
+            -Path build/cpp/${{ env.ARROW_BUILD_TYPE }}/arrow_flight_sql_odbc.dll `
+            -NewName arrow_flight_sql_odbc_unsigned.dll
+      - name: Upload ODBC DLL to the job
+        uses: actions/upload-artifact@v7
+        with:
+          name: flight-sql-odbc-dll
+          path: build/cpp/${{ env.ARROW_BUILD_TYPE }}/arrow_flight_sql_odbc_unsigned.dll
+          if-no-files-found: error
+
+  # -AL- CI A's follow up 
+  odbc-dll-release:
+    needs: odbc-msvc-upload-dll
+    name: Upload Unsigned ODBC DLL
+    runs-on: ubuntu-latest
+    permissions:
+      # Upload to GitHub Release
+      contents: write
+    env:
+      RELEASE_CANDIDATE_TAG_NAME: 'apache-arrow-test-24.0.0-rc0' #ALINA_TEST_TAG -AL-
+    steps:
+      - name: Checkout Arrow
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Download the artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: flight-sql-odbc-dll
+
+      - name: Test Echo RELEASE_CANDIDATE_TAG_NAME # -AL- delete later
+        run: |
+          echo ${RELEASE_CANDIDATE_TAG_NAME}
+
+      - name: Wait for creating GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dev/release/utils-watch-gh-workflow.sh \
+            ${RELEASE_CANDIDATE_TAG_NAME} \
+            release_candidate.yml
+      - name: Upload the artifacts to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${RELEASE_CANDIDATE_TAG_NAME} \
+            --clobber \
+            arrow_flight_sql_odbc_unsigned.dll
+
+# -AL- This is CI B draft.
+  odbc-msvc-upload-msi:
+    needs: check-labels
+    name: ODBC Windows Upload Unsigned MSI
+    runs-on: windows-2022
+    # -AL- todo: change to dispatch workflow instead of trigger by defualt.
+    # -AL- todo 2: add RELEASE_CANDIDATE_TAG_NAME as input. Example: "v12.0.0-rc1"
+    if: >-
+      needs.check-labels.outputs.force == 'true' ||
+      contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra') ||
+      contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra: C++')
+    timeout-minutes: 240
+    permissions:
+      packages: write
+    env: *odbc_msvc_env
+    steps:
+      - name: Checkout Arrow
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Build ODBC Windows
+        uses: ./.github/actions/odbc-windows
+      - name: Download signed ODBC DLL
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download ${RELEASE_CANDIDATE_TAG_NAME} \
+          --pattern arrow_flight_sql_odbc.dll \
+          --clobber
+    # Let ODBC Build (build should come after download to save time in case signed DLL is not available)
+      - name: Replace signed DLL with unsigned DLL
+        run: |
+          Move-Item -Path .\arrow_flight_sql_odbc.dll -Destination .\build\cpp\release\Release\arrow_flight_sql_odbc.dll -Force
+      - name: Install WiX Toolset
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri https://github.com/wixtoolset/wix/releases/download/v6.0.0/wix-cli-x64.msi -OutFile wix-cli-x64.msi
+          Start-Process -FilePath wix-cli-x64.msi -ArgumentList '/quiet', 'Include_freethreaded=1' -Wait
+          echo "C:\Program Files\WiX Toolset v6.0\bin\" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Build MSI ODBC installer
+        shell: pwsh
+        run: |
+          # Verify WiX version
+          wix --version
+          cd build/cpp
+          cpack
+      - name: Upload the artifacts to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${RELEASE_CANDIDATE_TAG_NAME} \
+            --clobber \
+            Apache-Arrow-Flight-SQL-ODBC-*-win64.msi
 
   odbc-nightly:
     needs: odbc-msvc
@@ -761,6 +890,8 @@ jobs:
       # - odbc-linux
       # - odbc-macos
       - odbc-msvc
+      - odbc-msvc-upload-dll
+      - odbc-msvc-upload-msi
       - odbc-nightly
       - odbc-release
     uses: ./.github/workflows/report_ci.yml
