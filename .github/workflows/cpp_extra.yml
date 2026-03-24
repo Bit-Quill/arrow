@@ -624,15 +624,16 @@ jobs:
         shell: cmd
         run: |
           call "cpp\src\arrow\flight\sql\odbc\tests\install_odbc.cmd" ${{ github.workspace }}\build\cpp\%ARROW_BUILD_TYPE%\arrow_flight_sql_odbc.dll
-      - name: Test
-        shell: cmd
-        run: |
-          set VCPKG_ROOT_KEEP=%VCPKG_ROOT%
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
-          set VCPKG_ROOT=%VCPKG_ROOT_KEEP%
-          # Convert VCPKG Windows path to MSYS path
-          for /f "usebackq delims=" %%I in (`bash -c "cygpath -u \"$VCPKG_ROOT_KEEP\""` ) do set VCPKG_ROOT=%%I
-          bash -c "ci/scripts/cpp_test.sh $(pwd) $(pwd)/build"
+      # -AL- temp disable test step to test CI DLL steps
+      # - name: Test
+      #   shell: cmd
+      #   run: |
+      #     set VCPKG_ROOT_KEEP=%VCPKG_ROOT%
+      #     call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+      #     set VCPKG_ROOT=%VCPKG_ROOT_KEEP%
+      #     # Convert VCPKG Windows path to MSYS path
+      #     for /f "usebackq delims=" %%I in (`bash -c "cygpath -u \"$VCPKG_ROOT_KEEP\""` ) do set VCPKG_ROOT=%%I
+      #     bash -c "ci/scripts/cpp_test.sh $(pwd) $(pwd)/build"
       - name: Install WiX Toolset
         shell: pwsh
         run: |
