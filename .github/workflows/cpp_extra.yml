@@ -685,8 +685,6 @@ jobs:
     permissions:
       # Upload to GitHub Release
       contents: write
-    env:
-      RELEASE_CANDIDATE_TAG_NAME: 'apache-arrow-test-24.0.0-rc0' #ALINA_TEST_TAG -AL-
     steps:
       - name: Checkout Arrow
         uses: actions/checkout@v6
@@ -698,22 +696,22 @@ jobs:
         with:
           name: flight-sql-odbc-dll
 
-      - name: Test Echo RELEASE_CANDIDATE_TAG_NAME # -AL- delete later
+      - name: Test Echo GITHUB_REF_NAME # -AL- delete later
         run: |
-          echo ${RELEASE_CANDIDATE_TAG_NAME}
+          echo ${GITHUB_REF_NAME}
 
       - name: Wait for creating GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           dev/release/utils-watch-gh-workflow.sh \
-            ${RELEASE_CANDIDATE_TAG_NAME} \
+            ${GITHUB_REF_NAME} \
             release_candidate.yml
       - name: Upload the artifacts to GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${RELEASE_CANDIDATE_TAG_NAME} \
+          gh release upload ${GITHUB_REF_NAME} \
             --clobber \
             arrow_flight_sql_odbc_unsigned.dll
 
@@ -723,7 +721,6 @@ jobs:
     name: ODBC Windows Upload Unsigned MSI
     runs-on: windows-2022
     # -AL- todo: change to dispatch workflow instead of trigger by defualt.
-    # -AL- todo 2: add RELEASE_CANDIDATE_TAG_NAME as input. Example: "v12.0.0-rc1"
     if: >-
       needs.check-labels.outputs.force == 'true' ||
       contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra') ||
@@ -744,7 +741,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download ${RELEASE_CANDIDATE_TAG_NAME} `
+          gh release download ${GITHUB_REF_NAME} `
           --pattern arrow_flight_sql_odbc.dll `
           --clobber
     # Let ODBC Build (build should come after download to save time in case signed DLL is not available)
@@ -768,7 +765,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${RELEASE_CANDIDATE_TAG_NAME} \
+          gh release upload ${GITHUB_REF_NAME} \
             --clobber \
             Apache-Arrow-Flight-SQL-ODBC-*-win64.msi
 
