@@ -716,14 +716,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download ${GITHUB_REF_NAME} `
+          gh release download $env:GITHUB_REF_NAME `
           --pattern arrow_flight_sql_odbc.dll `
           --clobber
       - name: Build ODBC Windows
         uses: ./.github/actions/odbc-windows
       - name: Replace signed DLL with unsigned DLL
         run: |
-          Move-Item -Path .\arrow_flight_sql_odbc.dll -Destination .\build\cpp\release\Release\arrow_flight_sql_odbc.dll -Force
+          Move-Item `
+          -Path ./arrow_flight_sql_odbc.dll `
+          -Destination build/cpp/${{ env.ARROW_BUILD_TYPE }}/arrow_flight_sql_odbc.dll `
+          -Force
       - name: Install WiX Toolset
         shell: pwsh
         run: |
@@ -741,8 +744,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${GITHUB_REF_NAME} \
-            --clobber \
+          cd build/cpp
+          gh release upload $env:GITHUB_REF_NAME `
+            --clobber `
             Apache-Arrow-Flight-SQL-ODBC-*-win64.msi
 
   odbc-nightly:
