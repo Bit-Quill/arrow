@@ -78,10 +78,9 @@ on:
   # -AL- todo implement dispatch variables.
   # -AL- I need to make sure the workflows run first before implementing
   # dispatch in workflow A and B. Assume that user trigger via tag.
-  # -AL- can use: 
-  # if: inputs.odbc_upload == 'dll' # For CI A, trigger first
-  # if: inputs.odbc_upload == 'msi' # For CI B, trigger after upload signed DLL
-  # And then replace `${RELEASE_CANDIDATE_TAG_NAME}` with `GITHUB_REF_NAME`
+
+# -AL- todo need to add `github.event_name != 'workflow_dispatch' ||` to all existing workflows after uncomment
+# (except CI A and B ofc)
     inputs:
       odbc_upload:
         description: 'ODBC Component Upload'
@@ -539,18 +538,17 @@ jobs:
 # Then run `cpack` and build the unsigned MSI, and upload the MSI to GitHub release.
 #  This MSI will pick up the signed DLL. 
 
-# -AL- todo need to add `github.event_name != 'workflow_dispatch' ||` to all existing workflows after uncomment
-# (except CI A and B ofc)
 
   odbc-msvc:
     needs: check-labels
     name: ODBC Windows
     runs-on: windows-2022
     if: >-
-      github.event_name != 'workflow_dispatch' ||
+      github.event_name != 'workflow_dispatch' && (
       needs.check-labels.outputs.force == 'true' ||
       contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra') ||
       contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra: C++')
+      )
     timeout-minutes: 240
     permissions:
       packages: write
@@ -649,10 +647,7 @@ jobs:
     name: ODBC Windows Upload Unsigned DLL
     runs-on: windows-2022
     # -AL- todo: change to dispatch workflow instead of trigger by defualt.
-    if: >-
-      needs.check-labels.outputs.force == 'true' ||
-      contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra') ||
-      contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra: C++')
+    if: inputs.odbc_upload == 'dll'
     timeout-minutes: 240
     permissions:
       packages: write
@@ -720,14 +715,12 @@ jobs:
     needs: check-labels
     name: ODBC Windows Upload Unsigned MSI
     runs-on: windows-2022
-    # -AL- todo: change to dispatch workflow instead of trigger by defualt.
-    if: >-
-      needs.check-labels.outputs.force == 'true' ||
-      contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra') ||
-      contains(fromJSON(needs.check-labels.outputs.ci-extra-labels || '[]'), 'CI: Extra: C++')
+    # -AL- todo: change to dispatch workflow instead of trigger by defualt, see top of file for suggestions.
+    if: inputs.odbc_upload == 'msi'
     timeout-minutes: 240
     permissions:
-      packages: write
+      # Upload to GitHub Release
+      contents: write
     env: *odbc_msvc_env
     steps:
       - name: Checkout Arrow
