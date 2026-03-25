@@ -533,17 +533,6 @@ jobs:
           sudo chown -R $USER /Library/ODBC
           ci/scripts/cpp_test.sh $(pwd) $(pwd)/build
 
-# -AL- todo create CI A, and CI B.
-# - [get ODBC DLL] Trigger CI A - This CI will build `arrow_flight_sql_odbc.dll` and 
-# upload the DLL to GitHub release as `arrow_flight_sql_odbc_unsigned.dll` 
-# to differentiate from signed DLL.
-# - [get ODBC MSI] Trigger CI B - This CI will generate cpack files (and unsigned ODBC), 
-# then download signed `arrow_flight_sql_odbc.dll` from GitHub release, 
-# and then replace unsigned DLL with the signed DLL locally. 
-# Then run `cpack` and build the unsigned MSI, and upload the MSI to GitHub release.
-#  This MSI will pick up the signed DLL. 
-
-
   odbc-msvc:
     needs: check-labels
     name: ODBC Windows
@@ -645,7 +634,6 @@ jobs:
           Write-Error "ODBC DLL not found"
           exit 1
 
-# -AL- This is CI A.
   odbc-msvc-upload-dll:
     needs: check-labels
     name: ODBC Windows Upload Unsigned DLL
@@ -675,7 +663,6 @@ jobs:
           path: build/cpp/${{ env.ARROW_BUILD_TYPE }}/arrow_flight_sql_odbc_unsigned.dll
           if-no-files-found: error
 
-  # -AL- CI A's follow up 
   odbc-dll-release:
     needs: odbc-msvc-upload-dll
     name: Upload Unsigned ODBC DLL
@@ -708,7 +695,6 @@ jobs:
             --clobber \
             arrow_flight_sql_odbc_unsigned.dll
 
-# -AL- This is CI B draft.
   odbc-msvc-upload-msi:
     needs: check-labels
     name: ODBC Windows Upload Unsigned MSI
