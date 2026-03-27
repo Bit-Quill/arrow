@@ -574,6 +574,8 @@ jobs:
           submodules: recursive
       - name: Build ODBC Windows
         uses: ./.github/actions/odbc-windows
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Test
         shell: cmd
         run: |
@@ -655,6 +657,8 @@ jobs:
           submodules: recursive
       - name: Build ODBC Windows
         uses: ./.github/actions/odbc-windows
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Name Unsigned ODBC DLL
         run: |
           Rename-Item `
@@ -725,6 +729,8 @@ jobs:
           --clobber
       - name: Build ODBC Windows
         uses: ./.github/actions/odbc-windows
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Replace signed DLL with unsigned DLL
         run: |
           Move-Item `
