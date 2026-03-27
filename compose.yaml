@@ -205,6 +205,10 @@ volumes:
   ubuntu-ccache:
     name: ${ARCH}-ubuntu-${UBUNTU}-ccache
 
+networks:
+  odbc_net:
+    external: true
+
 services:
 
   ################################# C++ #######################################
@@ -571,6 +575,9 @@ services:
       # GH-49651 Link ODBC tests statically on Linux to fix segfault
       ARROW_TEST_LINKAGE: "static"
     # Register ODBC before running tests
+    # -AL- temp: test 32010 port is reachable.
+    networks:
+      - odbc_net
     command: >
       /bin/bash -c "
         /arrow/ci/scripts/cpp_build.sh /arrow /build &&
