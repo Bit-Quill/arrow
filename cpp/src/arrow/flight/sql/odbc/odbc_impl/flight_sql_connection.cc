@@ -34,6 +34,8 @@
 #include <boost/lexical_cast.hpp>
 #include "arrow/flight/sql/odbc/odbc_impl/exceptions.h"
 
+#include "arrow/util/logging.h" // -AL- TEMP
+
 #include <sql.h>
 #include <sqlext.h>
 
@@ -152,37 +154,58 @@ std::shared_ptr<FlightSqlSslConfig> LoadFlightSslConfigs(
 
 void FlightSqlConnection::Connect(const ConnPropertyMap& properties,
                                   std::vector<std::string_view>& missing_attr) {
+  // -AL- segfault occurred in this function.
+  ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 1"; // -AL- TEMP
   try {
     auto flight_ssl_configs = LoadFlightSslConfigs(properties);
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 2"; // -AL- TEMP
 
     Location location = BuildLocation(properties, missing_attr, flight_ssl_configs);
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 3"; // -AL- TEMP
     client_options_ =
         BuildFlightClientOptions(properties, missing_attr, flight_ssl_configs);
 
+ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 4"; // -AL- TEMP
     std::unique_ptr<FlightClient> flight_client;
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 5"; // -AL- TEMP
     ThrowIfNotOK(FlightClient::Connect(location, client_options_).Value(&flight_client));
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 6"; // -AL- TEMP
     PopulateMetadataSettings(properties);
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 7"; // -AL- TEMP
     PopulateCallOptions(properties);
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 8"; // -AL- TEMP
 
     std::unique_ptr<FlightSqlAuthMethod> auth_method =
         FlightSqlAuthMethod::FromProperties(flight_client, properties);
+        ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 9"; // -AL- TEMP
+    // -AL- segfault happens here.
     auth_method->Authenticate(*this, call_options_);
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 10"; // -AL- TEMP
 
     sql_client_.reset(new FlightSqlClient(std::move(flight_client)));
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 11"; // -AL- TEMP
     closed_ = false;
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 12"; // -AL- TEMP
 
     // Note: This should likely come from Flight instead of being from the
     // connection properties to allow reporting a user for other auth mechanisms
     // and also decouple the database user from user credentials.
 
     info_.SetProperty(SQL_USER_NAME, auth_method->GetUser());
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 13"; // -AL- TEMP
+
     attribute_[CONNECTION_DEAD] = static_cast<uint32_t>(SQL_FALSE);
+
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 14"; // -AL- TEMP
   } catch (...) {
     attribute_[CONNECTION_DEAD] = static_cast<uint32_t>(SQL_TRUE);
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 15"; // -AL- TEMP
     sql_client_.reset();
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 16"; // -AL- TEMP
 
     throw;
   }
+  ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 17"; // -AL- TEMP
 }
 
 void FlightSqlConnection::PopulateMetadataSettings(

@@ -60,6 +60,8 @@
 #include "arrow/flight/types.h"
 #include "arrow/flight/types_async.h"
 
+#include "arrow/util/logging.h" // -AL- TEMP
+
 namespace arrow {
 
 namespace flight {
@@ -861,8 +863,11 @@ class GrpcClientImpl : public internal::ClientTransport {
 
   Status Authenticate(const FlightCallOptions& options,
                       std::unique_ptr<ClientAuthHandler> auth_handler) override {
+    ARROW_LOG(DEBUG) << "GRPC Client - Authenticate 1"; // -AL- TEMP                    
     auth_handler_ = std::move(auth_handler);
+    ARROW_LOG(DEBUG) << "GRPC Client - Authenticate 2"; // -AL- TEMP
     ClientRpc rpc(options);
+    ARROW_LOG(DEBUG) << "GRPC Client - Authenticate 3"; // -AL- TEMP
     return AuthenticateInternal(rpc);
   }
 
@@ -1053,17 +1058,26 @@ class GrpcClientImpl : public internal::ClientTransport {
 
  private:
   Status AuthenticateInternal(ClientRpc& rpc) {
+    ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 1"; // -AL- TEMP  
     std::shared_ptr<
         ::grpc::ClientReaderWriter<pb::HandshakeRequest, pb::HandshakeResponse>>
         stream = stub_->Handshake(&rpc.context);
+    ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 2"; // -AL- TEMP  
     if (auth_handler_) {
+      ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 3"; // -AL- TEMP  
       GrpcClientAuthSender outgoing{stream};
+      ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 4"; // -AL- TEMP  
       GrpcClientAuthReader incoming{stream};
+      ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 5"; // -AL- TEMP  
       RETURN_NOT_OK(auth_handler_->Authenticate(&outgoing, &incoming));
+      ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 6"; // -AL- TEMP  
     }
+    ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 7"; // -AL- TEMP  
     // Explicitly close our side of the connection
     bool finished_writes = stream->WritesDone();
+    ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 8"; // -AL- TEMP  
     if (!finished_writes) {
+      ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 9"; // -AL- TEMP  
       return MakeFlightError(FlightStatusCode::Internal,
                              "Could not finish writing before closing");
     }
@@ -1071,10 +1085,15 @@ class GrpcClientImpl : public internal::ClientTransport {
     // only call Finish() when the client closes the writer or the
     // reader finishes, so it's OK to assume the client no longer
     // wants to read and drain the read side.
+    ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 10"; // -AL- TEMP  
     pb::HandshakeResponse response;
+    ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 11"; // -AL- TEMP  
     while (stream->Read(&response)) {
+      ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal while loop - 12"; // -AL- TEMP  
     }
+    ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 13"; // -AL- TEMP  
     RETURN_NOT_OK(FromGrpcStatus(stream->Finish(), &rpc.context));
+    ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 14"; // -AL- TEMP  
     return Status::OK();
   }
 

@@ -31,6 +31,8 @@
 #include "arrow/flight/sql/odbc/odbc_impl/spi/statement.h"
 #include "arrow/flight/sql/odbc/odbc_impl/util.h"
 
+#include "arrow/util/logging.h" // -AL- TEMP
+
 // Include ODBC headers after arrow headers to avoid conflicts
 #include <odbcinst.h>
 #include <sql.h>
@@ -82,15 +84,24 @@ const std::string& ODBCConnection::GetDSN() const { return dsn_; }
 void ODBCConnection::Connect(std::string dsn,
                              const Connection::ConnPropertyMap& properties,
                              std::vector<std::string_view>& missing_properties) {
+  // -AL- add logs here. Segfaul occurred in this call.
+  ARROW_LOG(DEBUG) << "ODBCConnection::Connect 1"; // -AL- TEMP
   if (is_connected_) {
+    ARROW_LOG(DEBUG) << "ODBCConnection::Connect 2"; // -AL- TEMP
     throw DriverException("Already connected.", "HY010");
   }
-
+ARROW_LOG(DEBUG) << "ODBCConnection::Connect 3"; // -AL- TEMP
   dsn_ = std::move(dsn);
+  ARROW_LOG(DEBUG) << "ODBCConnection::Connect 4"; // -AL- TEMP
+  // -AL- segfault occurred here,
   spi_connection_->Connect(properties, missing_properties);
+  ARROW_LOG(DEBUG) << "ODBCConnection::Connect 5"; // -AL- TEMP
   is_connected_ = true;
+  ARROW_LOG(DEBUG) << "ODBCConnection::Connect 6"; // -AL- TEMP
   std::shared_ptr<Statement> spi_statement = spi_connection_->CreateStatement();
+  ARROW_LOG(DEBUG) << "ODBCConnection::Connect 7"; // -AL- TEMP
   attribute_tracking_statement_ = std::make_shared<ODBCStatement>(*this, spi_statement);
+  ARROW_LOG(DEBUG) << "ODBCConnection::Connect 8"; // -AL- TEMP
 }
 
 SQLRETURN ODBCConnection::GetInfo(SQLUSMALLINT info_type, SQLPOINTER value,

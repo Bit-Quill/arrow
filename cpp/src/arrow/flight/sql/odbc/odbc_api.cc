@@ -854,21 +854,30 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
 
   using ODBC::ODBCConnection;
 
+  ARROW_LOG(DEBUG) << "SQLDriverConnectW 1"; // -AL- TEMP
+
   return ODBCConnection::ExecuteWithDiagnostics(conn, SQL_ERROR, [=]() {
+    ARROW_LOG(DEBUG) << "SQLDriverConnectW 2"; // -AL- TEMP
     ODBCConnection* connection = reinterpret_cast<ODBCConnection*>(conn);
+    ARROW_LOG(DEBUG) << "SQLDriverConnectW 3"; // -AL- TEMP
     std::string connection_string =
         ODBC::SqlWcharToString(in_connection_string, in_connection_string_len);
+    ARROW_LOG(DEBUG) << "SQLDriverConnectW 4"; // -AL- TEMP
     Connection::ConnPropertyMap properties;
     std::string dsn_value = "";
     std::optional<std::string> dsn = ODBCConnection::GetDsnIfExists(connection_string);
+    ARROW_LOG(DEBUG) << "SQLDriverConnectW 5"; // -AL- TEMP
     if (dsn.has_value()) {
+      ARROW_LOG(DEBUG) << "SQLDriverConnectW 6"; // -AL- TEMP
       dsn_value = dsn.value();
       LoadPropertiesFromDSN(dsn_value, properties);
+      ARROW_LOG(DEBUG) << "SQLDriverConnectW 7"; // -AL- TEMP
     }
+    ARROW_LOG(DEBUG) << "SQLDriverConnectW 8"; // -AL- TEMP
     ODBCConnection::GetPropertiesFromConnString(connection_string, properties);
-
+ARROW_LOG(DEBUG) << "SQLDriverConnectW 9"; // -AL- TEMP
     std::vector<std::string_view> missing_properties;
-
+ARROW_LOG(DEBUG) << "SQLDriverConnectW 10"; // -AL- TEMP
     // GH-46448 TODO: Implement SQL_DRIVER_COMPLETE_REQUIRED in SQLDriverConnect according
     // to the spec
 #if defined _WIN32
@@ -904,8 +913,10 @@ SQLRETURN SQLDriverConnect(SQLHDBC conn, SQLHWND window_handle,
       connection->Connect(dsn_value, properties, missing_properties);
     }
 #else
+ARROW_LOG(DEBUG) << "SQLDriverConnectW 11"; // -AL- TEMP
     // Attempt connection without loading DSN window on macOS/Linux
     connection->Connect(dsn_value, properties, missing_properties);
+    ARROW_LOG(DEBUG) << "SQLDriverConnectW 12"; // -AL- TEMP
 #endif
     // Copy connection string to out_connection_string after connection attempt
     return ODBC::GetStringAttribute(true, connection_string, false, out_connection_string,

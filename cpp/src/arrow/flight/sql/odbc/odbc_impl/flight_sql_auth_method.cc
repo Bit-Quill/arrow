@@ -24,6 +24,8 @@
 #include "arrow/result.h"
 #include "arrow/status.h"
 
+#include "arrow/util/logging.h" // -AL- TEMP
+
 #include <optional>
 #include <utility>
 
@@ -40,6 +42,7 @@ class NoOpAuthMethod : public FlightSqlAuthMethod {
 
     // GH-46733 TODO: implement NoOpAuthMethod to validate server address.
     // Can use NoOpClientAuthHandler.
+    ARROW_LOG(DEBUG) << "NoOpAuthMethod::Authenticate 1"; // -AL- TEMP
   }
 };
 
@@ -50,11 +53,16 @@ class NoOpClientAuthHandler : public ClientAuthHandler {
   Status Authenticate(ClientAuthSender* outgoing, ClientAuthReader* incoming) override {
     // The server should ignore this and just accept any Handshake
     // request. Some servers do not allow authentication with no handshakes.
+
+    // -AL- the segfault is inside `TokenAuthMethod::Authenticate`. Ignore this func.
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate 1"; // -AL- TEMP  
     return outgoing->Write(std::string());
   }
 
   Status GetToken(std::string* token) override {
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::GetToken 1"; // -AL- TEMP  
     *token = std::string();
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::GetToken 2"; // -AL- TEMP  
     return Status::OK();
   }
 };
@@ -121,26 +129,40 @@ class TokenAuthMethod : public FlightSqlAuthMethod {
 
   void Authenticate(FlightSqlConnection& connection,
                     FlightCallOptions& call_options) override {
+    ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 1"; // -AL- TEMP                  
     // add the token to the front of the headers. For consistency auth headers should be
     // at the front.
     const std::pair<std::string, std::string> token_header("authorization",
                                                            "Bearer " + token_);
+    ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 2"; // -AL- TEMP  
+
     call_options.headers.insert(call_options.headers.begin(), token_header);
+
+    ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 3"; // -AL- TEMP  
 
     const Status status = client_.Authenticate(
         call_options, std::unique_ptr<ClientAuthHandler>(new NoOpClientAuthHandler()));
+
+    ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 4"; // -AL- TEMP  
     if (!status.ok()) {
+      ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 5"; // -AL- TEMP  
       const auto& flight_status = FlightStatusDetail::UnwrapStatus(status);
+      ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 6"; // -AL- TEMP  
       if (flight_status != nullptr) {
+        ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 7"; // -AL- TEMP  
         if (flight_status->code() == FlightStatusCode::Unauthenticated) {
+          ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 8"; // -AL- TEMP  
           throw AuthenticationException("Failed to authenticate with token: " + token_ +
                                         " Message: " + status.message());
         } else if (flight_status->code() == FlightStatusCode::Unavailable) {
+          ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 9"; // -AL- TEMP  
           throw CommunicationException(status.message());
         }
       }
+      ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 10"; // -AL- TEMP  
       throw DriverException(status.message());
     }
+    ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 11"; // -AL- TEMP  
   }
 };
 }  // namespace
