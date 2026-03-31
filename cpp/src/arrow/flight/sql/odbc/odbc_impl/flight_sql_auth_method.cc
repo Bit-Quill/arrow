@@ -48,6 +48,8 @@ class NoOpAuthMethod : public FlightSqlAuthMethod {
 
 class NoOpClientAuthHandler : public ClientAuthHandler {
  public:
+  std::string handshake_msg;
+
   NoOpClientAuthHandler() {}
 
   Status Authenticate(ClientAuthSender* outgoing, ClientAuthReader* incoming) override {
@@ -55,8 +57,30 @@ class NoOpClientAuthHandler : public ClientAuthHandler {
     // request. Some servers do not allow authentication with no handshakes.
 
     // -AL- the segfault is inside `TokenAuthMethod::Authenticate`. Ignore this func.
-    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate 1"; // -AL- TEMP  
-    return outgoing->Write(std::string());
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate 1"; // -AL- TEMP
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate 2, outgoing: " << outgoing << ", incoming: " << incoming; // -AL- TEMP  
+    
+    if (!outgoing) { // -AL- TEMP, outgoing shouldn't be null.
+        ARROW_LOG(ERROR) << "-AL- outgoing is null!";
+        return Status::Invalid("Outgoing is null");
+    }
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate 3"; // -AL- TEMP
+    // Status stat = outgoing->Write(std::string(" ")); // <- -AL- adding " " doesn't resolve segfault issue.
+    // Status stat = Status::OK();
+    // Status stat = outgoing->Write(std::string()); 
+    handshake_msg = "handshake message";
+    RETURN_NOT_OK(outgoing->Write(handshake_msg));
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate 4"; // -AL- TEMP  
+
+    // READ the server's response -AL- code from copilot
+    // -AL- this is where segfault happens, so that's also shown inside grpc.
+    std::string response;
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate - Reading response from server";
+    RETURN_NOT_OK(incoming->Read(&response));
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate - Got response: " << response;
+    
+  
+    return Status::OK(); // -AL- returning OK without write doesn't resolve the issue.
   }
 
   Status GetToken(std::string* token) override {
@@ -140,8 +164,14 @@ class TokenAuthMethod : public FlightSqlAuthMethod {
 
     ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 3"; // -AL- TEMP  
 
+    // -AL- if issue got fixed, try reverting my change here.
+        // const Status status = client_.Authenticate(
+        // call_options, std::unique_ptr<ClientAuthHandler>(new NoOpClientAuthHandler()));
+    std::unique_ptr<ClientAuthHandler> noop_handler = std::make_unique<NoOpClientAuthHandler>();
+    // auto noop_handler = std::make_unique<NoOpClientAuthHandler>();
+    ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 3.1"; // -AL- TEMP 
     const Status status = client_.Authenticate(
-        call_options, std::unique_ptr<ClientAuthHandler>(new NoOpClientAuthHandler()));
+        call_options, std::move(noop_handler));
 
     ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 4"; // -AL- TEMP  
     if (!status.ok()) {

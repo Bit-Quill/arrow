@@ -864,7 +864,8 @@ class GrpcClientImpl : public internal::ClientTransport {
   Status Authenticate(const FlightCallOptions& options,
                       std::unique_ptr<ClientAuthHandler> auth_handler) override {
     ARROW_LOG(DEBUG) << "GRPC Client - Authenticate 1"; // -AL- TEMP                    
-    auth_handler_ = std::move(auth_handler);
+    // auth_handler_ = std::move(auth_handler);
+    auth_handler_ = std::shared_ptr<ClientAuthHandler>(std::move(auth_handler));
     ARROW_LOG(DEBUG) << "GRPC Client - Authenticate 2"; // -AL- TEMP
     ClientRpc rpc(options);
     ARROW_LOG(DEBUG) << "GRPC Client - Authenticate 3"; // -AL- TEMP
@@ -1063,12 +1064,15 @@ class GrpcClientImpl : public internal::ClientTransport {
         ::grpc::ClientReaderWriter<pb::HandshakeRequest, pb::HandshakeResponse>>
         stream = stub_->Handshake(&rpc.context);
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 2"; // -AL- TEMP  
-    if (auth_handler_) {
-      ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 3"; // -AL- TEMP  
+          ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 3"; // -AL- TEMP  
       GrpcClientAuthSender outgoing{stream};
+
       ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 4"; // -AL- TEMP  
       GrpcClientAuthReader incoming{stream};
-      ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 5"; // -AL- TEMP  
+    if (auth_handler_) {
+
+      ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 5"; // -AL- TEMP
+      // If `outgoing->Write(std::string(" "));`, then crash happens here. -AL-
       RETURN_NOT_OK(auth_handler_->Authenticate(&outgoing, &incoming));
       ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 6"; // -AL- TEMP  
     }
@@ -1088,6 +1092,8 @@ class GrpcClientImpl : public internal::ClientTransport {
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 10"; // -AL- TEMP  
     pb::HandshakeResponse response;
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 11"; // -AL- TEMP  
+    // -AL- if I return `OK` directly without running `outgoing->Write(std::string(" "));`,
+    // The test segfaults here instead. On macOS the loop is never entered too.
     while (stream->Read(&response)) {
       ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal while loop - 12"; // -AL- TEMP  
     }

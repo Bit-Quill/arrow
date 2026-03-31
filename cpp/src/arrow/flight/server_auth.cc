@@ -17,6 +17,8 @@
 
 #include "arrow/flight/server_auth.h"
 
+#include "arrow/util/logging.h" // -AL- TEMP
+
 namespace arrow {
 namespace flight {
 
@@ -26,6 +28,15 @@ NoOpAuthHandler::~NoOpAuthHandler() {}
 Status NoOpAuthHandler::Authenticate(const ServerCallContext& context,
                                      ServerAuthSender* outgoing,
                                      ServerAuthReader* incoming) {
+    // -AL- If this approach does work, I need to create a new handler to for the mock server.
+    ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - Reading response from server";
+    std::string client_token;
+    RETURN_NOT_OK(incoming->Read(&client_token));  // Read client's message
+    
+    // -AL- 
+ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - write response from server";
+    // Validate token, then write response
+    RETURN_NOT_OK(outgoing->Write("server-response"));  // Write response!
   return Status::OK();
 }
 
