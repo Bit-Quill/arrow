@@ -414,7 +414,8 @@ class GrpcServiceHandler final : public FlightService::Service {
     GrpcServerAuthSender outgoing{stream};
     ARROW_LOG(DEBUG) << "GRPC Server - Handshake 2"; // -AL- TEMP  
     GrpcServerAuthReader incoming{stream};
-    ARROW_LOG(DEBUG) << "GRPC Server - Handshake 3"; // -AL- TEMP  
+    ARROW_LOG(DEBUG) << "GRPC Server - Handshake 3"; // -AL- TEMP
+    // -AL- after below line returns, segfault occurs on the server side.
     RETURN_WITH_MIDDLEWARE(flight_context, auth_handler_->Authenticate(
                                                flight_context, &outgoing, &incoming));                                     
   }

@@ -33,6 +33,7 @@ namespace arrow::flight::sql::odbc {
 class MockServerEnvironment : public ::testing::Environment {
  public:
   void SetUp() override {
+    ARROW_LOG(INFO) << "MockServerEnvironment - SetUp 1"; // -AL- TEMP
     ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
     arrow::flight::FlightServerOptions options(location);
     options.auth_handler = std::make_shared<DoNothingHandler>(); // -AL- our own handler, reads the client
@@ -49,20 +50,29 @@ class MockServerEnvironment : public ::testing::Environment {
     // options.auth_handler = std::make_unique<arrow::flight::NoOpAuthHandler>(); // -AL- causes race condition on Linux.
     // options.auth_handler = std::make_unique<NoOpAuthHandler>();
 
+    // -AL- removing MockServerMiddlewareFactory doesn't resolve segfault.
     options.middleware.push_back(
         {"bearer-auth-server", std::make_shared<MockServerMiddlewareFactory>()});
+
     ASSERT_OK_AND_ASSIGN(mock_server,
                          arrow::flight::sql::example::SQLiteFlightSqlServer::Create());
     ASSERT_OK(mock_server->Init(options));
 
     mock_server_port = mock_server->port();
-    ASSERT_OK_AND_ASSIGN(location, Location::ForGrpcTcp("localhost", mock_server_port));
-    ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
+
+    // -AL- if we don't need client then location can also be removed.
+    // ASSERT_OK_AND_ASSIGN(location, Location::ForGrpcTcp("localhost", mock_server_port));
+    // -AL- we don't need to use client
+    // ASSERT_OK_AND_ASSIGN(auto client, arrow::flight::FlightClient::Connect(location));
+
+    ARROW_LOG(INFO) << "MockServerEnvironment - SetUp 2"; // -AL- TEMP
   }
 
   void TearDown() override {
+    ARROW_LOG(INFO) << "MockServerEnvironment - TearDown 1"; // -AL- TEMP
     ASSERT_OK(mock_server->Shutdown());
     ASSERT_OK(mock_server->Wait());
+    ARROW_LOG(INFO) << "MockServerEnvironment - TearDown 2"; // -AL- TEMP
   }
 };
 
@@ -248,7 +258,7 @@ void FlightSQLOdbcEnvConnHandleRemoteTestBase::TearDownTestSuite() {
 }
 
 std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
-  ARROW_LOG(DEBUG) << "FindTokenInCallHeaders 1"; // -AL- TEMP 
+  ARROW_LOG(INFO) << "FindTokenInCallHeaders 1"; // -AL- TEMP 
   // Lambda function to compare characters without case sensitivity.
   auto char_compare = [](const char& char1, const char& char2) {
     return (::toupper(char1) == ::toupper(char2));
@@ -265,31 +275,31 @@ std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
       }
     }
   }
-  ARROW_LOG(DEBUG) << "FindTokenInCallHeaders 2"; // -AL- TEMP 
+  ARROW_LOG(INFO) << "FindTokenInCallHeaders 2"; // -AL- TEMP 
   return bearer_token;
 }
 
 void MockServerMiddleware::SendingHeaders(AddCallHeaders* outgoing_headers) {
-  ARROW_LOG(DEBUG) << "MockServerMiddleware - SendingHeaders 1"; // -AL- TEMP  
+  ARROW_LOG(INFO) << "MockServerMiddleware - SendingHeaders 1"; // -AL- TEMP  
   std::string bearer_token = FindTokenInCallHeaders(incoming_headers_);
   *is_valid_ = (bearer_token == std::string(kTestToken));
-  ARROW_LOG(DEBUG) << "MockServerMiddleware - SendingHeaders 2"; // -AL- TEMP 
+  ARROW_LOG(INFO) << "MockServerMiddleware - SendingHeaders 2"; // -AL- TEMP 
 }
 
 Status MockServerMiddlewareFactory::StartCall(
     const CallInfo& info, const ServerCallContext& context,
     std::shared_ptr<ServerMiddleware>* middleware) {
-ARROW_LOG(DEBUG) << "MockServerMiddleware - StartCall 1"; // -AL- TEMP 
+ARROW_LOG(INFO) << "MockServerMiddleware - StartCall 1"; // -AL- TEMP 
   std::string bearer_token = FindTokenInCallHeaders(context.incoming_headers());
   if (bearer_token == std::string(kTestToken)) {
     *middleware =
         std::make_shared<MockServerMiddleware>(context.incoming_headers(), &is_valid_);
   } else {
-    ARROW_LOG(DEBUG) << "MockServerMiddleware - StartCall 3"; // -AL- TEMP 
+    ARROW_LOG(INFO) << "MockServerMiddleware - StartCall 3"; // -AL- TEMP 
     return MakeFlightError(FlightStatusCode::Unauthenticated,
                            "Invalid token for mock server");
   }
-ARROW_LOG(DEBUG) << "MockServerMiddleware - StartCall 2"; // -AL- TEMP 
+ARROW_LOG(INFO) << "MockServerMiddleware - StartCall 2"; // -AL- TEMP 
   return Status::OK();
 }
 

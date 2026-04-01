@@ -318,6 +318,14 @@ static ::grpc::Status ToRawGrpcStatus(const Status& arrow_status) {
   ARROW_LOG(DEBUG) << "ToGrpcStatus 1 "; // -AL- TEMP
   ::grpc::Status status = ToRawGrpcStatus(arrow_status);
   ARROW_LOG(DEBUG) << "ToGrpcStatus 2 "; // -AL- TEMP
+
+  ARROW_LOG(DEBUG) << "ToGrpcStatus ctx: " << ctx; // -AL- TEMP
+  if (ctx) { // -AL- remove this if statement later.
+    ARROW_LOG(DEBUG) << "ToGrpcStatus ctx is valid"; // -AL- TEMP
+  } else {
+    ARROW_LOG(DEBUG) << "ToGrpcStatus ctx is NOT valid!!!"; // -AL- TEMP
+  }
+
   if (!status.ok() && ctx) {
     ARROW_LOG(DEBUG) << "ToGrpcStatus 3 "; // -AL- TEMP
     const std::string code = ToChars(static_cast<int>(arrow_status.code()));

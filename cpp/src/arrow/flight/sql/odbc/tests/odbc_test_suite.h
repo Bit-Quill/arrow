@@ -142,7 +142,7 @@ class MockServerMiddleware : public ServerMiddleware {
   }
 
   void SendingHeaders(AddCallHeaders* outgoing_headers) override;
-
+// CallCompleted does nothing, is normal here. -AL-
   void CallCompleted(const Status& status) override {}
 
   std::string name() const override { return "MockServerMiddleware"; }
