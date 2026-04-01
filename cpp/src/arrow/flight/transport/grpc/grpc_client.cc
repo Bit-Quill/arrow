@@ -252,17 +252,17 @@ class GrpcClientAuthReader : public ClientAuthReader {
       : stream_(stream) {}
 
   Status Read(std::string* token) override {
-    ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read START - stream=" << stream_; // -AL- TEMP
+    ARROW_LOG(DEBUG) << "GrpcClientAuthReader::Read START - stream=" << stream_; // -AL- TEMP
     pb::HandshakeResponse request;
-    ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read 1";  // -AL- TEMP
+    ARROW_LOG(DEBUG) << "GrpcClientAuthReader::Read 1";  // -AL- TEMP
     if (stream_->Read(&request)) { // -AL- previous location of segfault after server waits for client auth, 
       // -AL- since I am no longer calling `Read` on the client side, this function is not hit.
-      ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read - stream_ is null!"; // -AL- TEMP
+      ARROW_LOG(DEBUG) << "GrpcClientAuthReader::Read - stream_ is null!"; // -AL- TEMP
       *token = std::move(*request.mutable_payload());
-      ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read 2";  // -AL- TEMP
+      ARROW_LOG(DEBUG) << "GrpcClientAuthReader::Read 2";  // -AL- TEMP
       return Status::OK();
     }
-    ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read 3";  // -AL- TEMP
+    ARROW_LOG(DEBUG) << "GrpcClientAuthReader::Read 3";  // -AL- TEMP
     return FromGrpcStatus(stream_->Finish());
   }
 
