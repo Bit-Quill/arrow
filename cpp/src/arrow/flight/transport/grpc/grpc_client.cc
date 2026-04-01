@@ -172,12 +172,15 @@ class GrpcClientInterceptorAdapterFactory
 
   ::grpc::experimental::Interceptor* CreateClientInterceptor(
       ::grpc::experimental::ClientRpcInfo* info) override {
+    ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 1";  // -AL- TEMP
     std::vector<std::unique_ptr<ClientMiddleware>> middleware;
-
+ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 2";  // -AL- TEMP
     FlightMethod flight_method = FlightMethod::Invalid;
     std::string_view method(info->method());
     if (method.ends_with("/Handshake")) {
+      ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 3";  // -AL- TEMP
       flight_method = FlightMethod::Handshake;
+      ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 4";  // -AL- TEMP
     } else if (method.ends_with("/ListFlights")) {
       flight_method = FlightMethod::ListFlights;
     } else if (method.ends_with("/GetFlightInfo")) {
@@ -200,15 +203,23 @@ class GrpcClientInterceptorAdapterFactory
       ARROW_LOG(WARNING) << "Unknown Flight method: " << info->method();
       flight_method = FlightMethod::Invalid;
     }
-
+ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 5";  // -AL- TEMP
     const CallInfo flight_info{flight_method};
+    ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 6";  // -AL- TEMP
     for (auto& factory : middleware_) {
+      ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 7";  // -AL- TEMP
       std::unique_ptr<ClientMiddleware> instance;
+      ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 8";  // -AL- TEMP
       factory->StartCall(flight_info, &instance);
+      ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 9";  // -AL- TEMP
       if (instance) {
+        ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 10";  // -AL- TEMP
         middleware.push_back(std::move(instance));
+        ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 11";  // -AL- TEMP
       }
+      ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 12";  // -AL- TEMP
     }
+    ARROW_LOG(DEBUG) << "GrpcClientInterceptorAdapterFactory::CreateClientInterceptor 13";  // -AL- TEMP
     return new GrpcClientInterceptorAdapter(std::move(middleware));
   }
 

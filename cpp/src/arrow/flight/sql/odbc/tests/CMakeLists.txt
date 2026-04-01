@@ -41,7 +41,7 @@ set(ARROW_FLIGHT_SQL_ODBC_TEST_SRCS
     # Enable Protobuf cleanup after test execution
     # GH-46889: move protobuf_test_util to a more common location
     ../../../../engine/substrait/protobuf_test_util.cc)
-
+message(status "-AL- ARROW_TEST_STATIC_LINK_LIBS: ${ARROW_TEST_STATIC_LINK_LIBS}")
 if(ARROW_TEST_LINKAGE STREQUAL "static")
   set(ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS arrow_flight_sql_odbc_static
                                            ${ARROW_TEST_STATIC_LINK_LIBS})
@@ -66,6 +66,9 @@ else()
   list(APPEND ARROW_FLIGHT_SQL_ODBC_TEST_STATIC_LINK_LIBS
        ${ARROW_FLIGHT_SQL_ODBC_TEST_LIBS} ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS})
 endif()
+
+message(status "-AL- ARROW_FLIGHT_SQL_ODBC_TEST_EXTRA_LINK_LIBS: ${ARROW_FLIGHT_SQL_ODBC_TEST_EXTRA_LINK_LIBS}")
+message(status "-AL- ARROW_FLIGHT_SQL_ODBC_TEST_STATIC_LINK_LIBS: ${ARROW_FLIGHT_SQL_ODBC_TEST_STATIC_LINK_LIBS}")
 
 add_arrow_test(flight_sql_odbc_test
                SOURCES
