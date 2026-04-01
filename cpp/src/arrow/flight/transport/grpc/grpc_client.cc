@@ -1073,7 +1073,7 @@ class GrpcClientImpl : public internal::ClientTransport {
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 1"; // -AL- TEMP  
     std::shared_ptr<
         ::grpc::ClientReaderWriter<pb::HandshakeRequest, pb::HandshakeResponse>>
-        stream = stub_->Handshake(&rpc.context);
+        stream = stub_->Handshake(&rpc.context); // -AL- this line invokes `Handshake` I think, or not
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 2"; // -AL- TEMP  
           ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 3"; // -AL- TEMP  
       GrpcClientAuthSender outgoing{stream};
@@ -1109,6 +1109,7 @@ class GrpcClientImpl : public internal::ClientTransport {
     // The test segfaults here instead. On macOS the loop is never entered too.
     // stream->Read  waits for server write to finish, if any.
     ARROW_LOG(DEBUG) << "GRPC Client - stream:" << stream; // -AL- TEMP 
+    //#ifdef DISABLE_FOR_NOW_AL
     while (stream->Read(&response)) {
       ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal while loop - 12"; // -AL- TEMP  
      // ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal - server_response: " << server_response;
@@ -1116,6 +1117,7 @@ class GrpcClientImpl : public internal::ClientTransport {
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 13"; // -AL- TEMP  
     RETURN_NOT_OK(FromGrpcStatus(stream->Finish(), &rpc.context));
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 14"; // -AL- TEMP  
+    //# endif // -AL- experiment if segfault goes away without read on Linux
     return Status::OK();
   }
 

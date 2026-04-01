@@ -166,7 +166,7 @@ class TokenAuthMethod : public FlightSqlAuthMethod {
     // auto noop_handler = std::make_unique<NoOpClientAuthHandler>();
     ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 3.1"; // -AL- TEMP 
     const Status status = client_.Authenticate(
-        call_options, std::move(noop_handler));
+        call_options, std::move(noop_handler)); // -AL- this line triggers `NoOpClientAuthHandler`
 
     ARROW_LOG(DEBUG) << "TokenAuthMethod::Authenticate 4"; // -AL- TEMP  
     if (!status.ok()) {

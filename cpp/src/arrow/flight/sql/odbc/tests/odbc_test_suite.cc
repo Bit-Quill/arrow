@@ -26,6 +26,8 @@
 #include "arrow/flight/sql/odbc/odbc_impl/encoding_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 
+#include "arrow/util/logging.h" // -AL- TEMP
+
 namespace arrow::flight::sql::odbc {
 
 class MockServerEnvironment : public ::testing::Environment {
@@ -33,7 +35,8 @@ class MockServerEnvironment : public ::testing::Environment {
   void SetUp() override {
     ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
     arrow::flight::FlightServerOptions options(location);
-    options.auth_handler = std::make_unique<DoNothingHandler>(); // -AL- our own handler, reads the client
+    options.auth_handler = std::make_shared<DoNothingHandler>(); // -AL- our own handler, reads the client
+    // making auth_handler shared doesn't fix segfault but it should be shared anyway.
 
     // #ifdef __linux__
     // options.auth_handler = std::make_unique<DoNothingHandler>(); // -AL- our own handler, reads the client
@@ -245,6 +248,7 @@ void FlightSQLOdbcEnvConnHandleRemoteTestBase::TearDownTestSuite() {
 }
 
 std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
+  ARROW_LOG(DEBUG) << "FindTokenInCallHeaders 1"; // -AL- TEMP 
   // Lambda function to compare characters without case sensitivity.
   auto char_compare = [](const char& char1, const char& char2) {
     return (::toupper(char1) == ::toupper(char2));
@@ -261,26 +265,31 @@ std::string FindTokenInCallHeaders(const CallHeaders& incoming_headers) {
       }
     }
   }
+  ARROW_LOG(DEBUG) << "FindTokenInCallHeaders 2"; // -AL- TEMP 
   return bearer_token;
 }
 
 void MockServerMiddleware::SendingHeaders(AddCallHeaders* outgoing_headers) {
+  ARROW_LOG(DEBUG) << "MockServerMiddleware - SendingHeaders 1"; // -AL- TEMP  
   std::string bearer_token = FindTokenInCallHeaders(incoming_headers_);
   *is_valid_ = (bearer_token == std::string(kTestToken));
+  ARROW_LOG(DEBUG) << "MockServerMiddleware - SendingHeaders 2"; // -AL- TEMP 
 }
 
 Status MockServerMiddlewareFactory::StartCall(
     const CallInfo& info, const ServerCallContext& context,
     std::shared_ptr<ServerMiddleware>* middleware) {
+ARROW_LOG(DEBUG) << "MockServerMiddleware - StartCall 1"; // -AL- TEMP 
   std::string bearer_token = FindTokenInCallHeaders(context.incoming_headers());
   if (bearer_token == std::string(kTestToken)) {
     *middleware =
         std::make_shared<MockServerMiddleware>(context.incoming_headers(), &is_valid_);
   } else {
+    ARROW_LOG(DEBUG) << "MockServerMiddleware - StartCall 3"; // -AL- TEMP 
     return MakeFlightError(FlightStatusCode::Unauthenticated,
                            "Invalid token for mock server");
   }
-
+ARROW_LOG(DEBUG) << "MockServerMiddleware - StartCall 2"; // -AL- TEMP 
   return Status::OK();
 }
 

@@ -177,8 +177,8 @@ ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 4"; // -AL- TEMP
 
     std::unique_ptr<FlightSqlAuthMethod> auth_method =
         FlightSqlAuthMethod::FromProperties(flight_client, properties);
-        ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 9"; // -AL- TEMP
-    // -AL- segfault happens here.
+    ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 9"; // -AL- TEMP
+    // -AL- segfault happens here. auth_method should be `TokenAuthMethod` only.
     auth_method->Authenticate(*this, call_options_);
     ARROW_LOG(DEBUG) << "FlightSqlConnection::Connect 10"; // -AL- TEMP
 
