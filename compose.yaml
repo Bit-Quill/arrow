@@ -565,6 +565,7 @@ services:
       ARROW_PARQUET: "OFF"
       ARROW_S3: "OFF"
       ARROW_SUBSTRAIT: "OFF"
+      ARROW_TEST_LINKAGE: "static"
     # Register ODBC before running tests
     command: >
       /bin/bash -c "
