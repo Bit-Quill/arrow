@@ -19,6 +19,9 @@
 
 #include "arrow/util/logging.h" // -AL- TEMP
 
+#include <chrono>
+#include <thread>
+
 namespace arrow {
 namespace flight {
 
@@ -49,16 +52,18 @@ Status DoNothingHandler::Authenticate(const ServerCallContext& context,
      ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate - client_token: " << client_token;
 
     // -AL- do not write anything, to match real server like dbt
-ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate - write response from server";
-    // Validate token, then write response
-    RETURN_NOT_OK(outgoing->Write("server-response"));  // Write response!
+// ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate - write response from server";
+//     // Validate token, then write response
+//     RETURN_NOT_OK(outgoing->Write("server-response"));  // Write response!
 
 ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate 1";
-//   while (incoming->Read(&client_token).ok()) {
-//     // Discard remaining messages
-//     ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate - drain messages from client";
-//   }
-// ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate 2";
+  while (incoming->Read(&client_token).ok()) {
+    // Discard remaining messages
+    ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate - drain messages from client";
+  }
+ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate 2";
+
+// std::this_thread::sleep_for(std::chrono::seconds(5)); // waits random 5 secs, then segfaults
   return Status::OK();
 }
 

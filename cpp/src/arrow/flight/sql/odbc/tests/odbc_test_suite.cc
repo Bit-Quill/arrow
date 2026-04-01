@@ -33,7 +33,19 @@ class MockServerEnvironment : public ::testing::Environment {
   void SetUp() override {
     ASSERT_OK_AND_ASSIGN(auto location, Location::ForGrpcTcp("0.0.0.0", 0));
     arrow::flight::FlightServerOptions options(location);
-    options.auth_handler = std::make_unique<NoOpAuthHandler>();
+    options.auth_handler = std::make_unique<DoNothingHandler>(); // -AL- our own handler, reads the client
+
+    // #ifdef __linux__
+    // options.auth_handler = std::make_unique<DoNothingHandler>(); // -AL- our own handler, reads the client
+    // #else
+    // // macOS and Windows
+    // options.auth_handler = std::make_unique<arrow::flight::NoOpAuthHandler>(); // -AL- causes race condition on Linux.
+    // #endif
+
+
+    // options.auth_handler = std::make_unique<arrow::flight::NoOpAuthHandler>(); // -AL- causes race condition on Linux.
+    // options.auth_handler = std::make_unique<NoOpAuthHandler>();
+
     options.middleware.push_back(
         {"bearer-auth-server", std::make_shared<MockServerMiddlewareFactory>()});
     ASSERT_OK_AND_ASSIGN(mock_server,
@@ -513,6 +525,7 @@ std::wstring GetStringColumnW(SQLHSTMT stmt, int col_id) {
 std::wstring ConvertToWString(const SQLWCHAR* str_val) {
 #ifdef __linux__
   size_t str_len = std::wcslen(reinterpret_cast<const wchar_t*>(str_val));
+  // -AL- Justin is checking on this
 #else
   size_t str_len = std::wcslen(str_val);
 #endif

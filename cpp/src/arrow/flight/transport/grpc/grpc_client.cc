@@ -254,14 +254,14 @@ class GrpcClientAuthReader : public ClientAuthReader {
   Status Read(std::string* token) override {
     ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read START - stream=" << stream_; // -AL- TEMP
     pb::HandshakeResponse request;
-    ARROW_LOG(ERROR) << "GrpcServerAuthReader::Read 1";  // -AL- TEMP
-    if (stream_->Read(&request)) {
-      ARROW_LOG(ERROR) << "GrpcServerAuthReader::Read - stream_ is null!"; // -AL- TEMP
+    ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read 1";  // -AL- TEMP
+    if (stream_->Read(&request)) { // -AL- location of segfault after server waits for client auth
+      ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read - stream_ is null!"; // -AL- TEMP
       *token = std::move(*request.mutable_payload());
-      ARROW_LOG(ERROR) << "GrpcServerAuthReader::Read 2";  // -AL- TEMP
+      ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read 2";  // -AL- TEMP
       return Status::OK();
     }
-    ARROW_LOG(ERROR) << "GrpcServerAuthReader::Read 3";  // -AL- TEMP
+    ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read 3";  // -AL- TEMP
     return FromGrpcStatus(stream_->Finish());
   }
 
