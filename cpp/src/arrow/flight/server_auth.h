@@ -103,5 +103,16 @@ class ARROW_FLIGHT_EXPORT NoOpAuthHandler : public ServerAuthHandler {
                  std::string* peer_identity) override;
 };
 
+/// \brief An authentication mechanism that does nothing by Alina for mock server
+/// TODO -AL- move to odbc tests later 
+class ARROW_FLIGHT_EXPORT DoNothingHandler : public ServerAuthHandler {
+ public:
+  ~DoNothingHandler() override;
+  Status Authenticate(const ServerCallContext& context, ServerAuthSender* outgoing,
+                      ServerAuthReader* incoming) override;
+  Status IsValid(const ServerCallContext& context, const std::string& token,
+                 std::string* peer_identity) override;
+};
+
 }  // namespace flight
 }  // namespace arrow

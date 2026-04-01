@@ -23,37 +23,50 @@ namespace arrow {
 namespace flight {
 
 ServerAuthHandler::~ServerAuthHandler() {}
-  // -AL- todo: write class read/write auth handler for our mock server.
-  // I think it is needed for stable behavior.
+
 NoOpAuthHandler::~NoOpAuthHandler() {}
 Status NoOpAuthHandler::Authenticate(const ServerCallContext& context,
                                      ServerAuthSender* outgoing,
                                      ServerAuthReader* incoming) {
-    // -AL- If this approach does work, I need to create a new handler to for the mock server.
-    ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - Reading response from client";
-    std::string client_token;
-    RETURN_NOT_OK(incoming->Read(&client_token));  // Read client's message
-     ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - client_token: " << client_token;
-
-    // -AL- do not write anything, to match real server like dbt
-// ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - write response from server";
-//     // Validate token, then write response
-//     RETURN_NOT_OK(outgoing->Write("server-response"));  // Write response!
-
-ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate 1";
-  while (incoming->Read(&client_token).ok()) {
-    // Discard remaining messages
-    ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - drain messages from client";
-  }
-ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate 2";
   return Status::OK();
 }
 
 Status NoOpAuthHandler::IsValid(const ServerCallContext& context,
                                 const std::string& token, std::string* peer_identity) {
-  ARROW_LOG(DEBUG) << "NoOpAuthHandler::IsValid 1"; // -AL- TEMP                              
   *peer_identity = "";
-  ARROW_LOG(DEBUG) << "NoOpAuthHandler::IsValid 2"; // -AL- TEMP
+  return Status::OK();
+}
+
+// -AL- TestServerAuthHandler should be the most similar here.
+DoNothingHandler::~DoNothingHandler() {}
+Status DoNothingHandler::Authenticate(const ServerCallContext& context,
+                                     ServerAuthSender* outgoing,
+                                     ServerAuthReader* incoming) {
+    // -AL- If this approach does work, I need to create a new handler to for the mock server.
+    ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate - Reading response from client";
+    std::string client_token;
+    RETURN_NOT_OK(incoming->Read(&client_token));  // Read client's message
+     ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate - client_token: " << client_token;
+
+    // -AL- do not write anything, to match real server like dbt
+ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate - write response from server";
+    // Validate token, then write response
+    RETURN_NOT_OK(outgoing->Write("server-response"));  // Write response!
+
+ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate 1";
+//   while (incoming->Read(&client_token).ok()) {
+//     // Discard remaining messages
+//     ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate - drain messages from client";
+//   }
+// ARROW_LOG(DEBUG) << "DoNothingHandler::Authenticate 2";
+  return Status::OK();
+}
+
+Status DoNothingHandler::IsValid(const ServerCallContext& context,
+                                const std::string& token, std::string* peer_identity) {
+  ARROW_LOG(DEBUG) << "DoNothingHandler::IsValid 1"; // -AL- TEMP                              
+  *peer_identity = "";
+  ARROW_LOG(DEBUG) << "DoNothingHandler::IsValid 2"; // -AL- TEMP
   return Status::OK();
 }
 

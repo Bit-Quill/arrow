@@ -74,12 +74,12 @@ class NoOpClientAuthHandler : public ClientAuthHandler {
     RETURN_NOT_OK(outgoing->Write(handshake_msg));
     ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate 4"; // -AL- TEMP  
 
-    // // READ the server's response -AL- code from copilot
-    // // -AL- this is where segfault happens, so that's also shown inside grpc.
-    // std::string response;
-    // ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate - Reading response from server";
-    // RETURN_NOT_OK(incoming->Read(&response));
-    // ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate - Got response: " << response;
+    // READ the server's response -AL- code from copilot
+    // -AL- Authenticate func is where segfault happens, so that's also shown inside grpc.
+    std::string response;
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate - Reading response from server";
+    RETURN_NOT_OK(incoming->Read(&response));
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate - Got response: " << response;
     
   
     return Status::OK(); // -AL- returning OK without write doesn't resolve the issue.
