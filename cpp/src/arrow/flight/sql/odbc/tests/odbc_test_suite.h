@@ -62,7 +62,7 @@ inline SQLHSTMT stmt = 0;
 inline bool skipping_test = false;
 inline bool connected = false;
 
-inline std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> mock_server;
+extern std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> mock_server;
 inline int mock_server_port = 0;
 
 namespace arrow::flight::sql::odbc {

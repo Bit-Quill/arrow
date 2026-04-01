@@ -29,6 +29,8 @@
 #include "arrow/util/logging.h" // -AL- TEMP
 
 namespace arrow::flight::sql::odbc {
+  // -AL- attempt to make server live longer.
+ std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> mock_server = nullptr;
 
 class MockServerEnvironment : public ::testing::Environment {
  public:
