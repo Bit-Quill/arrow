@@ -23,16 +23,17 @@ namespace arrow {
 namespace flight {
 
 ServerAuthHandler::~ServerAuthHandler() {}
-
+  // -AL- todo: write class read/write auth handler for our mock server.
+  // I think it is needed for stable behavior.
 NoOpAuthHandler::~NoOpAuthHandler() {}
 Status NoOpAuthHandler::Authenticate(const ServerCallContext& context,
                                      ServerAuthSender* outgoing,
                                      ServerAuthReader* incoming) {
     // -AL- If this approach does work, I need to create a new handler to for the mock server.
-    ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - Reading response from server";
+    ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - Reading response from client";
     std::string client_token;
     RETURN_NOT_OK(incoming->Read(&client_token));  // Read client's message
-    
+     ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - client_token: " << client_token;
     // -AL- 
 ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - write response from server";
     // Validate token, then write response

@@ -52,6 +52,8 @@ class NoOpClientAuthHandler : public ClientAuthHandler {
 
   NoOpClientAuthHandler() {}
 
+  // -AL- todo: write class read/write auth handler for our mock server.
+  // I think it is needed for stable behavior.
   Status Authenticate(ClientAuthSender* outgoing, ClientAuthReader* incoming) override {
     // The server should ignore this and just accept any Handshake
     // request. Some servers do not allow authentication with no handshakes.
@@ -64,7 +66,7 @@ class NoOpClientAuthHandler : public ClientAuthHandler {
         ARROW_LOG(ERROR) << "-AL- outgoing is null!";
         return Status::Invalid("Outgoing is null");
     }
-    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate 3"; // -AL- TEMP
+    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate 3 Write to server"; // -AL- TEMP
     // Status stat = outgoing->Write(std::string(" ")); // <- -AL- adding " " doesn't resolve segfault issue.
     // Status stat = Status::OK();
     // Status stat = outgoing->Write(std::string()); 
@@ -72,12 +74,12 @@ class NoOpClientAuthHandler : public ClientAuthHandler {
     RETURN_NOT_OK(outgoing->Write(handshake_msg));
     ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate 4"; // -AL- TEMP  
 
-    // READ the server's response -AL- code from copilot
-    // -AL- this is where segfault happens, so that's also shown inside grpc.
-    std::string response;
-    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate - Reading response from server";
-    RETURN_NOT_OK(incoming->Read(&response));
-    ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate - Got response: " << response;
+    // // READ the server's response -AL- code from copilot
+    // // -AL- this is where segfault happens, so that's also shown inside grpc.
+    // std::string response;
+    // ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate - Reading response from server";
+    // RETURN_NOT_OK(incoming->Read(&response));
+    // ARROW_LOG(DEBUG) << "NoOpClientAuthHandler::Authenticate - Got response: " << response;
     
   
     return Status::OK(); // -AL- returning OK without write doesn't resolve the issue.
