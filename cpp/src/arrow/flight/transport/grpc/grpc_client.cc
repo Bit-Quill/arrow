@@ -225,11 +225,16 @@ class GrpcClientAuthSender : public ClientAuthSender {
       : stream_(stream) {}
 
   Status Write(const std::string& token) override {
+    ARROW_LOG(DEBUG) << "GrpcClientAuthSender::Write 1";  // -AL- TEMP
     pb::HandshakeRequest response;
+    ARROW_LOG(DEBUG) << "GrpcClientAuthSender::Write 2";  // -AL- TEMP
     response.set_payload(token);
-    if (stream_->Write(response)) {
+    ARROW_LOG(DEBUG) << "GrpcClientAuthSender::Write 3";  // -AL- TEMP
+    if (stream_->Write(response)) { // -AL- we don't reach line 4. so code breaks here.
+      ARROW_LOG(DEBUG) << "GrpcClientAuthSender::Write 4";  // -AL- TEMP
       return Status::OK();
     }
+    ARROW_LOG(DEBUG) << "GrpcClientAuthSender::Write 5";  // -AL- TEMP
     return FromGrpcStatus(stream_->Finish());
   }
 
@@ -1078,6 +1083,7 @@ class GrpcClientImpl : public internal::ClientTransport {
 
       ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 5"; // -AL- TEMP
       // If `outgoing->Write(std::string(" "));`, then crash happens here. -AL-
+      // -AL- `auth_handler_->Authenticate(` is invoking the ODBC code.
       RETURN_NOT_OK(auth_handler_->Authenticate(&outgoing, &incoming));
       ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 6"; // -AL- TEMP  
     }
