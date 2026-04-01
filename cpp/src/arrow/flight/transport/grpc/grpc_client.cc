@@ -247,11 +247,16 @@ class GrpcClientAuthReader : public ClientAuthReader {
       : stream_(stream) {}
 
   Status Read(std::string* token) override {
+    ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read START - stream=" << stream_; // -AL- TEMP
     pb::HandshakeResponse request;
+    ARROW_LOG(ERROR) << "GrpcServerAuthReader::Read 1";  // -AL- TEMP
     if (stream_->Read(&request)) {
+      ARROW_LOG(ERROR) << "GrpcServerAuthReader::Read - stream_ is null!"; // -AL- TEMP
       *token = std::move(*request.mutable_payload());
+      ARROW_LOG(ERROR) << "GrpcServerAuthReader::Read 2";  // -AL- TEMP
       return Status::OK();
     }
+    ARROW_LOG(ERROR) << "GrpcServerAuthReader::Read 3";  // -AL- TEMP
     return FromGrpcStatus(stream_->Finish());
   }
 
@@ -1095,7 +1100,8 @@ class GrpcClientImpl : public internal::ClientTransport {
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 11"; // -AL- TEMP  
     // -AL- if I return `OK` directly without running `outgoing->Write(std::string(" "));`,
     // The test segfaults here instead. On macOS the loop is never entered too.
-    // stream->Read invokes server handshake.
+    // stream->Read  waits for server write to finish, if any.
+    ARROW_LOG(DEBUG) << "GRPC Client - stream:" << stream; // -AL- TEMP 
     while (stream->Read(&response)) {
       ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal while loop - 12"; // -AL- TEMP  
      // ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal - server_response: " << server_response;

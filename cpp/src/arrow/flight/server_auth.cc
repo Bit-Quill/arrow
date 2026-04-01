@@ -34,16 +34,26 @@ Status NoOpAuthHandler::Authenticate(const ServerCallContext& context,
     std::string client_token;
     RETURN_NOT_OK(incoming->Read(&client_token));  // Read client's message
      ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - client_token: " << client_token;
-    // -AL- 
-ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - write response from server";
-    // Validate token, then write response
-    RETURN_NOT_OK(outgoing->Write("server-response"));  // Write response!
+
+    // -AL- do not write anything, to match real server like dbt
+// ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - write response from server";
+//     // Validate token, then write response
+//     RETURN_NOT_OK(outgoing->Write("server-response"));  // Write response!
+
+ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate 1";
+  while (incoming->Read(&client_token).ok()) {
+    // Discard remaining messages
+    ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate - drain messages from client";
+  }
+ARROW_LOG(DEBUG) << "NoOpAuthHandler::Authenticate 2";
   return Status::OK();
 }
 
 Status NoOpAuthHandler::IsValid(const ServerCallContext& context,
                                 const std::string& token, std::string* peer_identity) {
+  ARROW_LOG(DEBUG) << "NoOpAuthHandler::IsValid 1"; // -AL- TEMP                              
   *peer_identity = "";
+  ARROW_LOG(DEBUG) << "NoOpAuthHandler::IsValid 2"; // -AL- TEMP
   return Status::OK();
 }
 

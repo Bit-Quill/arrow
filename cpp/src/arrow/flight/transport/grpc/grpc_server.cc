@@ -57,7 +57,9 @@ using ServerWriter = ::grpc::ServerWriter<T>;
 // Macro that runs interceptors before returning the given status
 #define RETURN_WITH_MIDDLEWARE(CONTEXT, STATUS) \
   do {                                          \
+    ARROW_LOG(DEBUG) << "RETURN_WITH_MIDDLEWARE 1 -AL- temp"; \
     const auto& __s = (STATUS);                 \
+    ARROW_LOG(DEBUG) << "RETURN_WITH_MIDDLEWARE 2 -AL- temp"; \
     return CONTEXT.FinishRequest(__s);          \
   } while (false)
 #define CHECK_ARG_NOT_NULL(CONTEXT, VAL, MESSAGE)                                \
@@ -139,15 +141,20 @@ class GrpcServerCallContext : public ServerCallContext {
   // then returns the final gRPC status to send to the client
   ::grpc::Status FinishRequest(const ::grpc::Status& status) {
     // Don't double-convert status - return the original one here
+    ARROW_LOG(DEBUG) << "GRPC FinishRequest grpc 1 "; // -AL- TEMP
     FinishRequest(FromGrpcStatus(status));
+    ARROW_LOG(DEBUG) << "GRPC FinishRequest grpc 2 "; // -AL- TEMP
     return status;
   }
 
   ::grpc::Status FinishRequest(const arrow::Status& status) {
+    ARROW_LOG(DEBUG) << "GRPC FinishRequest arrow 1 "; // -AL- TEMP
     for (const auto& instance : middleware_) {
+      ARROW_LOG(DEBUG) << "GRPC FinishRequest arrow 2 loop "; // -AL- TEMP
       instance->CallCompleted(status);
+      ARROW_LOG(DEBUG) << "GRPC FinishRequest  arrow 3 loop "; // -AL- TEMP
     }
-
+ARROW_LOG(DEBUG) << "GRPC FinishRequest arrow 4 "; // -AL- TEMP
     // Set custom headers to map the exact Arrow status for clients
     // who want it.
     return ToGrpcStatus(status, context_);
