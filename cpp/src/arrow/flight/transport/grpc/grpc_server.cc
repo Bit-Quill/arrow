@@ -85,11 +85,16 @@ class GrpcServerAuthReader : public ServerAuthReader {
       : stream_(stream) {}
 
   Status Read(std::string* token) override {
+    ARROW_LOG(DEBUG) << "GRPC Server - Read 1"; // -AL- TEMP
     pb::HandshakeRequest request;
+    ARROW_LOG(DEBUG) << "GRPC Server - Read 2"; // -AL- TEMP
     if (stream_->Read(&request)) {
+      ARROW_LOG(DEBUG) << "GRPC Server - Read 3"; // -AL- TEMP
       *token = std::move(*request.mutable_payload());
+      ARROW_LOG(DEBUG) << "GRPC Server - Read 4"; // -AL- TEMP
       return Status::OK();
     }
+    ARROW_LOG(DEBUG) << "GRPC Server - Read 5"; // -AL- TEMP
     return Status::IOError("Stream is closed.");
   }
 

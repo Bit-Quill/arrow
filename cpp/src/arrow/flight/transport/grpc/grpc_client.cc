@@ -230,7 +230,7 @@ class GrpcClientAuthSender : public ClientAuthSender {
     ARROW_LOG(DEBUG) << "GrpcClientAuthSender::Write 2";  // -AL- TEMP
     response.set_payload(token);
     ARROW_LOG(DEBUG) << "GrpcClientAuthSender::Write 3";  // -AL- TEMP
-    if (stream_->Write(response)) { // -AL- we don't reach line 4. so code breaks here.
+    if (stream_->Write(response)) { // -al- code no lnger randomly break here after server waits for client
       ARROW_LOG(DEBUG) << "GrpcClientAuthSender::Write 4";  // -AL- TEMP
       return Status::OK();
     }
@@ -255,7 +255,8 @@ class GrpcClientAuthReader : public ClientAuthReader {
     ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read START - stream=" << stream_; // -AL- TEMP
     pb::HandshakeResponse request;
     ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read 1";  // -AL- TEMP
-    if (stream_->Read(&request)) { // -AL- location of segfault after server waits for client auth
+    if (stream_->Read(&request)) { // -AL- previous location of segfault after server waits for client auth, 
+      // -AL- since I am no longer calling `Read` on the client side, this function is not hit.
       ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read - stream_ is null!"; // -AL- TEMP
       *token = std::move(*request.mutable_payload());
       ARROW_LOG(DEBUG) << "GrpcServerAuthReader::Read 2";  // -AL- TEMP

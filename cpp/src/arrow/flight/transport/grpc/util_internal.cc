@@ -31,6 +31,8 @@
 #include "arrow/util/string.h"
 #include "arrow/util/string_util.h"
 
+#include "arrow/util/logging.h" // -AL- TEMP
+
 namespace arrow {
 
 using internal::ToChars;
@@ -313,21 +315,34 @@ static ::grpc::Status ToRawGrpcStatus(const Status& arrow_status) {
 /// Convert an Arrow status to a gRPC status, and add extra headers to
 /// the response to encode the original Arrow status.
 ::grpc::Status ToGrpcStatus(const Status& arrow_status, ::grpc::ServerContext* ctx) {
+  ARROW_LOG(DEBUG) << "ToGrpcStatus 1 "; // -AL- TEMP
   ::grpc::Status status = ToRawGrpcStatus(arrow_status);
+  ARROW_LOG(DEBUG) << "ToGrpcStatus 2 "; // -AL- TEMP
   if (!status.ok() && ctx) {
+    ARROW_LOG(DEBUG) << "ToGrpcStatus 3 "; // -AL- TEMP
     const std::string code = ToChars(static_cast<int>(arrow_status.code()));
+    ARROW_LOG(DEBUG) << "ToGrpcStatus 4 "; // -AL- TEMP
     ctx->AddTrailingMetadata(kGrpcStatusCodeHeader, code);
+    ARROW_LOG(DEBUG) << "ToGrpcStatus 5 "; // -AL- TEMP
     ctx->AddTrailingMetadata(kGrpcStatusMessageHeader, arrow_status.message());
+    ARROW_LOG(DEBUG) << "ToGrpcStatus 6 "; // -AL- TEMP
     if (arrow_status.detail()) {
+      ARROW_LOG(DEBUG) << "ToGrpcStatus 7 "; // -AL- TEMP
       const std::string detail_string = arrow_status.detail()->ToString();
+      ARROW_LOG(DEBUG) << "ToGrpcStatus 8 "; // -AL- TEMP
       ctx->AddTrailingMetadata(kGrpcStatusDetailHeader, detail_string);
+      ARROW_LOG(DEBUG) << "ToGrpcStatus 9 "; // -AL- TEMP
     }
+    ARROW_LOG(DEBUG) << "ToGrpcStatus 10 "; // -AL- TEMP
     auto fsd = FlightStatusDetail::UnwrapStatus(arrow_status);
+    ARROW_LOG(DEBUG) << "ToGrpcStatus 11 "; // -AL- TEMP
     if (fsd && !fsd->extra_info().empty()) {
+      ARROW_LOG(DEBUG) << "ToGrpcStatus 12 "; // -AL- TEMP
       ctx->AddTrailingMetadata(kBinaryErrorDetailsKey, fsd->extra_info());
+      ARROW_LOG(DEBUG) << "ToGrpcStatus 13 "; // -AL- TEMP
     }
   }
-
+ARROW_LOG(DEBUG) << "ToGrpcStatus 14 "; // -AL- TEMP
   return status;
 }
 
