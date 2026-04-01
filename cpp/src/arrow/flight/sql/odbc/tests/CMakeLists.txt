@@ -65,6 +65,12 @@ else()
   # Unix
   list(APPEND ARROW_FLIGHT_SQL_ODBC_TEST_STATIC_LINK_LIBS
        ${ARROW_FLIGHT_SQL_ODBC_TEST_LIBS} ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS})
+  
+  if(NOT APPLE)
+    # Explicitly link to boost on Linux // -AL- trying to make `ARROW_TEST_LINKAGE=static` work.
+    list(APPEND ARROW_FLIGHT_SQL_ODBC_TEST_STATIC_LINK_LIBS arrow_odbc_spi_impl Boost::headers ${ARROW_PROTOBUF_LIBPROTOBUF})
+  endif()
+  
 endif()
 
 message(status "-AL- ARROW_FLIGHT_SQL_ODBC_TEST_EXTRA_LINK_LIBS: ${ARROW_FLIGHT_SQL_ODBC_TEST_EXTRA_LINK_LIBS}")
