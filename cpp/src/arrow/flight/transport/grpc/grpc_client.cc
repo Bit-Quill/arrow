@@ -1091,11 +1091,14 @@ class GrpcClientImpl : public internal::ClientTransport {
     // wants to read and drain the read side.
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 10"; // -AL- TEMP  
     pb::HandshakeResponse response;
+   // std::string response;
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 11"; // -AL- TEMP  
     // -AL- if I return `OK` directly without running `outgoing->Write(std::string(" "));`,
     // The test segfaults here instead. On macOS the loop is never entered too.
+    // stream->Read invokes server handshake.
     while (stream->Read(&response)) {
       ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal while loop - 12"; // -AL- TEMP  
+     // ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal - server_response: " << server_response;
     }
     ARROW_LOG(DEBUG) << "GRPC Client - AuthenticateInternal 13"; // -AL- TEMP  
     RETURN_NOT_OK(FromGrpcStatus(stream->Finish(), &rpc.context));

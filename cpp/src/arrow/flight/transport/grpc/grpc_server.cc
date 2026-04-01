@@ -41,6 +41,8 @@
 #include "arrow/util/logging.h"
 #include "arrow/util/uri.h"
 
+#include "arrow/util/logging.h" // -AL- TEMP
+
 namespace arrow {
 namespace flight {
 namespace transport {
@@ -100,11 +102,16 @@ class GrpcServerAuthSender : public ServerAuthSender {
       : stream_(stream) {}
 
   Status Write(const std::string& token) override {
+    ARROW_LOG(DEBUG) << "GRPC Server - Write 1, token: " << token; // -AL- TEMP
     pb::HandshakeResponse response;
+    ARROW_LOG(DEBUG) << "GRPC Server - Write 2"; // -AL- TEMP
     response.set_payload(token);
+    ARROW_LOG(DEBUG) << "GRPC Server - Write 3"; // -AL- TEMP
     if (stream_->Write(response)) {
+      ARROW_LOG(DEBUG) << "GRPC Server - Write 4"; // -AL- TEMP
       return Status::OK();
     }
+    ARROW_LOG(DEBUG) << "GRPC Server - Write 5"; // -AL- TEMP
     return Status::IOError("Stream was closed.");
   }
 
@@ -294,29 +301,47 @@ class GrpcServiceHandler final : public FlightService::Service {
   ::grpc::Status CheckAuth(const FlightMethod& method, ServerContext* context,
                            GrpcServerCallContext& flight_context,
                            bool skip_headers = false) {
+    ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 1"; // -AL- TEMP                          
     if (!auth_handler_) {
+      ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 2"; // -AL- TEMP  
       const auto auth_context = context->auth_context();
+      ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 3"; // -AL- TEMP  
       if (auth_context && auth_context->IsPeerAuthenticated()) {
+        ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 4"; // -AL- TEMP  
         auto peer_identity = auth_context->GetPeerIdentity();
+        ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 5"; // -AL- TEMP  
         flight_context.peer_identity_ =
             peer_identity.empty()
                 ? ""
                 : std::string(peer_identity.front().begin(), peer_identity.front().end());
+        ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 6"; // -AL- TEMP          
       } else {
+        ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 7"; // -AL- TEMP  
         flight_context.peer_identity_ = "";
+        ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 8"; // -AL- TEMP  
       }
     } else {
+      ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 9"; // -AL- TEMP  
       const auto client_metadata = context->client_metadata();
+      ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 10"; // -AL- TEMP  
       const auto [auth_header, auth_header_end] =
           client_metadata.equal_range(kGrpcAuthHeader);
+          ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 11"; // -AL- TEMP  
       std::string token;
+      ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 12"; // -AL- TEMP  
       if (auth_header == auth_header_end) {
+        ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 13"; // -AL- TEMP  
         token = "";
+        ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 14"; // -AL- TEMP  
       } else {
+        ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 15"; // -AL- TEMP  
         token = std::string(auth_header->second.data(), auth_header->second.length());
+        ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 16"; // -AL- TEMP  
       }
+      ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 17"; // -AL- TEMP  
       GRPC_RETURN_NOT_OK(
           auth_handler_->IsValid(flight_context, token, &flight_context.peer_identity_));
+       ARROW_LOG(DEBUG) << "GRPC Server - CheckAuth 18"; // -AL- TEMP     
     }
 
     return MakeCallContext(method, context, flight_context);
@@ -373,10 +398,13 @@ class GrpcServiceHandler final : public FlightService::Service {
               ::grpc::StatusCode::UNIMPLEMENTED,
               "This service does not have an authentication mechanism enabled."));
     }
+    ARROW_LOG(DEBUG) << "GRPC Server - Handshake 1"; // -AL- TEMP  
     GrpcServerAuthSender outgoing{stream};
+    ARROW_LOG(DEBUG) << "GRPC Server - Handshake 2"; // -AL- TEMP  
     GrpcServerAuthReader incoming{stream};
+    ARROW_LOG(DEBUG) << "GRPC Server - Handshake 3"; // -AL- TEMP  
     RETURN_WITH_MIDDLEWARE(flight_context, auth_handler_->Authenticate(
-                                               flight_context, &outgoing, &incoming));
+                                               flight_context, &outgoing, &incoming));                                     
   }
 
   ::grpc::Status ListFlights(ServerContext* context, const pb::Criteria* request,
