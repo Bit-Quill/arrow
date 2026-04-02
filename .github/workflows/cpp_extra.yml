@@ -76,11 +76,13 @@ on:
   workflow_dispatch:
     inputs:
       odbc_release_step:
-        description: 'ODBC MSI release step'
+        description: 'Which ODBC release step to run'
         required: true
-        default: false
-        type: boolean
-
+        default: 'msi'
+        type: choice
+        options:
+          - dll
+          - msi
 concurrency:
   group: ${{ github.repository }}-${{ github.head_ref || github.sha }}-${{ github.workflow }}
   cancel-in-progress: true
@@ -578,9 +580,8 @@ jobs:
     runs-on: windows-2022
     if: >-
       ${{ 
-        startsWith(github.ref_name, 'apache-arrow-') && 
-        contains(github.ref_name, '-rc') && 
-        !inputs.odbc_release_step 
+        (startsWith(github.ref_name, 'apache-arrow-') && contains(github.ref_name, '-rc')) ||
+        inputs.odbc_upload == 'dll'
       }}
     timeout-minutes: 240
     permissions:
@@ -644,7 +645,7 @@ jobs:
     needs: check-labels
     name: ODBC Windows Build & Upload Unsigned MSI
     runs-on: windows-2022
-    if: inputs.odbc_release_step
+    if: inputs.odbc_release_step == 'msi'
     timeout-minutes: 240
     permissions:
       # Upload to GitHub Release
