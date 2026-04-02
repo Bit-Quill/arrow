@@ -75,8 +75,8 @@ on:
         0 0 * * *
   workflow_dispatch:
     inputs:
-      odbc_msi_upload:
-        description: 'ODBC Unsigned MSI Upload'
+      odbc_release_step:
+        description: 'ODBC MSI release step'
         required: true
         default: false
         type: boolean
@@ -580,7 +580,7 @@ jobs:
       ${{ 
         startsWith(github.ref_name, 'apache-arrow-') && 
         contains(github.ref_name, '-rc') && 
-        !inputs.odbc_msi_upload 
+        !inputs.odbc_release_step 
       }}
     timeout-minutes: 240
     permissions:
@@ -596,7 +596,7 @@ jobs:
         uses: ./.github/actions/odbc-windows
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Name Unsigned ODBC DLL
+      - name: Rename Unsigned ODBC DLL
         run: |
           Rename-Item `
             -Path build/cpp/${{ env.ARROW_BUILD_TYPE }}/arrow_flight_sql_odbc.dll `
@@ -642,9 +642,9 @@ jobs:
 
   odbc-msvc-upload-msi:
     needs: check-labels
-    name: ODBC Windows Upload Unsigned MSI
+    name: ODBC Windows Build & Upload Unsigned MSI
     runs-on: windows-2022
-    if: inputs.odbc_msi_upload
+    if: inputs.odbc_release_step
     timeout-minutes: 240
     permissions:
       # Upload to GitHub Release
