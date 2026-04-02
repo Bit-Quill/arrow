@@ -75,14 +75,11 @@ on:
         0 0 * * *
   workflow_dispatch:
     inputs:
-      odbc_upload:
-        description: 'ODBC Component Upload'
+      odbc_msi_upload:
+        description: 'ODBC Unsigned MSI Upload'
         required: true
-        default: 'dll'
-        type: choice
-        options:
-          - dll
-          - msi
+        default: false
+        type: boolean
 
 concurrency:
   group: ${{ github.repository }}-${{ github.head_ref || github.sha }}-${{ github.workflow }}
@@ -579,7 +576,12 @@ jobs:
     needs: check-labels
     name: ODBC Windows Upload Unsigned DLL
     runs-on: windows-2022
-    if: inputs.odbc_upload == 'dll'
+    if: >-
+      ${{ 
+        startsWith(github.ref_name, 'apache-arrow-') && 
+        contains(github.ref_name, '-rc') && 
+        !inputs.odbc_msi_upload 
+      }}
     timeout-minutes: 240
     permissions:
       packages: write
@@ -642,7 +644,7 @@ jobs:
     needs: check-labels
     name: ODBC Windows Upload Unsigned MSI
     runs-on: windows-2022
-    if: inputs.odbc_upload == 'msi'
+    if: inputs.odbc_msi_upload
     timeout-minutes: 240
     permissions:
       # Upload to GitHub Release
