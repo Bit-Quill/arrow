@@ -42,6 +42,7 @@ set(ARROW_FLIGHT_SQL_ODBC_TEST_SRCS
     # GH-46889: move protobuf_test_util to a more common location
     ../../../../engine/substrait/protobuf_test_util.cc)
 
+# GH-49652: TODO support static test linkage on macOS
 if(ARROW_TEST_LINKAGE STREQUAL "static")
   set(ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS arrow_flight_sql_odbc_static
                                            ${ARROW_TEST_STATIC_LINK_LIBS})
@@ -65,12 +66,13 @@ else()
   # Unix
   list(APPEND ARROW_FLIGHT_SQL_ODBC_TEST_STATIC_LINK_LIBS
        ${ARROW_FLIGHT_SQL_ODBC_TEST_LIBS} ${ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS})
-  
+
   if(NOT APPLE)
-    # Explicitly link to boost on Linux // -AL- trying to make `ARROW_TEST_LINKAGE=static` work.
-    list(APPEND ARROW_FLIGHT_SQL_ODBC_TEST_STATIC_LINK_LIBS arrow_odbc_spi_impl Boost::headers ${ARROW_PROTOBUF_LIBPROTOBUF})
+    # Links static dependencies on Linux to support ARROW_TEST_LINKAGE=static
+    list(APPEND ARROW_FLIGHT_SQL_ODBC_TEST_STATIC_LINK_LIBS arrow_odbc_spi_impl
+         ${ARROW_PROTOBUF_LIBPROTOBUF})
   endif()
-  
+
 endif()
 
 add_arrow_test(flight_sql_odbc_test

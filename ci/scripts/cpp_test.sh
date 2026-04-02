@@ -55,8 +55,7 @@ if ! type minio >/dev/null 2>&1; then
 fi
 case "$(uname)" in
   Linux)
-    # -AL- check CI output not segfault right away.
-    # exclude_tests+=("arrow-flight-sql-odbc-test")
+    exclude_tests+=("arrow-flight-sql-odbc-test")
     n_jobs=$(nproc)
     ;;
   Darwin)
