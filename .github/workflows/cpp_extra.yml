@@ -377,8 +377,9 @@ jobs:
         include:
           - image: ubuntu-cpp-odbc
             title: AMD64 Ubuntu
-          - image: debian-cpp-odbc
-            title: AMD64 Debian
+          # GH-49582: TODO Enable Debian build for ODBC
+          # - image: debian-cpp-odbc
+          #   title: AMD64 Debian
     env:
       ARCH: amd64
       ARCHERY_DEBUG: 1
