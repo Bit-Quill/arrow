@@ -55,7 +55,7 @@ if ! type minio >/dev/null 2>&1; then
 fi
 case "$(uname)" in
   Linux)
-    # exclude_tests+=("arrow-flight-sql-odbc-test") # -AL- todo revert after CI connects to remote.
+    exclude_tests+=("arrow-flight-sql-odbc-test")
     n_jobs=$(nproc)
     ;;
   Darwin)
