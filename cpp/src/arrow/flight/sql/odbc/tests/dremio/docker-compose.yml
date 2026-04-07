@@ -15,11 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# GH-48068 TODO: run remote ODBC tests on Linux
-# -AL- todo: move this file's content to `arrow/compose.yaml` after it is proven to work.
-# -AL- if move, the `networks:` top level section doesn't need duplication as we already have it in
-# `arrow/compose.yaml`
-
 networks:
   odbc_net:
     external: true

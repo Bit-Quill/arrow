@@ -206,6 +206,7 @@ volumes:
     name: ${ARCH}-ubuntu-${UBUNTU}-ccache
 
 networks:
+  # GH-48068 for Flight SQL ODBC Testing
   odbc_net:
     external: true
 
@@ -562,10 +563,7 @@ services:
       ARROW_DEPENDENCY_SOURCE: BUNDLED
       ARROW_DEPENDENCY_USE_SHARED: "OFF"
       ARROW_FLIGHT_SQL_ODBC: "ON"
-    # -AL- temp: test 32010 port is reachable.
-      # -AL- this variable will work after Linux ODBC tests are enabled.
       ARROW_FLIGHT_SQL_ODBC_CONN: "driver={Apache Arrow Flight SQL ODBC Driver};HOST=dremio_container;port=32010;pwd=admin2025;uid=admin;useEncryption=false;UseWideChar=true;"
-      # ARROW_FLIGHT_SQL_ODBC_CONN: "driver={Apache Arrow Flight SQL ODBC Driver};HOST=host.docker.internal;port=32010;pwd=admin2025;uid=admin;useEncryption=false;UseWideChar=true;"
       ARROW_GANDIVA: "OFF"
       ARROW_GCS: "OFF"
       ARROW_HDFS: "OFF"
@@ -576,34 +574,13 @@ services:
       # GH-49651 Link ODBC tests statically on Linux to fix segfault
       ARROW_TEST_LINKAGE: "static"
     # Register ODBC before running tests
-    # -AL- temp: test 32010 port is reachable.
     networks:
       - odbc_net
-    # -AL- nc -vz localhost 32010 did not work.
     command: >
       /bin/bash -c "
         /arrow/ci/scripts/cpp_build.sh /arrow /build &&
         sudo /arrow/cpp/src/arrow/flight/sql/odbc/install/unix/install_odbc.sh /usr/local/lib/libarrow_flight_sql_odbc.so &&
-        /arrow/ci/scripts/cpp_test.sh /arrow /build
-        "
-
-#-AL- tried locations
-# /arrow/build/cpp/release/arrow-flight-sql-odbc-test "--gtest_filter=*.*SQLDriverConn*"
-# /arrow/build/cpp/arrow-flight-sql-odbc-test "--gtest_filter=*.*SQLDriverConn*"
-
-# -AL- old commands
-# /bin/bash -c "
-#   /arrow/ci/scripts/cpp_build.sh /arrow /build &&
-#   sudo /arrow/cpp/src/arrow/flight/sql/odbc/install/unix/install_odbc.sh /usr/local/lib/libarrow_flight_sql_odbc.so &&
-#   /arrow/ci/scripts/cpp_test.sh /arrow /build &&
-#   apt-get install -y netcat-openbsd &&
-#   nc -vz host.docker.internal 32010 &&
-#   apt-get install -y unixodbc &&
-#   isql -k \"$ARROW_FLIGHT_SQL_ODBC_CONN\" <<EOF
-#   select 1;
-#   select * from \\\$scatch.ODBCTest;
-#   quit;
-#   EOF"
+        /arrow/ci/scripts/cpp_test.sh /arrow /build"
 
   ubuntu-cpp-minimal:
     # Arrow build with minimal components/dependencies
