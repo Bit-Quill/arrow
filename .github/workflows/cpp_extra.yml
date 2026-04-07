@@ -398,6 +398,10 @@ jobs:
         run: |
           docker compose -f cpp/src/arrow/flight/sql/odbc/tests/dremio/docker-compose.yml up -d
           cpp/src/arrow/flight/sql/odbc/tests/dremio/set_up_dremio_instance.sh
+      - name: Set Up Dremio Instance -AL- TEST TODO REMOVE LATER
+        run: |
+          docker ps
+          docker compose ps
       - name: Cache Docker Volumes
         uses: actions/cache@v5
         with:
@@ -410,6 +414,10 @@ jobs:
           python-version: 3
       - name: Setup Archery
         run: python3 -m pip install -e dev/archery[docker]
+      - name: Set Up Dremio Instance -AL- TEST TODO REMOVE LATER
+        run: |
+          docker ps
+          docker compose ps
       - name: Execute Docker Build
         env:
           ARCHERY_DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
