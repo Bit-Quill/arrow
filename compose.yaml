@@ -564,7 +564,7 @@ services:
       ARROW_FLIGHT_SQL_ODBC: "ON"
     # -AL- temp: test 32010 port is reachable.
       # -AL- this variable will work after Linux ODBC tests are enabled.
-      ARROW_FLIGHT_SQL_ODBC_CONN: "driver={Apache Arrow Flight SQL ODBC Driver};HOST=localhost;port=32010;pwd=admin2025;uid=admin;useEncryption=false;UseWideChar=true;"
+      ARROW_FLIGHT_SQL_ODBC_CONN: "driver={Apache Arrow Flight SQL ODBC Driver};HOST=dremio_container;port=32010;pwd=admin2025;uid=admin;useEncryption=false;UseWideChar=true;"
       # ARROW_FLIGHT_SQL_ODBC_CONN: "driver={Apache Arrow Flight SQL ODBC Driver};HOST=host.docker.internal;port=32010;pwd=admin2025;uid=admin;useEncryption=false;UseWideChar=true;"
       ARROW_GANDIVA: "OFF"
       ARROW_GCS: "OFF"
