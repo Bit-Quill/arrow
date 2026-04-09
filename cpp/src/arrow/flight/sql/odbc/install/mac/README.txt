@@ -1,4 +1,3 @@
-# -AL- check TODO items in here.
 Files are available in '/Library/ODBC/arrow-odbc' after installation.
 
 To setup a connection, you can use DSN to store your data source connection information.

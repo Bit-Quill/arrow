@@ -158,26 +158,35 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
         "${CMAKE_CURRENT_SOURCE_DIR}/install/windows/arrow-wix-banner.bmp")
   elseif(APPLE)
     # -AL- todo use Arrow Flight SQL values.
-    set(CPACK_PACKAGE_FILE_NAME "ArrowFlightSqlOdbcODBC-${CPACK_PACKAGE_VERSION_MAJOR}.${ODBC_PACKAGE_VERSION_MINOR}.${ODBC_PACKAGE_VERSION_PATCH}")
+    set(CPACK_PACKAGE_FILE_NAME
+        "ArrowFlightSqlOdbcODBC-${CPACK_PACKAGE_VERSION_MAJOR}.${ODBC_PACKAGE_VERSION_MINOR}.${ODBC_PACKAGE_VERSION_PATCH}"
+    )
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 
     # This script will be run once the Driver component has finished installing.
     
     set(CPACK_SET_DESTDIR ON)
-    set(CPACK_INSTALL_PREFIX "/Library")
+    set(CPACK_INSTALL_PREFIX "/Library/ODBC")
     # -AL- if ODBC is directly installed to `Library`, we don't need `postinstall` to do anything except register ODBC?
     # set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
-    set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc.sh")
+    set(CPACK_POSTFLIGHT_DRIVER_SCRIPT
+        "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc.sh")
 
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/README.txt")
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/Welcome.txt")
 
     # -AL- todo update values before pushing.
-    install(TARGETS arrow_flight_sql_odbc_shared DESTINATION "arrow-odbc/lib" COMPONENT "Driver")
+    install(TARGETS arrow_flight_sql_odbc_shared
+            DESTINATION "arrow-odbc/lib"
+            COMPONENT arrow_flight_sql_odbc)
 
-    # Install documentation files # -AL- todo update some sources. 
-    # install(FILES "${PROJECT_ROOT}/LICENSE.txt" DESTINATION "arrow-odbc/doc" COMPONENT "Docs") # -AL- todo update and point to arrow's license
-    install(FILES "${PROJECT_ROOT}/Connection-Options.md" DESTINATION "arrow-odbc/doc" COMPONENT "Docs")
+    # Install documentation files # -AL- todo update some sources.
+    install(FILES "${PROJECT_ROOT}/LICENSE.txt"
+            DESTINATION "arrow-odbc/doc"
+            COMPONENT "Docs")
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/Connection-Options.md"
+            DESTINATION "arrow-odbc/doc"
+            COMPONENT "Docs")
   endif()
 
   get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
@@ -195,7 +204,7 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   elseif(APPLE)
     set(CPACK_GENERATOR "productbuild")
   endif()
-  # GH-47876 TODO: create macOS Installer using cpack
+  # GH-47876 TODO: create macOS Installer using cpack # -AL- todo search for `47876` and delete related comments.
   # GH-47877 TODO: create Linux Installer using cpack
 
   # Load CPack after all CPACK* variables are set
@@ -204,4 +213,12 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
                       DISPLAY_NAME "ODBC library"
                       DESCRIPTION "Apache Arrow Flight SQL ODBC library bin, required to install"
                       REQUIRED)
+  if(UNIX)
+    # On macOS and Linux, provide connection string documentation since users need to manually enter DSN keys.
+    cpack_add_component(Docs
+                        DISPLAY_NAME "Documentation"
+                        DESCRIPTION "Documentation for Apache Arrow Flight SQL ODBC Driver"
+    )
+    list(APPEND CPACK_COMPONENTS_ALL Docs)
+  endif()
 endif()
