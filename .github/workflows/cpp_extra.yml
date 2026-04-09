@@ -533,7 +533,7 @@ jobs:
         if: matrix.build-type == 'release'
         shell: bash
         run: |
-            cd $(pwd)/build/cpp/release
+            cd $(pwd)/build/cpp
             make package
       - name: Upload ODBC PKG to the job
         if: matrix.build-type == 'release'

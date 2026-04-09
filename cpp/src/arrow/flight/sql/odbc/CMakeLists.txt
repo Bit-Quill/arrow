@@ -164,13 +164,14 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 
     # This script will be run once the Driver component has finished installing.
-    
+    # -AL- todo write script or reuse install_odbc_ini that registers ODBC
+
     set(CPACK_SET_DESTDIR ON)
     set(CPACK_INSTALL_PREFIX "/Library/ODBC")
     # -AL- if ODBC is directly installed to `Library`, we don't need `postinstall` to do anything except register ODBC?
     # set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
     set(CPACK_POSTFLIGHT_DRIVER_SCRIPT
-        "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc.sh")
+        "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc_ini.sh")
 
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/README.txt")
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/Welcome.txt")
@@ -180,13 +181,13 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
             DESTINATION "arrow-odbc/lib"
             COMPONENT arrow_flight_sql_odbc)
 
-    # Install documentation files # -AL- todo update some sources.
-    install(FILES "${PROJECT_ROOT}/LICENSE.txt"
+    # Install documentation files
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt"
             DESTINATION "arrow-odbc/doc"
-            COMPONENT "Docs")
+            COMPONENT Docs)
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/Connection-Options.md"
             DESTINATION "arrow-odbc/doc"
-            COMPONENT "Docs")
+            COMPONENT Docs)
   endif()
 
   get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
@@ -201,8 +202,12 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
     # Upgrade GUID is required to be unchanged for ODBC installer to upgrade
     set(CPACK_WIX_UPGRADE_GUID "DBF27A18-F8BF-423F-9E3A-957414D52C4B")
     set(CPACK_WIX_PRODUCT_GUID "279D087B-93B5-4DC3-BA69-BCF485022A26")
-  elseif(APPLE)
-    set(CPACK_GENERATOR "productbuild")
+  else()
+    # macOS and Linux
+    list(APPEND CPACK_COMPONENTS_ALL Docs)
+    if(APPLE)
+      set(CPACK_GENERATOR "productbuild")
+    endif()
   endif()
   # GH-47876 TODO: create macOS Installer using cpack # -AL- todo search for `47876` and delete related comments.
   # GH-47877 TODO: create Linux Installer using cpack
@@ -219,6 +224,5 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
                         DISPLAY_NAME "Documentation"
                         DESCRIPTION "Documentation for Apache Arrow Flight SQL ODBC Driver"
     )
-    list(APPEND CPACK_COMPONENTS_ALL Docs)
   endif()
 endif()
