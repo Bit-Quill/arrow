@@ -162,7 +162,12 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 
     # This script will be run once the Driver component has finished installing.
-    set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/install_odbc")
+    
+    set(CPACK_SET_DESTDIR ON)
+    set(CPACK_INSTALL_PREFIX "/Library")
+    # -AL- if ODBC is directly installed to `Library`, we don't need `postinstall` to do anything except register ODBC?
+    # set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
+    set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc.sh")
 
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/README.txt")
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/Welcome.txt")

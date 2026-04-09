@@ -17,10 +17,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# -AL- todo clean this comment.
 # GH-47876 TODO: create macOS ODBC Installer.
 # Script for installing macOS ODBC driver, to be used for macOS installer.
 # This script assumes ODBC driver is at 
 # /Library/ODBC/arrow-odbc/libarrow_flight_sql_odbc.dylib
+
+# -AL- this script should be run after macOS doest the installation.
 
 set -euo pipefail
 
