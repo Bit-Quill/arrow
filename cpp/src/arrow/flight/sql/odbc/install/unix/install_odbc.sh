@@ -19,6 +19,9 @@
 
 # Used by macOS ODBC installer script `install_odbc_ini.sh` and macOS ODBC testing
 
+# -AL- todo change this script to do "/Library" without `$HOME` for installer.
+# (maybe have `$HOME` for default ? or remove `$HOME` altogether?)
+
 set -euo pipefail
 
 # Admin privilege is needed to add ODBC driver registration
@@ -46,8 +49,8 @@ case "$(uname)" in
     ;;
   *)
     # macOS
-    USER_ODBCINST_FILE="$HOME/Library/ODBC/odbcinst.ini"
-    mkdir -p "$HOME"/Library/ODBC
+    USER_ODBCINST_FILE="/Library/ODBC/odbcinst.ini"
+    mkdir -p /Library/ODBC
     ;;
 esac
 

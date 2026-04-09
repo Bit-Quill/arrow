@@ -38,7 +38,7 @@ odbc_install_script="${source_dir}/../unix/install_odbc.sh"
 
 "$odbc_install_script" /Library/ODBC/arrow-odbc/libarrow_flight_sql_odbc.dylib
 
-USER_ODBC_FILE="$HOME/Library/ODBC/odbc.ini"
+USER_ODBC_FILE="/Library/ODBC/odbc.ini"
 DRIVER_NAME="Apache Arrow Flight SQL ODBC Driver"
 DSN_NAME="Apache Arrow Flight SQL ODBC DSN"
 
