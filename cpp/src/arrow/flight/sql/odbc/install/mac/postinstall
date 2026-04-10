@@ -17,26 +17,45 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# -AL- todo clean this comment.
-# GH-47876 TODO: create macOS ODBC Installer.
-# Script for installing macOS ODBC driver, to be used for macOS installer.
-# This script assumes ODBC driver is at 
-# /Library/ODBC/arrow-odbc/lib/libarrow_flight_sql_odbc.dylib
+ODBC_64BIT="/Library/ODBC/arrow-odbc/lib/libarrow_flight_sql_odbc.dylib"
 
-# -AL- this script should be run after macOS doest the installation.
+# GH-xxxxx: -AL-
+# macOS
+USER_ODBCINST_FILE="/Library/ODBC/odbcinst.ini"
+mkdir -p /Library/ODBC
 
-set -euo pipefail
+DRIVER_NAME="Apache Arrow Flight SQL ODBC Driver"
 
-if [ $EUID -ne 0 ]; then 
-    echo "Please run this script with sudo"
-    exit 1
+touch "$USER_ODBCINST_FILE"
+
+if grep -q "^\[$DRIVER_NAME\]" "$USER_ODBCINST_FILE"; then
+  echo "Driver [$DRIVER_NAME] already exists in odbcinst.ini"
+else
+  echo "Adding [$DRIVER_NAME] to odbcinst.ini..."
+  echo "
+[$DRIVER_NAME]
+Description=An ODBC Driver for Apache Arrow Flight SQL
+Driver=$ODBC_64BIT
+" >>"$USER_ODBCINST_FILE"
 fi
 
-source_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-odbc_install_script="${source_dir}/../unix/install_odbc.sh"
-
-"$odbc_install_script" /Library/ODBC/arrow-odbc/lib/libarrow_flight_sql_odbc.dylib
+# Check if [ODBC Drivers] section exists
+if grep -q '^\[ODBC Drivers\]' "$USER_ODBCINST_FILE"; then
+  # Section exists: check if driver entry exists
+  if ! grep -q "^${DRIVER_NAME}=" "$USER_ODBCINST_FILE"; then
+    # Driver entry does not exist, add under [ODBC Drivers]
+    sed -i '' "/^\[ODBC Drivers\]/a\\
+${DRIVER_NAME}=Installed
+" "$USER_ODBCINST_FILE"
+  fi
+else
+  # Section doesn't exist, append both section and driver entry at end
+  {
+    echo ""
+    echo "[ODBC Drivers]"
+    echo "${DRIVER_NAME}=Installed"
+  } >>"$USER_ODBCINST_FILE"
+fi
 
 USER_ODBC_FILE="/Library/ODBC/odbc.ini"
 DRIVER_NAME="Apache Arrow Flight SQL ODBC Driver"
@@ -85,4 +104,3 @@ else
     echo "${DSN_NAME}=${DRIVER_NAME}"
   } >> "$USER_ODBC_FILE"
 fi
-

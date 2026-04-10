@@ -170,8 +170,8 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
     set(CPACK_INSTALL_PREFIX "/Library/ODBC")
     # -AL- if ODBC is directly installed to `Library`, we don't need `postinstall` to do anything except register ODBC?
     # set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
-    set(CPACK_POSTFLIGHT_DRIVER_SCRIPT
-        "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc_ini.sh")
+    set(CPACK_POSTFLIGHT_ARROW_FLIGHT_SQL_ODBC_SCRIPT
+        "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
 
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/README.txt")
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/Welcome.txt")

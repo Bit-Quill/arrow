@@ -17,7 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Used by macOS ODBC installer script `install_odbc_ini.sh` and macOS ODBC testing
+# -AL- Used by macOS ODBC installer script `install_odbc_ini.sh` and macOS ODBC testing
 
 # -AL- todo change this script to do "/Library" without `$HOME` for installer.
 # (maybe have `$HOME` for default ? or remove `$HOME` altogether?)
