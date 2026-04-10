@@ -172,14 +172,22 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
     # set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
     set(CPACK_POSTFLIGHT_ARROW_FLIGHT_SQL_ODBC_SCRIPT
         "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
-
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/README.txt")
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/Welcome.txt")
-
-    # -AL- todo update values before pushing.
+    
+    # Install ODBC
     install(TARGETS arrow_flight_sql_odbc_shared
             DESTINATION "arrow-odbc/lib"
             COMPONENT arrow_flight_sql_odbc)
+
+    # Install temporary driver registration script
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc.sh"
+            DESTINATION "arrow-odbc/lib"
+            COMPONENT arrow_flight_sql_odbc
+            PERMISSIONS
+            OWNER_EXECUTE OWNER_WRITE OWNER_READ
+            GROUP_EXECUTE GROUP_READ
+            WORLD_EXECUTE WORLD_READ)
 
     # Install documentation files
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt"
