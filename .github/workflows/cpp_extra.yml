@@ -535,7 +535,7 @@ jobs:
         shell: bash
         run: |
             cd $(pwd)/build/cpp
-            make package
+            cpack
       - name: Upload ODBC PKG to the job
         if: matrix.build-type == 'release'
         uses: actions/upload-artifact@v7
