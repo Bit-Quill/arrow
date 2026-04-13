@@ -186,8 +186,18 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
             DESTINATION "${ODBC_INSTALL_DIR}"
             COMPONENT arrow_flight_sql_odbc)
 
-    # Install temporary driver registration script, removed after driver registration is complete
+    # Install temporary driver registration scripts, they will be removed after driver registration is complete
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc.sh"
+            DESTINATION "${ODBC_INSTALL_DIR}"
+            COMPONENT arrow_flight_sql_odbc
+            PERMISSIONS OWNER_EXECUTE
+                        OWNER_WRITE
+                        OWNER_READ
+                        GROUP_EXECUTE
+                        GROUP_READ
+                        WORLD_EXECUTE
+                        WORLD_READ)
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc_ini.sh"
             DESTINATION "${ODBC_INSTALL_DIR}"
             COMPONENT arrow_flight_sql_odbc
             PERMISSIONS OWNER_EXECUTE
