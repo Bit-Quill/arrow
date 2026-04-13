@@ -17,10 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# -AL- Used by macOS ODBC installer script `install_odbc_ini.sh` and macOS ODBC testing
-
-# -AL- todo change this script to do "/Library" without `$HOME` for installer.
-# (maybe have `$HOME` for default ? or remove `$HOME` altogether?)
+# Used by /Users/alinal/Documents/GitHub/FlightSQL/arrow/cpp/src/arrow/flight/sql/odbc/install/mac/postinstall
 
 set -euo pipefail
 

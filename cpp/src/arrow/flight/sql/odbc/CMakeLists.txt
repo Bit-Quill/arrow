@@ -129,7 +129,6 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Apache Arrow Flight SQL ODBC Driver")
   set(CPACK_PACKAGE_CONTACT "dev@arrow.apache.org")
 
-  # GH-47876 TODO: set up `arrow_flight_sql_odbc` component for macOS Installer
   # GH-47877 TODO: set up `arrow_flight_sql_odbc` component for Linux Installer
   if(WIN32)
     # Install ODBC and its Arrow dependencies
@@ -157,37 +156,35 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
     set(CPACK_WIX_UI_BANNER
         "${CMAKE_CURRENT_SOURCE_DIR}/install/windows/arrow-wix-banner.bmp")
   elseif(APPLE)
-    # -AL- todo use Arrow Flight SQL values.
     set(CPACK_PACKAGE_FILE_NAME
         "ArrowFlightSqlOdbcODBC-${CPACK_PACKAGE_VERSION_MAJOR}.${ODBC_PACKAGE_VERSION_MINOR}.${ODBC_PACKAGE_VERSION_PATCH}"
     )
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 
-    # This script will be run once the Driver component has finished installing.
-    # -AL- todo write script or reuse install_odbc_ini that registers ODBC
-
     set(CPACK_SET_DESTDIR ON)
     set(CPACK_INSTALL_PREFIX "/Library/ODBC")
-    # -AL- if ODBC is directly installed to `Library`, we don't need `postinstall` to do anything except register ODBC?
-    # set(CPACK_POSTFLIGHT_DRIVER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
+    # Register ODBC after install
     set(CPACK_POSTFLIGHT_ARROW_FLIGHT_SQL_ODBC_SCRIPT
         "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/README.txt")
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/Welcome.txt")
-    
+
     # Install ODBC
     install(TARGETS arrow_flight_sql_odbc_shared
             DESTINATION "arrow-odbc/lib"
             COMPONENT arrow_flight_sql_odbc)
 
-    # Install temporary driver registration script
+    # Install temporary driver registration script, removed after driver registration is complete
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc.sh"
             DESTINATION "arrow-odbc/lib"
             COMPONENT arrow_flight_sql_odbc
-            PERMISSIONS
-            OWNER_EXECUTE OWNER_WRITE OWNER_READ
-            GROUP_EXECUTE GROUP_READ
-            WORLD_EXECUTE WORLD_READ)
+            PERMISSIONS OWNER_EXECUTE
+                        OWNER_WRITE
+                        OWNER_READ
+                        GROUP_EXECUTE
+                        GROUP_READ
+                        WORLD_EXECUTE
+                        WORLD_READ)
 
     # Install documentation files
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt"
@@ -217,7 +214,6 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
       set(CPACK_GENERATOR "productbuild")
     endif()
   endif()
-  # GH-47876 TODO: create macOS Installer using cpack # -AL- todo search for `47876` and delete related comments.
   # GH-47877 TODO: create Linux Installer using cpack
 
   # Load CPack after all CPACK* variables are set

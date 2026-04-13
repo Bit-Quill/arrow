@@ -541,7 +541,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: flight-sql-odbc-pkg-installer-${{ matrix.architecture }}
-          path: build/cpp/release/ArrowFlightSqlOdbcODBC-*.pkg
+          path: build/cpp/ArrowFlightSqlOdbcODBC-*.pkg
           if-no-files-found: error
       - name: Register Flight SQL ODBC Driver
         run: |
