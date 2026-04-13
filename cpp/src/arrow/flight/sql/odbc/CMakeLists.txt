@@ -155,28 +155,40 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
 
     set(CPACK_WIX_UI_BANNER
         "${CMAKE_CURRENT_SOURCE_DIR}/install/windows/arrow-wix-banner.bmp")
-  elseif(APPLE)
-    set(CPACK_PACKAGE_FILE_NAME
-        "ArrowFlightSqlOdbcODBC-${CPACK_PACKAGE_VERSION_MAJOR}.${ODBC_PACKAGE_VERSION_MINOR}.${ODBC_PACKAGE_VERSION_PATCH}"
-    )
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
+  else()
+    if(APPLE)
+      set(CPACK_PACKAGE_FILE_NAME
+          "ArrowFlightSqlOdbcODBC-${CPACK_PACKAGE_VERSION_MAJOR}.${ODBC_PACKAGE_VERSION_MINOR}.${ODBC_PACKAGE_VERSION_PATCH}"
+      )
+      set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 
-    set(CPACK_SET_DESTDIR ON)
-    set(CPACK_INSTALL_PREFIX "/Library/ODBC")
-    # Register ODBC after install
-    set(CPACK_POSTFLIGHT_ARROW_FLIGHT_SQL_ODBC_SCRIPT
-        "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
-    set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/README.txt")
-    set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/Welcome.txt")
+      set(CPACK_SET_DESTDIR ON)
+      set(CPACK_INSTALL_PREFIX "/Library/ODBC")
+      # Register ODBC after install
+      set(CPACK_POSTFLIGHT_ARROW_FLIGHT_SQL_ODBC_SCRIPT
+          "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/postinstall")
+      set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/README.txt")
+      set(CPACK_RESOURCE_FILE_WELCOME
+          "${CMAKE_CURRENT_SOURCE_DIR}/install/mac/Welcome.txt")
+
+      set(ODBC_INSTALL_DIR "arrow-odbc/lib")
+      set(DOC_INSTALL_DIR "arrow-odbc/doc")
+    else()
+      # Linux
+      # GH-49595: TODO implement DEB installer
+      # GH-47977: TODO implement RPM installer
+      message(STATUS "ODBC_PACKAGE_FORMAT DEB not implemented, see GH-49595")
+      message(STATUS "ODBC_PACKAGE_FORMAT RPM not implemented, see GH-47977")
+    endif()
 
     # Install ODBC
     install(TARGETS arrow_flight_sql_odbc_shared
-            DESTINATION "arrow-odbc/lib"
+            DESTINATION "${ODBC_INSTALL_DIR}"
             COMPONENT arrow_flight_sql_odbc)
 
     # Install temporary driver registration script, removed after driver registration is complete
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/install/unix/install_odbc.sh"
-            DESTINATION "arrow-odbc/lib"
+            DESTINATION "${ODBC_INSTALL_DIR}"
             COMPONENT arrow_flight_sql_odbc
             PERMISSIONS OWNER_EXECUTE
                         OWNER_WRITE
@@ -188,10 +200,10 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
 
     # Install documentation files
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt"
-            DESTINATION "arrow-odbc/doc"
+            DESTINATION "${DOC_INSTALL_DIR}"
             COMPONENT Docs)
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/Connection-Options.md"
-            DESTINATION "arrow-odbc/doc"
+            DESTINATION "${DOC_INSTALL_DIR}"
             COMPONENT Docs)
   endif()
 
