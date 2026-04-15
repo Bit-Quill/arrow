@@ -350,7 +350,9 @@ repos:
           ?^cpp/build-support/update-thrift\.sh$|
           ?^cpp/examples/minimal_build/run\.sh$|
           ?^cpp/examples/tutorial_examples/run\.sh$|
+          ?^cpp/src/arrow/flight/sql/odbc/install/mac/postinstall$|
           ?^cpp/src/arrow/flight/sql/odbc/install/unix/install_odbc\.sh$|
+          ?^cpp/src/arrow/flight/sql/odbc/install/unix/install_odbc_ini\.sh$|
           ?^dev/release/05-binary-upload\.sh$|
           ?^dev/release/08-binary-verify\.sh$|
           ?^dev/release/binary-recover\.sh$|
