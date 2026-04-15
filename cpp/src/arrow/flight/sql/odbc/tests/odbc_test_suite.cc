@@ -26,6 +26,8 @@
 #include "arrow/flight/sql/odbc/odbc_impl/encoding_utils.h"
 #include "arrow/flight/sql/odbc/odbc_impl/odbc_connection.h"
 
+#include <iostream>
+
 namespace arrow::flight::sql::odbc {
 
 class MockServerEnvironment : public ::testing::Environment {
@@ -56,29 +58,41 @@ bool RunningRemoteTests() { return !remote_test_connect_str.empty(); }
 class OdbcTestEnvironment : public ::testing::Environment {
  public:
   void SetUp() override {
+    std::cout << "Setting up OdbcTestEnvironment" << std::endl;
     remote_test_connect_str = ODBCTestBase::GetConnectionString();
     if (RunningRemoteTests()) {
+      std::cout << "Connecting to remote ODBC V3" << std::endl;
       ODBCTestBase::Connect(remote_test_connect_str, remote_odbcv3_handles.env,
                             remote_odbcv3_handles.conn, SQL_OV_ODBC3);
+      std::cout << "Connecting to remote ODBC V2" << std::endl;
       ODBCTestBase::Connect(remote_test_connect_str, remote_odbcv2_handles.env,
                             remote_odbcv2_handles.conn, SQL_OV_ODBC2);
     }
 
     std::string mock_test_connect_str = ODBCMockTestBase::GetConnectionString();
+    std::cout << "Connecting to mock ODBC V3" << std::endl;
     ODBCMockTestBase::Connect(mock_test_connect_str, mock_odbcv3_handles.env,
                               mock_odbcv3_handles.conn, SQL_OV_ODBC3);
+    std::cout << "Connecting to mock ODBC V2" << std::endl;
     ODBCMockTestBase::Connect(mock_test_connect_str, mock_odbcv2_handles.env,
                               mock_odbcv2_handles.conn, SQL_OV_ODBC2);
+    std::cout << "Finished establishing 4 ODBC connections" << std::endl;
   }
 
   void TearDown() override {
+    std::cout << "Tearing Down OdbcTestEnvironment" << std::endl;
     if (RunningRemoteTests()) {
+      std::cout << "Disconnecting from remote ODBC V3" << std::endl;
       ODBCTestBase::Disconnect(remote_odbcv3_handles.env, remote_odbcv3_handles.conn);
+      std::cout << "Disconnecting from remote ODBC V2" << std::endl;
       ODBCTestBase::Disconnect(remote_odbcv2_handles.env, remote_odbcv2_handles.conn);
     }
 
+    std::cout << "Disconnecting from mock ODBC V3" << std::endl;
     ODBCTestBase::Disconnect(mock_odbcv3_handles.env, mock_odbcv3_handles.conn);
+    std::cout << "Disconnecting from mock ODBC V2" << std::endl;
     ODBCTestBase::Disconnect(mock_odbcv2_handles.env, mock_odbcv2_handles.conn);
+    std::cout << "Finished disconnecting from ODBC" << std::endl;
   }
 };
 
