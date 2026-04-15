@@ -58,19 +58,21 @@ static constexpr std::string_view kTestDsn = "Apache Arrow Flight SQL Test DSN";
 inline std::string remote_test_connect_str = "";
 
 struct OdbcHandles {
-  SQLHENV env = 0;
-  SQLHDBC conn = 0;
-  SQLHSTMT stmt = 0;
+  SQLHENV env = SQL_NULL_HENV;
+  SQLHDBC conn = SQL_NULL_HDBC;
+  SQLHSTMT stmt = SQL_NULL_HSTMT;
 };
 
-inline OdbcHandles mock_odbcv2_handles;
-inline OdbcHandles mock_odbcv3_handles;
 inline OdbcHandles remote_odbcv2_handles;
 inline OdbcHandles remote_odbcv3_handles;
+inline OdbcHandles remote_non_connection_handles;
+inline OdbcHandles mock_odbcv2_handles;
+inline OdbcHandles mock_odbcv3_handles;
+inline OdbcHandles mock_non_connection_handles;
 
-inline SQLHENV env = 0;
-inline SQLHDBC conn = 0;
-inline SQLHSTMT stmt = 0;
+inline SQLHENV env = SQL_NULL_HENV;
+inline SQLHDBC conn = SQL_NULL_HDBC;
+inline SQLHSTMT stmt = SQL_NULL_HSTMT;
 
 inline std::shared_ptr<arrow::flight::sql::example::SQLiteFlightSqlServer> mock_server;
 inline int mock_server_port = 0;
@@ -85,19 +87,19 @@ namespace arrow::flight::sql::odbc {
 class ODBCTestBase : public ::testing::Test {
  public:
   /// \brief Allocate environment and connection handles
-  static void AllocEnvConnHandles(SQLHENV& env, SQLHDBC& conn,
+  static void AllocEnvConnHandles(SQLHENV& env_handle, SQLHDBC& conn_handle,
                                   SQLINTEGER odbc_ver = SQL_OV_ODBC3);
   /// \brief Free environment and connection handles
-  static void FreeEnvConnHandles(SQLHENV& env, SQLHDBC& conn);
+  static void FreeEnvConnHandles(SQLHENV& env_handle, SQLHDBC& conn_handle);
   /// \brief Connect to Arrow Flight SQL server using connection string defined in
   /// environment variable "ARROW_FLIGHT_SQL_ODBC_CONN", allocate statement handle.
   /// Connects using ODBC Ver 3 by default
-  static void Connect(std::string connect_str, SQLHENV& env, SQLHDBC& conn,
+  static void Connect(std::string connect_str, SQLHENV& env_handle, SQLHDBC& conn_handle,
                       SQLINTEGER odbc_ver = SQL_OV_ODBC3);
   /// \brief Connect to Arrow Flight SQL server using connection string
-  static void ConnectWithString(std::string connect_str, SQLHDBC& conn);
+  static void ConnectWithString(std::string connect_str, SQLHDBC& conn_handle);
   /// \brief Disconnect from server
-  static void Disconnect(SQLHENV& env, SQLHDBC& conn);
+  static void Disconnect(SQLHENV& env_handle, SQLHDBC& conn_handle);
   /// \brief Get connection string from environment variable "ARROW_FLIGHT_SQL_ODBC_CONN"
   static std::string GetConnectionString();
   /// \brief Get invalid connection string based on connection string defined in

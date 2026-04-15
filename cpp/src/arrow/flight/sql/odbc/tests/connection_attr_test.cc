@@ -87,8 +87,8 @@ TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrEnlistInDtcUnsupported)
 }
 
 TYPED_TEST(ConnectionAttributeTest, TestSQLSetConnectAttrOdbcCursorsDMOnly) {
-  SQLHENV test_env = 0;
-  SQLHDBC test_conn = 0;
+  SQLHENV test_env = SQL_NULL_HENV;
+  SQLHDBC test_conn = SQL_NULL_HDBC;
   this->AllocEnvConnHandles(test_env, test_conn);
 
   // Verify DM-only attribute is settable via Driver Manager
