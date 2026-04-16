@@ -69,6 +69,7 @@ inline OdbcHandles remote_non_connection_handles;
 inline OdbcHandles mock_odbcv2_handles;
 inline OdbcHandles mock_odbcv3_handles;
 inline OdbcHandles mock_non_connection_handles;
+inline bool connected = false;
 
 inline SQLHENV env = SQL_NULL_HENV;
 inline SQLHDBC conn = SQL_NULL_HDBC;

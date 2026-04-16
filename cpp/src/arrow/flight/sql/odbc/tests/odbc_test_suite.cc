@@ -76,23 +76,38 @@ class OdbcTestEnvironment : public ::testing::Environment {
     std::cout << "Connecting to mock ODBC V2" << std::endl;
     ODBCMockTestBase::Connect(mock_test_connect_str, mock_odbcv2_handles.env,
                               mock_odbcv2_handles.conn, SQL_OV_ODBC2);
+
+    if (testing::Test::HasFatalFailure()) {
+      std::cout << "-AL- HasFatalFailure" << std::endl;
+      return;
+    } else {
+      std::cout << "-AL- HasFatalFailure returns false." << std::endl;
+    }
+
     std::cout << "Finished establishing 4 ODBC connections" << std::endl;
+
+    connected = true;
   }
 
   void TearDown() override {
     std::cout << "Tearing Down OdbcTestEnvironment" << std::endl;
-    if (RunningRemoteTests()) {
-      std::cout << "Disconnecting from remote ODBC V3" << std::endl;
-      ODBCTestBase::Disconnect(remote_odbcv3_handles.env, remote_odbcv3_handles.conn);
-      std::cout << "Disconnecting from remote ODBC V2" << std::endl;
-      ODBCTestBase::Disconnect(remote_odbcv2_handles.env, remote_odbcv2_handles.conn);
-    }
 
-    std::cout << "Disconnecting from mock ODBC V3" << std::endl;
-    ODBCTestBase::Disconnect(mock_odbcv3_handles.env, mock_odbcv3_handles.conn);
-    std::cout << "Disconnecting from mock ODBC V2" << std::endl;
-    ODBCTestBase::Disconnect(mock_odbcv2_handles.env, mock_odbcv2_handles.conn);
-    std::cout << "Finished disconnecting from ODBC" << std::endl;
+    if (connected) {
+      if (RunningRemoteTests()) {
+        std::cout << "Disconnecting from remote ODBC V3" << std::endl;
+        ODBCTestBase::Disconnect(remote_odbcv3_handles.env, remote_odbcv3_handles.conn);
+        std::cout << "Disconnecting from remote ODBC V2" << std::endl;
+        ODBCTestBase::Disconnect(remote_odbcv2_handles.env, remote_odbcv2_handles.conn);
+      }
+
+      std::cout << "Disconnecting from mock ODBC V3" << std::endl;
+      ODBCTestBase::Disconnect(mock_odbcv3_handles.env, mock_odbcv3_handles.conn);
+      std::cout << "Disconnecting from mock ODBC V2" << std::endl;
+      ODBCTestBase::Disconnect(mock_odbcv2_handles.env, mock_odbcv2_handles.conn);
+      std::cout << "Finished disconnecting from ODBC" << std::endl;
+
+      connected = false;
+    }
   }
 };
 
@@ -459,6 +474,8 @@ void FlightSQLOdbcEnvConnHandleMockTestBase::SetUpTestSuite() {
 }
 
 void FlightSQLOdbcEnvConnHandleMockTestBase::TearDownTestSuite() {
+  // -AL- maybe we should free stmt first? Though `FreeEnvConnHandles` is supposed to
+  // handle that too.
   FreeEnvConnHandles(mock_non_connection_handles.env, mock_non_connection_handles.conn);
 }
 
