@@ -42,6 +42,11 @@ set(ARROW_FLIGHT_SQL_ODBC_TEST_SRCS
     # GH-46889: move protobuf_test_util to a more common location
     ../../../../engine/substrait/protobuf_test_util.cc)
 
+# Resolve segmentation fault error on Windows platform due to Arrow Compute Library Initialization
+if(WIN32)
+  list(APPEND ARROW_FLIGHT_SQL_ODBC_TEST_SRCS ../../../../compute/test_env.cc)
+endif()
+
 # GH-49652: TODO support static test linkage on macOS
 if(ARROW_TEST_LINKAGE STREQUAL "static")
   set(ARROW_FLIGHT_SQL_ODBC_TEST_LINK_LIBS arrow_flight_sql_odbc_static
