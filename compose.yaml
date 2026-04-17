@@ -564,7 +564,6 @@ services:
       ARROW_DEPENDENCY_USE_SHARED: "OFF"
       ARROW_FLIGHT_SQL_ODBC: "ON"
       ARROW_FLIGHT_SQL_ODBC_CONN: "driver={Apache Arrow Flight SQL ODBC Driver};HOST=dremio_container;port=32010;pwd=admin2025;uid=admin;useEncryption=false;UseWideChar=true;"
-      ARROW_FLIGHT_SQL_ODBC_INSTALLER: "ON"
       ARROW_GANDIVA: "OFF"
       ARROW_GCS: "OFF"
       ARROW_HDFS: "OFF"
