@@ -161,13 +161,16 @@ target_link_libraries(arrow_odbc_spi_impl_cli arrow_odbc_spi_impl)
 
 # Unit tests
 
-# On Windows, dynamic linking ODBC is supported.
-# On unix systems, static linking ODBC is supported, thus the library linking is static.
+set(ODBC_SPI_IMPL_TEST_EXTRA_LINK_LIBS "")
+set(ODBC_SPI_IMPL_TEST_STATIC_LINK_LIBS "")
 if(WIN32)
-  set(ODBC_SPI_IMPL_TEST_LINK_LIBS arrow_flight_testing_shared)
+  # arrow_odbc_spi_impl is required on Windows due to dynamic linking
+  list(APPEND ODBC_SPI_IMPL_TEST_EXTRA_LINK_LIBS arrow_odbc_spi_impl
+       arrow_flight_testing_static)
 else()
-  # unix
-  set(ODBC_SPI_IMPL_TEST_LINK_LIBS arrow_flight_testing_static)
+  # Unix
+  list(APPEND ODBC_SPI_IMPL_TEST_STATIC_LINK_LIBS
+       arrow_odbc_spi_impl arrow_flight_testing_static)
 endif()
 
 add_arrow_test(odbc_spi_impl_test
@@ -187,5 +190,6 @@ add_arrow_test(odbc_spi_impl_test
                record_batch_transformer_test.cc
                util_test.cc
                EXTRA_LINK_LIBS
-               arrow_odbc_spi_impl
-               ${ODBC_SPI_IMPL_TEST_LINK_LIBS})
+               ${ODBC_SPI_IMPL_TEST_EXTRA_LINK_LIBS}
+               STATIC_LINK_LIBS
+               ${ODBC_SPI_IMPL_TEST_STATIC_LINK_LIBS})
