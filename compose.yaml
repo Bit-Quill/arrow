@@ -408,7 +408,7 @@ services:
       - ${DOCKER_VOLUME_PREFIX}ubuntu-ccache:/ccache:delegated
     command: *cpp-command
 
-  ubuntu-cpp-static:
+  ubuntu-cpp-static: &ubuntu-cpp-static-base
     # Usage:
     #   docker compose build ubuntu-cpp-static
     #   docker compose run --rm ubuntu-cpp-static
@@ -498,7 +498,8 @@ services:
 
   ubuntu-cpp-odbc:
     # Arrow Flight SQL ODBC build with BUNDLED dependencies with downloaded dependencies.
-    <<: *ubuntu-cpp-base
+    # <<: *ubuntu-cpp-base # -AL- try `ubuntu-cpp-static` instead.
+    <<: *ubuntu-cpp-static-base
     environment:
       <<: [*common, *ccache, *sccache, *cpp]
       ARROW_ACERO: "OFF"
