@@ -87,10 +87,16 @@ case "$(uname)" in
     n_jobs=${NPROC:-1}
     ;;
 esac
-if [ "${#exclude_tests[@]}" -gt 0 ]; then
-  IFS="|"
-  ctest_options+=(--exclude-regex "${exclude_tests[*]}")
-  unset IFS
+
+if [ "$ARROW_FLIGHT_SQL_ODBC" = "ON" ]; then
+  # Only run ODBC-related tests on ODBC CI pipelines
+  ctest_options+=(--tests-regex "arrow-flight-sql-odbc-test|arrow-odbc-spi-impl-test")
+else
+  if [ "${#exclude_tests[@]}" -gt 0 ]; then
+    IFS="|"
+    ctest_options+=(--exclude-regex "${exclude_tests[*]}")
+    unset IFS
+  fi
 fi
 
 if [ "${ARROW_EMSCRIPTEN:-OFF}" = "ON" ]; then
