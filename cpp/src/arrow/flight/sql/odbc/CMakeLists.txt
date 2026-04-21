@@ -178,13 +178,21 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
       # Linux
       set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
       if(${ODBC_PACKAGE_FORMAT} STREQUAL "DEB")
-        # GH-49595 TODO: implement DEB installer
-        message(STATUS "ODBC_PACKAGE_FORMAT DEB not implemented, see GH-49595")
+        # -AL- todo delete all `GH-49595` comments
+        # -AL- todo implement.
+
+        set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE amd64)
+        set(CPACK_GENERATOR DEB)
+        set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE
+            "${CMAKE_CURRENT_SOURCE_DIR}/install/linux/postinst")
+        set(CPACK_DEBIAN_FILE_NAME "${ODBC_UNIX_FILE_NAME}.deb")
+        set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${CPACK_PACKAGE_CONTACT}")
+        set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
       elseif(${ODBC_PACKAGE_FORMAT} STREQUAL "RPM")
         set(CPACK_RPM_PACKAGE_ARCHITECTURE x86_64)
         set(CPACK_GENERATOR RPM)
         set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE
-            "${CMAKE_CURRENT_SOURCE_DIR}/install/linux/rpm/postinstall")
+            "${CMAKE_CURRENT_SOURCE_DIR}/install/linux/postinst")
         set(CPACK_RPM_FILE_NAME "${ODBC_UNIX_FILE_NAME}.rpm")
         # Disable dependency check as ODBC embeds all third party dependencies
         set(CPACK_RPM_PACKAGE_AUTOREQPROV "no")
