@@ -136,15 +136,15 @@ if [ "${PHASE_SIGN_DLL}" -gt 0 ]; then
 fi
 
 if [ "${PHASE_BUILD_MSI}" -gt 0 ]; then
-  echo "[4/8 Triggering odbc_release_step in cpp_extra.yml workflow..."
-  gh workflow run cpp_extra.yml \
+  echo "[4/8] Triggering odbc_release_step in package_odbc.yml workflow..."
+  gh workflow run package_odbc.yml \
     --repo "${GITHUB_REPOSITORY}" \
     --ref "${tag}" \
     --field odbc_release_step=true
 
   echo "[5/8 Waiting for workflow to complete. This can take a very long time..."
   REPOSITORY="${GITHUB_REPOSITORY}" \
-    "${SOURCE_DIR}/utils-watch-gh-workflow.sh" "${tag}" cpp_extra.yml
+    "${SOURCE_DIR}/utils-watch-gh-workflow.sh" "${tag}" package_odbc.yml
 fi
 
 if [ "${PHASE_SIGN_MSI}" -gt 0 ]; then
