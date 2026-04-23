@@ -445,7 +445,7 @@ jobs:
         if: matrix.build-type == 'release'
         uses: actions/upload-artifact@v7
         with:
-          name: flight-sql-odbc-pkg-installer-${{ matrix.format }}
+          name: flight-sql-odbc-${{ matrix.format }}-installer
           path: build/cpp/ArrowFlightSqlOdbcODBC-*.${{ matrix.format }}
           if-no-files-found: error
 
