@@ -239,7 +239,7 @@ if(ARROW_FLIGHT_SQL_ODBC_INSTALLER)
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../../LICENSE.txt"
             DESTINATION "${DOC_INSTALL_DIR}"
             COMPONENT Docs)
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/Connection-Options.md"
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/connection-options.md"
             DESTINATION "${DOC_INSTALL_DIR}"
             COMPONENT Docs)
   endif()

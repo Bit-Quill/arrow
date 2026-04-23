@@ -445,7 +445,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: flight-sql-odbc-${{ matrix.format }}-installer
-          path: build/cpp/ArrowFlightSqlOdbcODBC-*.${{ matrix.format }}
+          path: build/cpp/ArrowFlightSqlOdbc-*.${{ matrix.format }}
           if-no-files-found: error
 
       - name: Docker Push
@@ -571,7 +571,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: flight-sql-odbc-pkg-installer-${{ matrix.architecture }}
-          path: build/cpp/ArrowFlightSqlOdbcODBC-*.pkg
+          path: build/cpp/ArrowFlightSqlOdbc-*.pkg
           if-no-files-found: error
       - name: Register Flight SQL ODBC Driver
         run: |
