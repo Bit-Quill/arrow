@@ -15,6 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# TEST COMMENT TO TRIGGER CI
+
 if(WIN32)
   if(MSVC_VERSION GREATER_EQUAL 1900)
     set(ODBCINST legacy_stdio_definitions odbccp32 shlwapi)
