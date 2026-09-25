@@ -25,6 +25,28 @@
   * Docker
   * Tools to build tar.gz for Apache Arrow C++ and GLib
 
+## How to speed up repeated builds
+
+Each build runs in a `docker run --rm` container, so by default anything
+written under `/build` inside the container (including the `ccache` cache
+used by the C++ build) is thrown away as soon as the build finishes.
+
+Set the `BUILD_DIR` environment variable to a persistent directory on the
+host to have it bind-mounted as `/build` instead:
+
+```bash
+export BUILD_DIR=~/.cache/arrow-linux-packages
+rake apt:build APT_TARGETS=debian-bookworm
+rake yum:build YUM_TARGETS=almalinux-9
+```
+
+The first build for a given target still compiles from scratch, but later
+builds reuse the `ccache` contents from `${BUILD_DIR}/<target>/ccache`, which
+significantly speeds up rebuilds after small source changes. `BUILD_DIR` is
+shared by both the `apt:build` and `yum:build` tasks; each target gets its
+own subdirectory under it, so it's safe to reuse the same `BUILD_DIR` across
+platforms.
+
 ## How to build .deb packages for all supported platforms
 
 ```bash
