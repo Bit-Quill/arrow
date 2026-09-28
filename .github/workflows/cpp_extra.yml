@@ -727,7 +727,7 @@ jobs:
             fi
           done
 
-          pkgutil --flatten expanded "${pkg_name}-universal.pkg"
+          pkgutil --flatten-full expanded "${pkg_name}-universal.pkg"
       - name: Upload universal ODBC PKG
         uses: actions/upload-artifact@v7
         with:
