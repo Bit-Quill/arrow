@@ -664,6 +664,13 @@ jobs:
           name: flight-sql-odbc-pkg-installer-${{ matrix.architecture }}
           path: build/cpp/ArrowFlightSQLODBC-*.pkg
           if-no-files-found: error
+      - name: Upload ODBC dylib to the job
+        if: matrix.build-type == 'release' && matrix.architecture == 'AMD64'
+        uses: actions/upload-artifact@v7
+        with:
+          name: flight-sql-odbc-dylib-${{ matrix.architecture }}
+          path: build/cpp/${{ matrix.build-type }}/libarrow_flight_sql_odbc.dylib
+          if-no-files-found: error
       - name: Register Flight SQL ODBC Driver
         run: |
           sudo cpp/src/arrow/flight/sql/odbc/install/unix/install_odbc.sh $(pwd)/build/cpp/${{ matrix.build-type }}/libarrow_flight_sql_odbc.dylib
@@ -677,6 +684,48 @@ jobs:
           sudo mkdir -p /Library/ODBC
           sudo chown -R $USER /Library/ODBC
           ci/scripts/cpp_test.sh $(pwd) $(pwd)/build
+
+  odbc-macos-universal:
+    needs: odbc-macos
+    if: needs.check-enabled.outputs.is_enabled == 'true'
+    name: ODBC universal macOS installer
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+      - name: Download ARM64 PKG
+        uses: actions/download-artifact@v8
+        with:
+          name: flight-sql-odbc-pkg-installer-ARM64
+          path: arm64-pkg
+      - name: Download AMD64 dylib
+        uses: actions/download-artifact@v8
+        with:
+          name: flight-sql-odbc-dylib-AMD64
+          path: amd64-dylib
+      - name: Build universal installer
+        run: |
+          set -euo pipefail
+
+          pkg_path="$(ls arm64-pkg/ArrowFlightSQLODBC-*.pkg)"
+          pkg_name="$(basename "${pkg_path}" .pkg)"
+
+          # Re-use the arm64 CPack-generated .pkg as-is (scripts, resources,
+          # component layout, identifiers) and only swap in a universal
+          # dylib, instead of reconfiguring/rebuilding CMake just to package.
+          pkgutil --expand-full "${pkg_path}" expanded
+
+          dylib_path="$(find expanded -name libarrow_flight_sql_odbc.dylib)"
+          lipo -create "${dylib_path}" amd64-dylib/libarrow_flight_sql_odbc.dylib \
+            -output "${dylib_path}"
+          lipo -archs "${dylib_path}"
+
+          pkgutil --flatten expanded "${pkg_name}-universal.pkg"
+      - name: Upload universal ODBC PKG
+        uses: actions/upload-artifact@v7
+        with:
+          name: flight-sql-odbc-pkg-installer-universal
+          path: ArrowFlightSQLODBC-*-universal.pkg
+          if-no-files-found: error
 
   odbc-msvc:
     needs: check-enabled
@@ -844,6 +893,7 @@ jobs:
       - msvc-arm64
       - odbc-linux
       - odbc-macos
+      - odbc-macos-universal
       - odbc-msvc
       - odbc-nightly
     uses: ./.github/workflows/report_ci.yml
