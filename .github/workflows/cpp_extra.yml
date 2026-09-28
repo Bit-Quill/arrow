@@ -717,7 +717,15 @@ jobs:
           dylib_path="$(find expanded -name libarrow_flight_sql_odbc.dylib)"
           lipo -create "${dylib_path}" amd64-dylib/libarrow_flight_sql_odbc.dylib \
             -output "${dylib_path}"
-          lipo -archs "${dylib_path}"
+
+          archs="$(lipo -archs "${dylib_path}")"
+          echo "Universal dylib architectures: ${archs}"
+          for arch in arm64 x86_64; do
+            if ! grep -qw "${arch}" <<< "${archs}"; then
+              echo "::error::Universal dylib is missing '${arch}' (got: ${archs})"
+              exit 1
+            fi
+          done
 
           pkgutil --flatten expanded "${pkg_name}-universal.pkg"
       - name: Upload universal ODBC PKG
