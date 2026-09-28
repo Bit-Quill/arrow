@@ -722,7 +722,7 @@ jobs:
           echo "Universal dylib architectures: ${archs}"
           for arch in arm64 x86_64; do
             if ! grep -qw "${arch}" <<< "${archs}"; then
-              echo "::error::Universal dylib is missing '${arch}' (got: ${archs})"
+              echo "Universal dylib is missing '${arch}' (got: ${archs})"
               exit 1
             fi
           done
@@ -734,6 +734,52 @@ jobs:
           name: flight-sql-odbc-pkg-installer-universal
           path: ArrowFlightSQLODBC-*-universal.pkg
           if-no-files-found: error
+
+  odbc-macos-universal-verify:
+    needs: odbc-macos-universal
+    if: needs.check-enabled.outputs.is_enabled == 'true'
+    name: ODBC universal installer verify ${{ matrix.architecture }} macOS ${{ matrix.macos-version }}
+    runs-on: macos-${{ matrix.macos-version }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: AMD64
+            macos-version: "15-intel"
+          - architecture: ARM64
+            macos-version: "14"
+    steps:
+      - name: Download universal PKG
+        uses: actions/download-artifact@v8
+        with:
+          name: flight-sql-odbc-pkg-installer-universal
+      - name: Install ODBC PKG
+        run: |
+          set -euo pipefail
+
+          pkg_path="$(ls ArrowFlightSQLODBC-*-universal.pkg)"
+          sudo installer -pkg "${pkg_path}" -target / -verbose
+      - name: Check ODBC dylib installation
+        run: |
+          set -euo pipefail
+
+          dylib="/Library/ODBC/arrow-odbc/lib/libarrow_flight_sql_odbc.dylib"
+
+          if [ ! -f "${dylib}" ]; then
+            echo "ODBC dylib not found at ${dylib}"
+            exit 1
+          fi
+          echo "Found ODBC dylib: ${dylib}"
+
+          local_arch="$(uname -m)"
+          archs="$(lipo -archs "${dylib}")"
+          echo "Local architecture: ${local_arch}"
+          echo "Installed dylib architectures: ${archs}"
+          if ! grep -qw "${local_arch}" <<< "${archs}"; then
+            echo "Installed ODBC dylib does not support local architecture '${local_arch}' (got: ${archs})"
+            exit 1
+          fi
 
   odbc-msvc:
     needs: check-enabled
@@ -902,6 +948,7 @@ jobs:
       - odbc-linux
       - odbc-macos
       - odbc-macos-universal
+      - odbc-macos-universal-verify
       - odbc-msvc
       - odbc-nightly
     uses: ./.github/workflows/report_ci.yml
