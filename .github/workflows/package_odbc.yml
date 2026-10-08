@@ -24,7 +24,7 @@ on:
   workflow_dispatch:
     inputs:
       odbc_release_step:
-        description: 'ODBC MSI release step'
+        description: 'ODBC MSI and macOS PKG release step'
         required: false
         default: false
         type: boolean
@@ -180,8 +180,12 @@ jobs:
             --clobber `
             Apache-Arrow-Flight-SQL-ODBC-*-win64.msi
 
-  odbc-macos-build:
-    name: ODBC Build macOS ${{ matrix.architecture }}
+  # The dylib must be signed (outside of CI) before it goes into the PKG, so
+  # the unsigned universal dylib and the ARM64 base PKG are uploaded first and
+  # the universal PKG is assembled in odbc-macos-upload-pkg after the signed
+  # universal dylib is available on the release.
+  odbc-macos-upload-dylib:
+    name: ODBC macOS Upload Unsigned ${{ matrix.architecture }} DYLIB
     runs-on: macos-${{ matrix.macos-version }}
     if: github.event_name == 'push'
     timeout-minutes: 120
@@ -189,8 +193,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { architecture: AMD64, macos-version: "15-intel" }
-          - { architecture: ARM64, macos-version: "14" }
+          - { architecture: AMD64, macos-version: "26-intel" }
+          - { architecture: ARM64, macos-version: "26" }
     env:
       ARROW_BUILD_TESTS: OFF
       ARROW_BUILD_TYPE: release
@@ -211,6 +215,14 @@ jobs:
         run: |
           brew bundle --file=cpp/Brewfile
 
+          # On ARM64, Bundled gRPC v1.76.0 doesn't compile with OpenSSL 4 yet,
+          # so build against OpenSSL 3 instead of Homebrew's default "openssl".
+          brew list openssl@3 > /dev/null 2>&1 || brew install openssl@3
+          # Don't uninstall OpenSSL 4 as other formulae (e.g. ccache)
+          # could link to it.
+          brew unlink openssl@4 || :
+          brew link --overwrite --force openssl@3
+
           # Use bundled RE2, Protobuf and Boost for static linking.
           brew uninstall grpc || : # gRPC depends on RE2
           brew uninstall grpc@1.54 || : # gRPC 1.54 may be installed too
@@ -222,7 +234,8 @@ jobs:
           export BUILD_WARNING_LEVEL=PRODUCTION
           LIBIODBC_DIR="$(brew --cellar libiodbc)/$(brew list --versions libiodbc | awk '{print $2}')"
           ODBC_INCLUDE_DIR=$LIBIODBC_DIR/include
-          export ARROW_CMAKE_ARGS="-DODBC_INCLUDE_DIR=$ODBC_INCLUDE_DIR"
+          # GH-54638: Force link OpenSSL 3 to build with gRPC v1.76.0
+          export ARROW_CMAKE_ARGS="-DODBC_INCLUDE_DIR=$ODBC_INCLUDE_DIR -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)"
           export CXXFLAGS="$CXXFLAGS -I$ODBC_INCLUDE_DIR"
           ci/scripts/cpp_build.sh $(pwd) $(pwd)/build
       - name: Generate macOS Installer
@@ -230,26 +243,84 @@ jobs:
         run: |
           cd build/cpp
           cpack
-      - name: Upload ARM64 ODBC PKG to the job
+      - name: Copy Unsigned ODBC DYLIB
+        run: |
+          # The unversioned name libarrow_flight_sql_odbc.dylib is a symlink to
+          # libarrow_flight_sql_odbc.<version>.dylib. Copy the real file, keeping
+          # its versioned name, so the upload doesn't hit a dangling symlink.
+          mkdir ${{ matrix.architecture }}-dylib
+          cp "$(realpath build/cpp/${{ env.ARROW_BUILD_TYPE }}/libarrow_flight_sql_odbc.dylib)" \
+            ${{ matrix.architecture }}-dylib/
+      - name: Rename ARM64 base ODBC PKG
+        if: matrix.architecture == 'ARM64'
+        run: |
+          pkg_path="$(ls build/cpp/ArrowFlightSQLODBC-*.pkg)"
+          mv "${pkg_path}" "$(basename "${pkg_path}" .pkg)_ARM64_base.pkg"
+      - name: Upload ODBC DYLIB to the job
+        uses: actions/upload-artifact@v7
+        with:
+          name: flight-sql-odbc-dylib-${{ matrix.architecture }}
+          path: ${{ matrix.architecture }}-dylib/libarrow_flight_sql_odbc.*.dylib
+          if-no-files-found: error
+      - name: Upload ARM64 base ODBC PKG to the job
         if: matrix.architecture == 'ARM64'
         uses: actions/upload-artifact@v7
         with:
-          name: flight-sql-odbc-pkg-installer-ARM64
-          path: build/cpp/ArrowFlightSQLODBC-*.pkg
+          name: flight-sql-odbc-pkg-base-ARM64
+          path: ArrowFlightSQLODBC-*_ARM64_base.pkg
           if-no-files-found: error
-      - name: Upload Intel ODBC dylib to the job
-        if: matrix.architecture == 'AMD64'
-        uses: actions/upload-artifact@v7
+
+  odbc-macos-universal-dylib:
+    needs: odbc-macos-upload-dylib
+    name: ODBC macOS Create Unsigned Universal DYLIB
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - name: Download ARM64 DYLIB
+        uses: actions/download-artifact@v8
+        with:
+          name: flight-sql-odbc-dylib-ARM64
+          path: arm64-dylib
+      - name: Download AMD64 DYLIB
+        uses: actions/download-artifact@v8
         with:
           name: flight-sql-odbc-dylib-AMD64
-          path: build/cpp/${{ env.ARROW_BUILD_TYPE }}/libarrow_flight_sql_odbc.dylib
+          path: amd64-dylib
+      - name: Create universal DYLIB
+        run: |
+          set -euo pipefail
+
+          arm64_dylib="$(ls arm64-dylib/libarrow_flight_sql_odbc.*.dylib)"
+          amd64_dylib="$(ls amd64-dylib/libarrow_flight_sql_odbc.*.dylib)"
+          dylib_name="$(basename "${arm64_dylib}")"
+          if [ "$(basename "${amd64_dylib}")" != "${dylib_name}" ]; then
+            echo "ARM64 and AMD64 DYLIB names differ: ${arm64_dylib} vs ${amd64_dylib}"
+            exit 1
+          fi
+
+          # Rename unsigned DYLIB 
+          mkdir universal-dylib
+          unsigned_path="universal-dylib/libarrow_flight_sql_odbc_unsigned.${dylib_name#libarrow_flight_sql_odbc.}"
+          lipo -create "${arm64_dylib}" "${amd64_dylib}" -output "${unsigned_path}"
+          unsigned_archs="$(lipo -archs "${unsigned_path}")"
+          echo "${unsigned_path}: ${unsigned_archs}"
+          for arch in arm64 x86_64; do
+            if ! grep -qw "${arch}" <<< "${unsigned_archs}"; then
+              echo "${unsigned_path} is missing '${arch}' (got: ${unsigned_archs})"
+              exit 1
+            fi
+          done
+      - name: Upload universal DYLIB to the job
+        uses: actions/upload-artifact@v7
+        with:
+          name: flight-sql-odbc-dylib-universal
+          path: universal-dylib/libarrow_flight_sql_odbc_unsigned.*.dylib
           if-no-files-found: error
 
   odbc-macos-release:
-    needs: odbc-macos-build
-    name: Upload Unsigned Universal macOS PKG to Release
-    runs-on: macos-14
-    timeout-minutes: 30
+    needs: odbc-macos-universal-dylib
+    name: Upload Unsigned ODBC DYLIB and Base PKG to Release
+    runs-on: ubuntu-latest
     permissions:
       # Upload to GitHub Release
       contents: write
@@ -260,41 +331,14 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
           submodules: recursive
-      - name: Download ARM64 PKG
+      - name: Download the universal DYLIB
         uses: actions/download-artifact@v8
         with:
-          name: flight-sql-odbc-pkg-installer-ARM64
-          path: arm64-pkg
-      - name: Download AMD64 dylib
+          name: flight-sql-odbc-dylib-universal
+      - name: Download the ARM64 base PKG
         uses: actions/download-artifact@v8
         with:
-          name: flight-sql-odbc-dylib-AMD64
-          path: amd64-dylib
-      - name: Build universal macOS installer
-        run: |
-          set -euo pipefail
-
-          pkg_path="$(ls arm64-pkg/ArrowFlightSQLODBC-*.pkg)"
-          pkg_name="$(basename "${pkg_path}" .pkg)"
-
-          # Use the ARM64 .pkg and swap in a universal ODBC dylib
-          # that works on ARM64 and AMD64.
-          pkgutil --expand-full "${pkg_path}" expanded
-
-          dylib_path="$(find expanded -name libarrow_flight_sql_odbc.dylib)"
-          lipo -create "${dylib_path}" amd64-dylib/libarrow_flight_sql_odbc.dylib \
-            -output "${dylib_path}"
-
-          dylib_archs="$(lipo -archs "${dylib_path}")"
-          echo "Universal dylib architectures: ${dylib_archs}"
-          for arch in arm64 x86_64; do
-            if ! grep -qw "${arch}" <<< "${dylib_archs}"; then
-              echo "Universal dylib is missing '${arch}' (got: ${dylib_archs})"
-              exit 1
-            fi
-          done
-
-          pkgutil --flatten-full expanded "${pkg_name}_unsigned.pkg"
+          name: flight-sql-odbc-pkg-base-ARM64
       - name: Wait for creating GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -307,5 +351,73 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${GITHUB_REF_NAME} \
+            --clobber \
+            libarrow_flight_sql_odbc_unsigned.*.dylib \
+            ArrowFlightSQLODBC-*_ARM64_base.pkg
+
+  # No rebuild is needed here: the ARM64 base PKG and the signed universal
+  # dylib are downloaded from the release and only repackaged.
+  odbc-macos-upload-pkg:
+    name: ODBC macOS Build & Upload Unsigned Universal PKG
+    runs-on: macos-26
+    if: inputs.odbc_release_step
+    timeout-minutes: 30
+    permissions:
+      # Upload to GitHub Release
+      contents: write
+    steps:
+      - name: Download ARM64 base PKG and signed universal ODBC DYLIB
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download ${GITHUB_REF_NAME} \
+            --repo ${{ github.repository }} \
+            --pattern 'ArrowFlightSQLODBC-*_ARM64_base.pkg' \
+            --pattern 'libarrow_flight_sql_odbc.*.dylib' \
+            --clobber
+      - name: Build universal macOS installer
+        run: |
+          set -euo pipefail
+
+          pkg_path="$(ls ArrowFlightSQLODBC-*_ARM64_base.pkg)"
+          pkg_name="$(basename "${pkg_path}" _ARM64_base.pkg)"
+
+          # Use the ARM64 .pkg and swap in the signed universal ODBC dylib.
+          pkgutil --expand-full "${pkg_path}" expanded
+
+          # The unversioned name libarrow_flight_sql_odbc.dylib is a symlink
+          # to the versioned dylib that the install name
+          # (@rpath/libarrow_flight_sql_odbc.<SOVERSION>.dylib) resolves to.
+          # Replace the real file so the symlinks stay intact.
+          symlink_path="$(find expanded -name libarrow_flight_sql_odbc.dylib)"
+          lib_dir="$(dirname "${symlink_path}")"
+          dylib_path="$(realpath "${symlink_path}")"
+          signed_dylib="$(ls libarrow_flight_sql_odbc.*.dylib)"
+          if [ "${signed_dylib}" != "$(basename "${dylib_path}")" ]; then
+            echo "Signed DYLIB ${signed_dylib} doesn't match PKG DYLIB $(basename "${dylib_path}")"
+            exit 1
+          fi
+          echo "Replacing ${dylib_path} (via ${symlink_path}) with ${signed_dylib}"
+          cp "${signed_dylib}" "${dylib_path}"
+
+          # Verify every dylib (including the symlinks) is universal before re-packaging.
+          for lib in "${lib_dir}"/libarrow_flight_sql_odbc*.dylib; do
+            dylib_archs="$(lipo -archs "${lib}")"
+            echo "${lib}: ${dylib_archs}"
+            for arch in arm64 x86_64; do
+              if ! grep -qw "${arch}" <<< "${dylib_archs}"; then
+                echo "${lib} is missing '${arch}' (got: ${dylib_archs})"
+                exit 1
+              fi
+            done
+          done
+
+          pkgutil --flatten-full expanded "${pkg_name}_unsigned.pkg"
+      - name: Upload the artifacts to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${GITHUB_REF_NAME} \
+            --repo ${{ github.repository }} \
             --clobber \
             ArrowFlightSQLODBC-*_unsigned.pkg
