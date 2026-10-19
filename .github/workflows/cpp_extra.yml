@@ -591,6 +591,13 @@ jobs:
         run: |
           brew bundle --file=cpp/Brewfile
 
+          # Bundled gRPC doesn't compile with OpenSSL 4 yet
+          # (X509_CRL_get_issuer() returns a const pointer), so build
+          # against OpenSSL 3 instead of Homebrew's default "openssl".
+          brew list openssl@3 > /dev/null 2>&1 || brew install openssl@3
+          brew unlink openssl@4 || :
+          brew link --overwrite --force openssl@3
+
           # We want to use bundled RE2 for static linking. If
           # Homebrew's RE2 is installed, its header file may be used.
           # We uninstall Homebrew's RE2 to ensure using bundled RE2.
