@@ -33,6 +33,10 @@ concurrency:
   group: ${{ github.repository }}-${{ github.head_ref || github.sha }}-${{ github.workflow }}
   cancel-in-progress: true
 
+env:
+  # TEMPORARY (test branch only): reuse an existing draft release.
+  RELEASE_TAG: apache-arrow-test1-27.0.0-rc8
+
 permissions:
   actions: read
   contents: read
@@ -114,13 +118,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           dev/release/utils-watch-gh-workflow.sh \
-            ${GITHUB_REF_NAME} \
+            ${RELEASE_TAG} \
             release_candidate.yml
       - name: Upload the artifacts to GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${GITHUB_REF_NAME} \
+          gh release upload ${RELEASE_TAG} \
             --clobber \
             arrow_flight_sql_odbc_unsigned.dll
 
@@ -145,13 +149,13 @@ jobs:
         run: |
           # List the assets first so a failure here fails the step instead of
           # being read as "no assets".
-          assets="$(gh release view "${GITHUB_REF_NAME}" \
+          assets="$(gh release view "${RELEASE_TAG}" \
             --repo ${{ github.repository }} \
             --json assets \
             --jq '.assets[].name')"
 
           # The tag is apache-arrow-<version>-rc<N>.
-          version="${GITHUB_REF_NAME#apache-arrow-}"
+          version="${RELEASE_TAG#apache-arrow-test1-}"
           version="${version%-rc*}"
 
           msi=false
@@ -191,7 +195,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download $env:GITHUB_REF_NAME `
+          gh release download $env:RELEASE_TAG `
           --pattern arrow_flight_sql_odbc.dll `
           --clobber
       - name: Build ODBC Windows
@@ -222,7 +226,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd build/cpp
-          gh release upload $env:GITHUB_REF_NAME `
+          gh release upload $env:RELEASE_TAG `
             --clobber `
             Apache-Arrow-Flight-SQL-ODBC-*-win64.msi
 
@@ -339,13 +343,13 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           dev/release/utils-watch-gh-workflow.sh \
-            ${GITHUB_REF_NAME} \
+            ${RELEASE_TAG} \
             release_candidate.yml
       - name: Upload the artifacts to GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${GITHUB_REF_NAME} \
+          gh release upload ${RELEASE_TAG} \
             --clobber \
             libarrow_flight_sql_odbc_unsigned.*.dylib
 
@@ -388,7 +392,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download ${GITHUB_REF_NAME} \
+          gh release download ${RELEASE_TAG} \
             --repo ${{ github.repository }} \
             --pattern 'libarrow_flight_sql_odbc.*.dylib' \
             --clobber
@@ -471,7 +475,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload ${GITHUB_REF_NAME} \
+          gh release upload ${RELEASE_TAG} \
             --repo ${{ github.repository }} \
             --clobber \
             universal/ArrowFlightSQLODBC-*.pkg
